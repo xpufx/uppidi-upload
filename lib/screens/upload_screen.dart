@@ -101,7 +101,7 @@ class _UploadScreenState extends State<UploadScreen> {
                     color: r.success ? Colors.green : Colors.red,
                   ),
                   title: Text(r.success ? 'Success' : 'Failed'),
-                  subtitle: Text(r.success ? r.url ?? '' : r.errorMessage ?? 'Unknown error'),
+                  subtitle: Text(r.success ? r.url ?? '' : '${r.errorMessage ?? 'Unknown error'} (Status: ${r.statusCode})'),
                 );
               },
             ),
