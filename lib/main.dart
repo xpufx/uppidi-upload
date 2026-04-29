@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:file_picker/file_picker.dart';
+
 import 'core/registry.dart';
 import 'l10n/app_localizations.dart';
+import 'screens/upload_screen.dart';
+import 'screens/upload_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: UppidiApp()));
@@ -33,9 +37,9 @@ class AdaptiveHomePage extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 600) {
-          return _MobileLayout(providers: ProviderRegistry.all);
+          return _MobileLayout();
         } else {
-          return _DesktopLayout(providers: ProviderRegistry.all);
+          return _DesktopLayout();
         }
       },
     );
@@ -43,14 +47,13 @@ class AdaptiveHomePage extends StatelessWidget {
 }
 
 class _MobileLayout extends StatelessWidget {
-  final List<dynamic> providers;
-  const _MobileLayout({required this.providers});
+  const _MobileLayout();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('uppidi')),
-      body: _ProviderList(providers: providers),
+      body: const UploadScreen(),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.cloud_upload), label: 'Upload'),
@@ -63,8 +66,7 @@ class _MobileLayout extends StatelessWidget {
 }
 
 class _DesktopLayout extends StatelessWidget {
-  final List<dynamic> providers;
-  const _DesktopLayout({required this.providers});
+  const _DesktopLayout();
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +84,7 @@ class _DesktopLayout extends StatelessWidget {
             ],
           ),
           const VerticalDivider(width: 1),
-          Expanded(child: _ProviderList(providers: providers)),
+          const Expanded(child: UploadScreen()),
         ],
       ),
     );
