@@ -7,7 +7,7 @@ class UploadResult {
   final int? statusCode;
   final DateTime completedAt;
 
-  const UploadResult({
+  UploadResult({
     required this.success,
     this.url,
     this.errorMessage,

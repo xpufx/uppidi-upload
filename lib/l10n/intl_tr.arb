@@ -1,0 +1,21 @@
+{
+  "appTitle": "uppidi",
+  "genericError": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.",
+  "errorSessionExpired": "Oturumunuzun süresi doldu. Lütfen Ayarlar'dan kimlik bilgilerinizi kontrol edin.",
+  "providerWebNotSupported": "Bu sağlayıcı web tarayıcısında doğrudan kullanılamaz. Ayarlardan deneysel proxy'yi etkinleştirin.",
+  "selfSignedCertWarning": "Güvensiz bağlantı modu sertifika doğrulamasını atlar. Bu seçeneği yalnızca güvenilen kendi barındırılan sunucular için etkinleştirin.",
+  "upload": "Yükle",
+  "uploading": "Yükleniyor...",
+  "uploadComplete": "Yükleme tamamlandı!",
+  "uploadFailed": "Yükleme başarısız",
+  "cancelUpload": "Yüklemeyi İptal Et",
+  "selectProvider": "Sağlayıcı Seç",
+  "settings": "Ayarlar",
+  "history": "Geçmiş",
+  "enableInsecure": "Güvensiz bağlantılara izin ver (kendi imzalı sertifikalar)",
+  "proxyUrl": "Proxy URL (CORS bypass)",
+  "noProviders": "Hiç sağlayıcı yapılandırılmamış. Ayarlardan bir tane ekleyin.",
+  "disclaimer": "{provider} hizmetine yükleme yapmak üzeresiniz. Bu hizmetle ilişkili değiliz.",
+  "ok": "Tamam",
+  "cancel": "İptal"
+}

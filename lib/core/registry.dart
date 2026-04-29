@@ -1,4 +1,4 @@
-import '../interfaces/uploader.dart';
+import './interfaces/uploader.dart';
 
 class ProviderRegistry {
   static final List<BaseUploader> all = [

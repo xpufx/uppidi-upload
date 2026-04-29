@@ -1,0 +1,11 @@
+flutter_gen:
+  output: lib/generated/
+  line_length: 80
+  integrations:
+    flutter_localizations:
+      enabled: true
+      arb_dir: lib/l10n
+      template_arb_file: intl_en.arb
+      output_localizations_file: l10n.dart
+      output_localizations_getter: localizationsDelegates
+      output_supported_locales: supportedLocales
