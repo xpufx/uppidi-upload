@@ -1,0 +1,35 @@
+name: uppidi
+description: Cross-platform Flutter media uploader with modular provider plugins
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.16.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.4.8
+  hive_flutter: ^1.1.0
+  dio: ^5.4.0
+  flutter_secure_storage: ^9.0.0
+  flutter_localizations:
+    sdk: flutter
+  photo_manager: ^3.0.0
+  file_picker: ^8.0.0
+  background_downloader: ^8.0.0
+  flutter_adaptive_scaffold: ^0.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_gen_runner: ^5.4.0
+  build_runner: ^2.4.0
+  hive_generator: ^2.0.0
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - lib/l10n/

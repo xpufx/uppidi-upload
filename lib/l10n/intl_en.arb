@@ -1,0 +1,21 @@
+{
+  "appTitle": "uppidi",
+  "genericError": "An unexpected error occurred. Please try again.",
+  "errorSessionExpired": "Your session has expired. Please check your credentials in Settings.",
+  "providerWebNotSupported": "This provider cannot be used directly in a web browser. Enable the experimental proxy in settings.",
+  "selfSignedCertWarning": "Insecure connection mode bypasses certificate validation. Only enable this for trusted self-hosted servers.",
+  "upload": "Upload",
+  "uploading": "Uploading...",
+  "uploadComplete": "Upload complete!",
+  "uploadFailed": "Upload failed",
+  "cancelUpload": "Cancel Upload",
+  "selectProvider": "Select Provider",
+  "settings": "Settings",
+  "history": "History",
+  "enableInsecure": "Allow insecure connections (self-signed certificates)",
+  "proxyUrl": "Proxy URL (CORS bypass)",
+  "noProviders": "No providers configured. Add one in Settings.",
+  "disclaimer": "You are about to upload to {provider}. We are not affiliated with that service.",
+  "ok": "OK",
+  "cancel": "Cancel"
+}
