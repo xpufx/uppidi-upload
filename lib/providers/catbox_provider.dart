@@ -23,7 +23,6 @@ class CatboxProvider implements BaseUploader {
   @override
   Map<String, String> get configLabels => {
         'userhash': 'User Hash (optional, leave empty for anonymous)',
-        'proxy_url': 'Proxy URL (optional, for blocked regions)',
       };
 
   @override
@@ -40,21 +39,7 @@ class CatboxProvider implements BaseUploader {
       receiveTimeout: const Duration(seconds: 30),
     ));
 
-    if (config.containsKey('proxy_url') && config['proxy_url']!.isNotEmpty) {
-      dio.httpClientAdapter = IOHttpClientAdapter(
-        createHttpClient: () {
-          final client = HttpClient();
-          client.findProxy = (uri) {
-            return 'PROXY ${config['proxy_url']!}';
-          };
-          if (allowInsecureConn) {
-            client.badCertificateCallback =
-                (X509Certificate cert, String host, int port) => true;
-          }
-          return client;
-        },
-      );
-    } else if (allowInsecureConn) {
+    if (allowInsecureConn) {
       dio.httpClientAdapter = IOHttpClientAdapter(
         createHttpClient: () {
           final client = HttpClient();
