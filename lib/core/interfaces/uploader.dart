@@ -6,7 +6,7 @@ import 'package:dio/dio.dart';
 import '../models/upload_request.dart';
 import '../models/upload_result.dart';
 
-typedef ProgressCallback = void Function(int sent, int total);
+typedef UploadProgressCallback = void Function(int sent, int total);
 
 abstract class BaseUploader {
   String get providerId;
