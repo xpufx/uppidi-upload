@@ -7,23 +7,21 @@ import '../core/interfaces/uploader.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
 
-class CatboxProvider implements BaseUploader {
+class HttpBinProvider implements BaseUploader {
   @override
-  String get providerId => 'catbox';
+  String get providerId => 'httpbin';
 
   @override
-  String get providerName => 'Catbox.moe';
+  String get providerName => 'HttpBin.org (Test)';
 
   @override
-  bool get supportsWeb => false;
+  bool get supportsWeb => true;
 
   @override
-  List<String> get requiredConfigKeys => ['userhash'];
+  List<String> get requiredConfigKeys => [];
 
   @override
-  Map<String, String> get configLabels => {
-        'userhash': 'User Hash (optional, leave empty for anonymous)',
-      };
+  Map<String, String> get configLabels => {};
 
   @override
   String? get proxyUrl => null;
@@ -34,7 +32,7 @@ class CatboxProvider implements BaseUploader {
     bool allowInsecureConn = false,
   }) async {
     final dio = Dio(BaseOptions(
-      baseUrl: 'http://127.0.0.1:8080',  // Point to local test server
+      baseUrl: 'https://httpbin.org',
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
     ));
@@ -60,12 +58,10 @@ class CatboxProvider implements BaseUploader {
     CancelToken? cancelToken,
   }) async {
     try {
-      final config = <String, String>{}; // TODO: Load from storage
-      final dio = await createHttpClient(config);
+      final dio = await createHttpClient({});
 
       final formData = FormData.fromMap({
-        'reqtype': 'fileupload',
-        'fileToUpload': MultipartFile.fromStream(
+        'file': MultipartFile.fromStream(
           () => request.dataStream,
           request.sizeInBytes,
           filename: request.fileName,
@@ -76,47 +72,35 @@ class CatboxProvider implements BaseUploader {
       });
 
       final response = await dio.post(
-        '/user/api.php',
+        '/post',
         data: formData,
         onSendProgress: onProgress,
         cancelToken: cancelToken,
       );
 
-      final responseStr = response.data.toString().trim();
-
-      if (responseStr.startsWith('https://')) {
+      // httpbin.org returns JSON with the posted data
+      if (response.statusCode == 200 && response.data is Map) {
+        final data = response.data as Map;
+        final origin = data['origin'] ?? 'unknown';
         return UploadResult(
           success: true,
-          url: responseStr,
+          url: 'https://httpbin.org/post (from $origin)',
           statusCode: response.statusCode,
         );
       } else {
         return UploadResult(
           success: false,
-          errorMessage: _mapError(responseStr),
+          errorMessage: 'Unexpected response: ${response.data}',
           statusCode: response.statusCode,
         );
       }
     } catch (e, stackTrace) {
-      // TODO: Remove print in production - use proper logging
-      print('Upload error: $e');
+      print('HttpBin upload error: $e');
       print('Stack trace: $stackTrace');
       return UploadResult(
         success: false,
-        errorMessage: 'Error: $e', // Show actual error in dev
+        errorMessage: 'Error: $e',
       );
     }
-  }
-
-  String _mapError(String error) {
-    final lower = error.toLowerCase();
-    if (lower.contains('file is too large') || lower.contains('too large')) {
-      return 'errorFileTooLarge';
-    } else if (lower.contains('invalid') || lower.contains('auth')) {
-      return 'errorSessionExpired';
-    } else if (lower.contains('cancelled') || lower.contains('cancel')) {
-      return 'uploadCancelled';
-    }
-    return 'genericError';
   }
 }
