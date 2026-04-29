@@ -5,7 +5,6 @@ import 'package:file_picker/file_picker.dart';
 import 'core/registry.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/upload_screen.dart';
-import 'screens/upload_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: UppidiApp()));
@@ -37,9 +36,9 @@ class AdaptiveHomePage extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 600) {
-          return _MobileLayout();
+          return const _MobileLayout();
         } else {
-          return _DesktopLayout();
+          return const _DesktopLayout();
         }
       },
     );
@@ -47,7 +46,7 @@ class AdaptiveHomePage extends StatelessWidget {
 }
 
 class _MobileLayout extends StatelessWidget {
-  const _MobileLayout();
+  const _MobileLayout({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +65,7 @@ class _MobileLayout extends StatelessWidget {
 }
 
 class _DesktopLayout extends StatelessWidget {
-  const _DesktopLayout();
+  const _DesktopLayout({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -87,31 +86,6 @@ class _DesktopLayout extends StatelessWidget {
           const Expanded(child: UploadScreen()),
         ],
       ),
-    );
-  }
-}
-
-class _ProviderList extends StatelessWidget {
-  final List<dynamic> providers;
-  const _ProviderList({required this.providers});
-
-  @override
-  Widget build(BuildContext context) {
-    if (providers.isEmpty) {
-      return const Center(child: Text('No providers configured'));
-    }
-    return ListView.builder(
-      itemCount: providers.length,
-      itemBuilder: (context, index) {
-        final provider = providers[index];
-        return ListTile(
-          title: Text(provider.providerName ?? ''),
-          subtitle: Text(provider.providerId ?? ''),
-          trailing: provider.supportsWeb
-              ? const Icon(Icons.check_circle, color: Colors.green)
-              : const Icon(Icons.warning, color: Colors.orange),
-        );
-      },
     );
   }
 }
