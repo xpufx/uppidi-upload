@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:file_picker/file_picker.dart';
 
-import 'core/registry.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/upload_screen.dart';
 
@@ -46,7 +44,7 @@ class AdaptiveHomePage extends StatelessWidget {
 }
 
 class _MobileLayout extends StatelessWidget {
-  const _MobileLayout({super.key});
+  const _MobileLayout();
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +63,7 @@ class _MobileLayout extends StatelessWidget {
 }
 
 class _DesktopLayout extends StatelessWidget {
-  const _DesktopLayout({super.key});
+  const _DesktopLayout();
 
   @override
   Widget build(BuildContext context) {

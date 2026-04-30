@@ -6,7 +6,7 @@ class FileUploadRequest {
 
   const FileUploadRequest({
     required this.fileName,
-    required this.mimeType,
+    this.mimeType,
     required this.sizeInBytes,
     required this.dataStream,
   });

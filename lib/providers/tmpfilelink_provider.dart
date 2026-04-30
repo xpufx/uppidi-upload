@@ -1,22 +1,19 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 
 import '../core/interfaces/uploader.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
 
-class HttpBinProvider implements BaseUploader {
+class TmpFileLinkProvider implements BaseUploader {
   @override
-  String get providerId => 'httpbin';
+  String get providerId => 'tmpfilelink';
 
   @override
-  String get providerName => 'HttpBin.org (Test)';
+  String get providerName => 'tmpfile.link';
 
   @override
-  bool get supportsWeb => true;
+  bool get supportsWeb => false;
 
   @override
   List<String> get requiredConfigKeys => [];
@@ -33,21 +30,10 @@ class HttpBinProvider implements BaseUploader {
     bool allowInsecureConn = false,
   }) async {
     final dio = Dio(BaseOptions(
-      baseUrl: 'https://httpbin.org',
+      baseUrl: 'https://tmpfile.link',
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
     ));
-
-    if (allowInsecureConn) {
-      dio.httpClientAdapter = IOHttpClientAdapter(
-        createHttpClient: () {
-          final client = HttpClient();
-          client.badCertificateCallback =
-              (X509Certificate cert, String host, int port) => true;
-          return client;
-        },
-      );
-    }
 
     return dio;
   }
@@ -61,6 +47,9 @@ class HttpBinProvider implements BaseUploader {
     try {
       final dio = await createHttpClient({});
 
+      debugPrint('[TmpFileLink] Uploading: ${request.fileName} (${request.sizeInBytes} bytes)');
+      debugPrint('[TmpFileLink] Endpoint: https://tmpfile.link/api/upload');
+
       final formData = FormData.fromMap({
         'file': MultipartFile.fromStream(
           () => request.dataStream,
@@ -73,31 +62,42 @@ class HttpBinProvider implements BaseUploader {
       });
 
       final response = await dio.post(
-        '/post',
+        '/api/upload',
         data: formData,
         onSendProgress: onProgress,
         cancelToken: cancelToken,
       );
 
-      // httpbin.org returns JSON with the posted data
-      if (response.statusCode == 200 && response.data is Map) {
-        final data = response.data as Map;
-        final origin = data['origin'] ?? 'unknown';
-        return UploadResult(
-          success: true,
-          url: 'https://httpbin.org/post (from $origin)',
-          statusCode: response.statusCode,
-        );
+      debugPrint('[TmpFileLink] Response status: ${response.statusCode}');
+      debugPrint('[TmpFileLink] Response data: ${response.data}');
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data as Map<String, dynamic>;
+        final downloadLink = data['downloadLink'] as String?;
+
+        if (downloadLink != null && downloadLink.isNotEmpty) {
+          return UploadResult(
+            success: true,
+            url: downloadLink,
+            statusCode: response.statusCode,
+          );
+        } else {
+          return UploadResult(
+            success: false,
+            errorMessage: 'No download link in response',
+            statusCode: response.statusCode,
+          );
+        }
       } else {
         return UploadResult(
           success: false,
-          errorMessage: 'Unexpected response: ${response.data}',
+          errorMessage: 'Unexpected response: ${response.statusCode}',
           statusCode: response.statusCode,
         );
       }
     } catch (e, stackTrace) {
-      debugPrint('HttpBin upload error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugPrint('[TmpFileLink] Upload error: $e');
+      debugPrint('[TmpFileLink] Stack trace: $stackTrace');
       return UploadResult(
         success: false,
         errorMessage: 'Error: $e',

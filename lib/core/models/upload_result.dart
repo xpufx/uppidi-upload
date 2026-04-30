@@ -1,5 +1,3 @@
-import 'dart:io';
-
 class UploadResult {
   final bool success;
   final String? url;

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
+import 'package:flutter/foundation.dart';
 
 import '../core/interfaces/uploader.dart';
 import '../core/models/upload_request.dart';
@@ -34,7 +35,7 @@ class CatboxProvider implements BaseUploader {
     bool allowInsecureConn = false,
   }) async {
     final dio = Dio(BaseOptions(
-      baseUrl: 'http://127.0.0.1:8080',  // Point to local test server
+      baseUrl: 'https://catbox.moe',
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
     ));
@@ -98,12 +99,11 @@ class CatboxProvider implements BaseUploader {
         );
       }
     } catch (e, stackTrace) {
-      // TODO: Remove print in production - use proper logging
-      print('Upload error: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Upload error: $e');
+      debugPrint('Stack trace: $stackTrace');
       return UploadResult(
         success: false,
-        errorMessage: 'Error: $e', // Show actual error in dev
+        errorMessage: 'Error: $e',
       );
     }
   }
