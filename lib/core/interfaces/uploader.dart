@@ -21,7 +21,7 @@ abstract class BaseUploader {
 
   Future<UploadResult> upload(
     FileUploadRequest request, {
-    ProgressCallback? onProgress,
+    UploadProgressCallback? onProgress,
     CancelToken? cancelToken,
   });
 }

@@ -19,6 +19,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your session has expired. Please check your credentials in Settings.';
 
   @override
+  String get errorFileTooLarge => 'The file is too large for this provider.';
+
+  @override
+  String get errorConnectionFailed =>
+      'Could not connect to the provider. It may be unreachable or blocked by your browser.';
+
+  @override
+  String get uploadCancelled => 'Upload cancelled.';
+
+  @override
   String get providerWebNotSupported =>
       'This provider cannot be used directly in a web browser. Enable the experimental proxy in settings.';
 
@@ -40,6 +50,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancelUpload => 'Cancel Upload';
+
+  @override
+  String get pickAndUpload => 'Pick & Upload';
+
+  @override
+  String get urlCopiedToClipboard => 'URL copied to clipboard';
 
   @override
   String get selectProvider => 'Select Provider';
@@ -64,6 +80,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String disclaimer(Object provider) {
     return 'You are about to upload to $provider. We are not affiliated with that service.';
   }
+
+  @override
+  String get success => 'Success';
+
+  @override
+  String get failed => 'Failed';
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get unknownError => 'Unknown error';
 
   @override
   String get ok => 'OK';

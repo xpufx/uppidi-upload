@@ -20,6 +20,16 @@ class AppLocalizationsTr extends AppLocalizations {
       'Oturumunuzun süresi doldu. Lütfen Ayarlar\'dan kimlik bilgilerinizi kontrol edin.';
 
   @override
+  String get errorFileTooLarge => 'Bu dosya bu sağlayıcı için çok büyük.';
+
+  @override
+  String get errorConnectionFailed =>
+      'Sağlayıcıya bağlanılamadı. Erişilemiyor olabilir veya tarayıcınız tarafından engellenmiş olabilir.';
+
+  @override
+  String get uploadCancelled => 'Yükleme iptal edildi.';
+
+  @override
   String get providerWebNotSupported =>
       'Bu sağlayıcı web tarayıcısında doğrudan kullanılamaz. Ayarlardan deneysel proxy\'yi etkinleştirin.';
 
@@ -41,6 +51,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get cancelUpload => 'Yüklemeyi İptal Et';
+
+  @override
+  String get pickAndUpload => 'Seç ve Yükle';
+
+  @override
+  String get urlCopiedToClipboard => 'URL panoya kopyalandı';
 
   @override
   String get selectProvider => 'Sağlayıcı Seç';
@@ -66,6 +82,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String disclaimer(Object provider) {
     return '$provider hizmetine yükleme yapmak üzeresiniz. Bu hizmetle ilişkili değiliz.';
   }
+
+  @override
+  String get success => 'Başarılı';
+
+  @override
+  String get failed => 'Başarısız';
+
+  @override
+  String get error => 'Hata';
+
+  @override
+  String get unknownError => 'Bilinmeyen hata';
 
   @override
   String get ok => 'Tamam';

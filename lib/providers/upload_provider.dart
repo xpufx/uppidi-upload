@@ -1,14 +1,14 @@
-import 'dart:async';
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/logging/log.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
+import '../core/platform/file_source.dart';
 import '../core/registry.dart';
+
+final _log = Log('UploadNotifier');
 
 class UploadState {
   final List<UploadResult> results;
@@ -30,17 +30,14 @@ class UploadState {
 
 class UploadNotifier extends Notifier<UploadState> {
   @override
-  UploadState build() {
-    return const UploadState();
-  }
+  UploadState build() => const UploadState();
 
   void setProvider(int index) {
-    if (index >= 0 && index < ProviderRegistry.all.length) {
-      state = UploadState(
-        results: state.results,
-        selectedProviderIndex: index,
-      );
-    }
+    if (index < 0 || index >= ProviderRegistry.all.length) return;
+    state = UploadState(
+      results: state.results,
+      selectedProviderIndex: index,
+    );
   }
 
   Future<void> pickAndUpload() async {
@@ -56,29 +53,26 @@ class UploadNotifier extends Notifier<UploadState> {
     }
 
     final provider = ProviderRegistry.all[state.selectedProviderIndex];
-    debugPrint('[UploadNotifier] Using provider: ${provider.providerName} (${provider.providerId})');
+    _log.info('Using provider: ${provider.providerName} (${provider.providerId})');
 
     final pickResult = await FilePicker.platform.pickFiles();
     if (pickResult == null || pickResult.files.isEmpty) return;
 
     final file = pickResult.files.first;
-    if (file.path == null) return;
 
-    final ioFile = File(file.path!);
-    final fileStream = ioFile.openRead();
-    final size = await ioFile.length();
-
-    final ext = file.extension;
-    final mimeType = ext != null ? _mimeTypeFromExtension(ext) : null;
-
-    debugPrint('[UploadNotifier] File: ${file.name}, size: $size, mime: $mimeType');
-
-    final request = FileUploadRequest(
-      fileName: file.name,
-      mimeType: mimeType,
-      sizeInBytes: size,
-      dataStream: fileStream,
-    );
+    final FileUploadRequest request;
+    try {
+      request = await createUploadRequest(file);
+      _log.info('File: ${file.name}, size: ${request.sizeInBytes}, mime: ${request.mimeType}');
+    } catch (e) {
+      _log.warn('Failed to read file: $e', error: e);
+      state = UploadState(
+        results: state.results,
+        lastError: 'Failed to read selected file',
+        selectedProviderIndex: state.selectedProviderIndex,
+      );
+      return;
+    }
 
     final cancelToken = CancelToken();
     state = UploadState(
@@ -103,7 +97,7 @@ class UploadNotifier extends Notifier<UploadState> {
         cancelToken: cancelToken,
       );
 
-      debugPrint('[UploadNotifier] Result: success=${result.success}, url=${result.url}, error=${result.errorMessage}');
+      _log.info('Result: success=${result.success}, url=${result.url}, error=${result.errorMessage}');
 
       state = UploadState(
         isUploading: false,
@@ -112,7 +106,7 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: state.selectedProviderIndex,
       );
     } catch (e) {
-      debugPrint('[UploadNotifier] Exception: $e');
+      _log.warn('Upload exception: $e', error: e);
       state = UploadState(
         isUploading: false,
         results: state.results,
@@ -120,11 +114,6 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: state.selectedProviderIndex,
       );
     }
-  }
-
-  String _mimeTypeFromExtension(String ext) {
-    final cleanExt = ext.startsWith('.') ? ext.substring(1) : ext;
-    return 'application/$cleanExt';
   }
 
   void cancelUpload() {
@@ -138,5 +127,5 @@ class UploadNotifier extends Notifier<UploadState> {
 }
 
 final uploadProvider = NotifierProvider<UploadNotifier, UploadState>(
-  () => UploadNotifier(),
+  UploadNotifier.new,
 );

@@ -1,14 +1,9 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
-import 'package:flutter/foundation.dart';
 
-import '../core/interfaces/uploader.dart';
-import '../core/models/upload_request.dart';
+import '../core/interfaces/base_http_provider.dart';
 import '../core/models/upload_result.dart';
 
-class CatboxProvider implements BaseUploader {
+class CatboxProvider extends BaseHttpProvider {
   @override
   String get providerId => 'catbox';
 
@@ -30,92 +25,43 @@ class CatboxProvider implements BaseUploader {
   String? get proxyUrl => null;
 
   @override
-  Future<Dio> createHttpClient(
-    Map<String, String> config, {
-    bool allowInsecureConn = false,
-  }) async {
-    final dio = Dio(BaseOptions(
-      baseUrl: 'https://catbox.moe',
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-    ));
-
-    if (allowInsecureConn) {
-      dio.httpClientAdapter = IOHttpClientAdapter(
-        createHttpClient: () {
-          final client = HttpClient();
-          client.badCertificateCallback =
-              (X509Certificate cert, String host, int port) => true;
-          return client;
-        },
-      );
-    }
-
-    return dio;
-  }
+  String get baseUrl => 'https://catbox.moe';
 
   @override
-  Future<UploadResult> upload(
-    FileUploadRequest request, {
-    UploadProgressCallback? onProgress,
-    CancelToken? cancelToken,
-  }) async {
-    try {
-      final config = <String, String>{}; // TODO: Load from storage
-      final dio = await createHttpClient(config);
+  String get uploadEndpoint => '/user/api.php';
 
-      final formData = FormData.fromMap({
-        'reqtype': 'fileupload',
-        'fileToUpload': MultipartFile.fromStream(
-          () => request.dataStream,
-          request.sizeInBytes,
-          filename: request.fileName,
-          contentType: request.mimeType != null
-              ? DioMediaType.parse(request.mimeType!)
-              : null,
-        ),
-      });
+  @override
+  String get fileFormFieldName => 'fileToUpload';
 
-      final response = await dio.post(
-        '/user/api.php',
-        data: formData,
-        onSendProgress: onProgress,
-        cancelToken: cancelToken,
-      );
+  @override
+  Map<String, String> get additionalFormFields => {'reqtype': 'fileupload'};
 
-      final responseStr = response.data.toString().trim();
+  @override
+  UploadResult parseResponse(Response response) {
+    final responseStr = response.data.toString().trim();
 
-      if (responseStr.startsWith('https://')) {
-        return UploadResult(
-          success: true,
-          url: responseStr,
-          statusCode: response.statusCode,
-        );
-      } else {
-        return UploadResult(
-          success: false,
-          errorMessage: _mapError(responseStr),
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e, stackTrace) {
-      debugPrint('Upload error: $e');
-      debugPrint('Stack trace: $stackTrace');
+    if (responseStr.startsWith('https://')) {
       return UploadResult(
-        success: false,
-        errorMessage: 'Error: $e',
+        success: true,
+        url: responseStr,
+        statusCode: response.statusCode,
       );
     }
+
+    return UploadResult(
+      success: false,
+      errorMessage: _mapCatboxError(responseStr),
+      statusCode: response.statusCode,
+    );
   }
 
-  String _mapError(String error) {
-    final lower = error.toLowerCase();
+  String _mapCatboxError(String response) {
+    final lower = response.toLowerCase();
     if (lower.contains('file is too large') || lower.contains('too large')) {
       return 'errorFileTooLarge';
-    } else if (lower.contains('invalid') || lower.contains('auth')) {
+    }
+    if (lower.contains('invalid') || lower.contains('auth')) {
       return 'errorSessionExpired';
-    } else if (lower.contains('cancelled') || lower.contains('cancel')) {
-      return 'uploadCancelled';
     }
     return 'genericError';
   }

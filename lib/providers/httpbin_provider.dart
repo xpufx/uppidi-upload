@@ -1,14 +1,9 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
-import 'package:flutter/foundation.dart';
 
-import '../core/interfaces/uploader.dart';
-import '../core/models/upload_request.dart';
+import '../core/interfaces/base_http_provider.dart';
 import '../core/models/upload_result.dart';
 
-class HttpBinProvider implements BaseUploader {
+class HttpBinProvider extends BaseHttpProvider {
   @override
   String get providerId => 'httpbin';
 
@@ -28,80 +23,30 @@ class HttpBinProvider implements BaseUploader {
   String? get proxyUrl => null;
 
   @override
-  Future<Dio> createHttpClient(
-    Map<String, String> config, {
-    bool allowInsecureConn = false,
-  }) async {
-    final dio = Dio(BaseOptions(
-      baseUrl: 'https://httpbin.org',
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-    ));
-
-    if (allowInsecureConn) {
-      dio.httpClientAdapter = IOHttpClientAdapter(
-        createHttpClient: () {
-          final client = HttpClient();
-          client.badCertificateCallback =
-              (X509Certificate cert, String host, int port) => true;
-          return client;
-        },
-      );
-    }
-
-    return dio;
-  }
+  String get baseUrl => 'https://httpbin.org';
 
   @override
-  Future<UploadResult> upload(
-    FileUploadRequest request, {
-    UploadProgressCallback? onProgress,
-    CancelToken? cancelToken,
-  }) async {
-    try {
-      final dio = await createHttpClient({});
+  String get uploadEndpoint => '/post';
 
-      final formData = FormData.fromMap({
-        'file': MultipartFile.fromStream(
-          () => request.dataStream,
-          request.sizeInBytes,
-          filename: request.fileName,
-          contentType: request.mimeType != null
-              ? DioMediaType.parse(request.mimeType!)
-              : null,
-        ),
-      });
+  @override
+  String get fileFormFieldName => 'file';
 
-      final response = await dio.post(
-        '/post',
-        data: formData,
-        onSendProgress: onProgress,
-        cancelToken: cancelToken,
-      );
-
-      // httpbin.org returns JSON with the posted data
-      if (response.statusCode == 200 && response.data is Map) {
-        final data = response.data as Map;
-        final origin = data['origin'] ?? 'unknown';
-        return UploadResult(
-          success: true,
-          url: 'https://httpbin.org/post (from $origin)',
-          statusCode: response.statusCode,
-        );
-      } else {
-        return UploadResult(
-          success: false,
-          errorMessage: 'Unexpected response: ${response.data}',
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e, stackTrace) {
-      debugPrint('HttpBin upload error: $e');
-      debugPrint('Stack trace: $stackTrace');
+  @override
+  UploadResult parseResponse(Response response) {
+    if (response.statusCode == 200 && response.data is Map) {
+      final data = response.data as Map;
+      final origin = data['origin'] ?? 'unknown';
       return UploadResult(
-        success: false,
-        errorMessage: 'Error: $e',
+        success: true,
+        url: 'https://httpbin.org/post (from $origin)',
+        statusCode: response.statusCode,
       );
     }
+
+    return UploadResult(
+      success: false,
+      errorMessage: 'Unexpected response: ${response.data}',
+      statusCode: response.statusCode,
+    );
   }
 }

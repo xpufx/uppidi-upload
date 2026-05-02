@@ -116,6 +116,24 @@ abstract class AppLocalizations {
   /// **'Your session has expired. Please check your credentials in Settings.'**
   String get errorSessionExpired;
 
+  /// No description provided for @errorFileTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'The file is too large for this provider.'**
+  String get errorFileTooLarge;
+
+  /// No description provided for @errorConnectionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not connect to the provider. It may be unreachable or blocked by your browser.'**
+  String get errorConnectionFailed;
+
+  /// No description provided for @uploadCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload cancelled.'**
+  String get uploadCancelled;
+
   /// No description provided for @providerWebNotSupported.
   ///
   /// In en, this message translates to:
@@ -158,6 +176,18 @@ abstract class AppLocalizations {
   /// **'Cancel Upload'**
   String get cancelUpload;
 
+  /// No description provided for @pickAndUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick & Upload'**
+  String get pickAndUpload;
+
+  /// No description provided for @urlCopiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'URL copied to clipboard'**
+  String get urlCopiedToClipboard;
+
   /// No description provided for @selectProvider.
   ///
   /// In en, this message translates to:
@@ -199,6 +229,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You are about to upload to {provider}. We are not affiliated with that service.'**
   String disclaimer(Object provider);
+
+  /// No description provided for @success.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get success;
+
+  /// No description provided for @failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get failed;
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// No description provided for @unknownError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown error'**
+  String get unknownError;
 
   /// No description provided for @ok.
   ///

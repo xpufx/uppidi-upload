@@ -1,8 +1,11 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:uppidi/main.dart';
 
 void main() {
-  testWidgets('App smoke test', (WidgetTester tester) async {
-    // Basic smoke test placeholder
-    expect(1 + 1, 2);
+  testWidgets('App renders without crashing', (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: UppidiApp()));
+    await tester.pumpAndSettle();
+    expect(find.byType(AdaptiveHomePage), findsOneWidget);
   });
 }

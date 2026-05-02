@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uppidi/core/models/upload_request.dart';
@@ -82,7 +81,7 @@ void main() {
 
     test('has correct metadata', () {
       expect(provider.providerId, 'httpbin');
-      expect(provider.providerName, 'httpbin.org');
+      expect(provider.providerName, 'HttpBin.org (Test)');
     });
 
     test('upload success - echo response', () async {
