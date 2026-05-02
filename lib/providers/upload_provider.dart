@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/interfaces/uploader.dart';
 import '../core/logging/log.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
@@ -10,52 +13,102 @@ import '../core/registry.dart';
 
 final _log = Log('UploadNotifier');
 
-class UploadState {
+sealed class UploadState {
   final List<UploadResult> results;
-  final double progress;
-  final bool isUploading;
-  final CancelToken? cancelToken;
-  final String? lastError;
   final int selectedProviderIndex;
+  final List<BaseUploader> providers;
 
   const UploadState({
     this.results = const [],
-    this.progress = 0.0,
-    this.isUploading = false,
-    this.cancelToken,
-    this.lastError,
     this.selectedProviderIndex = 0,
+    this.providers = const [],
+  });
+}
+
+final class UploadIdle extends UploadState {
+  const UploadIdle({super.results, super.selectedProviderIndex, super.providers});
+}
+
+final class UploadInProgress extends UploadState {
+  final double progress;
+  final CancelToken cancelToken;
+
+  const UploadInProgress({
+    required this.progress,
+    required this.cancelToken,
+    super.results,
+    super.selectedProviderIndex,
+    super.providers,
+  });
+}
+
+final class UploadCompleted extends UploadState {
+  final UploadResult lastResult;
+  final String? errorMessage;
+
+  bool get isSuccess => lastResult.success;
+
+  const UploadCompleted({
+    required this.lastResult,
+    this.errorMessage,
+    super.results,
+    super.selectedProviderIndex,
+    super.providers,
   });
 }
 
 class UploadNotifier extends Notifier<UploadState> {
+  final FilePicker? _injectedPicker;
+  final List<BaseUploader>? _injectedProviders;
+
+  UploadNotifier({
+    FilePicker? filePicker,
+    List<BaseUploader>? providers,
+  })  : _injectedPicker = filePicker,
+        _injectedProviders = providers;
+
+  FilePicker get _filePicker => _injectedPicker ?? FilePicker.platform;
+  List<BaseUploader> get _providers => _injectedProviders ?? ProviderRegistry.all;
+
   @override
-  UploadState build() => const UploadState();
+  UploadState build() => UploadIdle(providers: _providers);
 
   void setProvider(int index) {
-    if (index < 0 || index >= ProviderRegistry.all.length) return;
-    state = UploadState(
-      results: state.results,
-      selectedProviderIndex: index,
-    );
+    if (index < 0 || index >= _providers.length) return;
+    final prev = state;
+    state = switch (prev) {
+      UploadIdle() => UploadIdle(
+          results: prev.results,
+          selectedProviderIndex: index,
+          providers: prev.providers,
+        ),
+      UploadInProgress() => prev,
+      UploadCompleted() => UploadIdle(
+          results: prev.results,
+          selectedProviderIndex: index,
+          providers: prev.providers,
+        ),
+    };
   }
 
   Future<void> pickAndUpload() async {
-    if (state.isUploading) return;
+    if (state is UploadInProgress) return;
 
-    if (ProviderRegistry.all.isEmpty) {
-      state = UploadState(
+    if (_providers.isEmpty) {
+      state = UploadCompleted(
+        lastResult: UploadResult(success: false),
+        errorMessage: 'No upload providers configured',
         results: state.results,
-        lastError: 'No upload providers configured',
         selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
       );
       return;
     }
 
-    final provider = ProviderRegistry.all[state.selectedProviderIndex];
+    final provider = _providers[state.selectedProviderIndex];
     _log.info('Using provider: ${provider.providerName} (${provider.providerId})');
 
-    final pickResult = await FilePicker.platform.pickFiles();
+    final pickResult = await _filePicker.pickFiles();
     if (pickResult == null || pickResult.files.isEmpty) return;
 
     final file = pickResult.files.first;
@@ -66,62 +119,79 @@ class UploadNotifier extends Notifier<UploadState> {
       _log.info('File: ${file.name}, size: ${request.sizeInBytes}, mime: ${request.mimeType}');
     } catch (e) {
       _log.warn('Failed to read file: $e', error: e);
-      state = UploadState(
+      state = UploadCompleted(
+        lastResult: UploadResult(success: false),
+        errorMessage: 'Failed to read selected file',
         results: state.results,
-        lastError: 'Failed to read selected file',
         selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
       );
       return;
     }
 
     final cancelToken = CancelToken();
-    state = UploadState(
-      isUploading: true,
+    state = UploadInProgress(
       progress: 0.0,
       cancelToken: cancelToken,
+      results: state.results,
       selectedProviderIndex: state.selectedProviderIndex,
+      providers: state.providers,
     );
 
     try {
       final result = await provider.upload(
         request,
         onProgress: (sent, total) {
-          state = UploadState(
-            results: state.results,
-            progress: sent / total,
-            isUploading: state.isUploading,
-            cancelToken: state.cancelToken,
-            selectedProviderIndex: state.selectedProviderIndex,
-          );
+          final current = state;
+          if (current is UploadInProgress) {
+            state = current.copyWithProgress(sent / total);
+          }
         },
         cancelToken: cancelToken,
       );
 
       _log.info('Result: success=${result.success}, url=${result.url}, error=${result.errorMessage}');
 
-      state = UploadState(
-        isUploading: false,
+      state = UploadCompleted(
+        lastResult: result,
+        errorMessage: result.success ? null : result.errorMessage,
         results: [result, ...state.results],
-        lastError: result.success ? null : result.errorMessage,
         selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
       );
     } catch (e) {
       _log.warn('Upload exception: $e', error: e);
-      state = UploadState(
-        isUploading: false,
+      state = UploadCompleted(
+        lastResult: UploadResult(success: false, errorMessage: 'Upload failed: $e'),
+        errorMessage: 'Upload failed: $e',
         results: state.results,
-        lastError: 'Upload failed: $e',
         selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
       );
     }
   }
 
   void cancelUpload() {
-    state.cancelToken?.cancel('User cancelled');
-    state = UploadState(
-      isUploading: false,
+    final current = state;
+    if (current is UploadInProgress) {
+      current.cancelToken.cancel('User cancelled');
+    }
+    state = UploadIdle(
       results: state.results,
       selectedProviderIndex: state.selectedProviderIndex,
+      providers: state.providers,
+    );
+  }
+}
+
+extension on UploadInProgress {
+  UploadInProgress copyWithProgress(double progress) {
+    return UploadInProgress(
+      progress: progress,
+      cancelToken: cancelToken,
+      results: results,
+      selectedProviderIndex: selectedProviderIndex,
+      providers: providers,
     );
   }
 }
