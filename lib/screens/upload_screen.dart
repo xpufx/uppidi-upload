@@ -159,6 +159,17 @@ class _ErrorBanner extends StatelessWidget {
 
   const _ErrorBanner({required this.error});
 
+  static String _translate(AppLocalizations l10n, String key) {
+    return switch (key) {
+      'genericError' => l10n.genericError,
+      'errorSessionExpired' => l10n.errorSessionExpired,
+      'errorFileTooLarge' => l10n.errorFileTooLarge,
+      'errorConnectionFailed' => l10n.errorConnectionFailed,
+      'uploadCancelled' => l10n.uploadCancelled,
+      _ => key,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -168,7 +179,7 @@ class _ErrorBanner extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         color: Colors.red.shade100,
         child: Text(
-          '${l10n.error}: $error',
+          '${l10n.error}: ${_translate(l10n, error)}',
           style: TextStyle(color: Colors.red.shade800),
         ),
       ),

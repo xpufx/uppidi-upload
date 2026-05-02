@@ -108,6 +108,18 @@ class UploadNotifier extends Notifier<UploadState> {
     final provider = _providers[state.selectedProviderIndex];
     _log.info('Using provider: ${provider.providerName} (${provider.providerId})');
 
+    final online = await _checkConnectivity(provider);
+    if (!online) {
+      state = UploadCompleted(
+        lastResult: UploadResult(success: false),
+        errorMessage: 'errorConnectionFailed',
+        results: state.results,
+        selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
+      );
+      return;
+    }
+
     final pickResult = await _filePicker.pickFiles();
     if (pickResult == null || pickResult.files.isEmpty) return;
 
@@ -168,6 +180,18 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
+    }
+  }
+
+  Future<bool> _checkConnectivity(BaseUploader provider) async {
+    try {
+      final dio = await provider.createHttpClient({});
+      dio.options.connectTimeout = const Duration(seconds: 3);
+      await dio.head('/');
+      return true;
+    } catch (e) {
+      _log.warn('Connectivity check failed: $e');
+      return false;
     }
   }
 
