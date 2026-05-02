@@ -4,6 +4,7 @@ import 'package:uppidi/core/models/upload_request.dart';
 import 'package:uppidi/providers/catbox_provider.dart';
 import 'package:uppidi/providers/httpbin_provider.dart';
 import 'package:uppidi/providers/tmpfilelink_provider.dart';
+import 'package:uppidi/providers/uguu_provider.dart';
 
 void main() {
   final testRequest = FileUploadRequest(
@@ -151,6 +152,53 @@ void main() {
     test('client uses correct baseUrl', () async {
       final client = await provider.createHttpClient({});
       expect(client.options.baseUrl, 'https://catbox.moe');
+    });
+  });
+
+  group('UguuProvider', () {
+    late UguuProvider provider;
+
+    setUp(() {
+      provider = UguuProvider();
+    });
+
+    test('metadata', () {
+      expect(provider.providerId, 'uguu');
+      expect(provider.providerName, 'uguu.se');
+      expect(provider.supportsWeb, isFalse);
+      expect(provider.requiredConfigKeys, isEmpty);
+    });
+
+    test('parseResponse extracts url from files[0].url', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/upload'),
+        statusCode: 200,
+        data: {
+          'success': true,
+          'files': [
+            {'url': 'https://h.uguu.se/abc123.png', 'hash': 'abc', 'size': 1024}
+          ],
+        },
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isTrue);
+      expect(result.url, 'https://h.uguu.se/abc123.png');
+    });
+
+    test('parseResponse handles empty files array', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/upload'),
+        statusCode: 200,
+        data: {'success': false, 'files': []},
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+    });
+
+    test('client uses correct baseUrl and form field name', () async {
+      final client = await provider.createHttpClient({});
+      expect(client.options.baseUrl, 'https://uguu.se');
+      expect(provider.fileFormFieldName, 'files[]');
     });
   });
 }
