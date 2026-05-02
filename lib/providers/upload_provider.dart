@@ -184,7 +184,7 @@ class UploadNotifier extends Notifier<UploadState> {
   }
 }
 
-extension on UploadInProgress {
+extension UploadInProgressX on UploadInProgress {
   UploadInProgress copyWithProgress(double progress) {
     return UploadInProgress(
       progress: progress,
