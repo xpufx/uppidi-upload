@@ -124,7 +124,7 @@ Widget _metadataBadges(dynamic meta) {
     chips.add(_buildBadge(meta.fileSizeLabel as String));
   }
   if (meta.allowedMimeTypes != null) {
-    chips.add(_buildBadge('Images only'));
+    chips.add(_buildBadge(_typeLabel(meta.allowedMimeTypes as Set<String>)));
   }
   if (meta.expiryInfo is String && (meta.expiryInfo as String).isNotEmpty) {
     chips.add(_buildBadge(meta.expiryInfo as String));
@@ -132,7 +132,13 @@ Widget _metadataBadges(dynamic meta) {
 
   if (chips.isEmpty) return const SizedBox.shrink();
 
-  return Row(mainAxisSize: MainAxisSize.min, children: [const SizedBox(width: 4), ...chips]);
+  return Row(mainAxisSize: MainAxisSize.min, children: chips);
+}
+
+String _typeLabel(Set<String> types) {
+  final allImages = types.every((t) => t.startsWith('image/'));
+  if (allImages && types.isNotEmpty) return 'Images only';
+  return types.map((t) => t.split('/').last.toUpperCase()).join(', ');
 }
 
 Widget _buildBadge(String label) {
@@ -165,7 +171,7 @@ class _ProviderInfo extends StatelessWidget {
       infos.add(meta.expiryInfo as String);
     }
     if (meta.allowedMimeTypes != null) {
-      infos.add('Images only');
+      infos.add(_typeLabel(meta.allowedMimeTypes as Set<String>));
     }
 
     if (infos.isEmpty) return const SizedBox.shrink();
