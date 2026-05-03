@@ -57,10 +57,16 @@ final class UploadStarting extends UploadState {
 final class UploadInProgress extends UploadState {
   final double progress;
   final CancelToken cancelToken;
+  final int sentBytes;
+  final int totalBytes;
+  final String speedLabel;
 
   const UploadInProgress({
     required this.progress,
     required this.cancelToken,
+    this.sentBytes = 0,
+    this.totalBytes = 0,
+    this.speedLabel = '',
     super.results,
     super.selectedProviderIndex,
     super.providers,
@@ -86,6 +92,8 @@ class UploadNotifier extends Notifier<UploadState> {
   final FilePicker? _injectedPicker;
   final List<BaseUploader>? _injectedProviders;
   FileUploadRequest? _pendingRequest;
+  DateTime _lastSpeedSample = DateTime.now();
+  int _lastSampleBytes = 0;
 
   UploadNotifier({
     FilePicker? filePicker,
@@ -236,10 +244,15 @@ class UploadNotifier extends Notifier<UploadState> {
     state = UploadInProgress(
       progress: 0.0,
       cancelToken: cancelToken,
+      sentBytes: 0,
+      totalBytes: request.sizeInBytes,
       results: state.results,
       selectedProviderIndex: state.selectedProviderIndex,
       providers: state.providers,
     );
+
+    _lastSpeedSample = DateTime.now();
+    _lastSampleBytes = 0;
 
     final meta = provider.metadata;
     if (!meta.acceptsFileSize(request.sizeInBytes)) {
@@ -293,7 +306,19 @@ class UploadNotifier extends Notifier<UploadState> {
         onProgress: (sent, total) {
           final current = state;
           if (current is UploadInProgress) {
-            state = current.copyWithProgress(sent / total);
+            final now = DateTime.now();
+            final elapsed = now.difference(_lastSpeedSample).inMilliseconds;
+            if (elapsed >= 500) {
+              final bytesDelta = sent - _lastSampleBytes;
+              final secs = elapsed / 1000.0;
+              final bytesPerSec = bytesDelta / secs;
+              final speed = _formatSpeed(bytesPerSec);
+              _lastSpeedSample = now;
+              _lastSampleBytes = sent;
+              state = current.copyWithProgress(sent / total, sent, total, speed);
+            } else {
+              state = current.copyWithProgress(sent / total, sent, total, current.speedLabel);
+            }
           }
         },
         cancelToken: cancelToken,
@@ -387,15 +412,24 @@ class UploadNotifier extends Notifier<UploadState> {
 }
 
 extension UploadInProgressX on UploadInProgress {
-  UploadInProgress copyWithProgress(double progress) {
+  UploadInProgress copyWithProgress(double progress, int sent, int total, String speedLabel) {
     return UploadInProgress(
       progress: progress,
       cancelToken: cancelToken,
+      sentBytes: sent,
+      totalBytes: total,
+      speedLabel: speedLabel,
       results: results,
       selectedProviderIndex: selectedProviderIndex,
       providers: providers,
     );
   }
+}
+
+String _formatSpeed(double bytesPerSec) {
+  if (bytesPerSec < 1024) return '${bytesPerSec.toStringAsFixed(0)} B/s';
+  if (bytesPerSec < 1024 * 1024) return '${(bytesPerSec / 1024).toStringAsFixed(1)} KB/s';
+  return '${(bytesPerSec / (1024 * 1024)).toStringAsFixed(1)} MB/s';
 }
 
 final uploadProvider = NotifierProvider<UploadNotifier, UploadState>(
