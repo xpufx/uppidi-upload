@@ -86,13 +86,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get approveUploadTitle => 'Confirm Upload';
 
   @override
-  String approveUploadMessage(Object provider) => 'Upload to $provider?';
+  String approveUploadMessage(Object provider) {
+    return 'Upload to $provider?';
+  }
 
   @override
   String get historyClearAll => 'Clear all';
 
   @override
   String get historyClearConfirm => 'Delete all history?';
+
+  @override
+  String historyRecords(Object count) => '$count records';
+
+  @override
+  String get clearHistory => 'Clear History';
+
+  @override
+  String get openInBrowser => 'Open in browser';
 
   @override
   String get noProviders => 'No providers configured. Add one in Settings.';

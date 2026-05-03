@@ -87,13 +87,24 @@ class AppLocalizationsTr extends AppLocalizations {
   String get approveUploadTitle => 'Yüklemeyi Onayla';
 
   @override
-  String approveUploadMessage(Object provider) => '$provider hizmetine yüklensin mi?';
+  String approveUploadMessage(Object provider) {
+    return '$provider hizmetine yüklensin mi?';
+  }
 
   @override
   String get historyClearAll => 'Tümünü temizle';
 
   @override
   String get historyClearConfirm => 'Tüm geçmiş silinsin mi?';
+
+  @override
+  String historyRecords(Object count) => '$count kayıt';
+
+  @override
+  String get clearHistory => 'Geçmişi Temizle';
+
+  @override
+  String get openInBrowser => 'Tarayıcıda aç';
 
   @override
   String get noProviders =>

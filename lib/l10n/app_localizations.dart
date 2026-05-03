@@ -260,6 +260,24 @@ abstract class AppLocalizations {
   /// **'Delete all history?'**
   String get historyClearConfirm;
 
+  /// No description provided for @historyRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} records'**
+  String historyRecords(Object count);
+
+  /// No description provided for @clearHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear History'**
+  String get clearHistory;
+
+  /// No description provided for @openInBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in browser'**
+  String get openInBrowser;
+
   /// No description provided for @noProviders.
   ///
   /// In en, this message translates to:

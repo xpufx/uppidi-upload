@@ -436,7 +436,7 @@ class _ResultTile extends StatelessWidget {
                 onTap: () => _copyUrl(context, url))),
               IconButton(icon: const Icon(Icons.open_in_new, size: 18),
                 onPressed: () => _openUrl(url),
-                tooltip: 'Open in browser'),
+                tooltip: l10n.openInBrowser),
               IconButton(icon: const Icon(Icons.copy, size: 18),
                 onPressed: () => _copyUrl(context, url),
                 tooltip: l10n.urlCopiedToClipboard),

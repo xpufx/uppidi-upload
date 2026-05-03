@@ -42,7 +42,7 @@ class HistoryScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: Row(
                 children: [
-                  Text('${records.length} records', style: Theme.of(context).textTheme.bodySmall),
+                  Text(l10n.historyRecords(records.length), style: Theme.of(context).textTheme.bodySmall),
                   const Spacer(),
                   TextButton.icon(
                     icon: const Icon(Icons.delete_sweep, size: 18),
@@ -51,7 +51,7 @@ class HistoryScreen extends ConsumerWidget {
                       final confirmed = await showDialog<bool>(
                         context: context,
                         builder: (ctx) => AlertDialog(
-                          title: const Text('Clear History'),
+                          title: Text(l10n.clearHistory),
                           content: Text(l10n.historyClearConfirm),
                           actions: [
                             TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
@@ -155,7 +155,7 @@ class _HistoryTile extends StatelessWidget {
                     final uri = Uri.tryParse(r.url!);
                     if (uri != null) await launchUrl(uri, mode: LaunchMode.externalApplication);
                   },
-                  tooltip: 'Open in browser'),
+                  tooltip: l10n.openInBrowser),
               IconButton(
                 icon: const Icon(Icons.copy, size: 18),
                 onPressed: onCopy,
