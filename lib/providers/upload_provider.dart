@@ -296,12 +296,21 @@ class UploadNotifier extends Notifier<UploadState> {
   Future<bool> _checkConnectivity(BaseUploader provider) async {
     try {
       final dio = await provider.createHttpClient({});
-      dio.options.connectTimeout = const Duration(seconds: 3);
-      await dio.head('/');
+      dio.options.connectTimeout = const Duration(seconds: 5);
+      try {
+        await dio.head('/');
+      } catch (_) {
+        // Some servers reject HEAD; try GET with small range
+        await dio.get('/', options: Options(
+          extra: {'noLog': true},
+          responseType: ResponseType.bytes,
+          headers: {'Range': 'bytes=0-0'},
+        ));
+      }
       return true;
     } catch (e) {
       _log.warn('Connectivity check failed: $e');
-      return false;
+      return true; // allow upload anyway — let the actual upload fail if truly down
     }
   }
 
