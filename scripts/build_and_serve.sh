@@ -23,6 +23,9 @@ DST="uppidi-${VERSION}-${GIT_HASH}-android-arm64-v8a.apk"
 cp "$SRC" "${ARTIFACTS_DIR}/${DST}"
 echo "    ${DST}"
 
+echo "==> Updating latest symlink..."
+ln -sf "${DST}" "${ARTIFACTS_DIR}/uppidi-latest-android-arm64-v8a.apk"
+
 echo "==> Cleaning old APKs (keep latest 5)..."
 ls -t "${ARTIFACTS_DIR}"/*-android-*.apk 2>/dev/null | tail -n +6 | xargs -r rm -f
 
@@ -35,10 +38,13 @@ flutter build linux --release --dart-define=GIT_HASH=$GIT_HASH
 echo "==> Packaging Linux release..."
 tar -czf "${ARTIFACTS_DIR}/${LINUX_NAME}" -C build/linux/x64/release/bundle .
 
+echo "==> Updating latest symlink..."
+ln -sf "${LINUX_NAME}" "${ARTIFACTS_DIR}/uppidi-latest-linux.tar.gz"
+
 echo "==> Cleaning old Linux builds (keep latest 5)..."
 ls -t "${ARTIFACTS_DIR}"/*-linux.tar.gz 2>/dev/null | tail -n +6 | xargs -r rm -f
 
 echo ""
 echo "==> Done"
-echo "    ${ARTIFACTS_DIR}/${APK_NAME}"
-echo "    ${ARTIFACTS_DIR}/${LINUX_NAME}"
+echo "    ${DST}"
+echo "    ${LINUX_NAME}"
