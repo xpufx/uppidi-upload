@@ -1,17 +1,27 @@
 import 'package:dio/dio.dart';
 
 import '../core/interfaces/base_http_provider.dart';
+import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
 
 class UguuProvider extends BaseHttpProvider {
   final String _name;
   final String _url;
+  final ProviderMetadata _metadata;
 
   UguuProvider({
     String name = 'uguu.se',
     String url = 'https://uguu.se',
+    ProviderMetadata? metadata,
   })  : _name = name,
-        _url = url;
+        _url = url,
+        _metadata = metadata ?? const ProviderMetadata(
+          maxFileSizeBytes: 256 * 1024 * 1024,
+          supportsDirectLink: true,
+        );
+
+  @override
+  ProviderMetadata get metadata => _metadata;
 
   @override
   String get providerId => 'uguu_${_name.replaceAll('.', '_')}';

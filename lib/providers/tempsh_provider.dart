@@ -1,9 +1,17 @@
 import 'package:dio/dio.dart';
 
 import '../core/interfaces/base_http_provider.dart';
+import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
 
 class TempShProvider extends BaseHttpProvider {
+  @override
+  ProviderMetadata get metadata => const ProviderMetadata(
+    maxFileSizeBytes: 4 * 1024 * 1024 * 1024,
+    expiryInfo: 'Files expire after 3 days',
+    supportsDirectLink: true,
+  );
+
   @override
   String get providerId => 'tempsh';
 

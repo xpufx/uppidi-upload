@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../logging/log.dart';
+import '../models/provider_metadata.dart';
 import '../models/upload_request.dart';
 import '../models/upload_result.dart';
 import '../platform/insecure_adapter.dart';
@@ -14,6 +15,9 @@ abstract class BaseHttpProvider implements BaseUploader {
   String get fileFormFieldName;
 
   Map<String, String> get additionalFormFields => const {};
+
+  @override
+  ProviderMetadata get metadata => const ProviderMetadata();
 
   @override
   Future<Dio> createHttpClient(

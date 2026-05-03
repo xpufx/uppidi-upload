@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 
+import '../models/provider_metadata.dart';
 import '../models/upload_request.dart';
 import '../models/upload_result.dart';
 
@@ -13,6 +14,8 @@ abstract class BaseUploader {
   List<String> get requiredConfigKeys;
   Map<String, String> get configLabels;
   String? get proxyUrl;
+
+  ProviderMetadata get metadata;
 
   Future<Dio> createHttpClient(
     Map<String, String> config, {

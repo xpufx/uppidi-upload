@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../core/interfaces/base_http_provider.dart';
+import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
 
 class FreeImageHostProvider extends BaseHttpProvider {
@@ -15,6 +16,13 @@ class FreeImageHostProvider extends BaseHttpProvider {
   })  : _name = name,
         _url = url,
         _apiKey = apiKey;
+
+  @override
+  ProviderMetadata get metadata => const ProviderMetadata(
+    maxFileSizeBytes: 64 * 1024 * 1024,
+    allowedMimeTypes: {'image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/bmp'},
+    supportsDirectLink: true,
+  );
 
   @override
   String get providerId => 'freeimage_${_name.replaceAll('.', '_')}';
