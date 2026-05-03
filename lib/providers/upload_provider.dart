@@ -189,6 +189,15 @@ class UploadNotifier extends Notifier<UploadState> {
     final provider = _providers[state.selectedProviderIndex];
     _log.info('Using provider: ${provider.providerName} (${provider.providerId})');
 
+    final cancelToken = CancelToken();
+    state = UploadInProgress(
+      progress: 0.0,
+      cancelToken: cancelToken,
+      results: state.results,
+      selectedProviderIndex: state.selectedProviderIndex,
+      providers: state.providers,
+    );
+
     final meta = provider.metadata;
     if (!meta.acceptsFileSize(request.sizeInBytes)) {
       state = UploadCompleted(
@@ -223,15 +232,6 @@ class UploadNotifier extends Notifier<UploadState> {
       );
       return;
     }
-
-    final cancelToken = CancelToken();
-    state = UploadInProgress(
-      progress: 0.0,
-      cancelToken: cancelToken,
-      results: state.results,
-      selectedProviderIndex: state.selectedProviderIndex,
-      providers: state.providers,
-    );
 
     try {
       final settingsService = ref.read(settingsServiceProvider);
