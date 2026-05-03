@@ -32,6 +32,8 @@ class ProviderMetadata {
 
   String get mimeTypeLabel {
     if (allowedMimeTypes == null || allowedMimeTypes!.isEmpty) return '';
+    final allImages = allowedMimeTypes!.every((t) => t.startsWith('image/'));
+    if (allImages && allowedMimeTypes!.isNotEmpty) return 'Images only';
     return allowedMimeTypes!.map((m) => m.split('/').last.toUpperCase()).join(', ');
   }
 
