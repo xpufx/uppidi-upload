@@ -293,6 +293,11 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         const SizedBox(height: 2),
         Text('${ProviderRegistry.all.length} providers · 45 tests · $gitHash',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
+        const SizedBox(height: 16),
+        Center(child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.asset('assets/logo.png', width: 64, height: 64),
+        )),
       ],
     );
   }
