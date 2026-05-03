@@ -24,11 +24,6 @@ final proxyUrlProvider = FutureProvider<String?>((ref) async {
   return svc.getProxyUrl();
 });
 
-final _approveBeforeUploadProvider = FutureProvider<bool>((ref) async {
-  final svc = ref.read(settingsServiceProvider);
-  return svc.needsApprovalBeforeUpload();
-});
-
 final localeProvider = FutureProvider<String>((ref) async {
   final svc = ref.read(settingsServiceProvider);
   return (await svc.get(SettingsService.localeKey)) ?? 'en';
@@ -46,38 +41,39 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final svc = ref.read(settingsServiceProvider);
+    final configurableProviders = ProviderRegistry.all.where((p) => p.requiredConfigKeys.isNotEmpty).toList();
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text(l10n.providersSection,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 12),
-        ...ProviderRegistry.all.map((provider) {
-          if (provider.requiredConfigKeys.isEmpty) return const SizedBox.shrink();
+        if (configurableProviders.isNotEmpty) ...[
+          Text(l10n.providersSection,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          ...configurableProviders.map((provider) {
+            final configAsync = ref.watch(providerConfigsProvider(provider.providerId));
+            final saved = configAsync.asData?.value ?? {};
+            final labels = provider.configLabels;
 
-          final configAsync = ref.watch(providerConfigsProvider(provider.providerId));
-          final saved = configAsync.asData?.value ?? {};
-          final labels = provider.configLabels;
-
-          return _ProviderConfigCard(
-            providerName: provider.providerName,
-            providerId: provider.providerId,
-            configKeys: provider.requiredConfigKeys,
-            labels: labels,
-            saved: saved,
-            onSave: (key, value) => svc.set(
-              svc.providerKey(provider.providerId, key),
-              value,
-            ),
-            onClear: (key) => svc.remove(
-              svc.providerKey(provider.providerId, key),
-            ),
-          );
-        }),
-        const SizedBox(height: 24),
-        const Divider(),
-        const SizedBox(height: 8),
+            return _ProviderConfigCard(
+              providerName: provider.providerName,
+              providerId: provider.providerId,
+              configKeys: provider.requiredConfigKeys,
+              labels: labels,
+              saved: saved,
+              onSave: (key, value) => svc.set(
+                svc.providerKey(provider.providerId, key),
+                value,
+              ),
+              onClear: (key) => svc.remove(
+                svc.providerKey(provider.providerId, key),
+              ),
+            );
+          }),
+          const SizedBox(height: 24),
+          const Divider(),
+          const SizedBox(height: 8),
+        ],
         Text(l10n.settings,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
@@ -209,15 +205,6 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           onChanged: (v) {
             svc.set(SettingsService.insecureConnKey, v.toString());
             ref.invalidate(insecureConnProvider);
-          },
-          contentPadding: EdgeInsets.zero,
-        ),
-        SwitchListTile(
-          title: Text(l10n.settingApproveBeforeUpload),
-          value: ref.watch(_approveBeforeUploadProvider).asData?.value ?? false,
-          onChanged: (v) {
-            svc.set(SettingsService.approveBeforeUploadKey, v.toString());
-            ref.invalidate(_approveBeforeUploadProvider);
           },
           contentPadding: EdgeInsets.zero,
         ),

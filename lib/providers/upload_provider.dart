@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
@@ -36,11 +37,13 @@ final class UploadFileSelected extends UploadState {
   final String fileName;
   final int fileSizeBytes;
   final String? mimeType;
+  final Uint8List? fileBytes;
 
   const UploadFileSelected({
     required this.fileName,
     required this.fileSizeBytes,
     this.mimeType,
+    this.fileBytes,
     super.results,
     super.selectedProviderIndex,
     super.providers,
@@ -82,6 +85,7 @@ final class UploadCompleted extends UploadState {
 class UploadNotifier extends Notifier<UploadState> {
   final FilePicker? _injectedPicker;
   final List<BaseUploader>? _injectedProviders;
+  FileUploadRequest? _pendingRequest;
 
   UploadNotifier({
     FilePicker? filePicker,
@@ -103,6 +107,7 @@ class UploadNotifier extends Notifier<UploadState> {
           fileName: prev.fileName,
           fileSizeBytes: prev.fileSizeBytes,
           mimeType: prev.mimeType,
+          fileBytes: prev.fileBytes,
           results: prev.results,
           selectedProviderIndex: index,
           providers: prev.providers,
@@ -133,13 +138,26 @@ class UploadNotifier extends Notifier<UploadState> {
       final request = await createUploadRequest(file);
       _log.info('File: ${file.name}, size: ${request.sizeInBytes}, mime: ${request.mimeType}');
 
-      final needsApproval = await ref.read(settingsServiceProvider).needsApprovalBeforeUpload();
-      if (needsApproval) {
-        ref.read(pendingApprovalProvider.notifier).set(request);
-        return;
+      // Read preview bytes
+      Uint8List? previewBytes;
+      if (file.bytes != null) {
+        previewBytes = file.bytes;
+      } else if (file.path != null) {
+        previewBytes = await File(file.path!).readAsBytes();
       }
 
-      await _executeUpload(request);
+      // Store request for later upload
+      _pendingRequest = request;
+
+      state = UploadFileSelected(
+        fileName: file.name,
+        fileSizeBytes: request.sizeInBytes,
+        mimeType: request.mimeType,
+        fileBytes: previewBytes,
+        results: state.results,
+        selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
+      );
     } catch (e) {
       _log.warn('Failed to read file: $e', error: e);
       state = UploadCompleted(
@@ -152,20 +170,41 @@ class UploadNotifier extends Notifier<UploadState> {
     }
   }
 
+  Future<void> uploadSelected() async {
+    final request = _pendingRequest;
+    if (request == null) return;
+    _pendingRequest = null;
+    await _executeUpload(request);
+  }
+
   Future<void> uploadFromFile(String filePath, String? mimeType) async {
     if (state is UploadInProgress) return;
 
     try {
       final ioFile = File(filePath);
       final size = await ioFile.length();
+      final fileName = ioFile.uri.pathSegments.last;
+
+      final previewBytes = await ioFile.readAsBytes();
+
       final request = FileUploadRequest(
-        fileName: ioFile.uri.pathSegments.last,
+        fileName: fileName,
         mimeType: mimeType,
         sizeInBytes: size,
         dataStream: ioFile.openRead(),
       );
       _log.info('Shared file: $filePath ($mimeType)');
-      await _executeUpload(request);
+
+      _pendingRequest = request;
+      state = UploadFileSelected(
+        fileName: fileName,
+        fileSizeBytes: size,
+        mimeType: mimeType,
+        fileBytes: previewBytes,
+        results: state.results,
+        selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
+      );
     } catch (e) {
       _log.warn('Failed to read shared file: $e', error: e);
       state = UploadCompleted(
@@ -271,14 +310,15 @@ class UploadNotifier extends Notifier<UploadState> {
         providers: state.providers,
       );
       _saveToHistory(result, provider, request.fileName);
-      Future.delayed(const Duration(milliseconds: 1500), () {
+    } catch (e) {
+      if (cancelToken.isCancelled) {
         state = UploadIdle(
           results: state.results,
           selectedProviderIndex: state.selectedProviderIndex,
           providers: state.providers,
         );
-      });
-    } catch (e) {
+        return;
+      }
       _log.warn('Upload exception: $e', error: e);
       final failResult = UploadResult(success: false, errorMessage: 'Upload failed: $e');
       state = UploadCompleted(
@@ -289,13 +329,6 @@ class UploadNotifier extends Notifier<UploadState> {
         providers: state.providers,
       );
       _saveToHistory(failResult, provider, request.fileName);
-      Future.delayed(const Duration(milliseconds: 1500), () {
-        state = UploadIdle(
-          results: state.results,
-          selectedProviderIndex: state.selectedProviderIndex,
-          providers: state.providers,
-        );
-      });
     }
   }
 
@@ -351,12 +384,6 @@ class UploadNotifier extends Notifier<UploadState> {
     );
   }
 
-  Future<void> confirmPending() async {
-    final request = ref.read(pendingApprovalProvider);
-    if (request == null) return;
-    ref.read(pendingApprovalProvider.notifier).set(null);
-    await _executeUpload(request);
-  }
 }
 
 extension UploadInProgressX on UploadInProgress {
@@ -375,13 +402,4 @@ final uploadProvider = NotifierProvider<UploadNotifier, UploadState>(
   UploadNotifier.new,
 );
 
-class _PendingNotifier extends Notifier<FileUploadRequest?> {
-  @override
-  FileUploadRequest? build() => null;
 
-  void set(FileUploadRequest? request) => state = request;
-}
-
-final pendingApprovalProvider = NotifierProvider<_PendingNotifier, FileUploadRequest?>(
-  _PendingNotifier.new,
-);

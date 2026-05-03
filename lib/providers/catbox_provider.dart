@@ -14,12 +14,10 @@ class CatboxProvider extends BaseHttpProvider {
   bool get supportsWeb => false;
 
   @override
-  List<String> get requiredConfigKeys => ['userhash'];
+  List<String> get requiredConfigKeys => [];
 
   @override
-  Map<String, String> get configLabels => {
-        'userhash': 'User Hash (optional, leave empty for anonymous)',
-      };
+  Map<String, String> get configLabels => {};
 
   @override
   String? get proxyUrl => null;

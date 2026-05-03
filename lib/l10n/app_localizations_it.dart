@@ -59,6 +59,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get urlCopiedToClipboard => 'URL copiato negli appunti';
 
   @override
+  String get shareUrl => 'Condividi URL';
+
+  @override
   String get selectProvider => 'Seleziona Servizio';
 
   @override
@@ -79,17 +82,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get providersSection => 'Configurazione Servizi';
-
-  @override
-  String get settingApproveBeforeUpload => 'Conferma prima di caricare';
-
-  @override
-  String get approveUploadTitle => 'Conferma Caricamento';
-
-  @override
-  String approveUploadMessage(Object provider) {
-    return 'Caricare su $provider?';
-  }
 
   @override
   String get historyClearAll => 'Cancella tutto';

@@ -49,14 +49,6 @@ class ShareHandler {
         if (idx >= 0) notifier.setProvider(idx);
       }
 
-      // Check approval before upload
-      final needsApproval = await svc.needsApprovalBeforeUpload();
-      if (needsApproval) {
-        _log.info('Approval required for shared file — skipping');
-        // Could show dialog, but no UI context in share handler
-        // For now, upload directly since user already chose to share
-      }
-
       notifier.uploadFromFile(filePath, mimeType);
     }
 

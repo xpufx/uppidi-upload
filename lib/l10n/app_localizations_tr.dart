@@ -59,6 +59,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get urlCopiedToClipboard => 'URL panoya kopyalandı';
 
   @override
+  String get shareUrl => 'URL Paylaş';
+
+  @override
   String get selectProvider => 'Sağlayıcı Seç';
 
   @override
@@ -79,17 +82,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get providersSection => 'Sağlayıcı Yapılandırması';
-
-  @override
-  String get settingApproveBeforeUpload => 'Yüklemeden önce onayla';
-
-  @override
-  String get approveUploadTitle => 'Yüklemeyi Onayla';
-
-  @override
-  String approveUploadMessage(Object provider) {
-    return '$provider hizmetine yüklensin mi?';
-  }
 
   @override
   String get historyClearAll => 'Tümünü temizle';

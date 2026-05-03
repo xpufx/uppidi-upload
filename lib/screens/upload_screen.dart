@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/format.dart';
-import '../core/models/upload_request.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 
@@ -29,31 +32,6 @@ class UploadScreen extends ConsumerWidget {
         : null;
     final webUnsupported = kIsWeb && provider != null && !provider.supportsWeb;
 
-    ref.listen<FileUploadRequest?>(
-      pendingApprovalProvider,
-      (prev, next) {
-        if (next == null || !context.mounted) return;
-        final l10n = AppLocalizations.of(context);
-        showDialog<bool>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text(l10n.approveUploadTitle),
-            content: Text(l10n.approveUploadMessage(provider?.providerName ?? 'this provider')),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
-              TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.ok)),
-            ],
-          ),
-        ).then((confirmed) {
-          if (confirmed == true) {
-            notifier.confirmPending();
-          } else {
-            ref.read(pendingApprovalProvider.notifier).set(null);
-          }
-        });
-      },
-    );
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -70,13 +48,14 @@ class UploadScreen extends ConsumerWidget {
           if (provider != null) _ProviderInfo(provider: provider),
           if (webUnsupported) const _WebWarning(),
           switch (uploadState) {
-            UploadFileSelected(fileName: final n, fileSizeBytes: final s, mimeType: final m) =>
-              _FileInfoBanner(fileName: n, fileSize: s, mimeType: m, provider: provider),
+            UploadFileSelected(fileName: final n, fileSizeBytes: final s, mimeType: final m, fileBytes: final b) =>
+              _FilePreview(fileName: n, fileSize: s, mimeType: m, fileBytes: b, provider: provider),
             _ => const SizedBox.shrink(),
           },
           const SizedBox(height: 16),
           switch (uploadState) {
-            UploadIdle() || UploadFileSelected() => _PickAndUploadButton(notifier: notifier),
+            UploadIdle() => _PickButton(notifier: notifier),
+            UploadFileSelected() => _UploadButton(notifier: notifier),
             _ => const SizedBox.shrink(),
           },
           switch (uploadState) {
@@ -205,11 +184,9 @@ class _ProviderInfo extends StatelessWidget {
   }
 }
 
-class _PickAndUploadButton extends ConsumerWidget {
+class _PickButton extends ConsumerWidget {
   final dynamic notifier;
-
-  const _PickAndUploadButton({required this.notifier});
-
+  const _PickButton({required this.notifier});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
@@ -220,21 +197,143 @@ class _PickAndUploadButton extends ConsumerWidget {
   }
 }
 
-class _FileInfoBanner extends StatelessWidget {
+class _UploadButton extends ConsumerWidget {
+  final dynamic notifier;
+  const _UploadButton({required this.notifier});
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return ElevatedButton.icon(
+      onPressed: () => notifier.uploadSelected(),
+      icon: const Icon(Icons.cloud_upload),
+      label: Text(l10n.upload),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+      ),
+    );
+  }
+}
+
+class _FilePreview extends StatelessWidget {
   final String fileName;
   final int fileSize;
   final String? mimeType;
+  final Uint8List? fileBytes;
   final dynamic provider;
 
-  const _FileInfoBanner({
+  const _FilePreview({
     required this.fileName,
     required this.fileSize,
     this.mimeType,
+    this.fileBytes,
     this.provider,
   });
 
+  bool get _isImage {
+    final mime = mimeType ?? '';
+    return mime.startsWith('image/');
+  }
+
   @override
   Widget build(BuildContext context) {
+    final warnings = _buildWarnings();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (fileBytes != null && _isImage) ...[
+                // Image preview
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 260),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Image.memory(
+                          fileBytes!,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 64),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ] else if (_isImage) ...[
+                // Image without bytes (shouldn't happen, but fallback)
+                const Center(child: Icon(Icons.image_outlined, size: 80, color: Colors.grey)),
+                const SizedBox(height: 12),
+              ] else ...[
+                // Non-image file icon
+                Center(
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(Icons.insert_drive_file, size: 48, color: Colors.grey),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+              // File info row
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(fileName,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(formatSize(fileSize),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
+              if (mimeType != null) ...[
+                const SizedBox(height: 4),
+                Text(mimeType!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                ),
+              ],
+              if (warnings.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                const Divider(),
+                ...warnings,
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildWarnings() {
     final warnings = <Widget>[];
     final meta = provider?.metadata;
 
@@ -248,29 +347,7 @@ class _FileInfoBanner extends StatelessWidget {
       warnings.add(_warningRow('File exceeds ${meta.fileSizeLabel} limit'));
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.insert_drive_file_outlined, size: 18),
-              const SizedBox(width: 6),
-              Expanded(child: Text(fileName, overflow: TextOverflow.ellipsis)),
-              const SizedBox(width: 8),
-              Text(formatSize(fileSize),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
-              if (mimeType != null) ...[
-                const SizedBox(width: 8),
-                Text(mimeType!, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-              ],
-            ],
-          ),
-          ...warnings,
-        ],
-      ),
-    );
+    return warnings;
   }
 
   Widget _warningRow(String msg) {
@@ -278,10 +355,13 @@ class _FileInfoBanner extends StatelessWidget {
       padding: const EdgeInsets.only(top: 4),
       child: Row(
         children: [
-          const Icon(Icons.warning_amber_rounded, size: 16, color: Colors.orange),
-          const SizedBox(width: 4),
-          Expanded(child: Text(msg,
-            style: const TextStyle(fontSize: 12, color: Colors.orange))),
+          Icon(Icons.warning_amber_rounded, size: 16, color: Colors.orange.shade700),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(msg,
+              style: TextStyle(fontSize: 12, color: Colors.orange.shade800),
+            ),
+          ),
         ],
       ),
     );
@@ -397,12 +477,47 @@ class _ResultBanner extends StatelessWidget {
           ),
           if (url != null) ...[
             const SizedBox(height: 4),
-            SelectableText(url!,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 13,
-                decoration: TextDecoration.underline,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: SelectableText(url!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 13,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.open_in_new, size: 18),
+                  onPressed: () async {
+                    final uri = Uri.tryParse(url!);
+                    if (uri != null) {
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                    }
+                  },
+                  tooltip: l10n.openInBrowser,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.copy, size: 18),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: url!));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.urlCopiedToClipboard)),
+                    );
+                  },
+                  tooltip: l10n.urlCopiedToClipboard,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.share, size: 18),
+                  onPressed: () {
+                    if (url != null) {
+                      SharePlus.instance.share(ShareParams(text: url!));
+                    }
+                  },
+                  tooltip: l10n.shareUrl,
+                ),
+              ],
             ),
           ],
         ],

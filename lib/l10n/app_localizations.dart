@@ -190,6 +190,12 @@ abstract class AppLocalizations {
   /// **'URL copied to clipboard'**
   String get urlCopiedToClipboard;
 
+  /// No description provided for @shareUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Share URL'**
+  String get shareUrl;
+
   /// No description provided for @selectProvider.
   ///
   /// In en, this message translates to:
@@ -231,24 +237,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Provider Configuration'**
   String get providersSection;
-
-  /// No description provided for @settingApproveBeforeUpload.
-  ///
-  /// In en, this message translates to:
-  /// **'Approve before uploading'**
-  String get settingApproveBeforeUpload;
-
-  /// No description provided for @approveUploadTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm Upload'**
-  String get approveUploadTitle;
-
-  /// No description provided for @approveUploadMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Upload to {provider}?'**
-  String approveUploadMessage(Object provider);
 
   /// No description provided for @historyClearAll.
   ///

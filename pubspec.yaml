@@ -23,6 +23,7 @@ dependencies:
   flutter_adaptive_scaffold: ^0.3.3+1
   receive_sharing_intent: ^1.8.1
   url_launcher: ^6.3.2
+  share_plus: ^12.0.2
 
 dev_dependencies:
   flutter_test:

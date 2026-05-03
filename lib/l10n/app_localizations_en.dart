@@ -58,6 +58,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get urlCopiedToClipboard => 'URL copied to clipboard';
 
   @override
+  String get shareUrl => 'Share URL';
+
+  @override
   String get selectProvider => 'Select Provider';
 
   @override
@@ -78,17 +81,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get providersSection => 'Provider Configuration';
-
-  @override
-  String get settingApproveBeforeUpload => 'Approve before uploading';
-
-  @override
-  String get approveUploadTitle => 'Confirm Upload';
-
-  @override
-  String approveUploadMessage(Object provider) {
-    return 'Upload to $provider?';
-  }
 
   @override
   String get historyClearAll => 'Clear all';

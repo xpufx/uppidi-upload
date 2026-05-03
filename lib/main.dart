@@ -88,7 +88,12 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
                 children: [
                   Image.asset('assets/logo.png', width: 28, height: 28),
                   const SizedBox(width: 8),
-                  Text(_selected.label(l10n)),
+                  Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const Spacer(),
+                  Text(_selected.label(l10n), style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w500,
+                  )),
                 ],
               ),
             ),
@@ -114,6 +119,8 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
                   children: [
                     const SizedBox(height: 16),
                     Image.asset('assets/logo.png', width: 40, height: 40),
+                    const SizedBox(height: 4),
+                    Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                     const SizedBox(height: 8),
                     Expanded(
                       child: NavigationRail(

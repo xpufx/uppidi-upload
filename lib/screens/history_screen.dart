@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/format.dart';
@@ -175,6 +176,12 @@ class _HistoryTile extends StatelessWidget {
                 onPressed: onCopy,
                 tooltip: l10n.urlCopiedToClipboard,
               ),
+              if (r.url != null)
+                IconButton(
+                  icon: const Icon(Icons.share, size: 18),
+                  onPressed: () => SharePlus.instance.share(ShareParams(text: r.url!)),
+                  tooltip: l10n.shareUrl,
+                ),
             ],
           ),
         ),
