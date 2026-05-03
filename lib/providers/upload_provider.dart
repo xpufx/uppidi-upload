@@ -245,12 +245,10 @@ class UploadNotifier extends Notifier<UploadState> {
       return;
     }
     if (request.mimeType != null && !meta.allowsMimeType(request.mimeType!)) {
-      final typeList = meta.allowedMimeTypes != null
-          ? meta.allowedMimeTypes!.map((m) => m.split('/').last.toUpperCase()).join(', ')
-          : 'this provider';
+      final label = meta.mimeTypeLabel;
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
-        errorMessage: '${provider.providerName} only accepts: $typeList',
+        errorMessage: '${provider.providerName} only accepts: ${label.isNotEmpty ? label : "this provider"}',
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,

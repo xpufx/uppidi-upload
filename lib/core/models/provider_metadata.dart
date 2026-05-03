@@ -30,6 +30,11 @@ class ProviderMetadata {
     return sizeBytes <= maxFileSizeBytes!;
   }
 
+  String get mimeTypeLabel {
+    if (allowedMimeTypes == null || allowedMimeTypes!.isEmpty) return '';
+    return allowedMimeTypes!.map((m) => m.split('/').last.toUpperCase()).join(', ');
+  }
+
   String get fileSizeLabel {
     if (maxFileSizeBytes == null) return '';
     final mb = maxFileSizeBytes! ~/ (1024 * 1024);

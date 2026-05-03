@@ -3,15 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/format.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
-
-String _formatSize(int bytes) {
-  if (bytes < 1024) return '$bytes B';
-  if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-  if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-  return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
-}
 
 IconData _providerIcon(String id) => switch (id) {
       'httpbin' => Icons.science_outlined,
@@ -140,7 +134,7 @@ Widget _metadataBadges(dynamic meta) {
     chips.add(_buildBadge(meta.fileSizeLabel as String));
   }
   if (meta.allowedMimeTypes != null) {
-    chips.add(_buildBadge(_typeLabel(meta.allowedMimeTypes as Set<String>)));
+    chips.add(_buildBadge(meta.mimeTypeLabel as String));
   }
   if (meta.expiryInfo is String && (meta.expiryInfo as String).isNotEmpty) {
     chips.add(_buildBadge(meta.expiryInfo as String));
@@ -149,12 +143,6 @@ Widget _metadataBadges(dynamic meta) {
   if (chips.isEmpty) return const SizedBox.shrink();
 
   return Row(mainAxisSize: MainAxisSize.min, children: chips);
-}
-
-String _typeLabel(Set<String> types) {
-  final allImages = types.every((t) => t.startsWith('image/'));
-  if (allImages && types.isNotEmpty) return 'Images only';
-  return types.map((t) => t.split('/').last.toUpperCase()).join(', ');
 }
 
 Widget _buildBadge(String label) {
@@ -187,7 +175,7 @@ class _ProviderInfo extends StatelessWidget {
       infos.add(meta.expiryInfo as String);
     }
     if (meta.allowedMimeTypes != null) {
-      infos.add(_typeLabel(meta.allowedMimeTypes as Set<String>));
+      infos.add(meta.mimeTypeLabel as String);
     }
 
     if (infos.isEmpty) return const SizedBox.shrink();
@@ -224,8 +212,7 @@ class _FileInfoBanner extends StatelessWidget {
 
     if (meta?.allowedMimeTypes != null && mimeType != null) {
       if (!meta.allowsMimeType(mimeType)) {
-        final types = meta.allowedMimeTypes!.map((m) => m.split('/').last.toUpperCase()).join(', ');
-        warnings.add(_warningRow('Provider only accepts: $types'));
+        warnings.add(_warningRow('Provider only accepts: ${meta.mimeTypeLabel}'));
       }
     }
 
@@ -244,7 +231,7 @@ class _FileInfoBanner extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(child: Text(fileName, overflow: TextOverflow.ellipsis)),
               const SizedBox(width: 8),
-              Text(_formatSize(fileSize),
+              Text(formatSize(fileSize),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
               if (mimeType != null) ...[
                 const SizedBox(width: 8),

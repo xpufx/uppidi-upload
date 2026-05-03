@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/format.dart';
 import '../core/history_service.dart';
 import '../l10n/app_localizations.dart';
 
@@ -101,7 +102,7 @@ class _HistoryTile extends StatelessWidget {
               Text(r.providerName, style: const TextStyle(fontSize: 12)),
               if (r.url != null)
                 Text(r.url!, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
-              Text(_formatTime(r.completedAt), style: const TextStyle(fontSize: 11, color: Colors.grey)),
+              Text(formatTime(r.completedAt), style: const TextStyle(fontSize: 11, color: Colors.grey)),
             ],
           ),
           trailing: IconButton(
@@ -112,14 +113,5 @@ class _HistoryTile extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatTime(DateTime dt) {
-    final now = DateTime.now();
-    final diff = now.difference(dt);
-    if (diff.inMinutes < 1) return 'just now';
-    if (diff.inHours < 1) return '${diff.inMinutes}m ago';
-    if (diff.inDays < 1) return '${diff.inHours}h ago';
-    return '${dt.day}/${dt.month}/${dt.year}';
   }
 }
