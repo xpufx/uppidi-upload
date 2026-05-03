@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../core/app_logo.dart';
 import '../core/format.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
@@ -42,21 +41,13 @@ class UploadScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              const AppLogo(size: 36),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _ProviderDropdown(
+          _ProviderDropdown(
             selectedIndex: uploadState.selectedProviderIndex,
             providers: providers,
             isUploading: uploadState is UploadInProgress,
             onChanged: (i) {
               if (i != null) notifier.setProvider(i);
             },
-          ),
-              ),
-            ],
           ),
           if (provider != null) _ProviderInfo(provider: provider),
           if (webUnsupported) const _WebWarning(),

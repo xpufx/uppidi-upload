@@ -258,16 +258,25 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         // Custom logo
         Text(l10n.themeCustomLogo, style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
-        OutlinedButton.icon(
-          onPressed: () async {
-            final result = await FilePicker.platform.pickFiles(type: FileType.image);
-            if (result != null && result.files.isNotEmpty) {
-              final path = result.files.single.path;
-              ref.read(logoPathProvider.notifier).setPath(path);
-            }
-          },
-          icon: const Icon(Icons.image, size: 18),
-          label: Text(ref.watch(logoPathProvider) != null ? 'Change Logo' : 'Choose Logo'),
+        Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: AppLogo(size: 48),
+            ),
+            const SizedBox(width: 12),
+            OutlinedButton.icon(
+              onPressed: () async {
+                final result = await FilePicker.platform.pickFiles(type: FileType.image);
+                if (result != null && result.files.isNotEmpty) {
+                  final path = result.files.single.path;
+                  ref.read(logoPathProvider.notifier).setPath(path);
+                }
+              },
+              icon: const Icon(Icons.image, size: 18),
+              label: Text(ref.watch(logoPathProvider) != null ? 'Change Logo' : 'Choose Logo'),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         Row(
