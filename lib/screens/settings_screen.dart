@@ -221,11 +221,11 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
             const Text('Language'),
             const Spacer(),
             DropdownButton<String>(
-              value: ref.watch(localeProvider).asData?.value ?? 'en',
+              value: ref.watch(localeCodeProvider).asData?.value ?? 'en',
               onChanged: (v) {
                 if (v != null) {
                   svc.set(SettingsService.localeKey, v);
-                  ref.invalidate(localeProvider);
+                  ref.invalidate(localeCodeProvider);
                 }
               },
               items: const [

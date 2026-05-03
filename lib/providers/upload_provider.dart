@@ -128,6 +128,13 @@ class UploadNotifier extends Notifier<UploadState> {
     try {
       final request = await createUploadRequest(file);
       _log.info('File: ${file.name}, size: ${request.sizeInBytes}, mime: ${request.mimeType}');
+
+      final needsApproval = await ref.read(settingsServiceProvider).needsApprovalBeforeUpload();
+      if (needsApproval) {
+        ref.read(pendingApprovalProvider.notifier).set(request);
+        return;
+      }
+
       await _executeUpload(request);
     } catch (e) {
       _log.warn('Failed to read file: $e', error: e);
@@ -325,6 +332,13 @@ class UploadNotifier extends Notifier<UploadState> {
       providers: state.providers,
     );
   }
+
+  Future<void> confirmPending() async {
+    final request = ref.read(pendingApprovalProvider);
+    if (request == null) return;
+    ref.read(pendingApprovalProvider.notifier).set(null);
+    await _executeUpload(request);
+  }
 }
 
 extension UploadInProgressX on UploadInProgress {
@@ -341,4 +355,15 @@ extension UploadInProgressX on UploadInProgress {
 
 final uploadProvider = NotifierProvider<UploadNotifier, UploadState>(
   UploadNotifier.new,
+);
+
+class _PendingNotifier extends Notifier<FileUploadRequest?> {
+  @override
+  FileUploadRequest? build() => null;
+
+  void set(FileUploadRequest? request) => state = request;
+}
+
+final pendingApprovalProvider = NotifierProvider<_PendingNotifier, FileUploadRequest?>(
+  _PendingNotifier.new,
 );

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/format.dart';
-import '../core/settings_service.dart';
+import '../core/models/upload_request.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 
@@ -31,6 +31,31 @@ class UploadScreen extends ConsumerWidget {
         : null;
     final webUnsupported = kIsWeb && provider != null && !provider.supportsWeb;
 
+    ref.listen<FileUploadRequest?>(
+      pendingApprovalProvider,
+      (prev, next) {
+        if (next == null || !context.mounted) return;
+        final l10n = AppLocalizations.of(context);
+        showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(l10n.approveUploadTitle),
+            content: Text(l10n.approveUploadMessage(provider?.providerName ?? 'this provider')),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+              TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.ok)),
+            ],
+          ),
+        ).then((confirmed) {
+          if (confirmed == true) {
+            notifier.confirmPending();
+          } else {
+            ref.read(pendingApprovalProvider.notifier).set(null);
+          }
+        });
+      },
+    );
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -53,7 +78,7 @@ class UploadScreen extends ConsumerWidget {
           },
           const SizedBox(height: 16),
           switch (uploadState) {
-            UploadIdle() || UploadFileSelected() => _PickAndUploadButton(notifier: notifier, provider: provider),
+            UploadIdle() || UploadFileSelected() => _PickAndUploadButton(notifier: notifier),
             _ => const SizedBox.shrink(),
           },
           switch (uploadState) {
@@ -181,34 +206,14 @@ class _ProviderInfo extends StatelessWidget {
 
 class _PickAndUploadButton extends ConsumerWidget {
   final dynamic notifier;
-  final dynamic provider;
 
-  const _PickAndUploadButton({required this.notifier, required this.provider});
+  const _PickAndUploadButton({required this.notifier});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final scaffoldContext = context;
     return ElevatedButton(
-      onPressed: () async {
-        final needsApproval = await ref.read(settingsServiceProvider).needsApprovalBeforeUpload();
-        if (needsApproval && scaffoldContext.mounted) {
-          final name = provider?.providerName ?? 'this provider';
-          final confirmed = await showDialog<bool>(
-            context: scaffoldContext,
-            builder: (ctx) => AlertDialog(
-              title: Text(l10n.approveUploadTitle),
-              content: Text(l10n.approveUploadMessage(name)),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
-                TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.ok)),
-              ],
-            ),
-          );
-          if (confirmed != true) return;
-        }
-        notifier.pickAndUpload();
-      },
+      onPressed: () => notifier.pickAndUpload(),
       child: Text(l10n.pickAndUpload),
     );
   }
