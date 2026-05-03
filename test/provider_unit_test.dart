@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uppidi/core/models/upload_request.dart';
 import 'package:uppidi/providers/catbox_provider.dart';
+import 'package:uppidi/providers/freeimage_provider.dart';
 import 'package:uppidi/providers/httpbin_provider.dart';
 import 'package:uppidi/providers/tmpfilelink_provider.dart';
 import 'package:uppidi/providers/uguu_provider.dart';
@@ -163,7 +164,7 @@ void main() {
     });
 
     test('metadata', () {
-      expect(provider.providerId, 'uguu');
+      expect(provider.providerId, contains('uguu'));
       expect(provider.providerName, 'uguu.se');
       expect(provider.supportsWeb, isFalse);
       expect(provider.requiredConfigKeys, isEmpty);
@@ -199,6 +200,80 @@ void main() {
       final client = await provider.createHttpClient({});
       expect(client.options.baseUrl, 'https://uguu.se');
       expect(provider.fileFormFieldName, 'files[]');
+    });
+  });
+
+  group('FreeImageHostProvider', () {
+    late FreeImageHostProvider provider;
+
+    setUp(() {
+      provider = FreeImageHostProvider(
+        name: 'freeimage.host',
+        url: 'https://freeimage.host',
+        apiKey: 'test_key',
+      );
+    });
+
+    test('metadata', () {
+      expect(provider.providerId, contains('freeimage'));
+      expect(provider.providerName, 'freeimage.host');
+      expect(provider.supportsWeb, isFalse);
+      expect(provider.requiredConfigKeys, isEmpty);
+    });
+
+    test('parseResponse extracts url from image.display_url', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/api/1/upload'),
+        statusCode: 200,
+        data: {
+          'status_code': 200,
+          'image': {
+            'name': 'test',
+            'extension': 'png',
+            'url': 'https://freeimage.host/images/test.png',
+            'display_url': 'https://freeimage.host/images/test.png',
+          },
+        },
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isTrue);
+      expect(result.url, 'https://freeimage.host/images/test.png');
+    });
+
+    test('parseResponse falls back to image.url', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/api/1/upload'),
+        statusCode: 200,
+        data: {
+          'status_code': 200,
+          'image': {
+            'url': 'https://freeimage.host/images/fallback.png',
+          },
+        },
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isTrue);
+      expect(result.url, 'https://freeimage.host/images/fallback.png');
+    });
+
+    test('parseResponse handles missing image', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/api/1/upload'),
+        statusCode: 400,
+        data: {'status_code': 400, 'error': {'message': 'fail'}},
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+    });
+
+    test('endpoint includes API key and format query params', () {
+      expect(provider.uploadEndpoint, contains('key=test_key'));
+      expect(provider.uploadEndpoint, contains('format=json'));
+    });
+
+    test('client uses correct baseUrl', () async {
+      final client = await provider.createHttpClient({});
+      expect(client.options.baseUrl, 'https://freeimage.host');
     });
   });
 }

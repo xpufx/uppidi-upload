@@ -3,18 +3,21 @@ import 'package:dio/dio.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/models/upload_result.dart';
 
-class UguuProvider extends BaseHttpProvider {
+class FreeImageHostProvider extends BaseHttpProvider {
   final String _name;
   final String _url;
+  final String _apiKey;
 
-  UguuProvider({
-    String name = 'uguu.se',
-    String url = 'https://uguu.se',
+  FreeImageHostProvider({
+    String name = 'freeimage.host',
+    String url = 'https://freeimage.host',
+    String apiKey = '6d207e02198a847aa98d0a2a901485a5',
   })  : _name = name,
-        _url = url;
+        _url = url,
+        _apiKey = apiKey;
 
   @override
-  String get providerId => 'uguu_${_name.replaceAll('.', '_')}';
+  String get providerId => 'freeimage_${_name.replaceAll('.', '_')}';
 
   @override
   String get providerName => _name;
@@ -35,22 +38,23 @@ class UguuProvider extends BaseHttpProvider {
   String get baseUrl => _url;
 
   @override
-  String get uploadEndpoint => '/upload';
+  String get uploadEndpoint => '/api/1/upload?key=$_apiKey&format=json';
 
   @override
-  String get fileFormFieldName => 'files[]';
+  String get fileFormFieldName => 'source';
 
   @override
   UploadResult parseResponse(Response response) {
     if (response.statusCode == 200 && response.data is Map) {
       final data = response.data as Map<String, dynamic>;
-      final files = data['files'] as List<dynamic>?;
+      final image = data['image'] as Map<String, dynamic>?;
 
-      if (files != null && files.isNotEmpty) {
-        final fileData = files[0] as Map<String, dynamic>?;
-        final url = fileData?['url'] as String?;
+      if (image != null) {
+        final url = (image['display_url'] ??
+                image['url'] ??
+                '') as String;
 
-        if (url != null && url.isNotEmpty) {
+        if (url.isNotEmpty) {
           return UploadResult(
             success: true,
             url: url,
