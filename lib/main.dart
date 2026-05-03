@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'l10n/app_localizations.dart';
+import 'screens/settings_screen.dart';
 import 'screens/upload_screen.dart';
 
 void main() {
@@ -101,7 +102,7 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
     return switch (_selected) {
       _NavTab.upload => const UploadScreen(),
       _NavTab.history => const _PlaceholderScreen(tab: _NavTab.history),
-      _NavTab.settings => const _PlaceholderScreen(tab: _NavTab.settings),
+      _NavTab.settings => const SettingsScreen(),
     };
   }
 }

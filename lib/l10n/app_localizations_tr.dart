@@ -72,7 +72,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Güvensiz bağlantılara izin ver (kendi imzalı sertifikalar)';
 
   @override
-  String get proxyUrl => 'Proxy URL (CORS bypass)';
+  String get proxyUrl => 'Proxy URL';
+
+  @override
+  String get providersSection => 'Sağlayıcı Yapılandırması';
 
   @override
   String get noProviders =>

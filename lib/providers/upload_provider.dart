@@ -10,6 +10,7 @@ import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
 import '../core/platform/file_source.dart';
 import '../core/registry.dart';
+import '../core/settings_service.dart';
 
 final _log = Log('UploadNotifier');
 
@@ -151,6 +152,17 @@ class UploadNotifier extends Notifier<UploadState> {
     );
 
     try {
+      final settingsService = ref.read(settingsServiceProvider);
+      final config = await settingsService.loadProviderConfig(
+        provider.providerId,
+        provider.requiredConfigKeys,
+      );
+
+      final allowInsecure = await settingsService.isInsecureConnAllowed();
+      if (allowInsecure) {
+        config['_allow_insecure_conn'] = 'true';
+      }
+
       final result = await provider.upload(
         request,
         onProgress: (sent, total) {

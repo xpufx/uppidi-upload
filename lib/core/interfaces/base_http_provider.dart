@@ -38,9 +38,12 @@ abstract class BaseHttpProvider implements BaseUploader {
     FileUploadRequest request, {
     UploadProgressCallback? onProgress,
     CancelToken? cancelToken,
+    Map<String, String> config = const {},
   }) async {
     try {
-      final dio = await createHttpClient({});
+      final allowInsecure = config['_allow_insecure_conn'] == 'true';
+      final cleanConfig = Map<String, String>.from(config)..remove('_allow_insecure_conn');
+      final dio = await createHttpClient(cleanConfig, allowInsecureConn: allowInsecure);
 
       final fields = Map<String, dynamic>.from(additionalFormFields);
       fields[fileFormFieldName] = _buildStreamFile(request);

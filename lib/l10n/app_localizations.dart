@@ -215,8 +215,14 @@ abstract class AppLocalizations {
   /// No description provided for @proxyUrl.
   ///
   /// In en, this message translates to:
-  /// **'Proxy URL (CORS bypass)'**
+  /// **'Proxy URL'**
   String get proxyUrl;
+
+  /// No description provided for @providersSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider Configuration'**
+  String get providersSection;
 
   /// No description provided for @noProviders.
   ///

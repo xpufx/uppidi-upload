@@ -71,7 +71,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Allow insecure connections (self-signed certificates)';
 
   @override
-  String get proxyUrl => 'Proxy URL (CORS bypass)';
+  String get proxyUrl => 'Proxy URL';
+
+  @override
+  String get providersSection => 'Provider Configuration';
 
   @override
   String get noProviders => 'No providers configured. Add one in Settings.';

@@ -23,5 +23,6 @@ abstract class BaseUploader {
     FileUploadRequest request, {
     UploadProgressCallback? onProgress,
     CancelToken? cancelToken,
+    Map<String, String> config,
   });
 }
