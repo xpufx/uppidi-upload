@@ -97,7 +97,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historyClearConfirm => 'Delete all history?';
 
   @override
-  String historyRecords(Object count) => '$count records';
+  String historyRecords(Object count) {
+    return '$count records';
+  }
 
   @override
   String get clearHistory => 'Clear History';

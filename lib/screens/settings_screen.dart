@@ -28,7 +28,7 @@ final _approveBeforeUploadProvider = FutureProvider<bool>((ref) async {
   return svc.needsApprovalBeforeUpload();
 });
 
-final _localeProvider = FutureProvider<String>((ref) async {
+final localeProvider = FutureProvider<String>((ref) async {
   final svc = ref.read(settingsServiceProvider);
   return (await svc.get(SettingsService.localeKey)) ?? 'en';
 });
@@ -221,11 +221,11 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
             const Text('Language'),
             const Spacer(),
             DropdownButton<String>(
-              value: ref.watch(_localeProvider).asData?.value ?? 'en',
+              value: ref.watch(localeProvider).asData?.value ?? 'en',
               onChanged: (v) {
                 if (v != null) {
                   svc.set(SettingsService.localeKey, v);
-                  ref.invalidate(_localeProvider);
+                  ref.invalidate(localeProvider);
                 }
               },
               items: const [

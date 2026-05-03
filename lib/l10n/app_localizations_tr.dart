@@ -98,7 +98,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get historyClearConfirm => 'Tüm geçmiş silinsin mi?';
 
   @override
-  String historyRecords(Object count) => '$count kayıt';
+  String historyRecords(Object count) {
+    return '$count kayıt';
+  }
 
   @override
   String get clearHistory => 'Geçmişi Temizle';

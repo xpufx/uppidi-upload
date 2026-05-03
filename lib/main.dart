@@ -25,30 +25,20 @@ class UppidiApp extends ConsumerStatefulWidget {
 }
 
 class _UppidiAppState extends ConsumerState<UppidiApp> {
-  Locale? _locale;
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ShareHandler.init(context, ref);
     });
-    _loadLocale();
-  }
-
-  Future<void> _loadLocale() async {
-    final svc = ref.read(settingsServiceProvider);
-    final code = await svc.get(SettingsService.localeKey);
-    if (code != null && mounted) {
-      setState(() => _locale = Locale(code));
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final localeCode = ref.watch(localeCodeProvider).asData?.value;
     return MaterialApp(
       title: 'uppidi',
-      locale: _locale,
+      locale: localeCode != null ? Locale(localeCode) : null,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,

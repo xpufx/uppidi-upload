@@ -3,6 +3,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final settingsServiceProvider = Provider<SettingsService>((ref) => SettingsService());
 
+final localeCodeProvider = FutureProvider<String>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  return (await svc.get(SettingsService.localeKey)) ?? 'en';
+});
+
 class SettingsService {
   final FlutterSecureStorage _storage;
 
