@@ -20,11 +20,21 @@ class AppLogo extends ConsumerWidget {
           width: size,
           height: size,
           fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) =>
-              Image.asset('assets/logo.png', width: size, height: size),
+          errorBuilder: (_, __, ___) => _assetLogo(context),
         ),
       );
     }
-    return Image.asset('assets/logo.png', width: size, height: size);
+    return _assetLogo(context);
+  }
+
+  Widget _assetLogo(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Image.asset(
+      isDark ? 'assets/logo-dark.png' : 'assets/logo-light.png',
+      width: size,
+      height: size,
+      errorBuilder: (_, __, ___) =>
+          Image.asset('assets/logo.png', width: size, height: size),
+    );
   }
 }
