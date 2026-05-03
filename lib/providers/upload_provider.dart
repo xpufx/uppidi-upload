@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
@@ -95,6 +95,54 @@ class UploadNotifier extends Notifier<UploadState> {
   Future<void> pickAndUpload() async {
     if (state is UploadInProgress) return;
 
+    final pickResult = await _filePicker.pickFiles();
+    if (pickResult == null || pickResult.files.isEmpty) return;
+
+    final file = pickResult.files.first;
+
+    try {
+      final request = await createUploadRequest(file);
+      _log.info('File: ${file.name}, size: ${request.sizeInBytes}, mime: ${request.mimeType}');
+      await _executeUpload(request);
+    } catch (e) {
+      _log.warn('Failed to read file: $e', error: e);
+      state = UploadCompleted(
+        lastResult: UploadResult(success: false),
+        errorMessage: 'Failed to read selected file',
+        results: state.results,
+        selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
+      );
+    }
+  }
+
+  Future<void> uploadFromFile(String filePath, String? mimeType) async {
+    if (state is UploadInProgress) return;
+
+    try {
+      final ioFile = File(filePath);
+      final size = await ioFile.length();
+      final request = FileUploadRequest(
+        fileName: ioFile.uri.pathSegments.last,
+        mimeType: mimeType,
+        sizeInBytes: size,
+        dataStream: ioFile.openRead(),
+      );
+      _log.info('Shared file: $filePath ($mimeType)');
+      await _executeUpload(request);
+    } catch (e) {
+      _log.warn('Failed to read shared file: $e', error: e);
+      state = UploadCompleted(
+        lastResult: UploadResult(success: false),
+        errorMessage: 'Failed to read selected file',
+        results: state.results,
+        selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
+      );
+    }
+  }
+
+  Future<void> _executeUpload(FileUploadRequest request) async {
     if (_providers.isEmpty) {
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
@@ -114,27 +162,6 @@ class UploadNotifier extends Notifier<UploadState> {
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
         errorMessage: 'errorConnectionFailed',
-        results: state.results,
-        selectedProviderIndex: state.selectedProviderIndex,
-        providers: state.providers,
-      );
-      return;
-    }
-
-    final pickResult = await _filePicker.pickFiles();
-    if (pickResult == null || pickResult.files.isEmpty) return;
-
-    final file = pickResult.files.first;
-
-    final FileUploadRequest request;
-    try {
-      request = await createUploadRequest(file);
-      _log.info('File: ${file.name}, size: ${request.sizeInBytes}, mime: ${request.mimeType}');
-    } catch (e) {
-      _log.warn('Failed to read file: $e', error: e);
-      state = UploadCompleted(
-        lastResult: UploadResult(success: false),
-        errorMessage: 'Failed to read selected file',
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -172,6 +199,7 @@ class UploadNotifier extends Notifier<UploadState> {
           }
         },
         cancelToken: cancelToken,
+        config: config,
       );
 
       _log.info('Result: success=${result.success}, url=${result.url}, error=${result.errorMessage}');

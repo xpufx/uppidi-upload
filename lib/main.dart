@@ -1,16 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/share_handler.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/settings_screen.dart';
 import 'screens/upload_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: UppidiApp()));
 }
 
-class UppidiApp extends StatelessWidget {
+class UppidiApp extends ConsumerStatefulWidget {
   const UppidiApp({super.key});
+
+  @override
+  ConsumerState<UppidiApp> createState() => _UppidiAppState();
+}
+
+class _UppidiAppState extends ConsumerState<UppidiApp> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ShareHandler.init(context, ref);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

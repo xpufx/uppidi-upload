@@ -6,6 +6,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 
+IconData _providerIcon(String id) => switch (id) {
+      'httpbin' => Icons.science_outlined,
+      'catbox' => Icons.folder_outlined,
+      'tmpfilelink' => Icons.link,
+      'uguu_uguu_se' || 'uguu_safe_uguu_se' => Icons.burst_mode_outlined,
+      'freeimage_freeimage_host' => Icons.image_outlined,
+      _ => Icons.cloud_upload,
+    };
+
 class UploadScreen extends ConsumerWidget {
   const UploadScreen({super.key});
 
@@ -87,7 +96,7 @@ class _ProviderDropdown extends StatelessWidget {
           enabled: online,
           child: Row(
             children: [
-              Icon(Icons.cloud_upload, size: 20,
+              Icon(_providerIcon(p.providerId), size: 20,
                 color: online ? Theme.of(context).colorScheme.primary : Theme.of(context).disabledColor),
               const SizedBox(width: 8),
               Text(p.providerName,
