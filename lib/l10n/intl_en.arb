@@ -28,5 +28,8 @@
   "error": "Error",
   "unknownError": "Unknown error",
   "ok": "OK",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "timeJustNow": "just now",
+  "timeMinutesAgo": "{minutes}m ago",
+  "timeHoursAgo": "{hours}h ago"
 }

@@ -5,11 +5,15 @@ String formatSize(int bytes) {
   return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
 }
 
-String formatTime(DateTime dt) {
+String formatTime(DateTime dt, {
+  required String justNow,
+  required String Function(int minutes) minutesAgo,
+  required String Function(int hours) hoursAgo,
+}) {
   final now = DateTime.now();
   final diff = now.difference(dt);
-  if (diff.inMinutes < 1) return 'just now';
-  if (diff.inHours < 1) return '${diff.inMinutes}m ago';
-  if (diff.inDays < 1) return '${diff.inHours}h ago';
+  if (diff.inMinutes < 1) return justNow;
+  if (diff.inHours < 1) return minutesAgo(diff.inMinutes);
+  if (diff.inDays < 1) return hoursAgo(diff.inHours);
   return '${dt.day}/${dt.month}/${dt.year}';
 }

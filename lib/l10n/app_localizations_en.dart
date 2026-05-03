@@ -104,4 +104,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancel => 'Cancel';
+
+  @override
+  String get timeJustNow => 'just now';
+
+  @override
+  String timeMinutesAgo(Object minutes) => '$minutes' 'm ago';
+
+  @override
+  String timeHoursAgo(Object hours) => '$hours' 'h ago';
 }

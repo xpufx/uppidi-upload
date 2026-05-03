@@ -106,4 +106,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get cancel => 'İptal';
+
+  @override
+  String get timeJustNow => 'az önce';
+
+  @override
+  String timeMinutesAgo(Object minutes) => '$minutes' 'dk önce';
+
+  @override
+  String timeHoursAgo(Object hours) => '$hours' 's önce';
 }

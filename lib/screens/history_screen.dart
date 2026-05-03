@@ -102,7 +102,11 @@ class _HistoryTile extends StatelessWidget {
               Text(r.providerName, style: const TextStyle(fontSize: 12)),
               if (r.url != null)
                 Text(r.url!, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
-              Text(formatTime(r.completedAt), style: const TextStyle(fontSize: 11, color: Colors.grey)),
+              Text(formatTime(r.completedAt,
+                justNow: l10n.timeJustNow,
+                minutesAgo: (m) => l10n.timeMinutesAgo(m),
+                hoursAgo: (h) => l10n.timeHoursAgo(h),
+              ), style: const TextStyle(fontSize: 11, color: Colors.grey)),
             ],
           ),
           trailing: IconButton(

@@ -28,5 +28,8 @@
   "error": "Hata",
   "unknownError": "Bilinmeyen hata",
   "ok": "Tamam",
-  "cancel": "İptal"
+  "cancel": "İptal",
+  "timeJustNow": "az önce",
+  "timeMinutesAgo": "{minutes}dk önce",
+  "timeHoursAgo": "{hours}s önce"
 }
