@@ -262,7 +262,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: AppLogo(size: 48),
+              child: AppLogo(size: 72),
             ),
             const SizedBox(width: 12),
             OutlinedButton.icon(
@@ -353,7 +353,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         const SizedBox(height: 16),
         Center(child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: AppLogo(size: 64),
+          child: AppLogo(size: 96),
         )),
       ],
     );

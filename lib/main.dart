@@ -100,7 +100,7 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
             appBar: AppBar(
               title: Row(
                 children: [
-                  AppLogo(size: 32),
+                  AppLogo(size: 48),
                   const SizedBox(width: 8),
                   Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
                   const Spacer(),
@@ -132,7 +132,7 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
                 child: Column(
                   children: [
                     const SizedBox(height: 16),
-                    AppLogo(size: 48),
+                    AppLogo(size: 72),
                     const SizedBox(height: 4),
                     Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                     const SizedBox(height: 8),
