@@ -159,6 +159,28 @@ class UploadNotifier extends Notifier<UploadState> {
     final provider = _providers[state.selectedProviderIndex];
     _log.info('Using provider: ${provider.providerName} (${provider.providerId})');
 
+    final meta = provider.metadata;
+    if (!meta.acceptsFileSize(request.sizeInBytes)) {
+      state = UploadCompleted(
+        lastResult: UploadResult(success: false),
+        errorMessage: 'errorFileTooLarge',
+        results: state.results,
+        selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
+      );
+      return;
+    }
+    if (request.mimeType != null && !meta.allowsMimeType(request.mimeType!)) {
+      state = UploadCompleted(
+        lastResult: UploadResult(success: false),
+        errorMessage: '${provider.providerName} only accepts: ${meta.allowedMimeTypes!.map((m) => m.split('/').last.toUpperCase()).join(', ')}',
+        results: state.results,
+        selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
+      );
+      return;
+    }
+
     final online = await _checkConnectivity(provider);
     if (!online) {
       state = UploadCompleted(

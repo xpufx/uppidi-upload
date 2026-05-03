@@ -42,6 +42,7 @@ class UploadScreen extends ConsumerWidget {
               if (i != null) notifier.setProvider(i);
             },
           ),
+          if (provider != null) _ProviderInfo(provider: provider),
           if (webUnsupported) const _WebWarning(),
           const SizedBox(height: 16),
           ElevatedButton(
@@ -107,10 +108,76 @@ class _ProviderDropdown extends StatelessWidget {
                     ? Theme.of(context).textTheme.bodySmall
                     : Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).disabledColor))
                     ?.copyWith(color: online ? Theme.of(context).colorScheme.outline : Theme.of(context).disabledColor)),
+              _metadataBadges(p.metadata),
             ],
           ),
         );
       }).toList(),
+    );
+  }
+}
+
+Widget _metadataBadges(dynamic meta) {
+  final chips = <Widget>[];
+
+  if (meta.fileSizeLabel is String && (meta.fileSizeLabel as String).isNotEmpty) {
+    chips.add(_buildBadge(meta.fileSizeLabel as String));
+  }
+  if (meta.allowedMimeTypes != null) {
+    chips.add(_buildBadge('Images only'));
+  }
+  if (meta.expiryInfo is String && (meta.expiryInfo as String).isNotEmpty) {
+    chips.add(_buildBadge(meta.expiryInfo as String));
+  }
+
+  if (chips.isEmpty) return const SizedBox.shrink();
+
+  return Row(mainAxisSize: MainAxisSize.min, children: [const SizedBox(width: 4), ...chips]);
+}
+
+Widget _buildBadge(String label) {
+  return Padding(
+    padding: const EdgeInsets.only(left: 4),
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(label, style: const TextStyle(fontSize: 10, color: Colors.blue)),
+    ),
+  );
+}
+
+class _ProviderInfo extends StatelessWidget {
+  final dynamic provider;
+  const _ProviderInfo({required this.provider});
+
+  @override
+  Widget build(BuildContext context) {
+    final meta = provider.metadata;
+    final infos = <String>[];
+
+    if (meta.fileSizeLabel is String && (meta.fileSizeLabel as String).isNotEmpty) {
+      infos.add('Max file size: ${meta.fileSizeLabel}');
+    }
+    if (meta.expiryInfo is String && (meta.expiryInfo as String).isNotEmpty) {
+      infos.add(meta.expiryInfo as String);
+    }
+    if (meta.allowedMimeTypes != null) {
+      infos.add('Images only');
+    }
+
+    if (infos.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: infos.map((info) => Text(info,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+        )).toList(),
+      ),
     );
   }
 }
