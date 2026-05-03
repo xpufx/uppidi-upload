@@ -111,8 +111,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get timeJustNow => 'az önce';
 
   @override
-  String timeMinutesAgo(Object minutes) => '$minutes' 'dk önce';
+  String timeMinutesAgo(Object minutes) {
+    return '${minutes}dk önce';
+  }
 
   @override
-  String timeHoursAgo(Object hours) => '$hours' 's önce';
+  String timeHoursAgo(Object hours) {
+    return '${hours}s önce';
+  }
 }
