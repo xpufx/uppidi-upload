@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -39,6 +40,9 @@ class SettingsService {
   static const proxyUrlKey = 'global.proxy_url';
   static const localeKey = 'global.locale';
   static const defaultShareProviderKey = 'global.default_share_provider';
+  static const themeModeKey = 'global.theme_mode';
+  static const seedColorKey = 'global.seed_color';
+  static const logoPathKey = 'global.logo_path';
 
   Future<bool> isInsecureConnAllowed() async {
     final val = await get(insecureConnKey);
@@ -46,4 +50,23 @@ class SettingsService {
   }
 
   Future<String?> getProxyUrl() => get(proxyUrlKey);
+
+  Future<ThemeMode> getThemeMode() async {
+    final val = await get(themeModeKey);
+    return switch (val) {
+      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      _ => ThemeMode.system,
+    };
+  }
+
+  Future<Color> getSeedColor() async {
+    final val = await get(seedColorKey);
+    if (val != null && val.length == 8) {
+      return Color(int.parse(val, radix: 16));
+    }
+    return Colors.deepPurple;
+  }
+
+  Future<String?> getLogoPath() => get(logoPathKey);
 }

@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:typed_data';
@@ -31,8 +31,12 @@ class UploadScreen extends ConsumerWidget {
         ? providers[uploadState.selectedProviderIndex]
         : null;
     final webUnsupported = kIsWeb && provider != null && !provider.supportsWeb;
+    final isDesktop = !kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.linux ||
+         defaultTargetPlatform == TargetPlatform.macOS ||
+         defaultTargetPlatform == TargetPlatform.windows);
 
-    return Padding(
+    final content = Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -78,6 +82,60 @@ class UploadScreen extends ConsumerWidget {
         ],
       ),
     );
+
+    if (isDesktop) {
+      return DragTarget<String>(
+        onWillAcceptWithDetails: (_) => true,
+        onAcceptWithDetails: (details) {
+          final lines = details.data.split(RegExp(r'[\r\n]+'));
+          for (final line in lines) {
+            final uri = Uri.tryParse(line.trim());
+            if (uri != null && uri.scheme == 'file' && uri.path.isNotEmpty) {
+              final path = Uri.decodeFull(uri.path);
+              notifier.uploadFromFile(path, null);
+              break; // takes first file only
+            }
+          }
+        },
+        builder: (context, candidateData, rejectedData) {
+          final isHovering = candidateData.isNotEmpty;
+          return Stack(
+            children: [
+              content,
+              if (isHovering)
+                Positioned.fill(
+                  child: Container(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.cloud_upload, color: Theme.of(context).colorScheme.primary),
+                            const SizedBox(width: 12),
+                            Text('Drop file to upload',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      );
+    }
+    return content;
   }
 }
 

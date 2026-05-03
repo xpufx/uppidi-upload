@@ -1,8 +1,10 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/registry.dart';
 import '../core/settings_service.dart';
+import '../core/theme_provider.dart';
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
 
@@ -207,6 +209,64 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
             ref.invalidate(insecureConnProvider);
           },
           contentPadding: EdgeInsets.zero,
+        ),
+        const SizedBox(height: 16),
+        // Theme mode
+        Text(l10n.themeMode, style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: 8),
+        Center(
+          child: SegmentedButton<ThemeMode>(
+            segments: [
+              ButtonSegment(value: ThemeMode.system, label: Text(l10n.themeSystem), icon: const Icon(Icons.brightness_auto)),
+              ButtonSegment(value: ThemeMode.light, label: Text(l10n.themeLight), icon: const Icon(Icons.light_mode)),
+              ButtonSegment(value: ThemeMode.dark, label: Text(l10n.themeDark), icon: const Icon(Icons.dark_mode)),
+            ],
+            selected: {ref.watch(themeModeProvider)},
+            onSelectionChanged: (sel) => ref.read(themeModeProvider.notifier).setMode(sel.first),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Seed color
+        Text(l10n.themeSeedColor, style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: 8),
+        Row(
+          children: const [
+            Colors.deepPurple, Colors.blue, Colors.teal,
+            Colors.orange, Colors.pink, Colors.indigo,
+          ].map((color) {
+            final selected = ref.watch(seedColorProvider);
+            final isSelected = selected.toARGB32() == color.toARGB32();
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: GestureDetector(
+                onTap: () => ref.read(seedColorProvider.notifier).setColor(color),
+                child: Container(
+                  width: 36, height: 36,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
+                    boxShadow: isSelected ? [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 6)] : null,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 16),
+        // Custom logo
+        Text(l10n.themeCustomLogo, style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: () async {
+            final result = await FilePicker.platform.pickFiles(type: FileType.image);
+            if (result != null && result.files.isNotEmpty) {
+              final path = result.files.single.path;
+              ref.read(logoPathProvider.notifier).setPath(path);
+            }
+          },
+          icon: const Icon(Icons.image, size: 18),
+          label: Text(ref.watch(logoPathProvider) != null ? 'Change Logo' : 'Choose Logo'),
         ),
         const SizedBox(height: 8),
         Row(

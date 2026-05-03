@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -5,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'core/models/upload_record.dart';
 import 'core/settings_service.dart';
 import 'core/share_handler.dart';
+import 'core/theme_provider.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/history_screen.dart';
 import 'screens/settings_screen.dart';
@@ -29,18 +32,28 @@ class _UppidiAppState extends ConsumerState<UppidiApp> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ShareHandler.init(context, ref);
+      if (Platform.isAndroid || Platform.isIOS) {
+        ShareHandler.init(context, ref);
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final localeCode = ref.watch(localeCodeProvider).asData?.value;
+    final seed = ref.watch(seedColorProvider);
+    final themeMode = ref.watch(themeModeProvider);
+
     return MaterialApp(
       title: 'uppidi',
       locale: localeCode != null ? Locale(localeCode) : null,
+      themeMode: themeMode,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: seed, brightness: Brightness.light),
+        useMaterial3: true,
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: seed, brightness: Brightness.dark),
         useMaterial3: true,
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -86,7 +99,7 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
             appBar: AppBar(
               title: Row(
                 children: [
-                  Image.asset('assets/logo.png', width: 28, height: 28),
+                  _AppLogo(size: 28),
                   const SizedBox(width: 8),
                   Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
                   const Spacer(),
@@ -118,7 +131,7 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
                 child: Column(
                   children: [
                     const SizedBox(height: 16),
-                    Image.asset('assets/logo.png', width: 40, height: 40),
+                    _AppLogo(size: 40),
                     const SizedBox(height: 4),
                     Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                     const SizedBox(height: 8),
@@ -154,5 +167,24 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
       _NavTab.history => const HistoryScreen(),
       _NavTab.settings => const SettingsScreen(),
     };
+  }
+}
+
+class _AppLogo extends ConsumerWidget {
+  final double size;
+  const _AppLogo({required this.size});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final logoPath = ref.watch(logoPathProvider);
+    if (logoPath != null && logoPath.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.file(File(logoPath), width: size, height: size, fit: BoxFit.contain,
+          errorBuilder: (_, __, ___) => Image.asset('assets/logo.png', width: size, height: size),
+        ),
+      );
+    }
+    return Image.asset('assets/logo.png', width: size, height: size);
   }
 }

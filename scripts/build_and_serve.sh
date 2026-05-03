@@ -13,16 +13,24 @@ ARTIFACTS_DIR="/home/oktay/code/uppidi/.caddy-artifacts"
 mkdir -p "$ARTIFACTS_DIR"
 
 # ── Android APK ────────────────────────────────────────────
-APK_NAME="uppidi-${VERSION}-${GIT_HASH}-android.apk"
-
 echo "==> Building Android APK @ ${GIT_HASH}..."
-flutter build apk --release --dart-define=GIT_HASH=$GIT_HASH
+flutter build apk --release --split-per-abi --dart-define=GIT_HASH=$GIT_HASH
 
-echo "==> Copying APK to ${ARTIFACTS_DIR}..."
-cp build/app/outputs/flutter-apk/app-release.apk "${ARTIFACTS_DIR}/${APK_NAME}"
+echo "==> Copying APKs to ${ARTIFACTS_DIR}..."
+APK_DIR="build/app/outputs/flutter-apk"
+for abi in arm64-v8a armeabi-v7a x86_64; do
+  SRC="${APK_DIR}/app-${abi}-release.apk"
+  DST="uppidi-${VERSION}-${GIT_HASH}-android-${abi}.apk"
+  if [ -f "$SRC" ]; then
+    cp "$SRC" "${ARTIFACTS_DIR}/${DST}"
+    echo "    ${DST}"
+  fi
+done
 
-echo "==> Cleaning old APKs (keep latest 5)..."
-ls -t "${ARTIFACTS_DIR}"/*-android.apk 2>/dev/null | tail -n +6 | xargs -r rm -f
+echo "==> Cleaning old APKs (keep latest 5 per ABI)..."
+for abi in arm64-v8a armeabi-v7a x86_64; do
+  ls -t "${ARTIFACTS_DIR}"/*-${abi}.apk 2>/dev/null | tail -n +6 | xargs -r rm -f
+done
 
 # ── Linux ──────────────────────────────────────────────────
 LINUX_NAME="uppidi-${VERSION}-${GIT_HASH}-linux.tar.gz"

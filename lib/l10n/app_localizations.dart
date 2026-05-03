@@ -286,6 +286,42 @@ abstract class AppLocalizations {
   /// **'Success'**
   String get success;
 
+  /// No description provided for @themeCustomLogo.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Logo'**
+  String get themeCustomLogo;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeMode;
+
+  /// No description provided for @themeSeedColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Accent Color'**
+  String get themeSeedColor;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get themeSystem;
+
   /// No description provided for @failed.
   ///
   /// In en, this message translates to:

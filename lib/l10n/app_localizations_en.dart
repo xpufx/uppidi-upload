@@ -111,6 +111,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get success => 'Success';
 
   @override
+  String get themeCustomLogo => 'Custom Logo';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeMode => 'Theme';
+
+  @override
+  String get themeSeedColor => 'Accent Color';
+
+  @override
+  String get themeSystem => 'System';
+
+  @override
   String get failed => 'Failed';
 
   @override

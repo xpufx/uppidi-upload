@@ -113,6 +113,24 @@ class AppLocalizationsTr extends AppLocalizations {
   String get success => 'Başarılı';
 
   @override
+  String get themeCustomLogo => 'Özel Logo';
+
+  @override
+  String get themeDark => 'Koyu';
+
+  @override
+  String get themeLight => 'Açık';
+
+  @override
+  String get themeMode => 'Tema';
+
+  @override
+  String get themeSeedColor => 'Vurgu Rengi';
+
+  @override
+  String get themeSystem => 'Sistem';
+
+  @override
   String get failed => 'Başarısız';
 
   @override
