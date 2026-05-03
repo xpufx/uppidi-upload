@@ -83,7 +83,15 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
       builder: (context, constraints) {
         if (constraints.maxWidth < 600) {
           return Scaffold(
-            appBar: AppBar(title: Text(_selected.label(l10n))),
+            appBar: AppBar(
+              title: Row(
+                children: [
+                  Image.asset('assets/logo.png', width: 28, height: 28),
+                  const SizedBox(width: 8),
+                  Text(_selected.label(l10n)),
+                ],
+              ),
+            ),
             body: _buildBody(),
             bottomNavigationBar: BottomNavigationBar(
               currentIndex: _selected.index,
@@ -100,17 +108,29 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
         return Scaffold(
           body: Row(
             children: [
-              NavigationRail(
-                selectedIndex: _selected.index,
-                onDestinationSelected: (i) =>
-                    setState(() => _selected = _NavTab.values[i]),
-                labelType: NavigationRailLabelType.all,
-                destinations: _NavTab.values
-                    .map((t) => NavigationRailDestination(
-                          icon: Icon(t.icon),
-                          label: Text(t.label(l10n)),
-                        ))
-                    .toList(),
+              SizedBox(
+                width: 80,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    Image.asset('assets/logo.png', width: 40, height: 40),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: NavigationRail(
+                        selectedIndex: _selected.index,
+                        onDestinationSelected: (i) =>
+                            setState(() => _selected = _NavTab.values[i]),
+                        labelType: NavigationRailLabelType.all,
+                        destinations: _NavTab.values
+                            .map((t) => NavigationRailDestination(
+                                  icon: Icon(t.icon),
+                                  label: Text(t.label(l10n)),
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const VerticalDivider(width: 1),
               Expanded(child: _buildBody()),

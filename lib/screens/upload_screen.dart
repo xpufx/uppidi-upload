@@ -88,8 +88,8 @@ class UploadScreen extends ConsumerWidget {
                 progress: null,
                 onCancel: notifier.cancelUpload,
               ),
-            UploadCompleted(errorMessage: final e) when e != null => _ErrorBanner(error: e),
-            UploadCompleted(isSuccess: final ok) => _ResultBanner(success: ok),
+            UploadCompleted(errorMessage: final e, lastResult: final _) when e != null => _ErrorBanner(error: e),
+            UploadCompleted(lastResult: final r) => _ResultBanner(url: r.url),
             _ => const SizedBox.shrink(),
           },
           const SizedBox(height: 16),
@@ -374,21 +374,37 @@ class _ErrorBanner extends StatelessWidget {
 }
 
 class _ResultBanner extends StatelessWidget {
-  final bool success;
+  final String? url;
 
-  const _ResultBanner({required this.success});
+  const _ResultBanner({this.url});
 
   @override
   Widget build(BuildContext context) {
+    final success = url != null;
     final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.only(top: 8),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(success ? Icons.check_circle : Icons.error,
-            color: success ? Colors.green : Colors.red, size: 20),
-          const SizedBox(width: 8),
-          Text(success ? l10n.uploadComplete : l10n.uploadFailed),
+          Row(
+            children: [
+              Icon(success ? Icons.check_circle : Icons.error,
+                color: success ? Colors.green : Colors.red, size: 20),
+              const SizedBox(width: 8),
+              Text(success ? l10n.uploadComplete : l10n.uploadFailed),
+            ],
+          ),
+          if (url != null) ...[
+            const SizedBox(height: 4),
+            SelectableText(url!,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 13,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ],
         ],
       ),
     );
