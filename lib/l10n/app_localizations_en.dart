@@ -67,6 +67,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get history => 'History';
 
   @override
+  String get historyEmpty => 'No upload history yet';
+
+  @override
   String get enableInsecure =>
       'Allow insecure connections (self-signed certificates)';
 

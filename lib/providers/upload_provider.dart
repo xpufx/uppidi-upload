@@ -4,7 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/history_service.dart';
 import '../core/interfaces/uploader.dart';
+import '../core/models/upload_record.dart';
 import '../core/logging/log.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
@@ -211,15 +213,27 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
+      _saveToHistory(result, provider);
     } catch (e) {
       _log.warn('Upload exception: $e', error: e);
+      final failResult = UploadResult(success: false, errorMessage: 'Upload failed: $e');
       state = UploadCompleted(
-        lastResult: UploadResult(success: false, errorMessage: 'Upload failed: $e'),
+        lastResult: failResult,
         errorMessage: 'Upload failed: $e',
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
+      _saveToHistory(failResult, provider);
+    }
+  }
+
+  Future<void> _saveToHistory(UploadResult result, BaseUploader provider) async {
+    try {
+      final history = ref.read(historyServiceProvider);
+      await history.add(UploadRecord.fromResult(result, provider.providerId, provider.providerName));
+    } catch (e) {
+      _log.warn('Failed to save history: $e');
     }
   }
 

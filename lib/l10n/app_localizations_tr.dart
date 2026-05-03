@@ -68,6 +68,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get history => 'Geçmiş';
 
   @override
+  String get historyEmpty => 'Henüz yükleme geçmişi yok';
+
+  @override
   String get enableInsecure =>
       'Güvensiz bağlantılara izin ver (kendi imzalı sertifikalar)';
 

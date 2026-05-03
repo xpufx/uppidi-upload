@@ -17,6 +17,7 @@
   "selectProvider": "Select Provider",
   "settings": "Settings",
   "history": "History",
+  "historyEmpty": "No upload history yet",
   "enableInsecure": "Allow insecure connections (self-signed certificates)",
   "proxyUrl": "Proxy URL",
   "providersSection": "Provider Configuration",

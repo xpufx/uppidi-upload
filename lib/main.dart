@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
+import 'core/models/upload_record.dart';
 import 'core/share_handler.dart';
 import 'l10n/app_localizations.dart';
+import 'screens/history_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/upload_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  Hive.registerAdapter(UploadRecordAdapter());
   runApp(const ProviderScope(child: UppidiApp()));
 }
 
@@ -116,33 +121,8 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
   Widget _buildBody() {
     return switch (_selected) {
       _NavTab.upload => const UploadScreen(),
-      _NavTab.history => const _PlaceholderScreen(tab: _NavTab.history),
+      _NavTab.history => const HistoryScreen(),
       _NavTab.settings => const SettingsScreen(),
     };
-  }
-}
-
-class _PlaceholderScreen extends StatelessWidget {
-  final _NavTab tab;
-  const _PlaceholderScreen({required this.tab});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(tab.icon, size: 64, color: Colors.grey.shade400),
-          const SizedBox(height: 16),
-          Text(
-            tab.label(l10n),
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: Colors.grey.shade400,
-                ),
-          ),
-        ],
-      ),
-    );
   }
 }

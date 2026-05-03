@@ -206,6 +206,12 @@ abstract class AppLocalizations {
   /// **'History'**
   String get history;
 
+  /// No description provided for @historyEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No upload history yet'**
+  String get historyEmpty;
+
   /// No description provided for @enableInsecure.
   ///
   /// In en, this message translates to:

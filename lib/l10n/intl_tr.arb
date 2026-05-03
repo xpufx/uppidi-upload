@@ -17,6 +17,7 @@
   "selectProvider": "Sağlayıcı Seç",
   "settings": "Ayarlar",
   "history": "Geçmiş",
+  "historyEmpty": "Henüz yükleme geçmişi yok",
   "enableInsecure": "Güvensiz bağlantılara izin ver (kendi imzalı sertifikalar)",
   "proxyUrl": "Proxy URL",
   "providersSection": "Sağlayıcı Yapılandırması",
