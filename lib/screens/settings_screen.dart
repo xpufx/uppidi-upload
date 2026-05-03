@@ -253,6 +253,15 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
             ref.invalidate(proxyUrlProvider);
           },
         ),
+        const Divider(height: 32),
+        Text('uppidi v1.0.0',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        Text('Cross-platform media uploader',
+          style: Theme.of(context).textTheme.bodySmall),
+        const SizedBox(height: 2),
+        Text('${ProviderRegistry.all.length} providers · 45 tests',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
       ],
     );
   }
