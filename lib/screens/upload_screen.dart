@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../core/format.dart';
 import '../core/models/upload_request.dart';
@@ -86,12 +84,15 @@ class UploadScreen extends ConsumerWidget {
                 progress: p,
                 onCancel: notifier.cancelUpload,
               ),
+            UploadStarting() => _ProgressSection(
+                progress: null,
+                onCancel: notifier.cancelUpload,
+              ),
             UploadCompleted(errorMessage: final e) when e != null => _ErrorBanner(error: e),
             UploadCompleted(isSuccess: final ok) => _ResultBanner(success: ok),
             _ => const SizedBox.shrink(),
           },
           const SizedBox(height: 16),
-          Expanded(child: _ResultList(results: uploadState.results)),
         ],
       ),
     );
@@ -312,10 +313,10 @@ class _WebWarning extends StatelessWidget {
 }
 
 class _ProgressSection extends StatelessWidget {
-  final double progress;
+  final double? progress;
   final VoidCallback onCancel;
 
-  const _ProgressSection({required this.progress, required this.onCancel});
+  const _ProgressSection({this.progress, required this.onCancel});
 
   @override
   Widget build(BuildContext context) {
@@ -390,65 +391,6 @@ class _ResultBanner extends StatelessWidget {
           Text(success ? l10n.uploadComplete : l10n.uploadFailed),
         ],
       ),
-    );
-  }
-}
-
-class _ResultList extends StatelessWidget {
-  final List<dynamic> results;
-
-  const _ResultList({required this.results});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: results.length,
-      itemBuilder: (context, index) => _ResultTile(result: results[index]),
-    );
-  }
-}
-
-class _ResultTile extends StatelessWidget {
-  final dynamic result;
-  const _ResultTile({required this.result});
-
-  static void _copyUrl(BuildContext context, String url) {
-    Clipboard.setData(ClipboardData(text: url));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppLocalizations.of(context).urlCopiedToClipboard)),
-    );
-  }
-
-  static void _openUrl(String url) async {
-    final uri = Uri.tryParse(url);
-    if (uri != null) await launchUrl(uri, mode: LaunchMode.externalApplication);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final success = result.success as bool;
-    final url = result.url as String?;
-
-    return ListTile(
-      leading: Icon(success ? Icons.check_circle : Icons.error,
-        color: success ? Colors.green : Colors.red),
-      title: Text(success ? l10n.success : l10n.failed),
-      subtitle: success && url != null
-          ? Row(children: [
-              Expanded(child: SelectableText(url,
-                style: TextStyle(color: Theme.of(context).colorScheme.primary, decoration: TextDecoration.underline),
-                onTap: () => _copyUrl(context, url))),
-              IconButton(icon: const Icon(Icons.open_in_new, size: 18),
-                onPressed: () => _openUrl(url),
-                tooltip: l10n.openInBrowser),
-              IconButton(icon: const Icon(Icons.copy, size: 18),
-                onPressed: () => _copyUrl(context, url),
-                tooltip: l10n.urlCopiedToClipboard),
-            ])
-          : Text(success
-              ? '${l10n.success}: ${result.statusCode}'
-              : '${result.errorMessage ?? l10n.unknownError} (${result.statusCode})'),
     );
   }
 }

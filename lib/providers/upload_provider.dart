@@ -47,6 +47,10 @@ final class UploadFileSelected extends UploadState {
   });
 }
 
+final class UploadStarting extends UploadState {
+  const UploadStarting({super.results, super.selectedProviderIndex, super.providers});
+}
+
 final class UploadInProgress extends UploadState {
   final double progress;
   final CancelToken cancelToken;
@@ -103,7 +107,7 @@ class UploadNotifier extends Notifier<UploadState> {
           selectedProviderIndex: index,
           providers: prev.providers,
         ),
-      UploadIdle() => UploadIdle(
+      UploadIdle() || UploadStarting() => UploadIdle(
           results: prev.results,
           selectedProviderIndex: index,
           providers: prev.providers,
@@ -267,6 +271,13 @@ class UploadNotifier extends Notifier<UploadState> {
         providers: state.providers,
       );
       _saveToHistory(result, provider, request.fileName);
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        state = UploadIdle(
+          results: state.results,
+          selectedProviderIndex: state.selectedProviderIndex,
+          providers: state.providers,
+        );
+      });
     } catch (e) {
       _log.warn('Upload exception: $e', error: e);
       final failResult = UploadResult(success: false, errorMessage: 'Upload failed: $e');
@@ -278,6 +289,13 @@ class UploadNotifier extends Notifier<UploadState> {
         providers: state.providers,
       );
       _saveToHistory(failResult, provider, request.fileName);
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        state = UploadIdle(
+          results: state.results,
+          selectedProviderIndex: state.selectedProviderIndex,
+          providers: state.providers,
+        );
+      });
     }
   }
 
