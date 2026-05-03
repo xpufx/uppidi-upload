@@ -4,6 +4,7 @@ import 'package:uppidi/core/models/upload_request.dart';
 import 'package:uppidi/providers/catbox_provider.dart';
 import 'package:uppidi/providers/freeimage_provider.dart';
 import 'package:uppidi/providers/httpbin_provider.dart';
+import 'package:uppidi/providers/tempsh_provider.dart';
 import 'package:uppidi/providers/tmpfilelink_provider.dart';
 import 'package:uppidi/providers/uguu_provider.dart';
 
@@ -274,6 +275,37 @@ void main() {
     test('client uses correct baseUrl', () async {
       final client = await provider.createHttpClient({});
       expect(client.options.baseUrl, 'https://freeimage.host');
+    });
+  });
+
+  group('TempShProvider', () {
+    late TempShProvider provider;
+
+    setUp(() {
+      provider = TempShProvider();
+    });
+
+    test('metadata', () {
+      expect(provider.providerId, 'tempsh');
+      expect(provider.providerName, 'temp.sh');
+      expect(provider.supportsWeb, isFalse);
+      expect(provider.requiredConfigKeys, isEmpty);
+    });
+
+    test('parseResponse extracts URL from plain text', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/upload'),
+        statusCode: 200,
+        data: 'https://temp.sh/abc123/test.png',
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isTrue);
+      expect(result.url, 'https://temp.sh/abc123/test.png');
+    });
+
+    test('client uses correct baseUrl', () async {
+      final client = await provider.createHttpClient({});
+      expect(client.options.baseUrl, 'https://temp.sh');
     });
   });
 }
