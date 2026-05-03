@@ -32,6 +32,21 @@ final class UploadIdle extends UploadState {
   const UploadIdle({super.results, super.selectedProviderIndex, super.providers});
 }
 
+final class UploadFileSelected extends UploadState {
+  final String fileName;
+  final int fileSizeBytes;
+  final String? mimeType;
+
+  const UploadFileSelected({
+    required this.fileName,
+    required this.fileSizeBytes,
+    this.mimeType,
+    super.results,
+    super.selectedProviderIndex,
+    super.providers,
+  });
+}
+
 final class UploadInProgress extends UploadState {
   final double progress;
   final CancelToken cancelToken;
@@ -63,6 +78,7 @@ final class UploadCompleted extends UploadState {
 class UploadNotifier extends Notifier<UploadState> {
   final FilePicker? _injectedPicker;
   final List<BaseUploader>? _injectedProviders;
+  FileUploadRequest? _pendingRequest;
 
   UploadNotifier({
     FilePicker? filePicker,
@@ -80,6 +96,14 @@ class UploadNotifier extends Notifier<UploadState> {
     if (index < 0 || index >= _providers.length) return;
     final prev = state;
     state = switch (prev) {
+      UploadFileSelected() => UploadFileSelected(
+          fileName: prev.fileName,
+          fileSizeBytes: prev.fileSizeBytes,
+          mimeType: prev.mimeType,
+          results: prev.results,
+          selectedProviderIndex: index,
+          providers: prev.providers,
+        ),
       UploadIdle() => UploadIdle(
           results: prev.results,
           selectedProviderIndex: index,
@@ -92,6 +116,56 @@ class UploadNotifier extends Notifier<UploadState> {
           providers: prev.providers,
         ),
     };
+  }
+
+  Future<void> pickFile() async {
+    if (state is UploadInProgress) return;
+
+    final pickResult = await _filePicker.pickFiles();
+    if (pickResult == null || pickResult.files.isEmpty) return;
+
+    final file = pickResult.files.first;
+
+    try {
+      _pendingRequest = await createUploadRequest(file);
+      _log.info('Picked: ${file.name}');
+
+      state = UploadFileSelected(
+        fileName: file.name,
+        fileSizeBytes: file.size,
+        mimeType: _pendingRequest!.mimeType,
+        results: state.results,
+        selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
+      );
+    } catch (e) {
+      _log.warn('Failed to read picked file: $e', error: e);
+      state = UploadCompleted(
+        lastResult: UploadResult(success: false),
+        errorMessage: 'Failed to read selected file',
+        results: state.results,
+        selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
+      );
+    }
+  }
+
+  Future<void> startUpload() async {
+    if (state is! UploadFileSelected) return;
+    final request = _pendingRequest;
+    _pendingRequest = null;
+    if (request == null) return;
+    await _executeUpload(request);
+  }
+
+  void clearSelection() {
+    if (state is UploadFileSelected) {
+      state = UploadIdle(
+        results: state.results,
+        selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
+      );
+    }
   }
 
   Future<void> pickAndUpload() async {

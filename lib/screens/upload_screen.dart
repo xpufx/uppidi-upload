@@ -6,6 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 
+String _formatSize(int bytes) {
+  if (bytes < 1024) return '$bytes B';
+  if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+  if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+}
+
 IconData _providerIcon(String id) => switch (id) {
       'httpbin' => Icons.science_outlined,
       'catbox' => Icons.folder_outlined,
@@ -44,17 +51,26 @@ class UploadScreen extends ConsumerWidget {
           ),
           if (provider != null) _ProviderInfo(provider: provider),
           if (webUnsupported) const _WebWarning(),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: uploadState is UploadInProgress || webUnsupported
-                ? null
-                : notifier.pickAndUpload,
-            child: Text(
-              uploadState is UploadInProgress ? l10n.uploading : l10n.pickAndUpload,
-            ),
-          ),
           switch (uploadState) {
-            UploadInProgress(progress: final p, cancelToken: final _) => _ProgressSection(
+            UploadFileSelected(fileName: final n, fileSizeBytes: final s, mimeType: final m) =>
+              _FileInfoBanner(fileName: n, fileSize: s, mimeType: m, provider: provider),
+            _ => const SizedBox.shrink(),
+          },
+          const SizedBox(height: 16),
+          switch (uploadState) {
+            UploadIdle() => ElevatedButton(
+                onPressed: notifier.pickFile,
+                child: Text(l10n.pickAndUpload),
+              ),
+            UploadFileSelected() when webUnsupported => const SizedBox.shrink(),
+            UploadFileSelected() => ElevatedButton(
+                onPressed: notifier.startUpload,
+                child: Text(l10n.upload),
+              ),
+            _ => const SizedBox.shrink(),
+          },
+          switch (uploadState) {
+            UploadInProgress(progress: final p) => _ProgressSection(
                 progress: p,
                 onCancel: notifier.cancelUpload,
               ),
@@ -188,6 +204,75 @@ class _ProviderInfo extends StatelessWidget {
   }
 }
 
+class _FileInfoBanner extends StatelessWidget {
+  final String fileName;
+  final int fileSize;
+  final String? mimeType;
+  final dynamic provider;
+
+  const _FileInfoBanner({
+    required this.fileName,
+    required this.fileSize,
+    this.mimeType,
+    this.provider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final warnings = <Widget>[];
+    final meta = provider?.metadata;
+
+    if (meta?.allowedMimeTypes != null && mimeType != null) {
+      if (!meta.allowsMimeType(mimeType)) {
+        final types = meta.allowedMimeTypes!.map((m) => m.split('/').last.toUpperCase()).join(', ');
+        warnings.add(_warningRow('Provider only accepts: $types'));
+      }
+    }
+
+    if (meta?.maxFileSizeBytes != null && fileSize > meta.maxFileSizeBytes) {
+      warnings.add(_warningRow('File exceeds ${meta.fileSizeLabel} limit'));
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.insert_drive_file_outlined, size: 18),
+              const SizedBox(width: 6),
+              Expanded(child: Text(fileName, overflow: TextOverflow.ellipsis)),
+              const SizedBox(width: 8),
+              Text(_formatSize(fileSize),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
+              if (mimeType != null) ...[
+                const SizedBox(width: 8),
+                Text(mimeType!, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+              ],
+            ],
+          ),
+          ...warnings,
+        ],
+      ),
+    );
+  }
+
+  Widget _warningRow(String msg) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Row(
+        children: [
+          const Icon(Icons.warning_amber_rounded, size: 16, color: Colors.orange),
+          const SizedBox(width: 4),
+          Expanded(child: Text(msg,
+            style: const TextStyle(fontSize: 12, color: Colors.orange))),
+        ],
+      ),
+    );
+  }
+}
+
 class _WebWarning extends StatelessWidget {
   const _WebWarning();
 
@@ -260,9 +345,13 @@ class _ErrorBanner extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         color: Colors.red.shade100,
-        child: Text(
-          '${l10n.error}: ${_translate(l10n, error)}',
-          style: TextStyle(color: Colors.red.shade800),
+        child: Row(
+          children: [
+            Text('${l10n.error}: ',
+              style: TextStyle(color: Colors.red.shade800, fontWeight: FontWeight.w600)),
+            Expanded(child: Text(_translate(l10n, error),
+              style: TextStyle(color: Colors.red.shade800))),
+          ],
         ),
       ),
     );

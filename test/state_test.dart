@@ -64,11 +64,16 @@ void main() {
       // If a new subclass is added, this would fail to compile.
       String describe(UploadState state) => switch (state) {
             UploadIdle() => 'idle',
+            UploadFileSelected() => 'file_selected',
             UploadInProgress() => 'in_progress',
             UploadCompleted() => 'completed',
           };
 
       expect(describe(const UploadIdle()), 'idle');
+      expect(
+        describe(UploadFileSelected(fileName: 'a', fileSizeBytes: 1)),
+        'file_selected',
+      );
       expect(
         describe(UploadInProgress(progress: 0, cancelToken: CancelToken())),
         'in_progress',
