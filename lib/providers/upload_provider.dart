@@ -89,20 +89,17 @@ final class UploadCompleted extends UploadState {
 }
 
 class UploadNotifier extends Notifier<UploadState> {
-  final FilePicker? _injectedPicker;
   final List<BaseUploader>? _injectedProviders;
+
+  UploadNotifier({
+    List<BaseUploader>? providers,
+  })  : _injectedProviders = providers;
+
+  List<BaseUploader> get _providers => _injectedProviders ?? ProviderRegistry.all;
+
   FileUploadRequest? _pendingRequest;
   DateTime _lastSpeedSample = DateTime.now();
   int _lastSampleBytes = 0;
-
-  UploadNotifier({
-    FilePicker? filePicker,
-    List<BaseUploader>? providers,
-  })  : _injectedPicker = filePicker,
-        _injectedProviders = providers;
-
-  FilePicker get _filePicker => _injectedPicker ?? FilePicker.platform;
-  List<BaseUploader> get _providers => _injectedProviders ?? ProviderRegistry.all;
 
   @override
   UploadState build() => UploadIdle(providers: _providers);
@@ -137,7 +134,7 @@ class UploadNotifier extends Notifier<UploadState> {
   Future<void> pickAndUpload() async {
     if (state is UploadInProgress) return;
 
-    final pickResult = await _filePicker.pickFiles();
+    final pickResult = await FilePicker.pickFiles();
     if (pickResult == null || pickResult.files.isEmpty) return;
 
     final file = pickResult.files.first;

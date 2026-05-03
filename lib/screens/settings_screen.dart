@@ -267,7 +267,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
             const SizedBox(width: 12),
             OutlinedButton.icon(
               onPressed: () async {
-                final result = await FilePicker.platform.pickFiles(type: FileType.image);
+                final result = await FilePicker.pickFiles(type: FileType.image);
                 if (result != null && result.files.isNotEmpty) {
                   final path = result.files.single.path;
                   ref.read(logoPathProvider.notifier).setPath(path);
