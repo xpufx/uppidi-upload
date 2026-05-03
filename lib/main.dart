@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'core/app_logo.dart';
 import 'core/models/upload_record.dart';
 import 'core/settings_service.dart';
 import 'core/share_handler.dart';
@@ -99,7 +100,7 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
             appBar: AppBar(
               title: Row(
                 children: [
-                  _AppLogo(size: 28),
+                  AppLogo(size: 32),
                   const SizedBox(width: 8),
                   Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
                   const Spacer(),
@@ -131,7 +132,7 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
                 child: Column(
                   children: [
                     const SizedBox(height: 16),
-                    _AppLogo(size: 40),
+                    AppLogo(size: 48),
                     const SizedBox(height: 4),
                     Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                     const SizedBox(height: 8),
@@ -167,24 +168,5 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
       _NavTab.history => const HistoryScreen(),
       _NavTab.settings => const SettingsScreen(),
     };
-  }
-}
-
-class _AppLogo extends ConsumerWidget {
-  final double size;
-  const _AppLogo({required this.size});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final logoPath = ref.watch(logoPathProvider);
-    if (logoPath != null && logoPath.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Image.file(File(logoPath), width: size, height: size, fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => Image.asset('assets/logo.png', width: size, height: size),
-        ),
-      );
-    }
-    return Image.asset('assets/logo.png', width: size, height: size);
   }
 }

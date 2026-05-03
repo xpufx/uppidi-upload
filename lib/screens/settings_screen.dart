@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/app_logo.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
 import '../core/theme_provider.dart';
@@ -343,7 +344,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         const SizedBox(height: 16),
         Center(child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Image.asset('assets/logo.png', width: 64, height: 64),
+          child: AppLogo(size: 64),
         )),
       ],
     );
