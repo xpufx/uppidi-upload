@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/registry.dart';
 import '../core/settings_service.dart';
+import '../core/version.dart';
 import '../l10n/app_localizations.dart';
 
 final providerConfigsProvider = FutureProvider.family<Map<String, String>, String>(
@@ -284,13 +285,13 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           },
         ),
         const Divider(height: 32),
-        Text('uppidi v1.0.0',
+        Text('uppidi v$appVersion',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
         Text('Cross-platform media uploader',
           style: Theme.of(context).textTheme.bodySmall),
         const SizedBox(height: 2),
-        Text('${ProviderRegistry.all.length} providers · 45 tests',
+        Text('${ProviderRegistry.all.length} providers · 45 tests · $gitHash',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
       ],
     );
