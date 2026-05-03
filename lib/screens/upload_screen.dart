@@ -2,8 +2,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/format.dart';
+import '../core/settings_service.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 
@@ -21,7 +23,6 @@ class UploadScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final uploadState = ref.watch(uploadProvider);
     final notifier = ref.read(uploadProvider.notifier);
     final providers = uploadState.providers;
@@ -52,15 +53,7 @@ class UploadScreen extends ConsumerWidget {
           },
           const SizedBox(height: 16),
           switch (uploadState) {
-            UploadIdle() => ElevatedButton(
-                onPressed: notifier.pickFile,
-                child: Text(l10n.pickAndUpload),
-              ),
-            UploadFileSelected() when webUnsupported => const SizedBox.shrink(),
-            UploadFileSelected() => ElevatedButton(
-                onPressed: notifier.startUpload,
-                child: Text(l10n.upload),
-              ),
+            UploadIdle() || UploadFileSelected() => _PickAndUploadButton(notifier: notifier, provider: provider),
             _ => const SizedBox.shrink(),
           },
           switch (uploadState) {
@@ -112,12 +105,6 @@ class _ProviderDropdown extends StatelessWidget {
               const SizedBox(width: 8),
               Text(p.providerName,
                 style: online ? null : TextStyle(color: Theme.of(context).disabledColor)),
-              const SizedBox(width: 4),
-              Text('(${p.providerId})',
-                style: (online
-                    ? Theme.of(context).textTheme.bodySmall
-                    : Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).disabledColor))
-                    ?.copyWith(color: online ? Theme.of(context).colorScheme.outline : Theme.of(context).disabledColor)),
               _metadataBadges(p.metadata),
             ],
           ),
@@ -188,6 +175,41 @@ class _ProviderInfo extends StatelessWidget {
           style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
         )).toList(),
       ),
+    );
+  }
+}
+
+class _PickAndUploadButton extends ConsumerWidget {
+  final dynamic notifier;
+  final dynamic provider;
+
+  const _PickAndUploadButton({required this.notifier, required this.provider});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final scaffoldContext = context;
+    return ElevatedButton(
+      onPressed: () async {
+        final needsApproval = await ref.read(settingsServiceProvider).needsApprovalBeforeUpload();
+        if (needsApproval && scaffoldContext.mounted) {
+          final name = provider?.providerName ?? 'this provider';
+          final confirmed = await showDialog<bool>(
+            context: scaffoldContext,
+            builder: (ctx) => AlertDialog(
+              title: Text(l10n.approveUploadTitle),
+              content: Text(l10n.approveUploadMessage(name)),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+                TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.ok)),
+              ],
+            ),
+          );
+          if (confirmed != true) return;
+        }
+        notifier.pickAndUpload();
+      },
+      child: Text(l10n.pickAndUpload),
     );
   }
 }
@@ -392,6 +414,11 @@ class _ResultTile extends StatelessWidget {
     );
   }
 
+  static void _openUrl(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri != null) await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -407,6 +434,9 @@ class _ResultTile extends StatelessWidget {
               Expanded(child: SelectableText(url,
                 style: TextStyle(color: Theme.of(context).colorScheme.primary, decoration: TextDecoration.underline),
                 onTap: () => _copyUrl(context, url))),
+              IconButton(icon: const Icon(Icons.open_in_new, size: 18),
+                onPressed: () => _openUrl(url),
+                tooltip: 'Open in browser'),
               IconButton(icon: const Icon(Icons.copy, size: 18),
                 onPressed: () => _copyUrl(context, url),
                 tooltip: l10n.urlCopiedToClipboard),

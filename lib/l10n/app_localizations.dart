@@ -230,6 +230,36 @@ abstract class AppLocalizations {
   /// **'Provider Configuration'**
   String get providersSection;
 
+  /// No description provided for @settingApproveBeforeUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve before uploading'**
+  String get settingApproveBeforeUpload;
+
+  /// No description provided for @approveUploadTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Upload'**
+  String get approveUploadTitle;
+
+  /// No description provided for @approveUploadMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload to {provider}?'**
+  String approveUploadMessage(Object provider);
+
+  /// No description provided for @historyClearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all'**
+  String get historyClearAll;
+
+  /// No description provided for @historyClearConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all history?'**
+  String get historyClearConfirm;
+
   /// No description provided for @noProviders.
   ///
   /// In en, this message translates to:

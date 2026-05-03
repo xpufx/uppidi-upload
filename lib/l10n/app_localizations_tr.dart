@@ -81,6 +81,21 @@ class AppLocalizationsTr extends AppLocalizations {
   String get providersSection => 'Sağlayıcı Yapılandırması';
 
   @override
+  String get settingApproveBeforeUpload => 'Yüklemeden önce onayla';
+
+  @override
+  String get approveUploadTitle => 'Yüklemeyi Onayla';
+
+  @override
+  String approveUploadMessage(Object provider) => '$provider hizmetine yüklensin mi?';
+
+  @override
+  String get historyClearAll => 'Tümünü temizle';
+
+  @override
+  String get historyClearConfirm => 'Tüm geçmiş silinsin mi?';
+
+  @override
   String get noProviders =>
       'Hiç sağlayıcı yapılandırılmamış. Ayarlardan bir tane ekleyin.';
 

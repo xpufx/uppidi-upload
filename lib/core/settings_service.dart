@@ -30,9 +30,16 @@ class SettingsService {
 
   static const insecureConnKey = 'global.allow_insecure_conn';
   static const proxyUrlKey = 'global.proxy_url';
+  static const approveBeforeUploadKey = 'global.approve_before_upload';
+  static const localeKey = 'global.locale';
 
   Future<bool> isInsecureConnAllowed() async {
     final val = await get(insecureConnKey);
+    return val == 'true';
+  }
+
+  Future<bool> needsApprovalBeforeUpload() async {
+    final val = await get(approveBeforeUploadKey);
     return val == 'true';
   }
 

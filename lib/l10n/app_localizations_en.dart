@@ -80,6 +80,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get providersSection => 'Provider Configuration';
 
   @override
+  String get settingApproveBeforeUpload => 'Approve before uploading';
+
+  @override
+  String get approveUploadTitle => 'Confirm Upload';
+
+  @override
+  String approveUploadMessage(Object provider) => 'Upload to $provider?';
+
+  @override
+  String get historyClearAll => 'Clear all';
+
+  @override
+  String get historyClearConfirm => 'Delete all history?';
+
+  @override
   String get noProviders => 'No providers configured. Add one in Settings.';
 
   @override

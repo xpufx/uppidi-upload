@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/models/upload_record.dart';
+import 'core/settings_service.dart';
 import 'core/share_handler.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/history_screen.dart';
@@ -24,18 +25,30 @@ class UppidiApp extends ConsumerStatefulWidget {
 }
 
 class _UppidiAppState extends ConsumerState<UppidiApp> {
+  Locale? _locale;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ShareHandler.init(context, ref);
     });
+    _loadLocale();
+  }
+
+  Future<void> _loadLocale() async {
+    final svc = ref.read(settingsServiceProvider);
+    final code = await svc.get(SettingsService.localeKey);
+    if (code != null && mounted) {
+      setState(() => _locale = Locale(code));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'uppidi',
+      locale: _locale,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,

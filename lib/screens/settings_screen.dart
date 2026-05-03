@@ -23,6 +23,16 @@ final proxyUrlProvider = FutureProvider<String?>((ref) async {
   return svc.getProxyUrl();
 });
 
+final _approveBeforeUploadProvider = FutureProvider<bool>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  return svc.needsApprovalBeforeUpload();
+});
+
+final _localeProvider = FutureProvider<String>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  return (await svc.get(SettingsService.localeKey)) ?? 'en';
+});
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -195,6 +205,35 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
             ref.invalidate(insecureConnProvider);
           },
           contentPadding: EdgeInsets.zero,
+        ),
+        SwitchListTile(
+          title: Text(l10n.settingApproveBeforeUpload),
+          value: ref.watch(_approveBeforeUploadProvider).asData?.value ?? false,
+          onChanged: (v) {
+            svc.set(SettingsService.approveBeforeUploadKey, v.toString());
+            ref.invalidate(_approveBeforeUploadProvider);
+          },
+          contentPadding: EdgeInsets.zero,
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            const Text('Language'),
+            const Spacer(),
+            DropdownButton<String>(
+              value: ref.watch(_localeProvider).asData?.value ?? 'en',
+              onChanged: (v) {
+                if (v != null) {
+                  svc.set(SettingsService.localeKey, v);
+                  ref.invalidate(_localeProvider);
+                }
+              },
+              items: const [
+                DropdownMenuItem(value: 'en', child: Text('English')),
+                DropdownMenuItem(value: 'tr', child: Text('Türkçe')),
+              ],
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         TextField(

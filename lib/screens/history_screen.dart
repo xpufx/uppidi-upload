@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/format.dart';
 import '../core/history_service.dart';
@@ -35,27 +36,63 @@ class HistoryScreen extends ConsumerWidget {
           );
         }
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(8),
-          itemCount: records.length,
-          itemBuilder: (context, index) {
-            final hr = records[index];
-            return _HistoryTile(
-              record: hr,
-              onDelete: () {
-                svc.delete(hr.key);
-                ref.invalidate(uploadHistoryProvider);
-              },
-              onCopy: () {
-                if (hr.record.url != null) {
-                  Clipboard.setData(ClipboardData(text: hr.record.url!));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.urlCopiedToClipboard)),
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Row(
+                children: [
+                  Text('${records.length} records', style: Theme.of(context).textTheme.bodySmall),
+                  const Spacer(),
+                  TextButton.icon(
+                    icon: const Icon(Icons.delete_sweep, size: 18),
+                    label: Text(l10n.historyClearAll),
+                    onPressed: () async {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Clear History'),
+                          content: Text(l10n.historyClearConfirm),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+                            TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.ok)),
+                          ],
+                        ),
+                      );
+                      if (confirmed == true) {
+                        await svc.clearAll();
+                        ref.invalidate(uploadHistoryProvider);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.only(top: 0),
+                itemCount: records.length,
+                itemBuilder: (context, index) {
+                  final hr = records[index];
+                  return _HistoryTile(
+                    record: hr,
+                    onDelete: () {
+                      svc.delete(hr.key);
+                      ref.invalidate(uploadHistoryProvider);
+                    },
+                    onCopy: () {
+                      if (hr.record.url != null) {
+                        Clipboard.setData(ClipboardData(text: hr.record.url!));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.urlCopiedToClipboard)),
+                        );
+                      }
+                    },
                   );
-                }
-              },
-            );
-          },
+                },
+              ),
+            ),
+          ],
         );
       },
     );
@@ -109,10 +146,22 @@ class _HistoryTile extends StatelessWidget {
               ), style: const TextStyle(fontSize: 11, color: Colors.grey)),
             ],
           ),
-          trailing: IconButton(
-            icon: const Icon(Icons.copy, size: 18),
-            onPressed: onCopy,
-            tooltip: l10n.urlCopiedToClipboard,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (r.url != null)
+                IconButton(icon: const Icon(Icons.open_in_new, size: 18),
+                  onPressed: () async {
+                    final uri = Uri.tryParse(r.url!);
+                    if (uri != null) await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  },
+                  tooltip: 'Open in browser'),
+              IconButton(
+                icon: const Icon(Icons.copy, size: 18),
+                onPressed: onCopy,
+                tooltip: l10n.urlCopiedToClipboard,
+              ),
+            ],
           ),
         ),
       ),
