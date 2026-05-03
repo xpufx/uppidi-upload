@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/history_service.dart';
-import '../core/models/upload_record.dart';
 import '../l10n/app_localizations.dart';
 
 class HistoryScreen extends ConsumerWidget {
@@ -38,18 +37,24 @@ class HistoryScreen extends ConsumerWidget {
         return ListView.builder(
           padding: const EdgeInsets.all(8),
           itemCount: records.length,
-          itemBuilder: (context, index) => _HistoryTile(
-            record: records[index],
-            onDelete: () => svc.delete(index),
-            onCopy: () {
-              if (records[index].url != null) {
-                Clipboard.setData(ClipboardData(text: records[index].url!));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.urlCopiedToClipboard)),
-                );
-              }
-            },
-          ),
+          itemBuilder: (context, index) {
+            final hr = records[index];
+            return _HistoryTile(
+              record: hr,
+              onDelete: () {
+                svc.delete(hr.key);
+                ref.invalidate(uploadHistoryProvider);
+              },
+              onCopy: () {
+                if (hr.record.url != null) {
+                  Clipboard.setData(ClipboardData(text: hr.record.url!));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.urlCopiedToClipboard)),
+                  );
+                }
+              },
+            );
+          },
         );
       },
     );
@@ -57,7 +62,7 @@ class HistoryScreen extends ConsumerWidget {
 }
 
 class _HistoryTile extends StatelessWidget {
-  final UploadRecord record;
+  final HistoryRecord record;
   final VoidCallback onDelete;
   final VoidCallback onCopy;
 
@@ -70,9 +75,10 @@ class _HistoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final r = record.record;
 
     return Dismissible(
-      key: ValueKey('${record.completedAt.millisecondsSinceEpoch}_${record.fileName}'),
+      key: ValueKey(record.key),
       direction: DismissDirection.endToStart,
       background: Container(
         color: Colors.red,
@@ -85,17 +91,17 @@ class _HistoryTile extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 4),
         child: ListTile(
           leading: Icon(
-            record.success ? Icons.check_circle : Icons.error,
-            color: record.success ? Colors.green : Colors.red,
+            r.success ? Icons.check_circle : Icons.error,
+            color: r.success ? Colors.green : Colors.red,
           ),
-          title: Text(record.fileName, overflow: TextOverflow.ellipsis),
+          title: Text(r.fileName, overflow: TextOverflow.ellipsis),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(record.providerName, style: const TextStyle(fontSize: 12)),
-              if (record.url != null)
-                Text(record.url!, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
-              Text(_formatTime(record.completedAt), style: const TextStyle(fontSize: 11, color: Colors.grey)),
+              Text(r.providerName, style: const TextStyle(fontSize: 12)),
+              if (r.url != null)
+                Text(r.url!, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+              Text(_formatTime(r.completedAt), style: const TextStyle(fontSize: 11, color: Colors.grey)),
             ],
           ),
           trailing: IconButton(

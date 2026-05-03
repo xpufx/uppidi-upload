@@ -1,7 +1,5 @@
 import 'package:hive/hive.dart';
 
-import 'upload_result.dart';
-
 class UploadRecord {
   final String fileName;
   final String? url;
@@ -22,29 +20,6 @@ class UploadRecord {
     this.statusCode,
     required this.completedAt,
   });
-
-  factory UploadRecord.fromResult(UploadResult result, String providerId, String providerName) {
-    return UploadRecord(
-      fileName: _extractFileName(result),
-      url: result.url,
-      providerId: providerId,
-      providerName: providerName,
-      success: result.success,
-      errorMessage: result.errorMessage,
-      statusCode: result.statusCode,
-      completedAt: result.completedAt,
-    );
-  }
-
-  static String _extractFileName(UploadResult result) {
-    if (result.url != null) {
-      final segments = Uri.tryParse(result.url!)?.pathSegments;
-      if (segments != null && segments.isNotEmpty) {
-        return segments.last;
-      }
-    }
-    return 'unknown';
-  }
 }
 
 class UploadRecordAdapter extends TypeAdapter<UploadRecord> {

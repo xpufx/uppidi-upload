@@ -6,6 +6,13 @@ import '../core/models/upload_record.dart';
 
 final _log = Log('HistoryService');
 
+class HistoryRecord {
+  final int key;
+  final UploadRecord record;
+
+  HistoryRecord({required this.key, required this.record});
+}
+
 class HistoryService {
   static const _boxName = 'uploadHistory';
   Box<UploadRecord>? _box;
@@ -25,12 +32,16 @@ class HistoryService {
     }
   }
 
-  Future<List<UploadRecord>> getAll() async {
+  Future<List<HistoryRecord>> getAll() async {
     try {
       final box = await _boxReady;
-      final records = box.values.toList();
-      records.sort((a, b) => b.completedAt.compareTo(a.completedAt));
-      return records;
+      final pairs = box.toMap().entries.map((e) => HistoryRecord(
+            key: e.key,
+            record: e.value,
+          ));
+      final sorted = pairs.toList()
+        ..sort((a, b) => b.record.completedAt.compareTo(a.record.completedAt));
+      return sorted;
     } catch (e) {
       _log.warn('Failed to read history: $e', error: e);
       return [];
@@ -46,10 +57,10 @@ class HistoryService {
     }
   }
 
-  Future<void> delete(int index) async {
+  Future<void> delete(int key) async {
     try {
       final box = await _boxReady;
-      await box.deleteAt(index);
+      await box.delete(key);
     } catch (e) {
       _log.warn('Failed to delete history: $e', error: e);
     }
@@ -67,7 +78,7 @@ class HistoryService {
 }
 
 final historyServiceProvider = Provider<HistoryService>((ref) => HistoryService());
-final uploadHistoryProvider = FutureProvider<List<UploadRecord>>((ref) async {
+final uploadHistoryProvider = FutureProvider<List<HistoryRecord>>((ref) async {
   final svc = ref.read(historyServiceProvider);
   return svc.getAll();
 });

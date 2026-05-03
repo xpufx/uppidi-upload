@@ -213,7 +213,7 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
-      _saveToHistory(result, provider);
+      _saveToHistory(result, provider, request.fileName);
     } catch (e) {
       _log.warn('Upload exception: $e', error: e);
       final failResult = UploadResult(success: false, errorMessage: 'Upload failed: $e');
@@ -224,14 +224,24 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
-      _saveToHistory(failResult, provider);
+      _saveToHistory(failResult, provider, request.fileName);
     }
   }
 
-  Future<void> _saveToHistory(UploadResult result, BaseUploader provider) async {
+  Future<void> _saveToHistory(UploadResult result, BaseUploader provider, String fileName) async {
     try {
       final history = ref.read(historyServiceProvider);
-      await history.add(UploadRecord.fromResult(result, provider.providerId, provider.providerName));
+      await history.add(UploadRecord(
+        fileName: fileName,
+        url: result.url,
+        providerId: provider.providerId,
+        providerName: provider.providerName,
+        success: result.success,
+        errorMessage: result.errorMessage,
+        statusCode: result.statusCode,
+        completedAt: result.completedAt,
+      ));
+      ref.invalidate(uploadHistoryProvider);
     } catch (e) {
       _log.warn('Failed to save history: $e');
     }
