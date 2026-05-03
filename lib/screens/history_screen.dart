@@ -127,12 +127,26 @@ class _HistoryTile extends StatelessWidget {
       onDismissed: (_) => onDelete(),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 4),
-        child: ListTile(
-          leading: Icon(
-            r.success ? Icons.check_circle : Icons.error,
-            color: r.success ? Colors.green : Colors.red,
-          ),
-          title: Text(r.fileName, overflow: TextOverflow.ellipsis),
+          child: ListTile(
+            leading: Icon(
+              r.success ? Icons.check_circle : Icons.error,
+              color: r.success ? Colors.green : Colors.red,
+            ),
+            title: Text(r.fileName, overflow: TextOverflow.ellipsis),
+            onLongPress: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: Text(r.fileName),
+                  content: const Text('Delete this record?'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+                    TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.ok)),
+                  ],
+                ),
+              );
+              if (confirmed == true) onDelete();
+            },
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

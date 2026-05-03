@@ -33,6 +33,11 @@ final localeProvider = FutureProvider<String>((ref) async {
   return (await svc.get(SettingsService.localeKey)) ?? 'en';
 });
 
+final _defaultShareProviderProvider = FutureProvider<String?>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  return svc.get(SettingsService.defaultShareProviderKey);
+});
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -231,9 +236,34 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               items: const [
                 DropdownMenuItem(value: 'en', child: Text('English')),
                 DropdownMenuItem(value: 'tr', child: Text('Türkçe')),
+                DropdownMenuItem(value: 'it', child: Text('Italiano')),
               ],
             ),
           ],
+        ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          value: ref.watch(_defaultShareProviderProvider).asData?.value,
+          decoration: const InputDecoration(
+            labelText: 'Default for sharing',
+            border: OutlineInputBorder(),
+            isDense: true,
+          ),
+          items: [
+            const DropdownMenuItem(value: null, child: Text('Last used')),
+            ...ProviderRegistry.all.map((p) => DropdownMenuItem(
+              value: p.providerId,
+              child: Text(p.providerName),
+            )),
+          ],
+          onChanged: (v) {
+            if (v == null) {
+              svc.remove(SettingsService.defaultShareProviderKey);
+            } else {
+              svc.set(SettingsService.defaultShareProviderKey, v);
+            }
+            ref.invalidate(_defaultShareProviderProvider);
+          },
         ),
         const SizedBox(height: 8),
         TextField(
