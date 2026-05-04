@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/interfaces/uploader.dart';
+import '../core/connectivity.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
 import '../l10n/app_localizations.dart';
