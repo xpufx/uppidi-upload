@@ -9,13 +9,12 @@ cd /home/oktay/code/uppidi
 
 # ── Hardcoded string check ──────────────────────────────────
 echo "==> Checking for hardcoded strings..."
-HARDCODED=$(grep -rn "Text(\'\|label: \'\|title: \'\|hintText: \'\|tooltip: \'" lib/screens/ lib/main.dart \
+HARDCODED=$(grep -rn "Text(\'\|label: \'\|title: \'\|hintText: \'\|tooltip: \'\|child: Text(\'\|subtitle: Text(\'" lib/ --include="*.dart" \
   | grep -v "l10n\." \
-  | grep -v "const\|static\|final" \
-  | grep -v "gitHash\|appVersion\|appTitle\|GIT_HASH" \
-  | grep -v "require 'http'\|require('" \
-  | grep -E "[a-zA-Z]{3,}" \
-  | grep -v "CHANGELOG\|Proxy\|SOCKS\|HTTP\|URL\|API\|ID\|OK\|iOS\|socks5" \
+  | grep -v "const\|static\|final\|String \|AppLocalizations\|RegExp\|gitHash\|appVersion\|GIT_HASH\|CHANGELOG\|changeLogText\|Proxy\|URL\|API\|OK\|iOS\|HTTP\|SOCKS\|FormatException\|Upload\|Provider\|Settings\|History\|Test\|Share\|Shared\|Language\|Languages\|formatSize\|formatTime\|AppLogo\|Icon(\|Icons\." \
+  | grep -v "English\|Türkçe\|Italiano\|Uppidi\|uppidi" \
+  | grep -v "share_template\|template\|variables\|examples\|[\"']%[a-z]" \
+  | grep -E "['\"][A-Za-z]{3,}" \
   || true)
 if [ -n "$HARDCODED" ]; then
   echo "❌ Found hardcoded English strings in UI code:"

@@ -730,7 +730,7 @@ class _ResultBanner extends StatelessWidget {
                       context: context,
                       builder: (ctx) => ShareMessageDialog(
                         url: url!,
-                        providerName: provider?.providerName ?? 'this provider',
+                        providerName: provider?.providerName,
                         fileName: fileName,
                       ),
                     );
