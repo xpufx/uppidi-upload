@@ -27,7 +27,7 @@ echo "==> Updating latest symlink..."
 ln -sf "${DST}" "${ARTIFACTS_DIR}/uppidi-upload-latest-android-arm64-v8a.apk"
 
 echo "==> Cleaning old APKs (keep latest 5)..."
-ls -t "${ARTIFACTS_DIR}"/*-android-*.apk 2>/dev/null | tail -n +6 | xargs -r rm -f
+ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-android-*.apk 2>/dev/null | tail -n +6 | xargs -r rm -f
 
 # ── Linux ──────────────────────────────────────────────────
 LINUX_NAME="uppidi-upload-${VERSION}-${GIT_HASH}-linux.tar.gz"
@@ -42,7 +42,7 @@ echo "==> Updating latest symlink..."
 ln -sf "${LINUX_NAME}" "${ARTIFACTS_DIR}/uppidi-upload-latest-linux.tar.gz"
 
 echo "==> Cleaning old Linux builds (keep latest 5)..."
-ls -t "${ARTIFACTS_DIR}"/*-linux.tar.gz 2>/dev/null | tail -n +6 | xargs -r rm -f
+ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-linux.tar.gz 2>/dev/null | tail -n +6 | xargs -r rm -f
 
 echo ""
 echo "==> Done"
