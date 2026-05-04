@@ -140,6 +140,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get unknownError => 'Errore sconosciuto';
 
   @override
+  String get language => 'Lingua';
+
   String get ok => 'OK';
 
   @override

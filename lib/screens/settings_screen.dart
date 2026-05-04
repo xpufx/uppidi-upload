@@ -304,7 +304,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         const SizedBox(height: 8),
         Row(
           children: [
-            const Text('Language'),
+            Text(l10n.language),
             const Spacer(),
             DropdownButton<String>(
               value: ref.watch(localeCodeProvider).asData?.value ?? 'en',

@@ -39,6 +39,7 @@
   "failed": "Başarısız",
   "error": "Hata",
   "unknownError": "Bilinmeyen hata",
+  "language": "Dil",
   "ok": "Tamam",
   "cancel": "İptal",
   "timeJustNow": "az önce",

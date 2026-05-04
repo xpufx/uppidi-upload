@@ -39,6 +39,7 @@
   "failed": "Failed",
   "error": "Error",
   "unknownError": "Unknown error",
+  "language": "Language",
   "ok": "OK",
   "cancel": "Cancel",
   "timeJustNow": "just now",

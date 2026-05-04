@@ -340,6 +340,8 @@ abstract class AppLocalizations {
   /// **'Unknown error'**
   String get unknownError;
 
+  String get language;
+
   /// No description provided for @ok.
   ///
   /// In en, this message translates to:

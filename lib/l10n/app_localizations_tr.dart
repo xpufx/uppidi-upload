@@ -140,6 +140,8 @@ class AppLocalizationsTr extends AppLocalizations {
   String get unknownError => 'Bilinmeyen hata';
 
   @override
+  String get language => 'Dil';
+
   String get ok => 'Tamam';
 
   @override
