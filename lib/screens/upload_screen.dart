@@ -343,7 +343,7 @@ class _UploadButton extends ConsumerWidget {
           notifier.uploadSelected();
         }
         } // end duplicate check
-        return;
+        notifier.uploadSelected();
       },
       icon: const Icon(Icons.cloud_upload),
       label: Text(l10n.upload),
