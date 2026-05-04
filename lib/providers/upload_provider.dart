@@ -14,6 +14,7 @@ import '../core/models/upload_result.dart';
 import '../core/platform/file_source.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
+import '../core/connectivity.dart';
 
 final _log = Log('UploadNotifier');
 
@@ -376,22 +377,12 @@ class UploadNotifier extends Notifier<UploadState> {
 
   Future<bool> _checkConnectivity(BaseUploader provider) async {
     try {
-      final dio = await provider.createHttpClient({});
-      dio.options.connectTimeout = const Duration(seconds: 5);
-      try {
-        await dio.head('/');
-      } catch (_) {
-        // Some servers reject HEAD; try GET with small range
-        await dio.get('/', options: Options(
-          extra: {'noLog': true},
-          responseType: ResponseType.bytes,
-          headers: {'Range': 'bytes=0-0'},
-        ));
-      }
+      final latency = await checkProviderConnectivity(provider);
+      if (latency == null) throw Exception('unreachable');
       return true;
     } catch (e) {
       _log.warn('Connectivity check failed: $e');
-      return true; // allow upload anyway — let the actual upload fail if truly down
+      return true; // allow upload anyway
     }
   }
 

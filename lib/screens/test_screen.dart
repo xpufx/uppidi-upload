@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
+import '../core/connectivity.dart';
 import '../core/app_logo.dart';
 
 class TestScreen extends ConsumerWidget {
@@ -13,7 +13,6 @@ class TestScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final allProviders = ProviderRegistry.all;
     final enabled = ref.watch(enabledProvidersProvider);
-    final disabled = ref.watch(disabledProviderIdsProvider).asData?.value ?? {};
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -27,8 +26,8 @@ class TestScreen extends ConsumerWidget {
             FilledButton.icon(
               onPressed: enabled.isEmpty ? null : () {
                 for (final p in enabled) {
-                  TestScreen._setLoading(ref, p.providerId);
-                  TestScreen._runTest(ref, p);
+                  _setLoading(ref, p.providerId);
+                  _runTest(ref, p);
                 }
               },
               icon: const Icon(Icons.refresh, size: 18),
@@ -41,48 +40,10 @@ class TestScreen extends ConsumerWidget {
           const Center(child: Text('No providers available')),
         ...allProviders.map((p) => _ProviderRow(
           provider: p,
-          isEnabled: !disabled.contains(p.providerId),
+          isEnabled: enabled.any((e) => e.providerId == p.providerId),
         )),
       ],
     );
-  }
-
-  static void _setLoading(WidgetRef ref, String id) {
-    ref.read(_testStates.notifier).setFor(id, const AsyncValue.loading());
-  }
-
-  static void _setResult(WidgetRef ref, String id, _TestResult r) {
-    ref.read(_testStates.notifier).setFor(id, AsyncValue.data(r));
-  }
-
-  static Future<void> _runTest(WidgetRef ref, BaseUploader p) async {
-    try {
-      final svc = ref.read(settingsServiceProvider);
-      final config = await svc.loadProviderConfig(p.providerId, p.requiredConfigKeys);
-      final allowInsecure = await svc.isInsecureConnAllowed();
-      final dio = await p.createHttpClient(config, allowInsecureConn: allowInsecure);
-      dio.options.connectTimeout = const Duration(seconds: 5);
-      final sw = Stopwatch()..start();
-      try {
-        await dio.head('/');
-      } catch (_) {
-        await dio.get('/', options: Options(
-          extra: {'noLog': true},
-          responseType: ResponseType.bytes,
-          headers: {'Range': 'bytes=0-0'},
-        ));
-      }
-      sw.stop();
-      _setResult(ref, p.providerId, _TestResult(
-        providerId: p.providerId, providerName: p.providerName,
-        online: true, latencyMs: sw.elapsedMilliseconds,
-      ));
-    } catch (e) {
-      _setResult(ref, p.providerId, _TestResult(
-        providerId: p.providerId, providerName: p.providerName,
-        online: false, error: e.toString(),
-      ));
-    }
   }
 }
 
@@ -174,8 +135,8 @@ class _ProviderRow extends ConsumerWidget {
                   icon: const Icon(Icons.play_arrow, size: 20),
                   tooltip: 'Test',
                   onPressed: isLoading ? null : () {
-                    TestScreen._setLoading(ref, provider.providerId);
-                    TestScreen._runTest(ref, provider);
+                    _setLoading(ref, provider.providerId);
+                    _runTest(ref, provider);
                   },
                 ),
                 Switch(
@@ -207,5 +168,29 @@ class _ProviderRow extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+// Top-level helpers
+void _setLoading(WidgetRef ref, String id) {
+  ref.read(_testStates.notifier).setFor(id, const AsyncValue.loading());
+}
+
+void _setResult(WidgetRef ref, String id, _TestResult r) {
+  ref.read(_testStates.notifier).setFor(id, AsyncValue.data(r));
+}
+
+Future<void> _runTest(WidgetRef ref, BaseUploader p) async {
+  final latency = await checkProviderConnectivity(p);
+  if (latency != null) {
+    _setResult(ref, p.providerId, _TestResult(
+      providerId: p.providerId, providerName: p.providerName,
+      online: true, latencyMs: latency,
+    ));
+  } else {
+    _setResult(ref, p.providerId, _TestResult(
+      providerId: p.providerId, providerName: p.providerName,
+      online: false, error: 'Connection failed',
+    ));
   }
 }
