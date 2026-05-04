@@ -9,6 +9,7 @@ import 'core/models/upload_record.dart';
 import 'core/settings_service.dart';
 import 'core/share_handler.dart';
 import 'core/theme_provider.dart';
+import 'core/version.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/history_screen.dart';
 import 'screens/settings_screen.dart';
@@ -115,15 +116,18 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
               ),
             ),
             body: _buildBody(),
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _selected.index,
-              onTap: (i) => setState(() => _selected = _NavTab.values[i]),
-              items: _NavTab.values
-                  .map((t) => BottomNavigationBarItem(
-                        icon: Icon(t.icon),
-                        label: t.label(l10n),
-                      ))
-                  .toList(),
+            bottomNavigationBar: Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: BottomNavigationBar(
+                currentIndex: _selected.index,
+                onTap: (i) => setState(() => _selected = _NavTab.values[i]),
+                items: _NavTab.values
+                    .map((t) => BottomNavigationBarItem(
+                          icon: Icon(t.icon),
+                          label: t.label(l10n),
+                        ))
+                    .toList(),
+              ),
             ),
           );
         }
@@ -159,6 +163,27 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
               const VerticalDivider(width: 1),
               Expanded(child: _buildBody()),
             ],
+          ),
+          bottomNavigationBar: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.3))),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Text(l10n.appTitle,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Spacer(),
+                Text('v$appVersion',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                ),
+              ],
+            ),
           ),
         );
       },
