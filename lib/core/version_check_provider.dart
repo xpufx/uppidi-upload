@@ -17,8 +17,6 @@ class VersionCheckNotifier extends Notifier<VersionCheckState> {
   @override
   VersionCheckState build() {
     ref.onDispose(() => _ticker?.cancel());
-    // Auto-check on first load
-    Future.microtask(() => check());
     return VersionCheckState.idle;
   }
 
