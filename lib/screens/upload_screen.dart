@@ -299,6 +299,8 @@ class _UploadButton extends ConsumerWidget {
         final fileName = state.fileName;
         final provider = state.providers[state.selectedProviderIndex];
 
+        // TODO: Enable duplicate detection (--disable-duplicate-check)
+        if (false) {
         // Check for duplicate in history
         final history = ref.read(historyServiceProvider);
         final records = await history.getAll();
@@ -340,6 +342,8 @@ class _UploadButton extends ConsumerWidget {
         } else {
           notifier.uploadSelected();
         }
+        } // end duplicate check
+        return;
       },
       icon: const Icon(Icons.cloud_upload),
       label: Text(l10n.upload),
