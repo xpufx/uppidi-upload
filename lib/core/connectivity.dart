@@ -1,5 +1,8 @@
 import 'package:dio/dio.dart';
 import 'interfaces/uploader.dart';
+import 'logging/log.dart';
+
+final _log = Log('Connectivity');
 
 /// Check if a provider is reachable. Returns latency in milliseconds, or null if unreachable.
 /// Accepts optional proxyUrl for testing through proxy.
@@ -19,7 +22,8 @@ Future<int?> checkProviderConnectivity(BaseUploader provider, {String? proxyUrl}
     }
     sw.stop();
     return sw.elapsedMilliseconds;
-  } catch (_) {
+  } catch (e) {
+    _log.warn('Provider check failed: $e');
     return null;
   }
 }
