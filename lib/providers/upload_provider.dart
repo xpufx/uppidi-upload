@@ -113,6 +113,8 @@ class UploadNotifier extends Notifier<UploadState> {
   })  : _injectedProviders = providers;
 
   FileUploadRequest? _pendingRequest;
+  String? _lastFilePath;
+  Uint8List? _lastFileBytes;
   DateTime _lastSpeedSample = DateTime.now();
   int _lastSampleBytes = 0;
 
@@ -165,6 +167,8 @@ class UploadNotifier extends Notifier<UploadState> {
     if (pickResult == null || pickResult.files.isEmpty) return;
 
     final file = pickResult.files.first;
+    _lastFilePath = file.path;
+    _lastFileBytes = file.bytes;
 
     try {
       final request = await createUploadRequest(file);
@@ -208,7 +212,26 @@ class UploadNotifier extends Notifier<UploadState> {
   }
 
   Future<void> uploadSelected() async {
-    final request = _pendingRequest;
+    FileUploadRequest? request;
+    if (_lastFilePath != null) {
+      final ioFile = File(_lastFilePath!);
+      final size = await ioFile.length();
+      request = FileUploadRequest(
+        fileName: ioFile.uri.pathSegments.last,
+        mimeType: state is UploadFileSelected ? (state as UploadFileSelected).mimeType : null,
+        sizeInBytes: size,
+        dataStream: ioFile.openRead(),
+      );
+    } else if (_lastFileBytes != null) {
+      request = FileUploadRequest(
+        fileName: state is UploadFileSelected ? (state as UploadFileSelected).fileName : 'file',
+        mimeType: state is UploadFileSelected ? (state as UploadFileSelected).mimeType : null,
+        sizeInBytes: _lastFileBytes!.length,
+        dataStream: Stream.value(_lastFileBytes!),
+      );
+    } else {
+      request = _pendingRequest;
+    }
     if (request == null) return;
     await _executeUpload(request);
   }
@@ -477,6 +500,8 @@ class UploadNotifier extends Notifier<UploadState> {
   /// Clears the current selection and returns to idle state
   void clearSelection() {
     _pendingRequest = null;
+    _lastFilePath = null;
+    _lastFileBytes = null;
     state = UploadIdle(
       results: state.results,
       selectedProviderIndex: state.selectedProviderIndex,
