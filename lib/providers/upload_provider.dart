@@ -419,10 +419,12 @@ class UploadNotifier extends Notifier<UploadState> {
         return;
       }
       _log.warn('Upload exception: $e', error: e);
-      final failResult = UploadResult(success: false, errorMessage: 'Upload failed: $e');
+      // Show actual exception type and first line of message instead of generic error
+      final errorMsg = e is DioException ? _mapDioException(e) : '${e.runtimeType}: ${e.toString().split('\n').first}';
+      final failResult = UploadResult(success: false, errorMessage: errorMsg);
       state = UploadCompleted(
         lastResult: failResult,
-        errorMessage: 'Upload failed: $e',
+        errorMessage: errorMsg,
         fileName: currentFileName,
         fileSizeBytes: currentFileSize,
         mimeType: currentMimeType,
@@ -477,6 +479,16 @@ class UploadNotifier extends Notifier<UploadState> {
     );
   }
 
+  /// Clears the current selection and returns to idle state
+  void clearSelection() {
+    _pendingRequest = null;
+    state = UploadIdle(
+      results: state.results,
+      selectedProviderIndex: state.selectedProviderIndex,
+      providers: state.providers,
+    );
+  }
+
 }
 
 extension UploadInProgressX on UploadInProgress {
@@ -504,9 +516,33 @@ String _formatSpeed(double bytesPerSec) {
   return '${(bytesPerSec / (1024 * 1024)).toStringAsFixed(1)} MB/s';
 }
 
+/// Maps DioException to a user-friendly error message
+String _mapDioException(DioException e) {
+  return switch (e.type) {
+    DioExceptionType.cancel => 'Upload cancelled',
+    DioExceptionType.connectionTimeout ||
+    DioExceptionType.sendTimeout ||
+    DioExceptionType.receiveTimeout =>
+      'Connection timed out',
+    DioExceptionType.connectionError =>
+      'Connection failed: ${e.message ?? "server unreachable"}',
+    DioExceptionType.badResponse =>
+      'Server error: ${e.response?.statusCode ?? "unknown"}',
+    _ => 'Upload failed: ${e.message ?? e.type.name}',
+  };
+}
+
 /// Helper to extract file info from current state for passing to UploadCompleted
 ({String? fileName, int fileSizeBytes, String? mimeType, Uint8List? fileBytes}) _extractFileInfo(UploadState current) {
   if (current is UploadFileSelected) {
+    return (
+      fileName: current.fileName,
+      fileSizeBytes: current.fileSizeBytes,
+      mimeType: current.mimeType,
+      fileBytes: current.fileBytes,
+    );
+  }
+  if (current is UploadCompleted) {
     return (
       fileName: current.fileName,
       fileSizeBytes: current.fileSizeBytes,

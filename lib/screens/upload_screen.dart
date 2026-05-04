@@ -54,7 +54,12 @@ class UploadScreen extends ConsumerWidget {
             if (webUnsupported) const _WebWarning(),
             switch (uploadState) {
               UploadFileSelected(fileName: final n, fileSizeBytes: final s, mimeType: final m, fileBytes: final b) =>
-                _FilePreview(fileName: n, fileSize: s, mimeType: m, fileBytes: b, provider: provider),
+                Dismissible(
+                  key: const ValueKey('file-preview'),
+                  direction: DismissDirection.horizontal,
+                  onDismissed: (_) => notifier.clearSelection(),
+                  child: _FilePreview(fileName: n, fileSize: s, mimeType: m, fileBytes: b, provider: provider),
+                ),
               UploadInProgress(fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb)
                   when fn != null =>
                 _FilePreview(fileName: fn, fileSize: fs, mimeType: m, fileBytes: fb, provider: provider),
@@ -66,7 +71,7 @@ class UploadScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             switch (uploadState) {
               UploadIdle() => _PickButton(notifier: notifier),
-              UploadFileSelected() => _UploadButton(notifier: notifier),
+              UploadFileSelected() => _FileSelectedButtons(notifier: notifier),
               _ => const SizedBox.shrink(),
             },
             switch (uploadState) {
@@ -91,6 +96,7 @@ class UploadScreen extends ConsumerWidget {
                   fileBytes: fb,
                   provider: provider,
                   onRetry: e != null ? () => notifier.uploadSelected() : null,
+                  onCancel: e != null ? () => notifier.clearSelection() : null,
                 ),
               _ => const SizedBox.shrink(),
             },
@@ -292,6 +298,25 @@ class _UploadButton extends ConsumerWidget {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
+    );
+  }
+}
+
+class _FileSelectedButtons extends ConsumerWidget {
+  final UploadNotifier notifier;
+  const _FileSelectedButtons({required this.notifier});
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Row(
+      children: [
+        Expanded(child: _UploadButton(notifier: notifier)),
+        const SizedBox(width: 8),
+        IconButton(
+          icon: const Icon(Icons.close, size: 20),
+          tooltip: 'Clear selection',
+          onPressed: () => notifier.clearSelection(),
+        ),
+      ],
     );
   }
 }
@@ -639,6 +664,7 @@ class _ResultBanner extends StatelessWidget {
   final Uint8List? fileBytes;
   final BaseUploader? provider;
   final VoidCallback? onRetry;
+  final VoidCallback? onCancel;
 
   const _ResultBanner({
     this.url,
@@ -649,6 +675,7 @@ class _ResultBanner extends StatelessWidget {
     this.fileBytes,
     this.provider,
     this.onRetry,
+    this.onCancel,
   });
 
   @override
@@ -732,17 +759,31 @@ class _ResultBanner extends StatelessWidget {
             ),
           ],
           // Retry button on error
-          if (hasError && onRetry != null) ...[
+          if (hasError) ...[
             const SizedBox(height: 8),
             Center(
-              child: ElevatedButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh),
-                label: Text(l10n.retry),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange.shade100,
-                  foregroundColor: Colors.orange.shade800,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (onRetry != null)
+                    ElevatedButton.icon(
+                      onPressed: onRetry,
+                      icon: const Icon(Icons.refresh, size: 18),
+                      label: Text(l10n.retry),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange.shade100,
+                        foregroundColor: Colors.orange.shade800,
+                      ),
+                    ),
+                  if (onCancel != null) ...[
+                    const SizedBox(width: 12),
+                    OutlinedButton.icon(
+                      onPressed: onCancel,
+                      icon: const Icon(Icons.close, size: 18),
+                      label: Text(l10n.cancel),
+                    ),
+                  ],
+                ],
               ),
             ),
           ],
