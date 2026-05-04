@@ -444,6 +444,17 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                             children: [
                               Text('${l10n.providersCount(ProviderRegistry.all.length)} · $gitHash',
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
+                              Visibility(
+                                visible: cdnUrl.isNotEmpty,
+                                child: IconButton(
+                                  icon: const Icon(Icons.refresh, size: 14),
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                  tooltip: 'Check for updates',
+                                  onPressed: () => ref.invalidate(_updateCheckProvider),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
                               const Spacer(),
                               _UpdateBadge(),
                             ],
