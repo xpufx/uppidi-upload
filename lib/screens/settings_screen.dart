@@ -202,49 +202,51 @@ class _VersionCheckWidget extends ConsumerWidget {
     }
 
     return SizedBox(
-      width: 60,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        switch (state) {
-          VersionCheckState.idle => IconButton(
-              icon: const Icon(Icons.refresh, size: 14),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              tooltip: 'Check for updates',
-              onPressed: () => notifier.check(),
-            ),
-          VersionCheckState.checking => const SizedBox(
-              width: 14,
-              height: 14,
-              child: CircularProgressIndicator(strokeWidth: 1.5),
-            ),
-          VersionCheckState.upToDate => const Icon(Icons.check_circle, size: 14, color: Colors.green),
-          VersionCheckState.updateAvailable => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('New', style: TextStyle(fontSize: 8, color: Colors.orange, fontWeight: FontWeight.bold)),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade100,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    notifier.latestHash ?? '',
-                    style: const TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.w600),
-                  ),
+      width: 90,
+      height: 24,
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            switch (state) {
+              VersionCheckState.idle => IconButton(
+                  icon: const Icon(Icons.refresh, size: 14),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  tooltip: 'Check for updates',
+                  onPressed: () => notifier.check(),
                 ),
-              ],
-            ),
-        },
-        if (ageText != null) ...[
-          const SizedBox(width: 4),
-          Text(ageText, style: TextStyle(fontSize: 9, color: Colors.grey.shade500)),
-        ],
-      ],
-    ),
+              VersionCheckState.checking => const SizedBox(
+                  width: 14, height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 1.5),
+                ),
+              VersionCheckState.upToDate => const Icon(Icons.check_circle, size: 14, color: Colors.green),
+              VersionCheckState.updateAvailable => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('New ', style: TextStyle(fontSize: 8, color: Colors.orange, fontWeight: FontWeight.bold)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade100,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        notifier.latestHash ?? '',
+                        style: const TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+            },
+            if (ageText != null) ...[
+              const SizedBox(width: 4),
+              Text(ageText, style: TextStyle(fontSize: 9, color: Colors.grey.shade500)),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }
