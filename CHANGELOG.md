@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: capture HTTP status code from DioException in catch block
+- docs: auto-update changelog
 - fix: recreate file stream on chain upload — no more FileSystemException (File closed)
 - docs: auto-update changelog
 - fix: display stack trace + raw error in debug modal, added rawError field to UploadResult
@@ -28,5 +30,3 @@
 - fix: moved insecure info icon outside SwitchListTile to prevent accidental toggle
 - feat: direct in-app APK download + install (no browser, no download manager)
 - fix: Android download uses standard browser launch, cleaned insecure connection label
-- feat: direct APK install from app (Android uses download manager, not browser)
-- fix: upload screen — removed duplicate preview, scrollable page, reduced spacing
