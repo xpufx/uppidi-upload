@@ -210,4 +210,19 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get deleteThisRecord => 'Bu kayıtı sil?';
+
+  @override
+  String get shareLink => 'Bağlantıyı Paylaş';
+
+  @override
+  String get includeMessage => 'Mesaj ekle';
+
+  @override
+  String get templateVars => 'Şablon Değişkenleri';
+
+  @override
+  String get templateExamples => 'Örnekler:';
+
+  @override
+  String get customizeMessage => 'Özelleştir:';
 }

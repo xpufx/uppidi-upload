@@ -60,5 +60,10 @@
   "dropFileToUpload": "Drop file to upload",
   "retry": "Retry",
   "chooseFile": "Choose File",
-  "deleteThisRecord": "Delete this record?"
+  "deleteThisRecord": "Delete this record?",
+  "shareLink": "Share Link",
+  "includeMessage": "Include message",
+  "templateVars": "Template Variables",
+  "templateExamples": "Examples:",
+  "customizeMessage": "Customize:"
 }

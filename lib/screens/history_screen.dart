@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/format.dart';
 import '../core/history_service.dart';
+import '../core/share_message_dialog.dart';
 import '../l10n/app_localizations.dart';
 
 class HistoryScreen extends ConsumerWidget {
@@ -179,7 +179,16 @@ class _HistoryTile extends StatelessWidget {
               if (r.url != null)
                 IconButton(
                   icon: const Icon(Icons.share, size: 18),
-                  onPressed: () => SharePlus.instance.share(ShareParams(text: r.url!)),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => ShareMessageDialog(
+                        url: r.url!,
+                        providerName: r.providerName,
+                        fileName: r.fileName,
+                      ),
+                    );
+                  },
                   tooltip: l10n.shareUrl,
                 ),
             ],

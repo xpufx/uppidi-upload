@@ -210,4 +210,19 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get deleteThisRecord => 'Eliminare questo record?';
+
+  @override
+  String get shareLink => 'Condividi Link';
+
+  @override
+  String get includeMessage => 'Includi messaggio';
+
+  @override
+  String get templateVars => 'Variabili Template';
+
+  @override
+  String get templateExamples => 'Esempi:';
+
+  @override
+  String get customizeMessage => 'Personalizza:';
 }

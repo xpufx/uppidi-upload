@@ -208,4 +208,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteThisRecord => 'Delete this record?';
+
+  @override
+  String get shareLink => 'Share Link';
+
+  @override
+  String get includeMessage => 'Include message';
+
+  @override
+  String get templateVars => 'Template Variables';
+
+  @override
+  String get templateExamples => 'Examples:';
+
+  @override
+  String get customizeMessage => 'Customize:';
 }

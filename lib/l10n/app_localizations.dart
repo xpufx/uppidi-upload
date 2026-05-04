@@ -471,6 +471,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete this record?'**
   String get deleteThisRecord;
+
+  /// No description provided for @shareLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Link'**
+  String get shareLink;
+
+  /// No description provided for @includeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Include message'**
+  String get includeMessage;
+
+  /// No description provided for @templateVars.
+  ///
+  /// In en, this message translates to:
+  /// **'Template Variables'**
+  String get templateVars;
+
+  /// No description provided for @templateExamples.
+  ///
+  /// In en, this message translates to:
+  /// **'Examples:'**
+  String get templateExamples;
+
+  /// No description provided for @customizeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize:'**
+  String get customizeMessage;
 }
 
 class _AppLocalizationsDelegate

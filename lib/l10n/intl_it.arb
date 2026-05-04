@@ -60,5 +60,10 @@
   "dropFileToUpload": "Trascina file per caricare",
   "retry": "Riprova",
   "chooseFile": "Scegli File",
-  "deleteThisRecord": "Eliminare questo record?"
+  "deleteThisRecord": "Eliminare questo record?",
+  "shareLink": "Condividi Link",
+  "includeMessage": "Includi messaggio",
+  "templateVars": "Variabili Template",
+  "templateExamples": "Esempi:",
+  "customizeMessage": "Personalizza:"
 }

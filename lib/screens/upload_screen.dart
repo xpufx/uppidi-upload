@@ -2,11 +2,11 @@ import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/format.dart';
 import '../core/interfaces/uploader.dart';
+import '../core/share_message_dialog.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 
@@ -720,9 +720,14 @@ class _ResultBanner extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.share, size: 18),
                   onPressed: () {
-                    if (url != null) {
-                      SharePlus.instance.share(ShareParams(text: url!));
-                    }
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => ShareMessageDialog(
+                        url: url!,
+                        providerName: provider?.providerName,
+                        fileName: fileName,
+                      ),
+                    );
                   },
                   tooltip: l10n.shareUrl,
                 ),

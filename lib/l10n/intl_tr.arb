@@ -60,5 +60,10 @@
   "dropFileToUpload": "Yüklemek için dosyayı bırak",
   "retry": "Tekrar Dene",
   "chooseFile": "Dosya Seç",
-  "deleteThisRecord": "Bu kayıtı sil?"
+  "deleteThisRecord": "Bu kayıtı sil?",
+  "shareLink": "Bağlantıyı Paylaş",
+  "includeMessage": "Mesaj ekle",
+  "templateVars": "Şablon Değişkenleri",
+  "templateExamples": "Örnekler:",
+  "customizeMessage": "Özelleştir:"
 }
