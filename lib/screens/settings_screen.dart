@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -13,24 +11,8 @@ import '../core/registry.dart';
 import '../core/settings_service.dart';
 import '../core/theme_provider.dart';
 import '../core/version.dart';
+import '../core/version_check_provider.dart';
 import '../l10n/app_localizations.dart';
-
-/// Fetches latest build hash from CDN. Cached for session.
-final _updateCheckProvider = FutureProvider<String?>((ref) async {
-  if (cdnUrl.isEmpty) return null;
-  try {
-    final client = HttpClient();
-    final request = await client.getUrl(Uri.parse('$cdnUrl/latest.txt'));
-    final response = await request.close();
-    if (response.statusCode == 200) {
-      final body = await response.transform(utf8.decoder).join();
-      final latestHash = body.trim();
-      if (latestHash.isNotEmpty && latestHash != gitHash) return latestHash;
-    }
-    client.close();
-  } catch (_) {}
-  return null;
-});
 
 const changeLogText = '''
 v1.0.0+1 (2026-05-04)
@@ -205,20 +187,37 @@ class _ProviderConfigCardState extends State<_ProviderConfigCard> {
   }
 }
 
-class _UpdateBadge extends ConsumerWidget {
+class _VersionCheckWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final update = ref.watch(_updateCheckProvider);
-    if (update.isLoading) return const SizedBox(width: 8, height: 8, child: CircularProgressIndicator(strokeWidth: 1.5));
-    if (!update.hasValue || update.value == null) return const SizedBox.shrink();
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: Colors.orange.shade100,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(update.value!, style: const TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.w600)),
-    );
+    final state = ref.watch(versionCheckProvider);
+
+    return switch (state) {
+      VersionCheckState.idle => IconButton(
+          icon: const Icon(Icons.refresh, size: 14),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          tooltip: 'Check for updates',
+          onPressed: () => ref.read(versionCheckProvider.notifier).check(),
+        ),
+      VersionCheckState.checking => const SizedBox(
+          width: 14,
+          height: 14,
+          child: CircularProgressIndicator(strokeWidth: 1.5),
+        ),
+      VersionCheckState.upToDate => const Icon(Icons.check_circle, size: 14, color: Colors.green),
+      VersionCheckState.updateAvailable => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.orange.shade100,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            ref.read(versionCheckProvider.notifier).latestHash ?? '',
+            style: const TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.w600),
+          ),
+        ),
+    };
   }
 }
 
@@ -444,19 +443,8 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                             children: [
                               Text('${l10n.providersCount(ProviderRegistry.all.length)} · $gitHash',
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
-                              Visibility(
-                                visible: cdnUrl.isNotEmpty,
-                                child: IconButton(
-                                  icon: const Icon(Icons.refresh, size: 14),
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                  tooltip: 'Check for updates',
-                                  onPressed: () => ref.invalidate(_updateCheckProvider),
-                                ),
-                              ),
                               const SizedBox(width: 4),
-                              const Spacer(),
-                              _UpdateBadge(),
+                              if (cdnUrl.isNotEmpty) _VersionCheckWidget(),
                             ],
                           ),
                         ],
