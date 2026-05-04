@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/format.dart';
-import '../core/history_service.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/models/upload_result.dart';
 import '../core/share_message_dialog.dart';
@@ -714,8 +713,12 @@ class _ResultBannerState extends State<_ResultBanner> {
     // Error details
     buffer.writeln('=== ERROR ===');
     buffer.writeln('Message: ${widget.errorMessage ?? "none"}');
+    buffer.writeln('Raw Error: ${result?.rawError ?? "none"}');
     buffer.writeln('Status Code: ${result?.statusCode ?? "none"}');
     buffer.writeln('Timestamp: ${result?.completedAt.toIso8601String() ?? "none"}');
+    if (result?.stackTrace != null) {
+      buffer.writeln('Stack Trace: ${result!.stackTrace}');
+    }
 
     // URL info
     buffer.writeln('=== RESPONSE ===');
