@@ -38,63 +38,65 @@ class UploadScreen extends ConsumerWidget {
 
     final content = Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _ProviderDropdown(
-            selectedIndex: uploadState.selectedProviderIndex,
-            providers: providers,
-            isUploading: uploadState is UploadInProgress,
-            onChanged: (i) {
-              if (i != null) notifier.setProvider(i);
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _ProviderDropdown(
+              selectedIndex: uploadState.selectedProviderIndex,
+              providers: providers,
+              isUploading: uploadState is UploadInProgress,
+              onChanged: (i) {
+                if (i != null) notifier.setProvider(i);
+              },
+            ),
+            if (provider != null) _ProviderInfo(provider: provider),
+            if (webUnsupported) const _WebWarning(),
+            switch (uploadState) {
+              UploadFileSelected(fileName: final n, fileSizeBytes: final s, mimeType: final m, fileBytes: final b) =>
+                _FilePreview(fileName: n, fileSize: s, mimeType: m, fileBytes: b, provider: provider),
+              UploadInProgress(fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb)
+                  when fn != null =>
+                _FilePreview(fileName: fn, fileSize: fs, mimeType: m, fileBytes: fb, provider: provider),
+              UploadCompleted(fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb)
+                  when fn != null =>
+                _FilePreview(fileName: fn, fileSize: fs, mimeType: m, fileBytes: fb, provider: provider),
+              _ => const SizedBox.shrink(),
             },
-          ),
-          if (provider != null) _ProviderInfo(provider: provider),
-          if (webUnsupported) const _WebWarning(),
-          switch (uploadState) {
-            UploadFileSelected(fileName: final n, fileSizeBytes: final s, mimeType: final m, fileBytes: final b) =>
-              _FilePreview(fileName: n, fileSize: s, mimeType: m, fileBytes: b, provider: provider),
-            UploadInProgress(fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb)
-                when fn != null =>
-              _FilePreview(fileName: fn, fileSize: fs, mimeType: m, fileBytes: fb, provider: provider),
-            UploadCompleted(fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb)
-                when fn != null =>
-              _FilePreview(fileName: fn, fileSize: fs, mimeType: m, fileBytes: fb, provider: provider),
-            _ => const SizedBox.shrink(),
-          },
-          const SizedBox(height: 16),
-          switch (uploadState) {
-            UploadIdle() => _PickButton(notifier: notifier),
-            UploadFileSelected() => _UploadButton(notifier: notifier),
-            _ => const SizedBox.shrink(),
-          },
-          switch (uploadState) {
-            UploadInProgress(progress: final p, speedLabel: final sp, sentBytes: final sb, totalBytes: final tb) => _ProgressSection(
-                progress: p,
-                speedLabel: sp,
-                sentBytes: sb,
-                totalBytes: tb,
-                onCancel: notifier.cancelUpload,
-              ),
-            UploadStarting() => _ProgressSection(
-                progress: null,
-                onCancel: notifier.cancelUpload,
-              ),
-            UploadCompleted(errorMessage: final e, lastResult: final r, fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb) =>
-              _ResultBanner(
-                url: r.url,
-                errorMessage: e,
-                fileName: fn,
-                fileSizeBytes: fs,
-                mimeType: m,
-                fileBytes: fb,
-                provider: provider,
-                onRetry: e != null ? () => notifier.uploadSelected() : null,
-              ),
-            _ => const SizedBox.shrink(),
-          },
-          const SizedBox(height: 16),
-        ],
+            const SizedBox(height: 12),
+            switch (uploadState) {
+              UploadIdle() => _PickButton(notifier: notifier),
+              UploadFileSelected() => _UploadButton(notifier: notifier),
+              _ => const SizedBox.shrink(),
+            },
+            switch (uploadState) {
+              UploadInProgress(progress: final p, speedLabel: final sp, sentBytes: final sb, totalBytes: final tb) => _ProgressSection(
+                  progress: p,
+                  speedLabel: sp,
+                  sentBytes: sb,
+                  totalBytes: tb,
+                  onCancel: notifier.cancelUpload,
+                ),
+              UploadStarting() => _ProgressSection(
+                  progress: null,
+                  onCancel: notifier.cancelUpload,
+                ),
+              UploadCompleted(errorMessage: final e, lastResult: final r, fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb) =>
+                _ResultBanner(
+                  url: r.url,
+                  errorMessage: e,
+                  fileName: fn,
+                  fileSizeBytes: fs,
+                  mimeType: m,
+                  fileBytes: fb,
+                  provider: provider,
+                  onRetry: e != null ? () => notifier.uploadSelected() : null,
+                ),
+              _ => const SizedBox.shrink(),
+            },
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
 
@@ -652,7 +654,6 @@ class _ResultBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasError = errorMessage != null;
-    final hasFileInfo = fileName != null;
     final l10n = AppLocalizations.of(context);
 
     return Padding(
@@ -660,16 +661,6 @@ class _ResultBanner extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Show file preview if file info is available
-          if (hasFileInfo)
-            _FilePreview(
-              fileName: fileName!,
-              fileSize: fileSizeBytes,
-              mimeType: mimeType,
-              fileBytes: fileBytes,
-              provider: provider,
-            ),
-          const SizedBox(height: 12),
           // Result row
           Row(
             children: [
