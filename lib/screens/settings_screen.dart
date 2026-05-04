@@ -288,32 +288,29 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SwitchListTile(
-          title: Row(
-            children: [
-              Text(l10n.enableInsecure),
-              GestureDetector(
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: Text(l10n.enableInsecure),
-                    content: Text(l10n.selfSignedCertWarning),
-                    actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok))],
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 6),
-                  child: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () => showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: Text(l10n.enableInsecure),
+                  content: Text(l10n.selfSignedCertWarning),
+                  actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok))],
                 ),
               ),
-            ],
-          ),
-          value: insecureAsync.asData?.value ?? false,
-          onChanged: (v) {
-            svc.set(SettingsService.insecureConnKey, v.toString());
-            ref.invalidate(insecureConnProvider);
-          },
-          contentPadding: EdgeInsets.zero,
+              child: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
+            ),
+            const SizedBox(width: 8),
+            Expanded(child: Text(l10n.enableInsecure)),
+            Switch(
+              value: insecureAsync.asData?.value ?? false,
+              onChanged: (v) {
+                svc.set(SettingsService.insecureConnKey, v.toString());
+                ref.invalidate(insecureConnProvider);
+              },
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         // Theme mode

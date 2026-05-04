@@ -210,12 +210,7 @@ class UploadNotifier extends Notifier<UploadState> {
   Future<void> uploadSelected() async {
     final request = _pendingRequest;
     if (request == null) return;
-    // Don't clear _pendingRequest — keep for retry
     await _executeUpload(request);
-    // Only clear on success
-    if (state is UploadCompleted && (state as UploadCompleted).isSuccess) {
-      _pendingRequest = null;
-    }
   }
 
   Future<void> uploadFromFile(String filePath, String? mimeType) async {
