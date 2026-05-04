@@ -1,4 +1,4 @@
-name: uppidi
+name: uppidi_upload
 description: Cross-platform Flutter media uploader with modular provider plugins
 publish_to: 'none'
 version: 1.0.0+1

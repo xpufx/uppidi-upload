@@ -9,7 +9,7 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
-  String get appTitle => 'uppidi';
+  String get appTitle => 'Uppidi Upload';
 
   @override
   String get genericError =>

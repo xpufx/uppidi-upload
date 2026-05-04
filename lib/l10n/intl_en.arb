@@ -1,5 +1,5 @@
 {
-  "appTitle": "uppidi",
+  "appTitle": "Uppidi Upload",
   "genericError": "An unexpected error occurred. Please try again.",
   "errorSessionExpired": "Your session has expired. Please check your credentials in Settings.",
   "errorFileTooLarge": "The file is too large for this provider.",

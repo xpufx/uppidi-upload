@@ -46,7 +46,7 @@ class _UppidiAppState extends ConsumerState<UppidiApp> {
     final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
-      title: 'uppidi',
+      title: 'Uppidi Upload',
       locale: localeCode != null ? Locale(localeCode) : null,
       themeMode: themeMode,
       theme: ThemeData(

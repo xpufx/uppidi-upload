@@ -1,5 +1,5 @@
 {
-  "appTitle": "uppidi",
+  "appTitle": "Uppidi Upload",
   "genericError": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.",
   "errorSessionExpired": "Oturumunuzun süresi doldu. Lütfen Ayarlar'dan kimlik bilgilerinizi kontrol edin.",
   "errorFileTooLarge": "Bu dosya bu sağlayıcı için çok büyük.",

@@ -1,5 +1,5 @@
 {
-  "appTitle": "uppidi",
+  "appTitle": "Uppidi Upload",
   "genericError": "Si è verificato un errore imprevisto. Riprova.",
   "errorSessionExpired": "La sessione è scaduta. Controlla le credenziali nelle Impostazioni.",
   "errorFileTooLarge": "Il file è troppo grande per questo servizio.",

@@ -9,7 +9,7 @@ class AppLocalizationsIt extends AppLocalizations {
   AppLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
-  String get appTitle => 'uppidi';
+  String get appTitle => 'Uppidi Upload';
 
   @override
   String get genericError => 'Si è verificato un errore imprevisto. Riprova.';
