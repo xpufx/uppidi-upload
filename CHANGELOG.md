@@ -1,46 +1,32 @@
 # Changelog
 
-## 1.0.0+1 (2026-05-04)
-
-### Features
-- Image preview with upload confirmation before every upload
-- Theme: dark mode toggle, 12 color presets, custom logo
-- Provider enable/disable switches + connectivity test page (Providers tab)
-- Share URL button on upload result and history
-- Share with templated message: %url, %provider, %date, %filename variables
-- Drag-and-drop file upload on desktop (Linux, macOS, Windows)
-- Animated upload progress with live speed (MB/s) and byte counter
-- Upload retry + cancel buttons, swipe to dismiss file selection
-- Desktop footer bar with app name + version
-- Latest symlinks for easy download endpoints
-- In-app APK download + install (Android, no browser)
-- Settings About card: download links, version check (manual + auto), changelog dialog
-- Pre-build hardcoded string detection (grep-based lint)
-- CHANGELOG.md + post-build test checklist
-
-### Fixes
-- Cancel upload no longer leaves sticky error state
-- Proxy URL now applied to upload connections (HTTP/HTTPS)
-- App icon replaced with new logo (light/dark variants)
-- Settings proxy field debounced at 500ms
-- Animation memory leak fixed in progress section
-- Dynamic types replaced with proper typing in upload screen
-- Navigation button colors: selected (primary) / unselected (surface variant)
-- All hardcoded UI strings localized (3 languages)
-- Redundant logo removed from Providers page header
-- Stale test count removed from settings
-- TmpFileLinkProvider parseResponse CastError on non-Map data
-- Upload screen scrollable, no duplicate preview
-- Upload deadlock broken: retry, cancel, clear ✕, swipe to dismiss, change provider
-- Real error messages shown instead of generic 'Upload failed'
-
-### Tests
-- 45 provider parseResponse unit tests covering all 6 providers
-
-### Agents
-- Archie (Architect) — DeepSeek V4 Pro
-- Jeb (Junior executor) — MiniMax M2.5 (free)
-- DJ (Docs) — BigPickle (free)
-- Audrey (Audit) — Hy3 Preview (free)
-- Theo (Tests) — Hy3 Preview (free)
-- All agents repo-agnostic, model-agnostic nicknames
+- docs: user manual covering upload, providers, history, settings (by DJ)
+- feat: debug info modal on upload errors — bug icon, full diagnostics, Copy All button
+- fix: version check auto-fires on Settings page visit via initState
+- fix: version check layout — age text on separate line, only for upToDate, Column not Row
+- fix: upload button — removed stray return that blocked all uploads
+- fix: version check layout stable — unified GestureDetector, removed vertical 'New' label, auto-check reverted to manual
+- fix: version check tappable in all states, auto-check on Settings page visit
+- fix: version check layout stable — fixed 90x24 area, New inline with badge, no vertical shift
+- docs: delegation discipline rule — think first, delegate clean, no stream of consciousness
+- fix: disable duplicate upload check (code preserved behind if(false) for future)
+- feat: duplicate upload detection — warns if same file already uploaded to same provider
+- fix: removed unused deps (background_downloader, photo_manager), connectivity logging
+- fix: info icon before title+switch (separate tap targets), %provider expanded on share, chain uploads kept
+- fix: info icon inline with switch title, version check fixed width (no layout shift)
+- docs: update CHANGELOG with all recent features and fixes
+- feat: version check UX — spinner, checkmark, badge states (Theo found upload bug + 45 tests)
+- fix: TmpFileLinkProvider parseResponse — CastError on non-Map data
+- feat: manual 'Check for updates' refresh button in About card
+- fix: upload deadlock — real errors, cancel+retry buttons, swipe to dismiss, broken preview
+- fix: moved insecure info icon outside SwitchListTile to prevent accidental toggle
+- feat: direct in-app APK download + install (no browser, no download manager)
+- fix: Android download uses standard browser launch, cleaned insecure connection label
+- feat: direct APK install from app (Android uses download manager, not browser)
+- fix: upload screen — removed duplicate preview, scrollable page, reduced spacing
+- feat: compact self-signed cert setting (info icon + modal), 12 color presets
+- feat: download links + version check in Settings About card
+- fix: localize 'Language' label, remove from grep exclusion list
+- fix: remove hardcoded 'this provider', tighten string grep to scan all lib/ files
+- fix: share dialog %provider bug, upload preview persists during transfer, retry + provider change
+- feat: post-build test checklist with checkboxes
