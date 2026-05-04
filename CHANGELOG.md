@@ -1,5 +1,7 @@
 # Changelog
 
+- refactor: remove dead connectivity check from upload flow — never blocked, just wasted a round-trip
+- docs: auto-update changelog
 - fix: capture HTTP status code from DioException in catch block
 - docs: auto-update changelog
 - fix: recreate file stream on chain upload — no more FileSystemException (File closed)
@@ -28,5 +30,3 @@
 - feat: manual 'Check for updates' refresh button in About card
 - fix: upload deadlock — real errors, cancel+retry buttons, swipe to dismiss, broken preview
 - fix: moved insecure info icon outside SwitchListTile to prevent accidental toggle
-- feat: direct in-app APK download + install (no browser, no download manager)
-- fix: Android download uses standard browser launch, cleaned insecure connection label

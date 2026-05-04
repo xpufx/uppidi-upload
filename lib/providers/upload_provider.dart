@@ -457,6 +457,18 @@ class UploadNotifier extends Notifier<UploadState> {
     }
   }
 
+  void cancelUpload() {
+    final current = state;
+    if (current is UploadInProgress) {
+      current.cancelToken.cancel('User cancelled');
+    }
+    state = UploadIdle(
+      results: state.results,
+      selectedProviderIndex: state.selectedProviderIndex,
+      providers: state.providers,
+    );
+  }
+
   void clearSelection() {
     _pendingRequest = null;
     _lastFilePath = null;
