@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -9,13 +10,21 @@ enum VersionCheckState { idle, checking, upToDate, updateAvailable }
 
 class VersionCheckNotifier extends Notifier<VersionCheckState> {
   String? _latestHash;
+  DateTime? _lastChecked;
+  int _tick = 0;
+  Timer? _ticker;
 
   @override
-  VersionCheckState build() => VersionCheckState.idle;
+  VersionCheckState build() {
+    ref.onDispose(() => _ticker?.cancel());
+    return VersionCheckState.idle;
+  }
 
   Future<void> check() async {
     if (cdnUrl.isEmpty) return;
+    _ticker?.cancel();
     state = VersionCheckState.checking;
+    _lastChecked = DateTime.now();
     try {
       final client = HttpClient();
       final request = await client.getUrl(Uri.parse('$cdnUrl/latest.txt'));
@@ -28,19 +37,33 @@ class VersionCheckNotifier extends Notifier<VersionCheckState> {
             : VersionCheckState.upToDate;
       } else {
         state = VersionCheckState.idle;
+        _lastChecked = null;
       }
       client.close();
     } catch (_) {
       state = VersionCheckState.idle;
+      _lastChecked = null;
     }
-    // Auto-reset to idle after a few seconds for upToDate
-    if (state == VersionCheckState.upToDate) {
-      await Future.delayed(const Duration(seconds: 3));
-      if (state == VersionCheckState.upToDate) state = VersionCheckState.idle;
+    if (state == VersionCheckState.upToDate || state == VersionCheckState.updateAvailable) {
+      _startTicker();
     }
   }
 
+  void _startTicker() {
+    _ticker?.cancel();
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (state == VersionCheckState.upToDate || state == VersionCheckState.updateAvailable) {
+        _tick++;
+        state = state;
+      } else {
+        _ticker?.cancel();
+      }
+    });
+  }
+
   String? get latestHash => _latestHash;
+  DateTime? get lastChecked => _lastChecked;
+  int get tick => _tick;
 }
 
 final versionCheckProvider = NotifierProvider<VersionCheckNotifier, VersionCheckState>(
