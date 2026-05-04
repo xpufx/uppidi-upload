@@ -194,22 +194,23 @@ class _VersionCheckWidget extends ConsumerWidget {
     final notifier = ref.read(versionCheckProvider.notifier);
     final lastChecked = notifier.lastChecked;
 
-    // Compute "Xs ago" text
+    // Age text only for upToDate (checkmark state)
     String? ageText;
-    if (lastChecked != null && (state == VersionCheckState.upToDate || state == VersionCheckState.updateAvailable)) {
+    if (lastChecked != null && state == VersionCheckState.upToDate) {
       final seconds = DateTime.now().difference(lastChecked).inSeconds;
       ageText = seconds < 60 ? '${seconds}s ago' : '${seconds ~/ 60}m ago';
     }
 
     return SizedBox(
       width: 90,
-      height: 24,
+      height: 32,
       child: Align(
         alignment: Alignment.centerRight,
         child: GestureDetector(
           onTap: state == VersionCheckState.checking ? null : () => ref.read(versionCheckProvider.notifier).check(),
-          child: Row(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               switch (state) {
                 VersionCheckState.idle => const Icon(Icons.refresh, size: 14, color: Colors.grey),
@@ -230,10 +231,8 @@ class _VersionCheckWidget extends ConsumerWidget {
                     ),
                   ),
               },
-              if (ageText != null) ...[
-                const SizedBox(width: 4),
+              if (ageText != null)
                 Text(ageText, style: TextStyle(fontSize: 9, color: Colors.grey.shade500)),
-              ],
             ],
           ),
         ),
