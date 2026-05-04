@@ -121,6 +121,9 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
               child: BottomNavigationBar(
                 currentIndex: _selected.index,
                 onTap: (i) => setState(() => _selected = _NavTab.values[i]),
+                type: BottomNavigationBarType.fixed,
+                selectedItemColor: Theme.of(context).colorScheme.primary,
+                unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
                 items: _NavTab.values
                     .map((t) => BottomNavigationBarItem(
                           icon: Icon(t.icon),
@@ -149,6 +152,20 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
                         onDestinationSelected: (i) =>
                             setState(() => _selected = _NavTab.values[i]),
                         labelType: NavigationRailLabelType.all,
+                        selectedIconTheme: IconThemeData(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        unselectedIconTheme: IconThemeData(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        selectedLabelTextStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 12,
+                        ),
+                        unselectedLabelTextStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontSize: 12,
+                        ),
                         destinations: _NavTab.values
                             .map((t) => NavigationRailDestination(
                                   icon: Icon(t.icon),

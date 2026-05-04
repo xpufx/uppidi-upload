@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../core/app_logo.dart';
 import '../core/registry.dart';
@@ -11,6 +10,25 @@ import '../core/settings_service.dart';
 import '../core/theme_provider.dart';
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
+
+const changeLogText = '''
+v1.0.0+1 (2026-05-04)
+
+Features:
+• Image preview with upload confirmation
+• Dark mode + 6 color theme presets
+• Provider enable/disable + connectivity tests
+• Share URL on upload result and history
+• Drag-and-drop file upload (desktop)
+• Animated upload progress with speed (MB/s)
+• Per-ABI APK builds (~20MB)
+
+Fixes:
+• Cancel upload no longer blocks re-upload
+• Proxy URL now applied to uploads
+• Settings debounce, animation fixes
+• New app icon (light/dark variants)
+''';
 
 final providerConfigsProvider = FutureProvider.family<Map<String, String>, String>(
   (ref, providerId) async {
@@ -379,7 +397,21 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                 ),
                 const SizedBox(height: 12),
                 OutlinedButton.icon(
-                  onPressed: () => launchUrl(Uri.parse('CHANGELOG.md'), mode: LaunchMode.externalApplication),
+                  onPressed: () => showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Changelog'),
+                      content: SingleChildScrollView(
+                        child: Text(changeLogText),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: Text(l10n.ok),
+                        ),
+                      ],
+                    ),
+                  ),
                   icon: const Icon(Icons.list_alt, size: 16),
                   label: const Text('View Changelog'),
                 ),
