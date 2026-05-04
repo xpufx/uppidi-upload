@@ -257,6 +257,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
     super.initState();
     _proxyController = TextEditingController();
     Future.microtask(_load);
+    Future.microtask(() => ref.read(versionCheckProvider.notifier).check());
   }
 
   @override
