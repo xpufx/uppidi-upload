@@ -3,6 +3,7 @@ class UploadResult {
   final String? url;
   final String? errorMessage;
   final int? statusCode;
+  final String? stackTrace;
   final DateTime completedAt;
 
   UploadResult({
@@ -10,6 +11,7 @@ class UploadResult {
     this.url,
     this.errorMessage,
     this.statusCode,
+    this.stackTrace,
     DateTime? completedAt,
   }) : completedAt = completedAt ?? DateTime.now();
 }

@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../core/format.dart';
 import '../core/history_service.dart';
 import '../core/interfaces/uploader.dart';
+import '../core/models/upload_result.dart';
 import '../core/share_message_dialog.dart';
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
@@ -99,6 +100,7 @@ class UploadScreen extends ConsumerWidget {
                   mimeType: m,
                   fileBytes: fb,
                   provider: provider,
+                  lastResult: r,
                   onRetry: e != null ? () => notifier.uploadSelected() : null,
                   onCancel: e != null ? () => notifier.clearSelection() : null,
                 ),
@@ -298,54 +300,6 @@ class _UploadButton extends ConsumerWidget {
       onPressed: () async {
         final state = ref.read(uploadProvider);
         if (state is! UploadFileSelected) return;
-
-        final fileName = state.fileName;
-        final provider = state.providers[state.selectedProviderIndex];
-
-        // TODO: Enable duplicate detection (--disable-duplicate-check)
-        if (false) {
-        // Check for duplicate in history
-        final history = ref.read(historyServiceProvider);
-        final records = await history.getAll();
-        final duplicate = records.where((r) =>
-          r.record.fileName == fileName &&
-          r.record.providerId == provider.providerId &&
-          r.record.success == true
-        ).firstOrNull;
-
-        if (!context.mounted) return;
-
-        if (duplicate != null) {
-          final confirmed = await showDialog<bool>(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text('Duplicate Upload'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Identical file already uploaded to ${provider.providerName}.'),
-                  const SizedBox(height: 8),
-                  if (duplicate.record.url != null) ...[
-                    Text('Previous link:', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-                    const SizedBox(height: 4),
-                    SelectableText(duplicate.record.url!, style: const TextStyle(fontSize: 12, color: Colors.blue)),
-                  ],
-                ],
-              ),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Upload Anyway')),
-              ],
-            ),
-          );
-          if (confirmed == true) {
-            notifier.uploadSelected();
-          }
-        } else {
-          notifier.uploadSelected();
-        }
-        } // end duplicate check
         notifier.uploadSelected();
       },
       icon: const Icon(Icons.cloud_upload),
@@ -719,6 +673,7 @@ class _ResultBanner extends StatefulWidget {
   final String? mimeType;
   final Uint8List? fileBytes;
   final BaseUploader? provider;
+  final UploadResult? lastResult;
   final VoidCallback? onRetry;
   final VoidCallback? onCancel;
 
@@ -730,6 +685,7 @@ class _ResultBanner extends StatefulWidget {
     this.mimeType,
     this.fileBytes,
     this.provider,
+    this.lastResult,
     this.onRetry,
     this.onCancel,
   });
@@ -741,12 +697,36 @@ class _ResultBanner extends StatefulWidget {
 class _ResultBannerState extends State<_ResultBanner> {
   void _showDebugInfo(BuildContext context) {
     final buffer = StringBuffer();
-    buffer.writeln('Provider: ${widget.provider?.providerName ?? "unknown"} (${widget.provider?.providerId ?? "?"})');
-    buffer.writeln('File: ${widget.fileName} (${formatSize(widget.fileSizeBytes)}, ${widget.mimeType})');
-    buffer.writeln('Error: ${widget.errorMessage}');
+    final result = widget.lastResult;
+    final p = widget.provider;
+
+    // Provider info
+    buffer.writeln('=== PROVIDER ===');
+    buffer.writeln('Name: ${p?.providerName ?? "unknown"}');
+    buffer.writeln('ID: ${p?.providerId ?? "?"}');
+
+    // File info
+    buffer.writeln('=== FILE ===');
+    buffer.writeln('Name: ${widget.fileName ?? "none"}');
+    buffer.writeln('Size: ${formatSize(widget.fileSizeBytes)} (${widget.fileSizeBytes} bytes)');
+    buffer.writeln('MIME: ${widget.mimeType ?? "unknown"}');
+
+    // Error details
+    buffer.writeln('=== ERROR ===');
+    buffer.writeln('Message: ${widget.errorMessage ?? "none"}');
+    buffer.writeln('Status Code: ${result?.statusCode ?? "none"}');
+    buffer.writeln('Timestamp: ${result?.completedAt.toIso8601String() ?? "none"}');
+
+    // URL info
+    buffer.writeln('=== RESPONSE ===');
     buffer.writeln('URL: ${widget.url ?? "none"}');
-    buffer.writeln('Build: $gitHash');
+    buffer.writeln('Success: ${result?.success ?? false}');
+
+    // Build info
+    buffer.writeln('=== BUILD ===');
+    buffer.writeln('Git Hash: $gitHash');
     buffer.writeln('Platform: ${Platform.operatingSystem}');
+    buffer.writeln('Platform Version: ${Platform.operatingSystemVersion}');
 
     final text = buffer.toString();
 

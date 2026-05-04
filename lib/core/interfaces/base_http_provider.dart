@@ -77,6 +77,7 @@ abstract class BaseHttpProvider implements BaseUploader {
       return UploadResult(
         success: false,
         errorMessage: _mapException(e),
+        stackTrace: stackTrace.toString(),
       );
     }
   }
