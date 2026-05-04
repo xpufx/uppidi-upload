@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/app_logo.dart';
 import '../core/registry.dart';
@@ -350,19 +351,42 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         ),
         const SizedBox(height: 16),
         const Divider(height: 32),
-        Text('uppidi v$appVersion',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
-        Text('Cross-platform media uploader',
-          style: Theme.of(context).textTheme.bodySmall),
-        const SizedBox(height: 2),
-        Text('${ProviderRegistry.all.length} providers · $gitHash',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
-        const SizedBox(height: 16),
-        Center(child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: AppLogo(size: 96),
-        )),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: AppLogo(size: 56),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Uppidi Upload v$appVersion',
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 4),
+                          Text('${ProviderRegistry.all.length} providers · $gitHash',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () => launchUrl(Uri.parse('CHANGELOG.md'), mode: LaunchMode.externalApplication),
+                  icon: const Icon(Icons.list_alt, size: 16),
+                  label: const Text('View Changelog'),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
