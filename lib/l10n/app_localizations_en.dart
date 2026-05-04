@@ -73,8 +73,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historyEmpty => 'No upload history yet';
 
   @override
-  String get enableInsecure =>
-      'Allow insecure connections';
+  String get enableInsecure => 'Allow insecure connections';
 
   @override
   String get proxyUrl => 'Proxy URL';

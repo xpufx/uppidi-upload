@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../core/apk_installer.dart';
 import '../core/app_logo.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
@@ -461,9 +462,16 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                       IconButton(
                         icon: const Icon(Icons.android, size: 20),
                         tooltip: 'Download Android APK',
-                        onPressed: () {
-                          final uri = Uri.parse('$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk');
-                          launchUrl(uri, mode: LaunchMode.externalApplication);
+                        onPressed: () async {
+                          try {
+                            await downloadAndInstallApk('$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk');
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Download failed: $e')),
+                              );
+                            }
+                          }
                         },
                       ),
                       const SizedBox(width: 8),

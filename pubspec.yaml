@@ -22,6 +22,8 @@ dependencies:
   background_downloader: ^9.5.4
   receive_sharing_intent: ^1.8.1
   url_launcher: ^6.3.2
+  path_provider: ^2.1.0
+  open_filex: ^4.6.0
   share_plus: ^12.0.2
 
 dev_dependencies:

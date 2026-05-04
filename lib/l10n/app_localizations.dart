@@ -223,7 +223,7 @@ abstract class AppLocalizations {
   /// No description provided for @enableInsecure.
   ///
   /// In en, this message translates to:
-  /// **'Allow insecure connections (self-signed certificates)'**
+  /// **'Allow insecure connections'**
   String get enableInsecure;
 
   /// No description provided for @proxyUrl.

@@ -74,8 +74,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get historyEmpty => 'Henüz yükleme geçmişi yok';
 
   @override
-  String get enableInsecure =>
-      'Güvensiz bağlantılara izin ver';
+  String get enableInsecure => 'Güvensiz bağlantılara izin ver';
 
   @override
   String get proxyUrl => 'Proxy URL';

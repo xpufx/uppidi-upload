@@ -74,8 +74,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get historyEmpty => 'Nessun caricamento precedente';
 
   @override
-  String get enableInsecure =>
-      'Consenti connessioni insicure';
+  String get enableInsecure => 'Consenti connessioni insicure';
 
   @override
   String get proxyUrl => 'Proxy URL';
