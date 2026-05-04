@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: display stack trace + raw error in debug modal, added rawError field to UploadResult
+- docs: auto-update changelog
 - feat: stack trace capture in UploadResult, enhanced debug modal with structured sections
 - docs: auto-update changelog
 - docs: user manual covering upload, providers, history, settings (by DJ)
@@ -28,5 +30,3 @@
 - fix: upload screen — removed duplicate preview, scrollable page, reduced spacing
 - feat: compact self-signed cert setting (info icon + modal), 12 color presets
 - feat: download links + version check in Settings About card
-- fix: localize 'Language' label, remove from grep exclusion list
-- fix: remove hardcoded 'this provider', tighten string grep to scan all lib/ files
