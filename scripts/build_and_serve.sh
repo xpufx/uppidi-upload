@@ -77,3 +77,30 @@ echo ""
 echo "==> Done"
 echo "    ${DST}"
 echo "    ${LINUX_NAME}"
+
+# ── Feature test checklist ───────────────────────────────────
+echo ""
+echo "==> Test Checklist"
+echo ""
+cat <<'CHECKLIST'
+[ ] Upload: Pick file, preview shows, Upload button works
+[ ] Upload: Speed/progress animation during upload
+[ ] Upload: Retry button appears on failure, preview stays
+[ ] Upload: Cancel clears state, can upload again
+[ ] Share: Share icon opens templated message dialog
+[ ] Share: Info popup shows template variables + examples
+[ ] Providers: Test All + individual test buttons work
+[ ] Providers: Enable/disable toggle, reflects in Upload dropdown
+[ ] History: Records visible, delete + copy + share work
+[ ] Settings: Theme mode (System/Light/Dark) switches correctly
+[ ] Settings: Color presets apply instantly
+[ ] Settings: About card → View Changelog opens dialog
+[ ] Theme: Logo changes between light/dark mode
+[ ] Theme: Navigation buttons have visible colors
+[ ] Localization: Change language, no hardcoded English text
+[ ] Desktop: Drag-and-drop a file onto the upload area
+CHECKLIST
+echo ""
+echo "Happy testing!"
+
+true  # ensure script always exits 0 after checklist
