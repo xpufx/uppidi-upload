@@ -95,17 +95,18 @@ class UploadNotifier extends Notifier<UploadState> {
     List<BaseUploader>? providers,
   })  : _injectedProviders = providers;
 
-  List<BaseUploader> get _providers => _injectedProviders ?? ref.read(enabledProvidersProvider);
-
   FileUploadRequest? _pendingRequest;
   DateTime _lastSpeedSample = DateTime.now();
   int _lastSampleBytes = 0;
 
   @override
-  UploadState build() => UploadIdle(providers: _providers);
+  UploadState build() {
+    final List<BaseUploader> enabled = _injectedProviders ?? ref.watch(enabledProvidersProvider);
+    return UploadIdle(providers: enabled);
+  }
 
   void setProvider(int index) {
-    if (index < 0 || index >= _providers.length) return;
+    if (index < 0 || index >= state.providers.length) return;
     final prev = state;
     state = switch (prev) {
       UploadFileSelected() => UploadFileSelected(
@@ -223,7 +224,7 @@ class UploadNotifier extends Notifier<UploadState> {
   }
 
   Future<void> _executeUpload(FileUploadRequest request) async {
-    if (_providers.isEmpty) {
+    if (state.providers.isEmpty) {
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
         errorMessage: 'No upload providers configured',
@@ -234,7 +235,7 @@ class UploadNotifier extends Notifier<UploadState> {
       return;
     }
 
-    final provider = _providers[state.selectedProviderIndex];
+    final provider = state.providers[state.selectedProviderIndex];
     _log.info('Using provider: ${provider.providerName} (${provider.providerId})');
 
     final cancelToken = CancelToken();
