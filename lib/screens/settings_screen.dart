@@ -221,8 +221,13 @@ class _VersionCheckWidget extends ConsumerWidget {
                   width: 14, height: 14,
                   child: CircularProgressIndicator(strokeWidth: 1.5),
                 ),
-              VersionCheckState.upToDate => const Icon(Icons.check_circle, size: 14, color: Colors.green),
-              VersionCheckState.updateAvailable => Row(
+              VersionCheckState.upToDate => GestureDetector(
+                  onTap: () => notifier.check(),
+                  child: const Icon(Icons.check_circle, size: 14, color: Colors.green),
+                ),
+              VersionCheckState.updateAvailable => GestureDetector(
+                  onTap: () => notifier.check(),
+                  child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text('New ', style: TextStyle(fontSize: 8, color: Colors.orange, fontWeight: FontWeight.bold)),
@@ -238,6 +243,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                       ),
                     ),
                   ],
+                ),
                 ),
             },
             if (ageText != null) ...[
