@@ -1,5 +1,7 @@
 # Changelog
 
+- feat: stack trace capture in UploadResult, enhanced debug modal with structured sections
+- docs: auto-update changelog
 - docs: user manual covering upload, providers, history, settings (by DJ)
 - feat: debug info modal on upload errors — bug icon, full diagnostics, Copy All button
 - fix: version check auto-fires on Settings page visit via initState
@@ -28,5 +30,3 @@
 - feat: download links + version check in Settings About card
 - fix: localize 'Language' label, remove from grep exclusion list
 - fix: remove hardcoded 'this provider', tighten string grep to scan all lib/ files
-- fix: share dialog %provider bug, upload preview persists during transfer, retry + provider change
-- feat: post-build test checklist with checkboxes
