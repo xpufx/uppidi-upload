@@ -19,7 +19,7 @@
   "settings": "Settings",
   "history": "History",
   "historyEmpty": "No upload history yet",
-  "enableInsecure": "Allow insecure connections (self-signed certificates)",
+  "enableInsecure": "Allow insecure connections",
   "proxyUrl": "Proxy URL",
   "providersSection": "Provider Configuration",
   "historyClearAll": "Clear all",

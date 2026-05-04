@@ -75,7 +75,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get enableInsecure =>
-      'Güvensiz bağlantılara izin ver (kendi imzalı sertifikalar)';
+      'Güvensiz bağlantılara izin ver';
 
   @override
   String get proxyUrl => 'Proxy URL';

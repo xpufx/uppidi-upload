@@ -376,7 +376,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: ref.watch(_defaultShareProviderProvider).asData?.value,
+          initialValue: ref.watch(_defaultShareProviderProvider).asData?.value,
           decoration: InputDecoration(
             labelText: l10n.defaultForSharing,
             border: const OutlineInputBorder(),
@@ -463,8 +463,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                         tooltip: 'Download Android APK',
                         onPressed: () {
                           final uri = Uri.parse('$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk');
-                          final mode = Platform.isAndroid ? LaunchMode.externalNonBrowserApplication : LaunchMode.externalApplication;
-                          launchUrl(uri, mode: mode);
+                          launchUrl(uri, mode: LaunchMode.externalApplication);
                         },
                       ),
                       const SizedBox(width: 8),

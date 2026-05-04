@@ -74,7 +74,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enableInsecure =>
-      'Allow insecure connections (self-signed certificates)';
+      'Allow insecure connections';
 
   @override
   String get proxyUrl => 'Proxy URL';

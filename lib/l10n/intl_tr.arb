@@ -19,7 +19,7 @@
   "settings": "Ayarlar",
   "history": "Geçmiş",
   "historyEmpty": "Henüz yükleme geçmişi yok",
-  "enableInsecure": "Güvensiz bağlantılara izin ver (kendi imzalı sertifikalar)",
+  "enableInsecure": "Güvensiz bağlantılara izin ver",
   "proxyUrl": "Proxy URL",
   "providersSection": "Sağlayıcı Yapılandırması",
   "historyClearAll": "Tümünü temizle",

@@ -19,7 +19,7 @@
   "settings": "Impostazioni",
   "history": "Cronologia",
   "historyEmpty": "Nessun caricamento precedente",
-  "enableInsecure": "Consenti connessioni insicure (certificati autofirmati)",
+  "enableInsecure": "Consenti connessioni insicure",
   "proxyUrl": "Proxy URL",
   "providersSection": "Configurazione Servizi",
   "historyClearAll": "Cancella tutto",
