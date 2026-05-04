@@ -19,18 +19,18 @@ flutter build apk --release --target-platform android-arm64 --dart-define=GIT_HA
 echo "==> Copying APK to ${ARTIFACTS_DIR}..."
 APK_DIR="build/app/outputs/flutter-apk"
 SRC="${APK_DIR}/app-release.apk"
-DST="uppidi-${VERSION}-${GIT_HASH}-android-arm64-v8a.apk"
+DST="uppidi-upload-${VERSION}-${GIT_HASH}-android-arm64-v8a.apk"
 cp "$SRC" "${ARTIFACTS_DIR}/${DST}"
 echo "    ${DST}"
 
 echo "==> Updating latest symlink..."
-ln -sf "${DST}" "${ARTIFACTS_DIR}/uppidi-latest-android-arm64-v8a.apk"
+ln -sf "${DST}" "${ARTIFACTS_DIR}/uppidi-upload-latest-android-arm64-v8a.apk"
 
 echo "==> Cleaning old APKs (keep latest 5)..."
 ls -t "${ARTIFACTS_DIR}"/*-android-*.apk 2>/dev/null | tail -n +6 | xargs -r rm -f
 
 # ── Linux ──────────────────────────────────────────────────
-LINUX_NAME="uppidi-${VERSION}-${GIT_HASH}-linux.tar.gz"
+LINUX_NAME="uppidi-upload-${VERSION}-${GIT_HASH}-linux.tar.gz"
 
 echo "==> Building Linux release @ ${GIT_HASH}..."
 flutter build linux --release --dart-define=GIT_HASH=$GIT_HASH
@@ -39,7 +39,7 @@ echo "==> Packaging Linux release..."
 tar -czf "${ARTIFACTS_DIR}/${LINUX_NAME}" -C build/linux/x64/release/bundle .
 
 echo "==> Updating latest symlink..."
-ln -sf "${LINUX_NAME}" "${ARTIFACTS_DIR}/uppidi-latest-linux.tar.gz"
+ln -sf "${LINUX_NAME}" "${ARTIFACTS_DIR}/uppidi-upload-latest-linux.tar.gz"
 
 echo "==> Cleaning old Linux builds (keep latest 5)..."
 ls -t "${ARTIFACTS_DIR}"/*-linux.tar.gz 2>/dev/null | tail -n +6 | xargs -r rm -f
