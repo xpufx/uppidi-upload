@@ -461,7 +461,11 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                       IconButton(
                         icon: const Icon(Icons.android, size: 20),
                         tooltip: 'Download Android APK',
-                        onPressed: () => launchUrl(Uri.parse('$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk'), mode: LaunchMode.externalApplication),
+                        onPressed: () {
+                          final uri = Uri.parse('$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk');
+                          final mode = Platform.isAndroid ? LaunchMode.externalNonBrowserApplication : LaunchMode.externalApplication;
+                          launchUrl(uri, mode: mode);
+                        },
                       ),
                       const SizedBox(width: 8),
                       IconButton(
