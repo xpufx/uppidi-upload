@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/format.dart';
+import '../core/interfaces/uploader.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 
@@ -141,7 +142,7 @@ class UploadScreen extends ConsumerWidget {
 
 class _ProviderDropdown extends StatelessWidget {
   final int selectedIndex;
-  final List<dynamic> providers;
+  final List<BaseUploader> providers;
   final bool isUploading;
   final ValueChanged<int?> onChanged;
 
@@ -213,22 +214,24 @@ Widget _buildBadge(String label) {
 }
 
 class _ProviderInfo extends StatelessWidget {
-  final dynamic provider;
+  final BaseUploader? provider;
   const _ProviderInfo({required this.provider});
 
   @override
   Widget build(BuildContext context) {
-    final meta = provider.metadata;
+    final p = provider;
+    if (p == null) return const SizedBox.shrink();
+    final meta = p.metadata;
     final infos = <String>[];
 
-    if (meta.fileSizeLabel is String && (meta.fileSizeLabel as String).isNotEmpty) {
+    if (meta.fileSizeLabel.isNotEmpty) {
       infos.add('Max file size: ${meta.fileSizeLabel}');
     }
-    if (meta.expiryInfo is String && (meta.expiryInfo as String).isNotEmpty) {
-      infos.add(meta.expiryInfo as String);
+    if (meta.expiryInfo != null && meta.expiryInfo!.isNotEmpty) {
+      infos.add(meta.expiryInfo!);
     }
     if (meta.allowedMimeTypes != null) {
-      infos.add(meta.mimeTypeLabel as String);
+      infos.add(meta.mimeTypeLabel);
     }
 
     if (infos.isEmpty) return const SizedBox.shrink();
@@ -246,7 +249,7 @@ class _ProviderInfo extends StatelessWidget {
 }
 
 class _PickButton extends ConsumerWidget {
-  final dynamic notifier;
+  final UploadNotifier notifier;
   const _PickButton({required this.notifier});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -259,7 +262,7 @@ class _PickButton extends ConsumerWidget {
 }
 
 class _UploadButton extends ConsumerWidget {
-  final dynamic notifier;
+  final UploadNotifier notifier;
   const _UploadButton({required this.notifier});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -281,7 +284,7 @@ class _FilePreview extends StatelessWidget {
   final int fileSize;
   final String? mimeType;
   final Uint8List? fileBytes;
-  final dynamic provider;
+  final BaseUploader? provider;
 
   const _FilePreview({
     required this.fileName,
@@ -396,15 +399,17 @@ class _FilePreview extends StatelessWidget {
 
   List<Widget> _buildWarnings() {
     final warnings = <Widget>[];
-    final meta = provider?.metadata;
+    final p = provider;
+    if (p == null) return warnings;
+    final meta = p.metadata;
 
-    if (meta?.allowedMimeTypes != null && mimeType != null) {
-      if (!meta.allowsMimeType(mimeType)) {
+    if (meta.allowedMimeTypes != null && mimeType != null) {
+      if (!meta.allowsMimeType(mimeType!)) {
         warnings.add(_warningRow('Provider only accepts: ${meta.mimeTypeLabel}'));
       }
     }
 
-    if (meta?.maxFileSizeBytes != null && fileSize > meta.maxFileSizeBytes) {
+    if (meta.maxFileSizeBytes != null && fileSize > meta.maxFileSizeBytes!) {
       warnings.add(_warningRow('File exceeds ${meta.fileSizeLabel} limit'));
     }
 
@@ -493,11 +498,13 @@ class _ProgressSectionState extends State<_ProgressSection>
   @override
   void didUpdateWidget(_ProgressSection old) {
     super.didUpdateWidget(old);
-    final target = widget.progress ?? 0;
-    _anim = Tween<double>(begin: _anim.value, end: target).animate(
-      CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic),
-    );
-    _animCtrl.forward(from: 0);
+    if (old.progress != widget.progress) {
+      final target = widget.progress ?? 0;
+      _anim = Tween<double>(begin: _anim.value, end: target).animate(
+        CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic),
+      );
+      _animCtrl.forward(from: 0);
+    }
   }
 
   @override

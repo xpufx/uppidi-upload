@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 
 import '../logging/log.dart';
 import '../models/provider_metadata.dart';
@@ -23,6 +26,7 @@ abstract class BaseHttpProvider implements BaseUploader {
   Future<Dio> createHttpClient(
     Map<String, String> config, {
     bool allowInsecureConn = false,
+    String? proxyUrl,
   }) async {
     final dio = Dio(BaseOptions(
       baseUrl: baseUrl,
@@ -32,6 +36,10 @@ abstract class BaseHttpProvider implements BaseUploader {
 
     if (allowInsecureConn) {
       configureInsecureConn(dio);
+    }
+
+    if (proxyUrl != null && proxyUrl.isNotEmpty) {
+      configureProxy(dio, proxyUrl);
     }
 
     return dio;
@@ -46,8 +54,12 @@ abstract class BaseHttpProvider implements BaseUploader {
   }) async {
     try {
       final allowInsecure = config['_allow_insecure_conn'] == 'true';
-      final cleanConfig = Map<String, String>.from(config)..remove('_allow_insecure_conn');
-      final dio = await createHttpClient(cleanConfig, allowInsecureConn: allowInsecure);
+      final proxyUrl = config['_proxy_url'];
+      final cleanConfig = Map<String, String>.from(config)
+        ..remove('_allow_insecure_conn')
+        ..remove('_proxy_url');
+      final dio = await createHttpClient(cleanConfig,
+          allowInsecureConn: allowInsecure, proxyUrl: proxyUrl);
 
       final fields = Map<String, dynamic>.from(additionalFormFields);
       fields[fileFormFieldName] = _buildStreamFile(request);
@@ -96,4 +108,21 @@ abstract class BaseHttpProvider implements BaseUploader {
     }
     return 'genericError';
   }
+}
+
+/// Apply proxy configuration to a Dio instance.
+/// Supports HTTP/HTTPS proxy (http://host:port or https://host:port).
+/// SOCKS5 proxies require a third-party adapter — not yet implemented.
+void configureProxy(Dio dio, String proxyUrl) {
+  final uri = Uri.tryParse(proxyUrl);
+  if (uri == null) return;
+
+  // HTTP/HTTPS proxy — configure via underlying HttpClient
+  dio.httpClientAdapter = IOHttpClientAdapter(
+    createHttpClient: () {
+      final client = HttpClient();
+      client.findProxy = (url) => 'PROXY ${uri.host}:${uri.port}';
+      return client;
+    },
+  );
 }

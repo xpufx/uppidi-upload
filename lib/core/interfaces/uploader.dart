@@ -20,6 +20,7 @@ abstract class BaseUploader {
   Future<Dio> createHttpClient(
     Map<String, String> config, {
     bool allowInsecureConn = false,
+    String? proxyUrl,
   });
 
   Future<UploadResult> upload(

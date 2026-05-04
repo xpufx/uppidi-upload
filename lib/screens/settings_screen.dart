@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -172,6 +174,7 @@ class _GlobalToggles extends ConsumerStatefulWidget {
 
 class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
   late TextEditingController _proxyController;
+  Timer? _proxyDebounce;
 
   @override
   void initState() {
@@ -182,6 +185,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
 
   @override
   void dispose() {
+    _proxyDebounce?.cancel();
     _proxyController.dispose();
     super.dispose();
   }
@@ -333,12 +337,15 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
             isDense: true,
           ),
           onChanged: (v) {
-            if (v.isEmpty) {
-              svc.remove(SettingsService.proxyUrlKey);
-            } else {
-              svc.set(SettingsService.proxyUrlKey, v);
-            }
-            ref.invalidate(proxyUrlProvider);
+            _proxyDebounce?.cancel();
+            _proxyDebounce = Timer(const Duration(milliseconds: 500), () {
+              if (v.isEmpty) {
+                svc.remove(SettingsService.proxyUrlKey);
+              } else {
+                svc.set(SettingsService.proxyUrlKey, v);
+              }
+              ref.invalidate(proxyUrlProvider);
+            });
           },
         ),
         const SizedBox(height: 16),
@@ -349,7 +356,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         Text('Cross-platform media uploader',
           style: Theme.of(context).textTheme.bodySmall),
         const SizedBox(height: 2),
-        Text('${ProviderRegistry.all.length} providers · 45 tests · $gitHash',
+        Text('${ProviderRegistry.all.length} providers · $gitHash',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
         const SizedBox(height: 16),
         Center(child: ClipRRect(

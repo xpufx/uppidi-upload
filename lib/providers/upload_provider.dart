@@ -300,6 +300,11 @@ class UploadNotifier extends Notifier<UploadState> {
         config['_allow_insecure_conn'] = 'true';
       }
 
+      final proxyUrl = await settingsService.getProxyUrl();
+      if (proxyUrl != null && proxyUrl.isNotEmpty) {
+        config['_proxy_url'] = proxyUrl;
+      }
+
       final result = await provider.upload(
         request,
         onProgress: (sent, total) {
