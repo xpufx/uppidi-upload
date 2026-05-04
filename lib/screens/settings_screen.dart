@@ -261,9 +261,22 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SwitchListTile(
-          title: Text(l10n.enableInsecure),
-          subtitle: Text(l10n.selfSignedCertWarning,
-              style: const TextStyle(fontSize: 12)),
+          title: Row(
+            children: [
+              Expanded(child: Text(l10n.enableInsecure)),
+              GestureDetector(
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: Text(l10n.enableInsecure),
+                    content: Text(l10n.selfSignedCertWarning),
+                    actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok))],
+                  ),
+                ),
+                child: Icon(Icons.info_outline, size: 18, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6)),
+              ),
+            ],
+          ),
           value: insecureAsync.asData?.value ?? false,
           onChanged: (v) {
             svc.set(SettingsService.insecureConnKey, v.toString());
@@ -294,6 +307,8 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           children: const [
             Colors.deepPurple, Colors.blue, Colors.teal,
             Colors.orange, Colors.pink, Colors.indigo,
+            Colors.red, Colors.green, Colors.amber,
+            Colors.cyan, Colors.brown, Colors.deepOrange,
           ].map((color) {
             final selected = ref.watch(seedColorProvider);
             final isSelected = selected.toARGB32() == color.toARGB32();
