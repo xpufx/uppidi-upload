@@ -134,9 +134,10 @@ class _ShareMessageDialogState extends ConsumerState<ShareMessageDialog> {
           onPressed: () => Navigator.pop(context, false),
           child: Text(l10n.cancel),
         ),
-        FilledButton.icon(
+          FilledButton.icon(
           onPressed: () {
-            final text = _includeMessage ? '${_controller.text}\n${widget.url}' : widget.url;
+            final customMsg = _includeMessage ? _controller.text : null;
+            final text = customMsg ?? widget.url;
             SharePlus.instance.share(ShareParams(text: text));
             Navigator.pop(context, true);
           },

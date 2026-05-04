@@ -61,6 +61,10 @@ final class UploadInProgress extends UploadState {
   final int sentBytes;
   final int totalBytes;
   final String speedLabel;
+  final Uint8List? fileBytes;
+  final String? fileName;
+  final int fileSizeBytes;
+  final String? mimeType;
 
   const UploadInProgress({
     required this.progress,
@@ -68,6 +72,10 @@ final class UploadInProgress extends UploadState {
     this.sentBytes = 0,
     this.totalBytes = 0,
     this.speedLabel = '',
+    this.fileBytes,
+    this.fileName,
+    this.fileSizeBytes = 0,
+    this.mimeType,
     super.results,
     super.selectedProviderIndex,
     super.providers,
@@ -133,6 +141,15 @@ class UploadNotifier extends Notifier<UploadState> {
           providers: prev.providers,
         ),
       UploadInProgress() => prev,
+      UploadCompleted() when prev.fileName != null => UploadFileSelected(
+          fileName: prev.fileName!,
+          fileSizeBytes: prev.fileSizeBytes,
+          mimeType: prev.mimeType,
+          fileBytes: prev.fileBytes,
+          results: prev.results,
+          selectedProviderIndex: index,
+          providers: prev.providers,
+        ),
       UploadCompleted() => UploadIdle(
           results: prev.results,
           selectedProviderIndex: index,
@@ -266,12 +283,17 @@ class UploadNotifier extends Notifier<UploadState> {
     final provider = state.providers[state.selectedProviderIndex];
     _log.info('Using provider: ${provider.providerName} (${provider.providerId})');
 
+    final info = _extractFileInfo(state);
     final cancelToken = CancelToken();
     state = UploadInProgress(
       progress: 0.0,
       cancelToken: cancelToken,
       sentBytes: 0,
       totalBytes: request.sizeInBytes,
+      fileName: info.fileName,
+      fileSizeBytes: info.fileSizeBytes,
+      mimeType: info.mimeType,
+      fileBytes: info.fileBytes,
       results: state.results,
       selectedProviderIndex: state.selectedProviderIndex,
       providers: state.providers,
@@ -280,7 +302,6 @@ class UploadNotifier extends Notifier<UploadState> {
     _lastSpeedSample = DateTime.now();
     _lastSampleBytes = 0;
 
-    final info = _extractFileInfo(state);
     final currentFileName = info.fileName ?? request.fileName;
     final currentFileSize = info.fileSizeBytes > 0 ? info.fileSizeBytes : request.sizeInBytes;
     final currentMimeType = info.mimeType ?? request.mimeType;
@@ -466,6 +487,10 @@ extension UploadInProgressX on UploadInProgress {
       sentBytes: sent,
       totalBytes: total,
       speedLabel: speedLabel,
+      fileBytes: fileBytes,
+      fileName: fileName,
+      fileSizeBytes: fileSizeBytes,
+      mimeType: mimeType,
       results: results,
       selectedProviderIndex: selectedProviderIndex,
       providers: providers,

@@ -54,6 +54,12 @@ class UploadScreen extends ConsumerWidget {
           switch (uploadState) {
             UploadFileSelected(fileName: final n, fileSizeBytes: final s, mimeType: final m, fileBytes: final b) =>
               _FilePreview(fileName: n, fileSize: s, mimeType: m, fileBytes: b, provider: provider),
+            UploadInProgress(fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb)
+                when fn != null =>
+              _FilePreview(fileName: fn, fileSize: fs, mimeType: m, fileBytes: fb, provider: provider),
+            UploadCompleted(fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb)
+                when fn != null =>
+              _FilePreview(fileName: fn, fileSize: fs, mimeType: m, fileBytes: fb, provider: provider),
             _ => const SizedBox.shrink(),
           },
           const SizedBox(height: 16),
@@ -724,7 +730,7 @@ class _ResultBanner extends StatelessWidget {
                       context: context,
                       builder: (ctx) => ShareMessageDialog(
                         url: url!,
-                        providerName: provider?.providerName,
+                        providerName: provider?.providerName ?? 'this provider',
                         fileName: fileName,
                       ),
                     );
