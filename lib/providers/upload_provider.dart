@@ -14,7 +14,6 @@ import '../core/models/upload_result.dart';
 import '../core/platform/file_source.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
-import '../core/connectivity.dart';
 
 final _log = Log('UploadNotifier');
 
@@ -356,22 +355,6 @@ class UploadNotifier extends Notifier<UploadState> {
       return;
     }
 
-    final online = await _checkConnectivity(provider);
-    if (!online) {
-      state = UploadCompleted(
-        lastResult: UploadResult(success: false),
-        errorMessage: 'errorConnectionFailed',
-        fileName: currentFileName,
-        fileSizeBytes: currentFileSize,
-        mimeType: currentMimeType,
-        fileBytes: currentFileBytes,
-        results: state.results,
-        selectedProviderIndex: state.selectedProviderIndex,
-        providers: state.providers,
-      );
-      return;
-    }
-
     try {
       final settingsService = ref.read(settingsServiceProvider);
       final config = await settingsService.loadProviderConfig(
@@ -474,30 +457,6 @@ class UploadNotifier extends Notifier<UploadState> {
     }
   }
 
-  Future<bool> _checkConnectivity(BaseUploader provider) async {
-    try {
-      final latency = await checkProviderConnectivity(provider);
-      if (latency == null) throw Exception('unreachable');
-      return true;
-    } catch (e) {
-      _log.warn('Connectivity check failed: $e');
-      return true; // allow upload anyway
-    }
-  }
-
-  void cancelUpload() {
-    final current = state;
-    if (current is UploadInProgress) {
-      current.cancelToken.cancel('User cancelled');
-    }
-    state = UploadIdle(
-      results: state.results,
-      selectedProviderIndex: state.selectedProviderIndex,
-      providers: state.providers,
-    );
-  }
-
-  /// Clears the current selection and returns to idle state
   void clearSelection() {
     _pendingRequest = null;
     _lastFilePath = null;
