@@ -11,7 +11,8 @@ class TestScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final providers = ref.watch(enabledProvidersProvider);
+    final allProviders = ProviderRegistry.all;
+    final enabled = ref.watch(enabledProvidersProvider);
     final disabled = ref.watch(disabledProviderIdsProvider).asData?.value ?? {};
 
     return ListView(
@@ -21,13 +22,13 @@ class TestScreen extends ConsumerWidget {
           children: [
             const AppLogo(size: 32),
             const SizedBox(width: 12),
-            Text('Provider Tests', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            Text('Providers', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
             const Spacer(),
             FilledButton.icon(
-              onPressed: () {
-                for (final p in providers) {
-                  _setLoading(ref, p.providerId);
-                  _runTest(ref, p);
+              onPressed: enabled.isEmpty ? null : () {
+                for (final p in enabled) {
+                  TestScreen._setLoading(ref, p.providerId);
+                  TestScreen._runTest(ref, p);
                 }
               },
               icon: const Icon(Icons.refresh, size: 18),
@@ -36,9 +37,9 @@ class TestScreen extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 16),
-        if (providers.isEmpty)
-          const Center(child: Text('No providers enabled')),
-        ...providers.map((p) => _ProviderRow(
+        if (allProviders.isEmpty)
+          const Center(child: Text('No providers available')),
+        ...allProviders.map((p) => _ProviderRow(
           provider: p,
           isEnabled: !disabled.contains(p.providerId),
         )),
@@ -113,6 +114,21 @@ class _ProviderRow extends ConsumerWidget {
   final bool isEnabled;
   const _ProviderRow({required this.provider, required this.isEnabled});
 
+  String _buildMetadataString() {
+    final meta = provider.metadata;
+    final parts = <String>[];
+    if (meta.fileSizeLabel.isNotEmpty) {
+      parts.add('Max: ${meta.fileSizeLabel}');
+    }
+    if (meta.mimeTypeLabel.isNotEmpty) {
+      parts.add(meta.mimeTypeLabel);
+    }
+    if (meta.expiryInfo != null && meta.expiryInfo!.isNotEmpty) {
+      parts.add(meta.expiryInfo!);
+    }
+    return parts.join(' · ');
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final testStates = ref.watch(_testStates);
@@ -120,59 +136,73 @@ class _ProviderRow extends ConsumerWidget {
     final isLoading = testState != null && testState.isLoading;
     final result = testState?.maybeWhen(data: (r) => r, orElse: () => null);
 
+    final metadataStr = _buildMetadataString();
+
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: 24, height: 24,
-              child: isLoading
-                ? const CircularProgressIndicator(strokeWidth: 2)
-                : Icon(
-                    result == null ? Icons.help_outline : result.online ? Icons.check_circle : Icons.error,
-                    color: result == null ? Colors.grey : result.online ? Colors.green : Colors.red,
-                    size: 20,
+            Row(
+              children: [
+                SizedBox(
+                  width: 24, height: 24,
+                  child: isLoading
+                    ? const CircularProgressIndicator(strokeWidth: 2)
+                    : Icon(
+                        result == null ? Icons.help_outline : result.online ? Icons.check_circle : Icons.error,
+                        color: result == null ? Colors.grey : result.online ? Colors.green : Colors.red,
+                        size: 20,
+                      ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(provider.providerName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      if (metadataStr.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(metadataStr, style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
+                      ],
+                    ],
                   ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.play_arrow, size: 20),
+                  tooltip: 'Test',
+                  onPressed: isLoading ? null : () {
+                    TestScreen._setLoading(ref, provider.providerId);
+                    TestScreen._runTest(ref, provider);
+                  },
+                ),
+                Switch(
+                  value: isEnabled,
+                  onChanged: (v) async {
+                    final svc = ref.read(settingsServiceProvider);
+                    final current = await svc.getDisabledProviders();
+                    if (v) {
+                      current.remove(provider.providerId);
+                    } else {
+                      current.add(provider.providerId);
+                    }
+                    await svc.setDisabledProviders(current);
+                    ref.invalidate(disabledProviderIdsProvider);
+                  },
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(provider.providerName, style: const TextStyle(fontWeight: FontWeight.w600)),
-                  if (result != null) ...[
-                    const SizedBox(height: 2),
-                    result.online
-                      ? Text('${result.latencyMs}ms', style: TextStyle(fontSize: 12, color: Colors.green.shade700))
-                      : Text(result.error ?? 'Connection failed', style: const TextStyle(fontSize: 12, color: Colors.red)),
-                  ],
-                ],
+            if (result != null) ...[
+              const SizedBox(height: 4),
+              Padding(
+                padding: const EdgeInsets.only(left: 36),
+                child: result.online
+                  ? Text('${result.latencyMs}ms', style: TextStyle(fontSize: 12, color: Colors.green.shade700, fontWeight: FontWeight.w500))
+                  : Text(result.error ?? 'Connection failed', style: const TextStyle(fontSize: 12, color: Colors.red)),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.play_arrow, size: 20),
-              tooltip: 'Test',
-              onPressed: isLoading ? null : () {
-                TestScreen._setLoading(ref, provider.providerId);
-                TestScreen._runTest(ref, provider);
-              },
-            ),
-            Switch(
-              value: isEnabled,
-              onChanged: (v) async {
-                final svc = ref.read(settingsServiceProvider);
-                final current = await svc.getDisabledProviders();
-                if (v) {
-                  current.remove(provider.providerId);
-                } else {
-                  current.add(provider.providerId);
-                }
-                await svc.setDisabledProviders(current);
-                ref.invalidate(disabledProviderIdsProvider);
-              },
-            ),
+            ],
           ],
         ),
       ),

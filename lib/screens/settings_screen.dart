@@ -342,32 +342,6 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           },
         ),
         const SizedBox(height: 16),
-        const Divider(),
-        const SizedBox(height: 8),
-        Text('Enabled Providers', style: Theme.of(context).textTheme.titleSmall),
-        const SizedBox(height: 8),
-        ...ProviderRegistry.all.map((provider) {
-          final disabled = ref.watch(disabledProviderIdsProvider).asData?.value ?? {};
-          final isEnabled = !disabled.contains(provider.providerId);
-          return SwitchListTile(
-            title: Text(provider.providerName),
-            subtitle: Text(provider.providerId, style: const TextStyle(fontSize: 11)),
-            value: isEnabled,
-            dense: true,
-            contentPadding: EdgeInsets.zero,
-            onChanged: (v) async {
-              final svc = ref.read(settingsServiceProvider);
-              final current = await svc.getDisabledProviders();
-              if (v) {
-                current.remove(provider.providerId);
-              } else {
-                current.add(provider.providerId);
-              }
-              await svc.setDisabledProviders(current);
-              ref.invalidate(disabledProviderIdsProvider);
-            },
-          );
-        }),
         const Divider(height: 32),
         Text('uppidi v$appVersion',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
