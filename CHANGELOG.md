@@ -4,18 +4,19 @@
 
 ### Features
 - Image preview with upload confirmation before every upload
-- Theme: dark mode toggle, 6 color presets, custom logo
+- Theme: dark mode toggle, 12 color presets, custom logo
 - Provider enable/disable switches + connectivity test page (Providers tab)
 - Share URL button on upload result and history
+- Share with templated message: %url, %provider, %date, %filename variables
 - Drag-and-drop file upload on desktop (Linux, macOS, Windows)
 - Animated upload progress with live speed (MB/s) and byte counter
+- Upload retry + cancel buttons, swipe to dismiss file selection
 - Desktop footer bar with app name + version
 - Latest symlinks for easy download endpoints
-- Upload retry: preview stays visible, retry button on failure
-- Share with templated message: %url, %provider, %date, %filename variables
+- In-app APK download + install (Android, no browser)
+- Settings About card: download links, version check (manual + auto), changelog dialog
 - Pre-build hardcoded string detection (grep-based lint)
-- CHANGELOG.md + About card in Settings with View Changelog dialog
-- Per-ABI Android APK builds (~20MB arm64)
+- CHANGELOG.md + post-build test checklist
 
 ### Fixes
 - Cancel upload no longer leaves sticky error state
@@ -28,6 +29,13 @@
 - All hardcoded UI strings localized (3 languages)
 - Redundant logo removed from Providers page header
 - Stale test count removed from settings
+- TmpFileLinkProvider parseResponse CastError on non-Map data
+- Upload screen scrollable, no duplicate preview
+- Upload deadlock broken: retry, cancel, clear ✕, swipe to dismiss, change provider
+- Real error messages shown instead of generic 'Upload failed'
+
+### Tests
+- 45 provider parseResponse unit tests covering all 6 providers
 
 ### Agents
 - Archie (Architect) — DeepSeek V4 Pro
