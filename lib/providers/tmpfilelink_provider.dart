@@ -33,7 +33,7 @@ class TmpFileLinkProvider extends BaseHttpProvider {
 
   @override
   UploadResult parseResponse(Response response) {
-    if (response.statusCode == 200 && response.data != null) {
+    if (response.statusCode == 200 && response.data is Map) {
       final data = response.data as Map<String, dynamic>;
       final downloadLink = data['downloadLink'] as String?;
 

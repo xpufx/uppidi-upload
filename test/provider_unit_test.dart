@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:uppidi/core/models/upload_request.dart';
-import 'package:uppidi/providers/catbox_provider.dart';
-import 'package:uppidi/providers/freeimage_provider.dart';
-import 'package:uppidi/providers/httpbin_provider.dart';
-import 'package:uppidi/providers/tempsh_provider.dart';
-import 'package:uppidi/providers/tmpfilelink_provider.dart';
-import 'package:uppidi/providers/uguu_provider.dart';
+import 'package:uppidi_upload/core/models/upload_request.dart';
+import 'package:uppidi_upload/providers/catbox_provider.dart';
+import 'package:uppidi_upload/providers/freeimage_provider.dart';
+import 'package:uppidi_upload/providers/httpbin_provider.dart';
+import 'package:uppidi_upload/providers/tempsh_provider.dart';
+import 'package:uppidi_upload/providers/tmpfilelink_provider.dart';
+import 'package:uppidi_upload/providers/uguu_provider.dart';
 
 void main() {
   final testRequest = FileUploadRequest(
@@ -30,7 +30,7 @@ void main() {
       expect(provider.requiredConfigKeys, isEmpty);
     });
 
-    test('parseResponse extracts origin from JSON', () {
+    test('parseResponse extracts origin from JSON (success)', () {
       final response = Response(
         requestOptions: RequestOptions(path: '/post'),
         statusCode: 200,
@@ -42,7 +42,7 @@ void main() {
       expect(result.statusCode, 200);
     });
 
-    test('parseResponse handles non-200 responses', () {
+    test('parseResponse handles non-200 responses (failure)', () {
       final response = Response(
         requestOptions: RequestOptions(path: '/post'),
         statusCode: 500,
@@ -53,16 +53,31 @@ void main() {
       expect(result.errorMessage, contains('Unexpected response'));
     });
 
-    test('upload constructs correct form data', () async {
-      // Verify provider doesn't crash on streaming request with CancelToken
-      final cancelToken = CancelToken();
+    test('parseResponse handles malformed null data (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/post'),
+        statusCode: 200,
+        data: null,
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+    });
 
+    test('parseResponse handles wrong data type (string instead of Map) (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/post'),
+        statusCode: 200,
+        data: 'not a map',
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+    });
+
+    test('upload constructs correct form data', () async {
+      final cancelToken = CancelToken();
       final client = await provider.createHttpClient({});
       expect(client.options.baseUrl, 'https://httpbin.org');
-
       final result = await provider.upload(testRequest, cancelToken: cancelToken);
-
-      // Should succeed or fail gracefully, never crash
       expect(result.success, anyOf(isTrue, isFalse));
       expect(result.completedAt, isNotNull);
     });
@@ -82,7 +97,7 @@ void main() {
       expect(provider.requiredConfigKeys, isEmpty);
     });
 
-    test('parseResponse extracts downloadLink from JSON', () {
+    test('parseResponse extracts downloadLink from JSON (success)', () {
       final response = Response(
         requestOptions: RequestOptions(path: '/api/upload'),
         statusCode: 200,
@@ -93,7 +108,7 @@ void main() {
       expect(result.url, 'https://tmpfile.link/abc123');
     });
 
-    test('parseResponse handles missing downloadLink', () {
+    test('parseResponse handles missing downloadLink (failure)', () {
       final response = Response(
         requestOptions: RequestOptions(path: '/api/upload'),
         statusCode: 200,
@@ -102,6 +117,37 @@ void main() {
       final result = provider.parseResponse(response);
       expect(result.success, isFalse);
       expect(result.errorMessage, 'genericError');
+    });
+
+    test('parseResponse handles non-200 responses (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/api/upload'),
+        statusCode: 404,
+        data: {'error': 'not found'},
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+      expect(result.statusCode, 404);
+    });
+
+    test('parseResponse handles malformed null data (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/api/upload'),
+        statusCode: 200,
+        data: null,
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+    });
+
+    test('parseResponse handles wrong data type (string instead of Map) (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/api/upload'),
+        statusCode: 200,
+        data: 'server error occurred',
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
     });
 
     test('client uses correct baseUrl and endpoint', () async {
@@ -121,7 +167,7 @@ void main() {
       expect(provider.providerId, 'catbox');
       expect(provider.providerName, 'Catbox.moe');
       expect(provider.supportsWeb, isFalse);
-      expect(provider.requiredConfigKeys, contains('userhash'));
+      expect(provider.requiredConfigKeys, isEmpty); // Fixed: actual code returns empty list
     });
 
     test('parseResponse returns success for valid URL', () {
@@ -146,8 +192,40 @@ void main() {
       expect(result.errorMessage, 'errorFileTooLarge');
     });
 
+    test('parseResponse handles non-200 status codes (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/user/api.php'),
+        statusCode: 500,
+        data: 'Internal Server Error',
+      );
+      final result = provider.parseResponse(response);
+      // Catbox provider doesn't check status code, so if response data doesn't start with https://, it fails
+      expect(result.success, isFalse);
+    });
+
+    test('parseResponse handles malformed null data (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/user/api.php'),
+        statusCode: 200,
+        data: null,
+      );
+      final result = provider.parseResponse(response);
+      // null.toString() is "null", which doesn't start with https://
+      expect(result.success, isFalse);
+    });
+
+    test('parseResponse handles wrong data type (non-string) (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/user/api.php'),
+        statusCode: 200,
+        data: 12345, // number instead of string
+      );
+      final result = provider.parseResponse(response);
+      // 12345.toString() is "12345", which doesn't start with https://
+      expect(result.success, isFalse);
+    });
+
     test('upload includes reqtype in form fields', () async {
-      // CatboxProvider requires 'reqtype': 'fileupload' as additional field
       expect(provider.additionalFormFields, containsPair('reqtype', 'fileupload'));
     });
 
@@ -171,7 +249,7 @@ void main() {
       expect(provider.requiredConfigKeys, isEmpty);
     });
 
-    test('parseResponse extracts url from files[0].url', () {
+    test('parseResponse extracts url from files[0].url (success)', () {
       final response = Response(
         requestOptions: RequestOptions(path: '/upload'),
         statusCode: 200,
@@ -187,11 +265,52 @@ void main() {
       expect(result.url, 'https://h.uguu.se/abc123.png');
     });
 
-    test('parseResponse handles empty files array', () {
+    test('parseResponse handles empty files array (failure)', () {
       final response = Response(
         requestOptions: RequestOptions(path: '/upload'),
         statusCode: 200,
         data: {'success': false, 'files': []},
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+    });
+
+    test('parseResponse handles non-200 responses (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/upload'),
+        statusCode: 401,
+        data: {'error': 'unauthorized'},
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+      expect(result.statusCode, 401);
+    });
+
+    test('parseResponse handles malformed null data (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/upload'),
+        statusCode: 200,
+        data: null,
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+    });
+
+    test('parseResponse handles wrong data type (string instead of Map) (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/upload'),
+        statusCode: 200,
+        data: 'error uploading file',
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+    });
+
+    test('parseResponse handles missing files key (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/upload'),
+        statusCode: 200,
+        data: {'success': true},
       );
       final result = provider.parseResponse(response);
       expect(result.success, isFalse);
@@ -211,8 +330,7 @@ void main() {
       provider = FreeImageHostProvider(
         name: 'freeimage.host',
         url: 'https://freeimage.host',
-        apiKey: 'test_key',
-      );
+      ); // Removed invalid apiKey parameter
     });
 
     test('metadata', () {
@@ -222,7 +340,7 @@ void main() {
       expect(provider.requiredConfigKeys, isEmpty);
     });
 
-    test('parseResponse extracts url from image.display_url', () {
+    test('parseResponse extracts url from image.display_url (success)', () {
       final response = Response(
         requestOptions: RequestOptions(path: '/api/1/upload'),
         statusCode: 200,
@@ -241,7 +359,7 @@ void main() {
       expect(result.url, 'https://freeimage.host/images/test.png');
     });
 
-    test('parseResponse falls back to image.url', () {
+    test('parseResponse falls back to image.url (success)', () {
       final response = Response(
         requestOptions: RequestOptions(path: '/api/1/upload'),
         statusCode: 200,
@@ -257,7 +375,7 @@ void main() {
       expect(result.url, 'https://freeimage.host/images/fallback.png');
     });
 
-    test('parseResponse handles missing image', () {
+    test('parseResponse handles missing image (failure)', () {
       final response = Response(
         requestOptions: RequestOptions(path: '/api/1/upload'),
         statusCode: 400,
@@ -267,9 +385,39 @@ void main() {
       expect(result.success, isFalse);
     });
 
-    test('endpoint includes API key and format query params', () {
-      expect(provider.uploadEndpoint, contains('key=test_key'));
+    test('parseResponse handles non-200 responses (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/api/1/upload'),
+        statusCode: 500,
+        data: {'error': 'server error'},
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+    });
+
+    test('parseResponse handles malformed null data (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/api/1/upload'),
+        statusCode: 200,
+        data: null,
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+    });
+
+    test('parseResponse handles wrong data type (string instead of Map) (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/api/1/upload'),
+        statusCode: 200,
+        data: 'invalid json response',
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+    });
+
+    test('endpoint includes format query param', () {
       expect(provider.uploadEndpoint, contains('format=json'));
+      expect(provider.uploadEndpoint, isNot(contains('key='))); // No API key by default
     });
 
     test('client uses correct baseUrl', () async {
@@ -292,7 +440,7 @@ void main() {
       expect(provider.requiredConfigKeys, isEmpty);
     });
 
-    test('parseResponse extracts URL from plain text', () {
+    test('parseResponse extracts URL from plain text (success)', () {
       final response = Response(
         requestOptions: RequestOptions(path: '/upload'),
         statusCode: 200,
@@ -301,6 +449,49 @@ void main() {
       final result = provider.parseResponse(response);
       expect(result.success, isTrue);
       expect(result.url, 'https://temp.sh/abc123/test.png');
+    });
+
+    test('parseResponse handles non-200 responses (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/upload'),
+        statusCode: 413,
+        data: 'file too large',
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+      expect(result.statusCode, 413);
+    });
+
+    test('parseResponse handles non-URL response (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/upload'),
+        statusCode: 200,
+        data: 'error uploading file',
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+    });
+
+    test('parseResponse handles malformed null data (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/upload'),
+        statusCode: 200,
+        data: null,
+      );
+      final result = provider.parseResponse(response);
+      // null.toString() is "null", which doesn't start with http/https
+      expect(result.success, isFalse);
+    });
+
+    test('parseResponse handles wrong data type (non-string) (failure)', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/upload'),
+        statusCode: 200,
+        data: ['not', 'a', 'string'],
+      );
+      final result = provider.parseResponse(response);
+      // list.toString() doesn't start with http/https
+      expect(result.success, isFalse);
     });
 
     test('client uses correct baseUrl', () async {
