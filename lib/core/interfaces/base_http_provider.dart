@@ -74,10 +74,12 @@ abstract class BaseHttpProvider implements BaseUploader {
       return parseResponse(response);
     } catch (e, stackTrace) {
       _log.error('Upload failed: $e', error: e, stackTrace: stackTrace);
+      final statusCode = e is DioException ? e.response?.statusCode : null;
       return UploadResult(
         success: false,
         errorMessage: _mapException(e),
         rawError: e.toString(),
+        statusCode: statusCode,
         stackTrace: stackTrace.toString(),
       );
     }
