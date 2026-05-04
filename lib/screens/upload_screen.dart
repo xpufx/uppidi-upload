@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/format.dart';
+import '../core/history_service.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/share_message_dialog.dart';
 import '../l10n/app_localizations.dart';
@@ -291,7 +292,55 @@ class _UploadButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     return ElevatedButton.icon(
-      onPressed: () => notifier.uploadSelected(),
+      onPressed: () async {
+        final state = ref.read(uploadProvider);
+        if (state is! UploadFileSelected) return;
+
+        final fileName = state.fileName;
+        final provider = state.providers[state.selectedProviderIndex];
+
+        // Check for duplicate in history
+        final history = ref.read(historyServiceProvider);
+        final records = await history.getAll();
+        final duplicate = records.where((r) =>
+          r.record.fileName == fileName &&
+          r.record.providerId == provider.providerId &&
+          r.record.success == true
+        ).firstOrNull;
+
+        if (!context.mounted) return;
+
+        if (duplicate != null) {
+          final confirmed = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Duplicate Upload'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Identical file already uploaded to ${provider.providerName}.'),
+                  const SizedBox(height: 8),
+                  if (duplicate.record.url != null) ...[
+                    Text('Previous link:', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                    const SizedBox(height: 4),
+                    SelectableText(duplicate.record.url!, style: const TextStyle(fontSize: 12, color: Colors.blue)),
+                  ],
+                ],
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Upload Anyway')),
+              ],
+            ),
+          );
+          if (confirmed == true) {
+            notifier.uploadSelected();
+          }
+        } else {
+          notifier.uploadSelected();
+        }
+      },
       icon: const Icon(Icons.cloud_upload),
       label: Text(l10n.upload),
       style: ElevatedButton.styleFrom(
