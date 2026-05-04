@@ -262,28 +262,27 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SwitchListTile(
-          title: Row(
-            children: [
-              Expanded(child: Text(l10n.enableInsecure)),
-              GestureDetector(
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: Text(l10n.enableInsecure),
-                    content: Text(l10n.selfSignedCertWarning),
-                    actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok))],
-                  ),
-                ),
-                child: Icon(Icons.info_outline, size: 18, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6)),
-              ),
-            ],
-          ),
+          title: Text(l10n.enableInsecure),
           value: insecureAsync.asData?.value ?? false,
           onChanged: (v) {
             svc.set(SettingsService.insecureConnKey, v.toString());
             ref.invalidate(insecureConnProvider);
           },
           contentPadding: EdgeInsets.zero,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16, bottom: 4),
+          child: GestureDetector(
+            onTap: () => showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: Text(l10n.enableInsecure),
+                content: Text(l10n.selfSignedCertWarning),
+                actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok))],
+              ),
+            ),
+            child: const Icon(Icons.info_outline, size: 16, color: Colors.grey),
+          ),
         ),
         const SizedBox(height: 16),
         // Theme mode
