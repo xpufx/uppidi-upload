@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: recreate file stream on chain upload — no more FileSystemException (File closed)
+- docs: auto-update changelog
 - fix: display stack trace + raw error in debug modal, added rawError field to UploadResult
 - docs: auto-update changelog
 - feat: stack trace capture in UploadResult, enhanced debug modal with structured sections
@@ -28,5 +30,3 @@
 - fix: Android download uses standard browser launch, cleaned insecure connection label
 - feat: direct APK install from app (Android uses download manager, not browser)
 - fix: upload screen — removed duplicate preview, scrollable page, reduced spacing
-- feat: compact self-signed cert setting (info icon + modal), 12 color presets
-- feat: download links + version check in Settings About card
