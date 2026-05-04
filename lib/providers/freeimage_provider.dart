@@ -12,10 +12,9 @@ class FreeImageHostProvider extends BaseHttpProvider {
   FreeImageHostProvider({
     String name = 'freeimage.host',
     String url = 'https://freeimage.host',
-    String apiKey = '6d207e02198a847aa98d0a2a901485a5',
   })  : _name = name,
         _url = url,
-        _apiKey = apiKey;
+        _apiKey = '';
 
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
@@ -46,7 +45,9 @@ class FreeImageHostProvider extends BaseHttpProvider {
   String get baseUrl => _url;
 
   @override
-  String get uploadEndpoint => '/api/1/upload?key=$_apiKey&format=json';
+  String get uploadEndpoint => _apiKey.isNotEmpty
+      ? '/api/1/upload?key=$_apiKey&format=json'
+      : '/api/1/upload?format=json';
 
   @override
   String get fileFormFieldName => 'source';

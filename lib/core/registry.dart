@@ -23,7 +23,6 @@ class ProviderRegistry {
     FreeImageHostProvider(
       name: 'freeimage.host',
       url: 'https://freeimage.host',
-      apiKey: '6d207e02198a847aa98d0a2a901485a5',
     ),
     TempShProvider(),
   ];
