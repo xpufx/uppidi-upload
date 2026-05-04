@@ -297,7 +297,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                 }
               },
               icon: const Icon(Icons.image, size: 18),
-              label: Text(ref.watch(logoPathProvider) != null ? 'Change Logo' : 'Choose Logo'),
+              label: Text(ref.watch(logoPathProvider) != null ? l10n.changeLogo : l10n.chooseLogo),
             ),
           ],
         ),
@@ -325,13 +325,13 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           value: ref.watch(_defaultShareProviderProvider).asData?.value,
-          decoration: const InputDecoration(
-            labelText: 'Default for sharing',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: l10n.defaultForSharing,
+            border: const OutlineInputBorder(),
             isDense: true,
           ),
           items: [
-            const DropdownMenuItem(value: null, child: Text('Last used')),
+            DropdownMenuItem(value: null, child: Text(l10n.lastUsed)),
             ...ProviderRegistry.all.map((p) => DropdownMenuItem(
               value: p.providerId,
               child: Text(p.providerName),
@@ -351,7 +351,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           controller: _proxyController,
           decoration: InputDecoration(
             labelText: l10n.proxyUrl,
-            hintText: 'socks5://10.0.10.11:1080',
+            hintText: l10n.proxyHint,
             border: const OutlineInputBorder(),
             isDense: true,
           ),
@@ -388,7 +388,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                           Text('Uppidi Upload v$appVersion',
                             style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
-                          Text('${ProviderRegistry.all.length} providers · $gitHash',
+                          Text('${l10n.providersCount(ProviderRegistry.all.length)} · $gitHash',
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
                         ],
                       ),
@@ -400,7 +400,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                   onPressed: () => showDialog(
                     context: context,
                     builder: (ctx) => AlertDialog(
-                      title: const Text('Changelog'),
+                      title: Text(l10n.changelogTitle),
                       content: SingleChildScrollView(
                         child: Text(changeLogText),
                       ),
@@ -413,7 +413,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                     ),
                   ),
                   icon: const Icon(Icons.list_alt, size: 16),
-                  label: const Text('View Changelog'),
+                  label: Text(l10n.viewChangelog),
                 ),
               ],
             ),

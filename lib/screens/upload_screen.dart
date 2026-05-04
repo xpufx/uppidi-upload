@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -75,8 +74,17 @@ class UploadScreen extends ConsumerWidget {
                 progress: null,
                 onCancel: notifier.cancelUpload,
               ),
-            UploadCompleted(errorMessage: final e, lastResult: final _) when e != null => _ErrorBanner(error: e),
-            UploadCompleted(lastResult: final r) => _ResultBanner(url: r.url),
+            UploadCompleted(errorMessage: final e, lastResult: final r, fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb) =>
+              _ResultBanner(
+                url: r.url,
+                errorMessage: e,
+                fileName: fn,
+                fileSizeBytes: fs,
+                mimeType: m,
+                fileBytes: fb,
+                provider: provider,
+                onRetry: e != null ? () => notifier.uploadSelected() : null,
+              ),
             _ => const SizedBox.shrink(),
           },
           const SizedBox(height: 16),
@@ -99,6 +107,7 @@ class UploadScreen extends ConsumerWidget {
           }
         },
         builder: (context, candidateData, rejectedData) {
+          final l10n = AppLocalizations.of(context);
           final isHovering = candidateData.isNotEmpty;
           return Stack(
             children: [
@@ -119,7 +128,7 @@ class UploadScreen extends ConsumerWidget {
                           children: [
                             Icon(Icons.cloud_upload, color: Theme.of(context).colorScheme.primary),
                             const SizedBox(width: 12),
-                            Text('Drop file to upload',
+                            Text(l10n.dropFileToUpload,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.w600,
@@ -611,65 +620,70 @@ class _ProgressSectionState extends State<_ProgressSection>
   }
 }
 
-class _ErrorBanner extends StatelessWidget {
-  final String error;
-
-  const _ErrorBanner({required this.error});
-
-  static String _translate(AppLocalizations l10n, String key) {
-    return switch (key) {
-      'genericError' => l10n.genericError,
-      'errorSessionExpired' => l10n.errorSessionExpired,
-      'errorFileTooLarge' => l10n.errorFileTooLarge,
-      'errorConnectionFailed' => l10n.errorConnectionFailed,
-      'uploadCancelled' => l10n.uploadCancelled,
-      _ => key,
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        color: Colors.red.shade100,
-        child: Row(
-          children: [
-            Text('${l10n.error}: ',
-              style: TextStyle(color: Colors.red.shade800, fontWeight: FontWeight.w600)),
-            Expanded(child: Text(_translate(l10n, error),
-              style: TextStyle(color: Colors.red.shade800))),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// _ResultBanner is now merged into the main result handling
 
 class _ResultBanner extends StatelessWidget {
   final String? url;
+  final String? errorMessage;
+  final String? fileName;
+  final int fileSizeBytes;
+  final String? mimeType;
+  final Uint8List? fileBytes;
+  final BaseUploader? provider;
+  final VoidCallback? onRetry;
 
-  const _ResultBanner({this.url});
+  const _ResultBanner({
+    this.url,
+    this.errorMessage,
+    this.fileName,
+    this.fileSizeBytes = 0,
+    this.mimeType,
+    this.fileBytes,
+    this.provider,
+    this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final success = url != null;
+    final hasError = errorMessage != null;
+    final hasFileInfo = fileName != null;
     final l10n = AppLocalizations.of(context);
+
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Show file preview if file info is available
+          if (hasFileInfo)
+            _FilePreview(
+              fileName: fileName!,
+              fileSize: fileSizeBytes,
+              mimeType: mimeType,
+              fileBytes: fileBytes,
+              provider: provider,
+            ),
+          const SizedBox(height: 12),
+          // Result row
           Row(
             children: [
-              Icon(success ? Icons.check_circle : Icons.error,
-                color: success ? Colors.green : Colors.red, size: 20),
+              Icon(hasError ? Icons.error : Icons.check_circle,
+                color: hasError ? Colors.red : Colors.green, size: 20),
               const SizedBox(width: 8),
-              Text(success ? l10n.uploadComplete : l10n.uploadFailed),
+              Text(hasError ? l10n.uploadFailed : l10n.uploadComplete),
             ],
           ),
+          if (hasError && errorMessage != null) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(errorMessage!,
+                    style: TextStyle(color: Colors.red.shade800, fontSize: 13)),
+                ),
+              ],
+            ),
+          ],
           if (url != null) ...[
             const SizedBox(height: 4),
             Row(
@@ -713,6 +727,21 @@ class _ResultBanner extends StatelessWidget {
                   tooltip: l10n.shareUrl,
                 ),
               ],
+            ),
+          ],
+          // Retry button on error
+          if (hasError && onRetry != null) ...[
+            const SizedBox(height: 8),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh),
+                label: Text(l10n.retry),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange.shade100,
+                  foregroundColor: Colors.orange.shade800,
+                ),
+              ),
             ),
           ],
         ],

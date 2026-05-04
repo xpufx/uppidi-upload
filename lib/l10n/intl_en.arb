@@ -44,5 +44,21 @@
   "timeJustNow": "just now",
   "timeMinutesAgo": "{minutes}m ago",
   "timeHoursAgo": "{hours}h ago",
-  "navTest": "Test"
+  "navTest": "Test",
+  "testAll": "Test All",
+  "testProvider": "Test",
+  "noProvidersAvailable": "No providers available",
+  "connectionFailed": "Connection failed",
+  "viewChangelog": "View Changelog",
+  "changelogTitle": "Changelog",
+  "changeLogo": "Change Logo",
+  "chooseLogo": "Choose Logo",
+  "providersCount": "{count} providers",
+  "defaultForSharing": "Default for sharing",
+  "lastUsed": "Last used",
+  "proxyHint": "socks5://host:port",
+  "dropFileToUpload": "Drop file to upload",
+  "retry": "Retry",
+  "chooseFile": "Choose File",
+  "deleteThisRecord": "Delete this record?"
 }

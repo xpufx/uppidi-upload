@@ -160,4 +160,54 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get navTest => 'Test';
+
+  @override
+  String get testAll => 'Hepsini Test Et';
+
+  @override
+  String get testProvider => 'Test';
+
+  @override
+  String get noProvidersAvailable => 'Sağlayıcı yok';
+
+  @override
+  String get connectionFailed => 'Bağlantı başarısız';
+
+  @override
+  String get viewChangelog => 'Değişiklikleri Gör';
+
+  @override
+  String get changelogTitle => 'Değişiklikler';
+
+  @override
+  String get changeLogo => 'Logoyu Değiştir';
+
+  @override
+  String get chooseLogo => 'Logo Seç';
+
+  @override
+  String providersCount(Object count) {
+    return '$count sağlayıcı';
+  }
+
+  @override
+  String get defaultForSharing => 'Paylaşım için varsayılan';
+
+  @override
+  String get lastUsed => 'Son kullanılan';
+
+  @override
+  String get proxyHint => 'socks5://sunucu:port';
+
+  @override
+  String get dropFileToUpload => 'Yüklemek için dosyayı bırak';
+
+  @override
+  String get retry => 'Tekrar Dene';
+
+  @override
+  String get chooseFile => 'Dosya Seç';
+
+  @override
+  String get deleteThisRecord => 'Bu kayıtı sil?';
 }

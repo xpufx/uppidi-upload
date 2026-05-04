@@ -375,6 +375,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Test'**
   String get navTest;
+
+  /// No description provided for @testAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Test All'**
+  String get testAll;
+
+  /// No description provided for @testProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Test'**
+  String get testProvider;
+
+  /// No description provided for @noProvidersAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No providers available'**
+  String get noProvidersAvailable;
+
+  /// No description provided for @connectionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection failed'**
+  String get connectionFailed;
+
+  /// No description provided for @viewChangelog.
+  ///
+  /// In en, this message translates to:
+  /// **'View Changelog'**
+  String get viewChangelog;
+
+  /// No description provided for @changelogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Changelog'**
+  String get changelogTitle;
+
+  /// No description provided for @changeLogo.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Logo'**
+  String get changeLogo;
+
+  /// No description provided for @chooseLogo.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Logo'**
+  String get chooseLogo;
+
+  /// No description provided for @providersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} providers'**
+  String providersCount(Object count);
+
+  /// No description provided for @defaultForSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Default for sharing'**
+  String get defaultForSharing;
+
+  /// No description provided for @lastUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Last used'**
+  String get lastUsed;
+
+  /// No description provided for @proxyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'socks5://host:port'**
+  String get proxyHint;
+
+  /// No description provided for @dropFileToUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop file to upload'**
+  String get dropFileToUpload;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @chooseFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose File'**
+  String get chooseFile;
+
+  /// No description provided for @deleteThisRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this record?'**
+  String get deleteThisRecord;
 }
 
 class _AppLocalizationsDelegate

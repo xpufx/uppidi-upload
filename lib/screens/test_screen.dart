@@ -3,14 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
-import '../core/connectivity.dart';
-import '../core/app_logo.dart';
+import '../l10n/app_localizations.dart';
 
 class TestScreen extends ConsumerWidget {
   const TestScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final allProviders = ProviderRegistry.all;
     final enabled = ref.watch(enabledProvidersProvider);
 
@@ -19,25 +19,23 @@ class TestScreen extends ConsumerWidget {
       children: [
         Row(
           children: [
-            const AppLogo(size: 32),
-            const SizedBox(width: 12),
-            Text('Providers', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            Text(l10n.navTest, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
             const Spacer(),
             FilledButton.icon(
               onPressed: enabled.isEmpty ? null : () {
                 for (final p in enabled) {
                   _setLoading(ref, p.providerId);
-                  _runTest(ref, p);
+                  _runTest(ref, p, l10n.connectionFailed);
                 }
               },
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Test All'),
+              label: Text(l10n.testAll),
             ),
           ],
         ),
         const SizedBox(height: 16),
         if (allProviders.isEmpty)
-          const Center(child: Text('No providers available')),
+          Center(child: Text(l10n.noProvidersAvailable)),
         ...allProviders.map((p) => _ProviderRow(
           provider: p,
           isEnabled: enabled.any((e) => e.providerId == p.providerId),
@@ -92,6 +90,7 @@ class _ProviderRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final testStates = ref.watch(_testStates);
     final testState = testStates[provider.providerId];
     final isLoading = testState != null && testState.isLoading;
@@ -133,10 +132,10 @@ class _ProviderRow extends ConsumerWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.play_arrow, size: 20),
-                  tooltip: 'Test',
+                  tooltip: l10n.testProvider,
                   onPressed: isLoading ? null : () {
                     _setLoading(ref, provider.providerId);
-                    _runTest(ref, provider);
+                    _runTest(ref, provider, l10n.connectionFailed);
                   },
                 ),
                 Switch(
@@ -161,7 +160,7 @@ class _ProviderRow extends ConsumerWidget {
                 padding: const EdgeInsets.only(left: 36),
                 child: result.online
                   ? Text('${result.latencyMs}ms', style: TextStyle(fontSize: 12, color: Colors.green.shade700, fontWeight: FontWeight.w500))
-                  : Text(result.error ?? 'Connection failed', style: const TextStyle(fontSize: 12, color: Colors.red)),
+                  : Text(result.error ?? l10n.connectionFailed, style: const TextStyle(fontSize: 12, color: Colors.red)),
               ),
             ],
           ],
@@ -180,7 +179,7 @@ void _setResult(WidgetRef ref, String id, _TestResult r) {
   ref.read(_testStates.notifier).setFor(id, AsyncValue.data(r));
 }
 
-Future<void> _runTest(WidgetRef ref, BaseUploader p) async {
+Future<void> _runTest(WidgetRef ref, BaseUploader p, String connectionFailed) async {
   final latency = await checkProviderConnectivity(p);
   if (latency != null) {
     _setResult(ref, p.providerId, _TestResult(
@@ -190,7 +189,7 @@ Future<void> _runTest(WidgetRef ref, BaseUploader p) async {
   } else {
     _setResult(ref, p.providerId, _TestResult(
       providerId: p.providerId, providerName: p.providerName,
-      online: false, error: 'Connection failed',
+      online: false, error: connectionFailed,
     ));
   }
 }

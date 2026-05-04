@@ -139,7 +139,7 @@ class _HistoryTile extends StatelessWidget {
                 context: context,
                 builder: (ctx) => AlertDialog(
                   title: Text(r.fileName),
-                  content: const Text('Delete this record?'),
+                  content: Text(l10n.deleteThisRecord),
                   actions: [
                     TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
                     TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.ok)),

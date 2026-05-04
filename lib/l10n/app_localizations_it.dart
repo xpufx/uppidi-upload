@@ -87,7 +87,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get historyClearAll => 'Cancella tutto';
 
   @override
-  String get historyClearConfirm => 'Eliminare tutta la cronologia?';
+  String get historyClearConfirm => 'Eliminare toda la cronologia?';
 
   @override
   String historyRecords(Object count) {
@@ -160,4 +160,54 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get navTest => 'Test';
+
+  @override
+  String get testAll => 'Testa Tutti';
+
+  @override
+  String get testProvider => 'Testa';
+
+  @override
+  String get noProvidersAvailable => 'Nessun provider';
+
+  @override
+  String get connectionFailed => 'Connessione fallita';
+
+  @override
+  String get viewChangelog => 'Vedi Changelog';
+
+  @override
+  String get changelogTitle => 'Changelog';
+
+  @override
+  String get changeLogo => 'Cambia Logo';
+
+  @override
+  String get chooseLogo => 'Scegli Logo';
+
+  @override
+  String providersCount(Object count) {
+    return '$count provider';
+  }
+
+  @override
+  String get defaultForSharing => 'Predefinito per condivisione';
+
+  @override
+  String get lastUsed => 'Ultimo usato';
+
+  @override
+  String get proxyHint => 'socks5://host:porta';
+
+  @override
+  String get dropFileToUpload => 'Trascina file per caricare';
+
+  @override
+  String get retry => 'Riprova';
+
+  @override
+  String get chooseFile => 'Scegli File';
+
+  @override
+  String get deleteThisRecord => 'Eliminare questo record?';
 }

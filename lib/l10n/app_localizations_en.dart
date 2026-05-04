@@ -158,4 +158,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navTest => 'Test';
+
+  @override
+  String get testAll => 'Test All';
+
+  @override
+  String get testProvider => 'Test';
+
+  @override
+  String get noProvidersAvailable => 'No providers available';
+
+  @override
+  String get connectionFailed => 'Connection failed';
+
+  @override
+  String get viewChangelog => 'View Changelog';
+
+  @override
+  String get changelogTitle => 'Changelog';
+
+  @override
+  String get changeLogo => 'Change Logo';
+
+  @override
+  String get chooseLogo => 'Choose Logo';
+
+  @override
+  String providersCount(Object count) {
+    return '$count providers';
+  }
+
+  @override
+  String get defaultForSharing => 'Default for sharing';
+
+  @override
+  String get lastUsed => 'Last used';
+
+  @override
+  String get proxyHint => 'socks5://host:port';
+
+  @override
+  String get dropFileToUpload => 'Drop file to upload';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get chooseFile => 'Choose File';
+
+  @override
+  String get deleteThisRecord => 'Delete this record?';
 }

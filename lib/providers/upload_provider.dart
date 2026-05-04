@@ -77,12 +77,20 @@ final class UploadInProgress extends UploadState {
 final class UploadCompleted extends UploadState {
   final UploadResult lastResult;
   final String? errorMessage;
+  final String? fileName;
+  final int fileSizeBytes;
+  final String? mimeType;
+  final Uint8List? fileBytes;
 
   bool get isSuccess => lastResult.success;
 
   const UploadCompleted({
     required this.lastResult,
     this.errorMessage,
+    this.fileName,
+    this.fileSizeBytes = 0,
+    this.mimeType,
+    this.fileBytes,
     super.results,
     super.selectedProviderIndex,
     super.providers,
@@ -167,9 +175,14 @@ class UploadNotifier extends Notifier<UploadState> {
       );
     } catch (e) {
       _log.warn('Failed to read file: $e', error: e);
+      final info = _extractFileInfo(state);
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
         errorMessage: 'Failed to read selected file',
+        fileName: info.fileName,
+        fileSizeBytes: info.fileSizeBytes,
+        mimeType: info.mimeType,
+        fileBytes: info.fileBytes,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -180,8 +193,12 @@ class UploadNotifier extends Notifier<UploadState> {
   Future<void> uploadSelected() async {
     final request = _pendingRequest;
     if (request == null) return;
-    _pendingRequest = null;
+    // Don't clear _pendingRequest — keep for retry
     await _executeUpload(request);
+    // Only clear on success
+    if (state is UploadCompleted && (state as UploadCompleted).isSuccess) {
+      _pendingRequest = null;
+    }
   }
 
   Future<void> uploadFromFile(String filePath, String? mimeType) async {
@@ -214,9 +231,14 @@ class UploadNotifier extends Notifier<UploadState> {
       );
     } catch (e) {
       _log.warn('Failed to read shared file: $e', error: e);
+      final info = _extractFileInfo(state);
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
         errorMessage: 'Failed to read selected file',
+        fileName: info.fileName,
+        fileSizeBytes: info.fileSizeBytes,
+        mimeType: info.mimeType,
+        fileBytes: info.fileBytes,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -226,9 +248,14 @@ class UploadNotifier extends Notifier<UploadState> {
 
   Future<void> _executeUpload(FileUploadRequest request) async {
     if (state.providers.isEmpty) {
+      final info = _extractFileInfo(state);
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
         errorMessage: 'No upload providers configured',
+        fileName: info.fileName ?? request.fileName,
+        fileSizeBytes: info.fileSizeBytes > 0 ? info.fileSizeBytes : request.sizeInBytes,
+        mimeType: info.mimeType ?? request.mimeType,
+        fileBytes: info.fileBytes,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -253,11 +280,21 @@ class UploadNotifier extends Notifier<UploadState> {
     _lastSpeedSample = DateTime.now();
     _lastSampleBytes = 0;
 
+    final info = _extractFileInfo(state);
+    final currentFileName = info.fileName ?? request.fileName;
+    final currentFileSize = info.fileSizeBytes > 0 ? info.fileSizeBytes : request.sizeInBytes;
+    final currentMimeType = info.mimeType ?? request.mimeType;
+    final currentFileBytes = info.fileBytes;
+
     final meta = provider.metadata;
     if (!meta.acceptsFileSize(request.sizeInBytes)) {
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
         errorMessage: 'errorFileTooLarge',
+        fileName: currentFileName,
+        fileSizeBytes: currentFileSize,
+        mimeType: currentMimeType,
+        fileBytes: currentFileBytes,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -269,6 +306,10 @@ class UploadNotifier extends Notifier<UploadState> {
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
         errorMessage: '${provider.providerName} only accepts: ${label.isNotEmpty ? label : "this provider"}',
+        fileName: currentFileName,
+        fileSizeBytes: currentFileSize,
+        mimeType: currentMimeType,
+        fileBytes: currentFileBytes,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -281,6 +322,10 @@ class UploadNotifier extends Notifier<UploadState> {
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
         errorMessage: 'errorConnectionFailed',
+        fileName: currentFileName,
+        fileSizeBytes: currentFileSize,
+        mimeType: currentMimeType,
+        fileBytes: currentFileBytes,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -334,6 +379,10 @@ class UploadNotifier extends Notifier<UploadState> {
       state = UploadCompleted(
         lastResult: result,
         errorMessage: result.success ? null : result.errorMessage,
+        fileName: currentFileName,
+        fileSizeBytes: currentFileSize,
+        mimeType: currentMimeType,
+        fileBytes: currentFileBytes,
         results: [result, ...state.results],
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -353,6 +402,10 @@ class UploadNotifier extends Notifier<UploadState> {
       state = UploadCompleted(
         lastResult: failResult,
         errorMessage: 'Upload failed: $e',
+        fileName: currentFileName,
+        fileSizeBytes: currentFileSize,
+        mimeType: currentMimeType,
+        fileBytes: currentFileBytes,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -424,6 +477,19 @@ String _formatSpeed(double bytesPerSec) {
   if (bytesPerSec < 1024) return '${bytesPerSec.toStringAsFixed(0)} B/s';
   if (bytesPerSec < 1024 * 1024) return '${(bytesPerSec / 1024).toStringAsFixed(1)} KB/s';
   return '${(bytesPerSec / (1024 * 1024)).toStringAsFixed(1)} MB/s';
+}
+
+/// Helper to extract file info from current state for passing to UploadCompleted
+({String? fileName, int fileSizeBytes, String? mimeType, Uint8List? fileBytes}) _extractFileInfo(UploadState current) {
+  if (current is UploadFileSelected) {
+    return (
+      fileName: current.fileName,
+      fileSizeBytes: current.fileSizeBytes,
+      mimeType: current.mimeType,
+      fileBytes: current.fileBytes,
+    );
+  }
+  return (fileName: null, fileSizeBytes: 0, mimeType: null, fileBytes: null);
 }
 
 final uploadProvider = NotifierProvider<UploadNotifier, UploadState>(

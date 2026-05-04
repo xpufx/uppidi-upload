@@ -44,5 +44,21 @@
   "timeJustNow": "az önce",
   "timeMinutesAgo": "{minutes}dk önce",
   "timeHoursAgo": "{hours}s önce",
-  "navTest": "Test"
+  "navTest": "Test",
+  "testAll": "Hepsini Test Et",
+  "testProvider": "Test",
+  "noProvidersAvailable": "Sağlayıcı yok",
+  "connectionFailed": "Bağlantı başarısız",
+  "viewChangelog": "Değişiklikleri Gör",
+  "changelogTitle": "Değişiklikler",
+  "changeLogo": "Logoyu Değiştir",
+  "chooseLogo": "Logo Seç",
+  "providersCount": "{count} sağlayıcı",
+  "defaultForSharing": "Paylaşım için varsayılan",
+  "lastUsed": "Son kullanılan",
+  "proxyHint": "socks5://sunucu:port",
+  "dropFileToUpload": "Yüklemek için dosyayı bırak",
+  "retry": "Tekrar Dene",
+  "chooseFile": "Dosya Seç",
+  "deleteThisRecord": "Bu kayıtı sil?"
 }
