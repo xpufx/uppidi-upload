@@ -142,6 +142,7 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get language => 'Lingua';
 
+  @override
   String get ok => 'OK';
 
   @override

@@ -142,6 +142,7 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get language => 'Dil';
 
+  @override
   String get ok => 'Tamam';
 
   @override

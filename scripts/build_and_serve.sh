@@ -42,7 +42,7 @@ mkdir -p "$ARTIFACTS_DIR"
 
 # ── Android APK ────────────────────────────────────────────
 echo "==> Building Android APK (arm64) @ ${GIT_HASH}..."
-flutter build apk --release --target-platform android-arm64 --dart-define=GIT_HASH=$GIT_HASH
+flutter build apk --release --target-platform android-arm64 --dart-define=GIT_HASH=$GIT_HASH --dart-define=CDN_URL=http://10.20.30.24
 
 echo "==> Copying APK to ${ARTIFACTS_DIR}..."
 APK_DIR="build/app/outputs/flutter-apk"
@@ -54,6 +54,9 @@ echo "    ${DST}"
 echo "==> Updating latest symlink..."
 ln -sf "${DST}" "${ARTIFACTS_DIR}/uppidi-upload-latest-android-arm64-v8a.apk"
 
+echo "==> Writing version file..."
+echo "$GIT_HASH" > "${ARTIFACTS_DIR}/latest.txt"
+
 echo "==> Cleaning old APKs (keep latest 5)..."
 ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-android-*.apk 2>/dev/null | tail -n +6 | xargs -r rm -f
 
@@ -61,7 +64,7 @@ ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-android-*.apk 2>/dev/null | tail -n +6 
 LINUX_NAME="uppidi-upload-${VERSION}-${GIT_HASH}-linux.tar.gz"
 
 echo "==> Building Linux release @ ${GIT_HASH}..."
-flutter build linux --release --dart-define=GIT_HASH=$GIT_HASH
+flutter build linux --release --dart-define=GIT_HASH=$GIT_HASH --dart-define=CDN_URL=http://10.20.30.24
 
 echo "==> Packaging Linux release..."
 tar -czf "${ARTIFACTS_DIR}/${LINUX_NAME}" -C build/linux/x64/release/bundle .
