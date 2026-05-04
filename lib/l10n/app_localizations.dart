@@ -103,7 +103,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'uppidi'**
+  /// **'Uppidi Upload'**
   String get appTitle;
 
   /// No description provided for @genericError.
@@ -369,6 +369,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{hours}h ago'**
   String timeHoursAgo(Object hours);
+
+  /// No description provided for @navTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Test'**
+  String get navTest;
 }
 
 class _AppLocalizationsDelegate

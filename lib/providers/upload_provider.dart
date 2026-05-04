@@ -95,7 +95,7 @@ class UploadNotifier extends Notifier<UploadState> {
     List<BaseUploader>? providers,
   })  : _injectedProviders = providers;
 
-  List<BaseUploader> get _providers => _injectedProviders ?? ProviderRegistry.all;
+  List<BaseUploader> get _providers => _injectedProviders ?? ref.read(enabledProvidersProvider);
 
   FileUploadRequest? _pendingRequest;
   DateTime _lastSpeedSample = DateTime.now();

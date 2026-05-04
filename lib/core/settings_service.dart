@@ -11,6 +11,10 @@ final localeCodeProvider = FutureProvider<String>((ref) async {
   return (await svc.get(SettingsService.localeKey)) ?? 'en';
 });
 
+final disabledProviderIdsProvider = FutureProvider<Set<String>>((ref) async {
+  return ref.read(settingsServiceProvider).getDisabledProviders();
+});
+
 class SettingsService {
   final FlutterSecureStorage _storage;
 
@@ -43,6 +47,7 @@ class SettingsService {
   static const themeModeKey = 'global.theme_mode';
   static const seedColorKey = 'global.seed_color';
   static const logoPathKey = 'global.logo_path';
+  static const disabledProvidersKey = 'global.disabled_providers';
 
   Future<bool> isInsecureConnAllowed() async {
     final val = await get(insecureConnKey);
@@ -69,4 +74,18 @@ class SettingsService {
   }
 
   Future<String?> getLogoPath() => get(logoPathKey);
+
+  Future<Set<String>> getDisabledProviders() async {
+    final raw = await get(disabledProvidersKey);
+    if (raw == null || raw.isEmpty) return {};
+    return raw.split(',').toSet();
+  }
+
+  Future<void> setDisabledProviders(Set<String> ids) async {
+    if (ids.isEmpty) {
+      await remove(disabledProvidersKey);
+    } else {
+      await set(disabledProvidersKey, ids.join(','));
+    }
+  }
 }

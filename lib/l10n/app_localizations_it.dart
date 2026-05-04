@@ -157,4 +157,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String timeHoursAgo(Object hours) {
     return '$hours h fa';
   }
+
+  @override
+  String get navTest => 'Test';
 }

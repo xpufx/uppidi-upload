@@ -43,5 +43,6 @@
   "cancel": "Cancel",
   "timeJustNow": "just now",
   "timeMinutesAgo": "{minutes}m ago",
-  "timeHoursAgo": "{hours}h ago"
+  "timeHoursAgo": "{hours}h ago",
+  "navTest": "Test"
 }

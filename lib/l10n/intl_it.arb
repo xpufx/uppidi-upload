@@ -43,5 +43,6 @@
   "cancel": "Annulla",
   "timeJustNow": "proprio ora",
   "timeMinutesAgo": "{minutes} min fa",
-  "timeHoursAgo": "{hours} h fa"
+  "timeHoursAgo": "{hours} h fa",
+  "navTest": "Test"
 }

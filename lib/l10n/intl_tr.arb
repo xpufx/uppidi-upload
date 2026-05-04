@@ -43,5 +43,6 @@
   "cancel": "İptal",
   "timeJustNow": "az önce",
   "timeMinutesAgo": "{minutes}dk önce",
-  "timeHoursAgo": "{hours}s önce"
+  "timeHoursAgo": "{hours}s önce",
+  "navTest": "Test"
 }
