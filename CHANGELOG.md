@@ -1,5 +1,6 @@
 # Changelog
 
+- refactor: remove dead connectivity check, restore cancelUpload
 - refactor: remove dead connectivity check from upload flow — never blocked, just wasted a round-trip
 - docs: auto-update changelog
 - fix: capture HTTP status code from DioException in catch block
@@ -29,4 +30,3 @@
 - fix: TmpFileLinkProvider parseResponse — CastError on non-Map data
 - feat: manual 'Check for updates' refresh button in About card
 - fix: upload deadlock — real errors, cancel+retry buttons, swipe to dismiss, broken preview
-- fix: moved insecure info icon outside SwitchListTile to prevent accidental toggle
