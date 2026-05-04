@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +10,7 @@ import '../core/format.dart';
 import '../core/history_service.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/share_message_dialog.dart';
+import '../core/version.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 
@@ -708,7 +711,7 @@ class _ProgressSectionState extends State<_ProgressSection>
 
 // _ResultBanner is now merged into the main result handling
 
-class _ResultBanner extends StatelessWidget {
+class _ResultBanner extends StatefulWidget {
   final String? url;
   final String? errorMessage;
   final String? fileName;
@@ -732,8 +735,53 @@ class _ResultBanner extends StatelessWidget {
   });
 
   @override
+  State<_ResultBanner> createState() => _ResultBannerState();
+}
+
+class _ResultBannerState extends State<_ResultBanner> {
+  void _showDebugInfo(BuildContext context) {
+    final buffer = StringBuffer();
+    buffer.writeln('Provider: ${widget.provider?.providerName ?? "unknown"} (${widget.provider?.providerId ?? "?"})');
+    buffer.writeln('File: ${widget.fileName} (${formatSize(widget.fileSizeBytes)}, ${widget.mimeType})');
+    buffer.writeln('Error: ${widget.errorMessage}');
+    buffer.writeln('URL: ${widget.url ?? "none"}');
+    buffer.writeln('Build: $gitHash');
+    buffer.writeln('Platform: ${Platform.operatingSystem}');
+
+    final text = buffer.toString();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.bug_report, size: 18),
+            SizedBox(width: 8),
+            Text('Debug Info'),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: SelectableText(text, style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: text));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Copied to clipboard')),
+              );
+            },
+            child: const Text('Copy All'),
+          ),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final hasError = errorMessage != null;
+    final hasError = widget.errorMessage != null;
     final l10n = AppLocalizations.of(context);
 
     return Padding(
@@ -750,23 +798,30 @@ class _ResultBanner extends StatelessWidget {
               Text(hasError ? l10n.uploadFailed : l10n.uploadComplete),
             ],
           ),
-          if (hasError && errorMessage != null) ...[
+          if (hasError && widget.errorMessage != null) ...[
             const SizedBox(height: 4),
             Row(
               children: [
                 Expanded(
-                  child: Text(errorMessage!,
-                    style: TextStyle(color: Colors.red.shade800, fontSize: 13)),
+                  child: Text(widget.errorMessage!,
+                    style: TextStyle(color: Colors.red.shade700, fontSize: 13)),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.bug_report, size: 16),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  tooltip: 'Debug info',
+                  onPressed: () => _showDebugInfo(context),
                 ),
               ],
             ),
           ],
-          if (url != null) ...[
+          if (widget.url != null) ...[
             const SizedBox(height: 4),
             Row(
               children: [
                 Expanded(
-                  child: SelectableText(url!,
+                  child: SelectableText(widget.url!,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                       fontSize: 13,
@@ -777,7 +832,7 @@ class _ResultBanner extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.open_in_new, size: 18),
                   onPressed: () async {
-                    final uri = Uri.tryParse(url!);
+                    final uri = Uri.tryParse(widget.url!);
                     if (uri != null) {
                       await launchUrl(uri, mode: LaunchMode.externalApplication);
                     }
@@ -787,7 +842,7 @@ class _ResultBanner extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.copy, size: 18),
                   onPressed: () {
-                    Clipboard.setData(ClipboardData(text: url!));
+                    Clipboard.setData(ClipboardData(text: widget.url!));
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(l10n.urlCopiedToClipboard)),
                     );
@@ -800,9 +855,9 @@ class _ResultBanner extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (ctx) => ShareMessageDialog(
-                        url: url!,
-                        providerName: provider?.providerName,
-                        fileName: fileName,
+                        url: widget.url!,
+                        providerName: widget.provider?.providerName,
+                        fileName: widget.fileName,
                       ),
                     );
                   },
@@ -818,9 +873,9 @@ class _ResultBanner extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (onRetry != null)
+                  if (widget.onRetry != null)
                     ElevatedButton.icon(
-                      onPressed: onRetry,
+                      onPressed: widget.onRetry,
                       icon: const Icon(Icons.refresh, size: 18),
                       label: Text(l10n.retry),
                       style: ElevatedButton.styleFrom(
@@ -828,10 +883,10 @@ class _ResultBanner extends StatelessWidget {
                         foregroundColor: Colors.orange.shade800,
                       ),
                     ),
-                  if (onCancel != null) ...[
+                  if (widget.onCancel != null) ...[
                     const SizedBox(width: 12),
                     OutlinedButton.icon(
-                      onPressed: onCancel,
+                      onPressed: widget.onCancel,
                       icon: const Icon(Icons.close, size: 18),
                       label: Text(l10n.cancel),
                     ),
