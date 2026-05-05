@@ -1,5 +1,7 @@
 # Changelog
 
+- add public-facing content policy
+- docs: auto-update changelog
 - fix: test imports — package renamed from uppidi to uppidi_upload
 - docs: auto-update changelog
 - update .gitignore
@@ -28,5 +30,3 @@
 - fix: display stack trace + raw error in debug modal, added rawError field to UploadResult
 - docs: auto-update changelog
 - feat: stack trace capture in UploadResult, enhanced debug modal with structured sections
-- docs: auto-update changelog
-- docs: user manual covering upload, providers, history, settings (by DJ)
