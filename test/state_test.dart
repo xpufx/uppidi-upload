@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:uppidi/core/models/upload_result.dart';
-import 'package:uppidi/providers/upload_provider.dart';
+import 'package:uppidi_upload/core/models/upload_result.dart';
+import 'package:uppidi_upload/providers/upload_provider.dart';
 
 void main() {
   group('UploadState sealed classes', () {

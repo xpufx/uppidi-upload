@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:uppidi/core/models/upload_request.dart';
-import 'package:uppidi/providers/tmpfilelink_provider.dart';
-import 'package:uppidi/providers/httpbin_provider.dart';
-import 'package:uppidi/core/registry.dart';
+import 'package:uppidi_upload/core/models/upload_request.dart';
+import 'package:uppidi_upload/providers/tmpfilelink_provider.dart';
+import 'package:uppidi_upload/providers/httpbin_provider.dart';
+import 'package:uppidi_upload/core/registry.dart';
 
 void main() {
   group('ProviderRegistry', () {
