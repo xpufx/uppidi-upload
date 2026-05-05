@@ -372,6 +372,14 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               icon: const Icon(Icons.image, size: 18),
               label: Text(ref.watch(logoPathProvider) != null ? l10n.changeLogo : l10n.chooseLogo),
             ),
+            if (ref.watch(logoPathProvider) != null) ...[
+              const SizedBox(width: 8),
+              IconButton(
+                icon: const Icon(Icons.restore, size: 18),
+                tooltip: 'Reset to default',
+                onPressed: () => ref.read(logoPathProvider.notifier).setPath(null),
+              ),
+            ],
           ],
         ),
         const SizedBox(height: 8),
