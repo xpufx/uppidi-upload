@@ -1,5 +1,7 @@
 # Changelog
 
+- feat: reset button for custom logo — reverts to default asset
+- docs: auto-update changelog
 - refactor: remove dead connectivity check, restore cancelUpload
 - refactor: remove dead connectivity check from upload flow — never blocked, just wasted a round-trip
 - docs: auto-update changelog
@@ -28,5 +30,3 @@
 - docs: update CHANGELOG with all recent features and fixes
 - feat: version check UX — spinner, checkmark, badge states (Theo found upload bug + 45 tests)
 - fix: TmpFileLinkProvider parseResponse — CastError on non-Map data
-- feat: manual 'Check for updates' refresh button in About card
-- fix: upload deadlock — real errors, cancel+retry buttons, swipe to dismiss, broken preview
