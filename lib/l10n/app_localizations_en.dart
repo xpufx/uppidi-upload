@@ -21,6 +21,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorFileTooLarge => 'The file is too large for this provider.';
 
+  String get invalidMimeType => 'Invalid or unsupported file type.';
+
+  String get fileSystemError => 'Could not read the selected file.';
+
   @override
   String get errorConnectionFailed =>
       'Could not connect to the provider. It may be unreachable or blocked by your browser.';

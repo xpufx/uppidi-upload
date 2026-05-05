@@ -124,6 +124,10 @@ abstract class AppLocalizations {
   /// **'The file is too large for this provider.'**
   String get errorFileTooLarge;
 
+  String get invalidMimeType;
+
+  String get fileSystemError;
+
   /// No description provided for @errorConnectionFailed.
   ///
   /// In en, this message translates to:

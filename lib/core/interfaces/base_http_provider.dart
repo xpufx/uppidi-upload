@@ -100,27 +100,27 @@ abstract class BaseHttpProvider implements BaseUploader {
 
   UploadResult parseResponse(Response response);
 
-String _mapException(Object e) {
-  if (e is FormatException) {
-    return 'invalidMimeType';
+  String _mapException(Object e) {
+    if (e is FormatException) {
+      return 'invalidMimeType';
+    }
+    if (e is FileSystemException) {
+      _log.error('File system error: ${e.message}', error: e);
+      return 'fileSystemError';
+    }
+    if (e is DioException) {
+      return switch (e.type) {
+        DioExceptionType.cancel => 'uploadCancelled',
+        DioExceptionType.connectionTimeout ||
+        DioExceptionType.sendTimeout ||
+        DioExceptionType.receiveTimeout ||
+        DioExceptionType.connectionError =>
+          'errorConnectionFailed',
+        _ => 'genericError',
+      };
+    }
+    return 'genericError';
   }
-  if (e is FileSystemException) {
-    _log.error('File system error: ${e.message}', error: e);
-    return 'fileSystemError';
-  }
-  if (e is DioException) {
-    return switch (e.type) {
-      DioExceptionType.cancel => 'uploadCancelled',
-      DioExceptionType.connectionTimeout ||
-      DioExceptionType.sendTimeout ||
-      DioExceptionType.receiveTimeout ||
-      DioExceptionType.connectionError =>
-        'errorConnectionFailed',
-      _ => 'genericError',
-    };
-  }
-  return 'genericError';
-}
 }
 
 /// Apply proxy configuration to a Dio instance.

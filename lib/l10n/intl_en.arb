@@ -3,6 +3,8 @@
   "genericError": "An unexpected error occurred. Please try again.",
   "errorSessionExpired": "Your session has expired. Please check your credentials in Settings.",
   "errorFileTooLarge": "The file is too large for this provider.",
+  "invalidMimeType": "Invalid or unsupported file type.",
+  "fileSystemError": "Could not read the selected file.",
   "errorConnectionFailed": "Could not connect to the provider. It may be unreachable or blocked by your browser.",
   "uploadCancelled": "Upload cancelled.",
   "providerWebNotSupported": "This provider cannot be used directly in a web browser. Enable the experimental proxy in settings.",

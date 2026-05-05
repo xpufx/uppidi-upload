@@ -3,6 +3,8 @@
   "genericError": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.",
   "errorSessionExpired": "Oturumunuzun süresi doldu. Lütfen Ayarlar'dan kimlik bilgilerinizi kontrol edin.",
   "errorFileTooLarge": "Bu dosya bu sağlayıcı için çok büyük.",
+  "invalidMimeType": "Geçersiz veya desteklenmeyen dosya türü.",
+  "fileSystemError": "Seçilen dosya okunamadı.",
   "errorConnectionFailed": "Sağlayıcıya bağlanılamadı. Erişilemiyor olabilir veya tarayıcınız tarafından engellenmiş olabilir.",
   "uploadCancelled": "Yükleme iptal edildi.",
   "providerWebNotSupported": "Bu sağlayıcı web tarayıcısında doğrudan kullanılamaz. Ayarlardan deneysel proxy'yi etkinleştirin.",

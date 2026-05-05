@@ -3,6 +3,8 @@
   "genericError": "Si è verificato un errore imprevisto. Riprova.",
   "errorSessionExpired": "La sessione è scaduta. Controlla le credenziali nelle Impostazioni.",
   "errorFileTooLarge": "Il file è troppo grande per questo servizio.",
+  "invalidMimeType": "Tipo di file non valido o non supportato.",
+  "fileSystemError": "Impossibile leggere il file selezionato.",
   "errorConnectionFailed": "Impossibile connettersi al servizio. Potrebbe essere irraggiungibile o bloccato dal browser.",
   "uploadCancelled": "Caricamento annullato.",
   "providerWebNotSupported": "Questo servizio non può essere usato direttamente dal browser. Attiva il proxy sperimentale nelle Impostazioni.",
