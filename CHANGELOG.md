@@ -1,5 +1,7 @@
 # Changelog
 
+- feat: System Info button in Settings — collects build, platform, providers, theme for debugging
+- docs: auto-update changelog
 - feat: reset button for custom logo — reverts to default asset
 - docs: auto-update changelog
 - refactor: remove dead connectivity check, restore cancelUpload
@@ -28,5 +30,3 @@
 - fix: info icon before title+switch (separate tap targets), %provider expanded on share, chain uploads kept
 - fix: info icon inline with switch title, version check fixed width (no layout shift)
 - docs: update CHANGELOG with all recent features and fixes
-- feat: version check UX — spinner, checkmark, badge states (Theo found upload bug + 45 tests)
-- fix: TmpFileLinkProvider parseResponse — CastError on non-Map data
