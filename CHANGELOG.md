@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: test imports — package renamed from uppidi to uppidi_upload
+- docs: auto-update changelog
 - update .gitignore
 - docs: auto-update changelog
 - fix: indent _mapException properly, add invalidMimeType + fileSystemError ARB keys
@@ -28,5 +30,3 @@
 - feat: stack trace capture in UploadResult, enhanced debug modal with structured sections
 - docs: auto-update changelog
 - docs: user manual covering upload, providers, history, settings (by DJ)
-- feat: debug info modal on upload errors — bug icon, full diagnostics, Copy All button
-- fix: version check auto-fires on Settings page visit via initState
