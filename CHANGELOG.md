@@ -1,5 +1,9 @@
 # Changelog
 
+- fix: base_http_provider — FormatException handling, extended error mapping, docs (by Ivy)
+- docs: promote Intern (Hy3) as primary executor, Jeb (MiniMax) as backup
+- fix: broken test import — package renamed from uppidi to uppidi_upload
+- docs: auto-update changelog
 - feat: share button on upload debug modal — consistent with system info
 - docs: auto-update changelog
 - feat: Share button in System Info dialog — share debug data via system share sheet
@@ -26,7 +30,3 @@
 - fix: upload button — removed stray return that blocked all uploads
 - fix: version check layout stable — unified GestureDetector, removed vertical 'New' label, auto-check reverted to manual
 - fix: version check tappable in all states, auto-check on Settings page visit
-- fix: version check layout stable — fixed 90x24 area, New inline with badge, no vertical shift
-- docs: delegation discipline rule — think first, delegate clean, no stream of consciousness
-- fix: disable duplicate upload check (code preserved behind if(false) for future)
-- feat: duplicate upload detection — warns if same file already uploaded to same provider
