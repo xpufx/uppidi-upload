@@ -52,7 +52,7 @@ void main() {
       expect(result.url, isNotNull);
       expect(result.url, contains('tmpfile.link'));
       expect(result.statusCode, 200);
-    }, timeout: const Timeout(Duration(minutes: 2)));
+    }, timeout: const Timeout(Duration(minutes: 2)), skip: 'Relies on live external service (tmpfile.link)');
 
     test('upload returns download link in response', () async {
       final testData = Uint8List.fromList('Test content'.codeUnits);
@@ -69,7 +69,7 @@ void main() {
 
       expect(result.url, isNotNull);
       expect(result.url, startsWith('https://'));
-    }, timeout: const Timeout(Duration(minutes: 2)));
+    }, timeout: const Timeout(Duration(minutes: 2)), skip: 'Relies on live external service (tmpfile.link)');
   });
 
   group('HttpBinProvider', () {
@@ -100,6 +100,6 @@ void main() {
       // httpbin returns the URL in a different format
       expect(result.statusCode, 200);
       expect(result.success, true);
-    }, timeout: const Timeout(Duration(minutes: 2)));
+    }, timeout: const Timeout(Duration(minutes: 2)), skip: 'Relies on live external service (httpbin.org)');
   });
 }

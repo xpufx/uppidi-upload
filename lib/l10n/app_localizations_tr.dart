@@ -22,8 +22,10 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errorFileTooLarge => 'Bu dosya bu sağlayıcı için çok büyük.';
 
+  @override
   String get invalidMimeType => 'Geçersiz veya desteklenmeyen dosya türü.';
 
+  @override
   String get fileSystemError => 'Seçilen dosya okunamadı.';
 
   @override

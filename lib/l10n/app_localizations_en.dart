@@ -21,8 +21,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorFileTooLarge => 'The file is too large for this provider.';
 
+  @override
   String get invalidMimeType => 'Invalid or unsupported file type.';
 
+  @override
   String get fileSystemError => 'Could not read the selected file.';
 
   @override

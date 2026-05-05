@@ -663,8 +663,6 @@ class _ProgressSectionState extends State<_ProgressSection>
   }
 }
 
-// _ResultBanner is now merged into the main result handling
-
 class _ResultBanner extends StatefulWidget {
   final String? url;
   final String? errorMessage;

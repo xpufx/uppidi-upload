@@ -124,8 +124,16 @@ abstract class AppLocalizations {
   /// **'The file is too large for this provider.'**
   String get errorFileTooLarge;
 
+  /// No description provided for @invalidMimeType.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid or unsupported file type.'**
   String get invalidMimeType;
 
+  /// No description provided for @fileSystemError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read the selected file.'**
   String get fileSystemError;
 
   /// No description provided for @errorConnectionFailed.
