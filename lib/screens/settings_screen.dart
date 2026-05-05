@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -185,6 +187,63 @@ class _ProviderConfigCardState extends State<_ProviderConfigCard> {
       ),
     );
   }
+}
+
+void _showSystemInfo(BuildContext context, WidgetRef ref) {
+  final buffer = StringBuffer();
+  buffer.writeln('=== BUILD ===');
+  buffer.writeln('App: Uppidi Upload v$appVersion');
+  buffer.writeln('Git Hash: $gitHash');
+  buffer.writeln('');
+  buffer.writeln('=== PLATFORM ===');
+  buffer.writeln('OS: ${Platform.operatingSystem}');
+  buffer.writeln('Version: ${Platform.operatingSystemVersion}');
+  buffer.writeln('Locale: ${Platform.localeName}');
+  buffer.writeln('');
+  buffer.writeln('=== PROVIDERS ===');
+  buffer.writeln('Total: ${ProviderRegistry.all.length}');
+  final disabled = ref.read(disabledProviderIdsProvider).asData?.value ?? {};
+  for (final p in ProviderRegistry.all) {
+    final enabled = !disabled.contains(p.providerId);
+    buffer.writeln('${enabled ? "✓" : "✗"} ${p.providerName} (${p.providerId})');
+  }
+  buffer.writeln('');
+  buffer.writeln('=== THEME ===');
+  final theme = ref.read(themeModeProvider);
+  final seed = ref.read(seedColorProvider);
+  buffer.writeln('Mode: ${theme.name}');
+  buffer.writeln('Seed: 0x${seed.toARGB32().toRadixString(16).padLeft(8, '0')}');
+  buffer.writeln('Custom Logo: ${ref.read(logoPathProvider) != null ? "yes" : "no"}');
+
+  final text = buffer.toString();
+
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.bug_report, size: 18),
+          SizedBox(width: 8),
+          Text('System Info'),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: SelectableText(text, style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Clipboard.setData(ClipboardData(text: text));
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Copied to clipboard')),
+            );
+          },
+          child: const Text('Copy All'),
+        ),
+        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+      ],
+    ),
+  );
 }
 
 class _VersionCheckWidget extends ConsumerWidget {
@@ -518,6 +577,12 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                   ),
                 ],
                 const SizedBox(height: 8),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () => _showSystemInfo(context, ref),
+                  icon: const Icon(Icons.bug_report, size: 16),
+                  label: const Text('System Info'),
+                ),
                 OutlinedButton.icon(
                   onPressed: () => showDialog(
                     context: context,
