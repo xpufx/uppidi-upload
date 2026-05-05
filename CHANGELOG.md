@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: indent _mapException properly, add invalidMimeType + fileSystemError ARB keys
+- docs: auto-update changelog
 - fix: base_http_provider — FormatException handling, extended error mapping, docs (by Ivy)
 - docs: promote Intern (Hy3) as primary executor, Jeb (MiniMax) as backup
 - fix: broken test import — package renamed from uppidi to uppidi_upload
@@ -28,5 +30,3 @@
 - fix: version check auto-fires on Settings page visit via initState
 - fix: version check layout — age text on separate line, only for upToDate, Column not Row
 - fix: upload button — removed stray return that blocked all uploads
-- fix: version check layout stable — unified GestureDetector, removed vertical 'New' label, auto-check reverted to manual
-- fix: version check tappable in all states, auto-check on Settings page visit
