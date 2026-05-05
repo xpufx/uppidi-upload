@@ -1,5 +1,8 @@
 # Changelog
 
+- fix: remove dead UploadStarting state, _pendingRequest, dynamic types; add proxy validation, Hive close()
+- fix: remove UploadStarting dead code, replace dynamic types in _metadataBadges
+- docs: auto-update changelog
 - test: UploadNotifier state machine tests, skip flaky live tests, cleanup stale imports
 - docs: auto-update changelog
 - add public-facing content policy
@@ -27,6 +30,3 @@
 - docs: auto-update changelog
 - fix: capture HTTP status code from DioException in catch block
 - docs: auto-update changelog
-- fix: recreate file stream on chain upload — no more FileSystemException (File closed)
-- docs: auto-update changelog
-- fix: display stack trace + raw error in debug modal, added rawError field to UploadResult
