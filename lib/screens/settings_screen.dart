@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/apk_installer.dart';
@@ -231,6 +232,11 @@ void _showSystemInfo(BuildContext context, WidgetRef ref) {
         child: SelectableText(text, style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
       ),
       actions: [
+        TextButton.icon(
+          onPressed: () => SharePlus.instance.share(ShareParams(text: text)),
+          icon: const Icon(Icons.share, size: 16),
+          label: const Text('Share'),
+        ),
         TextButton(
           onPressed: () {
             Clipboard.setData(ClipboardData(text: text));
