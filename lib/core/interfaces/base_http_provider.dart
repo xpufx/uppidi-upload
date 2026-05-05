@@ -28,6 +28,7 @@ abstract class BaseHttpProvider implements BaseUploader {
     bool allowInsecureConn = false,
     String? proxyUrl,
   }) async {
+    // Async keyword retained to allow subclasses to override with async operations if needed
     final dio = Dio(BaseOptions(
       baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 30),
@@ -74,6 +75,7 @@ abstract class BaseHttpProvider implements BaseUploader {
       return parseResponse(response);
     } catch (e, stackTrace) {
       _log.error('Upload failed: $e', error: e, stackTrace: stackTrace);
+      // statusCode is only available for DioExceptions (which have associated HTTP responses); non-Dio exceptions have no HTTP status code, so default to null
       final statusCode = e is DioException ? e.response?.statusCode : null;
       return UploadResult(
         success: false,
@@ -98,20 +100,27 @@ abstract class BaseHttpProvider implements BaseUploader {
 
   UploadResult parseResponse(Response response);
 
-  String _mapException(Object e) {
-    if (e is DioException) {
-      return switch (e.type) {
-        DioExceptionType.cancel => 'uploadCancelled',
-        DioExceptionType.connectionTimeout ||
-        DioExceptionType.sendTimeout ||
-        DioExceptionType.receiveTimeout ||
-        DioExceptionType.connectionError =>
-          'errorConnectionFailed',
-        _ => 'genericError',
-      };
-    }
-    return 'genericError';
+String _mapException(Object e) {
+  if (e is FormatException) {
+    return 'invalidMimeType';
   }
+  if (e is FileSystemException) {
+    _log.error('File system error: ${e.message}', error: e);
+    return 'fileSystemError';
+  }
+  if (e is DioException) {
+    return switch (e.type) {
+      DioExceptionType.cancel => 'uploadCancelled',
+      DioExceptionType.connectionTimeout ||
+      DioExceptionType.sendTimeout ||
+      DioExceptionType.receiveTimeout ||
+      DioExceptionType.connectionError =>
+        'errorConnectionFailed',
+      _ => 'genericError',
+    };
+  }
+  return 'genericError';
+}
 }
 
 /// Apply proxy configuration to a Dio instance.
