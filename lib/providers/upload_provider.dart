@@ -50,10 +50,6 @@ final class UploadFileSelected extends UploadState {
   });
 }
 
-final class UploadStarting extends UploadState {
-  const UploadStarting({super.results, super.selectedProviderIndex, super.providers});
-}
-
 final class UploadInProgress extends UploadState {
   final double progress;
   final CancelToken cancelToken;
@@ -136,7 +132,7 @@ class UploadNotifier extends Notifier<UploadState> {
           selectedProviderIndex: index,
           providers: prev.providers,
         ),
-      UploadIdle() || UploadStarting() => UploadIdle(
+      UploadIdle() => UploadIdle(
           results: prev.results,
           selectedProviderIndex: index,
           providers: prev.providers,

@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../core/format.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/models/upload_result.dart';
+import '../core/models/provider_metadata.dart';
 import '../core/share_message_dialog.dart';
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
@@ -86,25 +87,8 @@ class UploadScreen extends ConsumerWidget {
                   sentBytes: sb,
                   totalBytes: tb,
                   onCancel: notifier.cancelUpload,
-                ),
-              UploadStarting() => _ProgressSection(
-                  progress: null,
-                  onCancel: notifier.cancelUpload,
-                ),
-              UploadCompleted(errorMessage: final e, lastResult: final r, fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb) =>
-                _ResultBanner(
-                  url: r.url,
-                  errorMessage: e,
-                  fileName: fn,
-                  fileSizeBytes: fs,
-                  mimeType: m,
-                  fileBytes: fb,
-                  provider: provider,
-                  lastResult: r,
-                  onRetry: e != null ? () => notifier.uploadSelected() : null,
-                  onCancel: e != null ? () => notifier.clearSelection() : null,
-                ),
-              _ => const SizedBox.shrink(),
+              ),
+            _ => const SizedBox.shrink(),
             },
             const SizedBox(height: 8),
           ],
@@ -210,7 +194,7 @@ class _ProviderDropdown extends StatelessWidget {
   }
 }
 
-Widget _metadataBadges(dynamic meta) {
+Widget _metadataBadges(ProviderMetadata meta) {
   final chips = <Widget>[];
 
   if (meta.fileSizeLabel is String && (meta.fileSizeLabel as String).isNotEmpty) {
