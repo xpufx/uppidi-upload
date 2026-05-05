@@ -1,5 +1,7 @@
 # Changelog
 
+- feat: Share button in System Info dialog — share debug data via system share sheet
+- docs: auto-update changelog
 - feat: System Info button in Settings — collects build, platform, providers, theme for debugging
 - docs: auto-update changelog
 - feat: reset button for custom logo — reverts to default asset
@@ -28,5 +30,3 @@
 - feat: duplicate upload detection — warns if same file already uploaded to same provider
 - fix: removed unused deps (background_downloader, photo_manager), connectivity logging
 - fix: info icon before title+switch (separate tap targets), %provider expanded on share, chain uploads kept
-- fix: info icon inline with switch title, version check fixed width (no layout shift)
-- docs: update CHANGELOG with all recent features and fixes
