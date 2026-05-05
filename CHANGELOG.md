@@ -1,5 +1,7 @@
 # Changelog
 
+- test: UploadNotifier state machine tests, skip flaky live tests, cleanup stale imports
+- docs: auto-update changelog
 - add public-facing content policy
 - docs: auto-update changelog
 - fix: test imports — package renamed from uppidi to uppidi_upload
@@ -28,5 +30,3 @@
 - fix: recreate file stream on chain upload — no more FileSystemException (File closed)
 - docs: auto-update changelog
 - fix: display stack trace + raw error in debug modal, added rawError field to UploadResult
-- docs: auto-update changelog
-- feat: stack trace capture in UploadResult, enhanced debug modal with structured sections
