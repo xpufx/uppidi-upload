@@ -107,7 +107,6 @@ class UploadNotifier extends Notifier<UploadState> {
     List<BaseUploader>? providers,
   })  : _injectedProviders = providers;
 
-  FileUploadRequest? _pendingRequest;
   String? _lastFilePath;
   Uint8List? _lastFileBytes;
   DateTime _lastSpeedSample = DateTime.now();
@@ -178,8 +177,6 @@ class UploadNotifier extends Notifier<UploadState> {
       }
 
       // Store request for later upload
-      _pendingRequest = request;
-
       state = UploadFileSelected(
         fileName: file.name,
         fileSizeBytes: request.sizeInBytes,
@@ -224,8 +221,6 @@ class UploadNotifier extends Notifier<UploadState> {
         sizeInBytes: _lastFileBytes!.length,
         dataStream: Stream.value(_lastFileBytes!),
       );
-    } else {
-      request = _pendingRequest;
     }
     if (request == null) return;
     await _executeUpload(request);
@@ -240,16 +235,8 @@ class UploadNotifier extends Notifier<UploadState> {
       final fileName = ioFile.uri.pathSegments.last;
 
       final previewBytes = await ioFile.readAsBytes();
-
-      final request = FileUploadRequest(
-        fileName: fileName,
-        mimeType: mimeType,
-        sizeInBytes: size,
-        dataStream: ioFile.openRead(),
-      );
       _log.info('Shared file: $filePath ($mimeType)');
 
-      _pendingRequest = request;
       state = UploadFileSelected(
         fileName: fileName,
         fileSizeBytes: size,
@@ -466,7 +453,6 @@ class UploadNotifier extends Notifier<UploadState> {
   }
 
   void clearSelection() {
-    _pendingRequest = null;
     _lastFilePath = null;
     _lastFileBytes = null;
     state = UploadIdle(

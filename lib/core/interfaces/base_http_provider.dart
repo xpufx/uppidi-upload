@@ -127,8 +127,10 @@ abstract class BaseHttpProvider implements BaseUploader {
 /// Supports HTTP/HTTPS proxy (http://host:port or https://host:port).
 /// SOCKS5 proxies require a third-party adapter — not yet implemented.
 void configureProxy(Dio dio, String proxyUrl) {
-  final uri = Uri.tryParse(proxyUrl);
-  if (uri == null) return;
+  final trimmed = proxyUrl.trim();
+  if (trimmed.isEmpty) return;
+  final uri = Uri.tryParse(trimmed);
+  if (uri == null || uri.host.isEmpty) return;
 
   // HTTP/HTTPS proxy — configure via underlying HttpClient
   dio.httpClientAdapter = IOHttpClientAdapter(
