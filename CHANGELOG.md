@@ -1,5 +1,7 @@
 # Changelog
 
+- update .gitignore
+- docs: auto-update changelog
 - fix: indent _mapException properly, add invalidMimeType + fileSystemError ARB keys
 - docs: auto-update changelog
 - fix: base_http_provider — FormatException handling, extended error mapping, docs (by Ivy)
@@ -28,5 +30,3 @@
 - docs: user manual covering upload, providers, history, settings (by DJ)
 - feat: debug info modal on upload errors — bug icon, full diagnostics, Copy All button
 - fix: version check auto-fires on Settings page visit via initState
-- fix: version check layout — age text on separate line, only for upToDate, Column not Row
-- fix: upload button — removed stray return that blocked all uploads
