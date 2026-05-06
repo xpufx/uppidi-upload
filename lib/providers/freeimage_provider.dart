@@ -76,7 +76,7 @@ class FreeImageHostProvider extends BaseHttpProvider {
     return UploadResult(
       success: false,
       errorMessage: 'genericError',
-      rawError: response.data.toString().length < 500 ? response.data.toString() : 'Response too large',
+      rawError: response.data.toString().substring(0, 5000),
       statusCode: response.statusCode,
     );
   }

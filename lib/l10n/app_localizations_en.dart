@@ -85,10 +85,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get proxyUrl => 'Proxy URL';
 
   @override
-  String get providersSection => 'Provider Configuration';
+  String get navProviders => 'Providers';
 
   @override
-  String get navProviders => 'Providers';
+  String get providersSection => 'Provider Configuration';
 
   @override
   String get historyClearAll => 'Clear all';

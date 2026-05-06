@@ -244,13 +244,17 @@ abstract class AppLocalizations {
   /// **'Proxy URL'**
   String get proxyUrl;
 
+  /// No description provided for @navProviders.
+  ///
+  /// In en, this message translates to:
+  /// **'Providers'**
+  String get navProviders;
+
   /// No description provided for @providersSection.
   ///
   /// In en, this message translates to:
   /// **'Provider Configuration'**
   String get providersSection;
-
-  String get navProviders;
 
   /// No description provided for @historyClearAll.
   ///
