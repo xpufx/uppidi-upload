@@ -14,7 +14,7 @@ class FreeImageHostProvider extends BaseHttpProvider {
     String url = 'https://freeimage.host',
   })  : _name = name,
         _url = url,
-        _apiKey = '';
+        _apiKey = '6d207e02198a847aa98d0a2a901485a5';
 
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
