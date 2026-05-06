@@ -66,21 +66,21 @@ class _UppidiAppState extends ConsumerState<UppidiApp> {
   }
 }
 
-enum _NavTab { upload, history, settings, test }
+enum _NavTab { upload, history, providers, settings }
 
 extension on _NavTab {
   String label(AppLocalizations l10n) => switch (this) {
         _NavTab.upload => l10n.upload,
         _NavTab.history => l10n.history,
-        _NavTab.settings => l10n.settings,
-        _NavTab.test => l10n.navTest,
+      _NavTab.providers => l10n.providersSection,
+      _NavTab.settings => l10n.settings,
       };
 
   IconData get icon => switch (this) {
         _NavTab.upload => Icons.cloud_upload,
         _NavTab.history => Icons.history,
-        _NavTab.settings => Icons.settings,
-        _NavTab.test => Icons.network_check,
+      _NavTab.providers => Icons.dns,
+      _NavTab.settings => Icons.settings,
       };
 }
 
@@ -211,8 +211,8 @@ class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
     return switch (_selected) {
       _NavTab.upload => const UploadScreen(),
       _NavTab.history => const HistoryScreen(),
+      _NavTab.providers => const TestScreen(),
       _NavTab.settings => const SettingsScreen(),
-      _NavTab.test => const TestScreen(),
     };
   }
 }

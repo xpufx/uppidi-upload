@@ -17,24 +17,13 @@ import '../core/version.dart';
 import '../core/version_check_provider.dart';
 import '../l10n/app_localizations.dart';
 
-const changeLogText = '''
-v1.0.0+1 (2026-05-04)
-
-Features:
-• Image preview with upload confirmation
-• Dark mode + 6 color theme presets
-• Provider enable/disable + connectivity tests
-• Share URL on upload result and history
-• Drag-and-drop file upload (desktop)
-• Animated upload progress with speed (MB/s)
-• Per-ABI APK builds (~20MB)
-
-Fixes:
-• Cancel upload no longer blocks re-upload
-• Proxy URL now applied to uploads
-• Settings debounce, animation fixes
-• New app icon (light/dark variants)
-''';
+String _readChangelog() {
+  try {
+    return File('CHANGELOG.md').readAsStringSync();
+  } catch (_) {
+    return 'Changelog not available';
+  }
+}
 
 final providerConfigsProvider = FutureProvider.family<Map<String, String>, String>(
   (ref, providerId) async {
@@ -595,7 +584,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                     builder: (ctx) => AlertDialog(
                       title: Text(l10n.changelogTitle),
                       content: SingleChildScrollView(
-                        child: Text(changeLogText),
+                        child: Text(_readChangelog()),
                       ),
                       actions: [
                         TextButton(
