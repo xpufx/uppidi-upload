@@ -36,7 +36,7 @@ echo "   ✅ Changelog updated"
 
 GIT_HASH=$(git rev-parse --short HEAD)
 VERSION=$(grep 'version:' pubspec.yaml | head -1 | awk '{print $2}')
-ARTIFACTS_DIR="/home/oktay/code/uppidi/.caddy-artifacts"
+ARTIFACTS_DIR="/home/xpufx/code/uppidi/.caddy-artifacts"
 mkdir -p "$ARTIFACTS_DIR"
 
 # ── Android APK ────────────────────────────────────────────
