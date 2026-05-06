@@ -89,6 +89,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get providersSection => 'Sağlayıcı Yapılandırması';
 
   @override
+  String get navProviders => 'Sağlayıcılar';
+
+  @override
   String get historyClearAll => 'Tümünü temizle';
 
   @override

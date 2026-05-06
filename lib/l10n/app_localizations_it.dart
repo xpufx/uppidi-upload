@@ -89,6 +89,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get providersSection => 'Configurazione Servizi';
 
   @override
+  String get navProviders => 'Provider';
+
+  @override
   String get historyClearAll => 'Cancella tutto';
 
   @override

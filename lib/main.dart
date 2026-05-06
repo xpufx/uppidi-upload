@@ -72,7 +72,7 @@ extension on _NavTab {
   String label(AppLocalizations l10n) => switch (this) {
         _NavTab.upload => l10n.upload,
         _NavTab.history => l10n.history,
-      _NavTab.providers => l10n.providersSection,
+      _NavTab.providers => l10n.navProviders,
       _NavTab.settings => l10n.settings,
       };
 

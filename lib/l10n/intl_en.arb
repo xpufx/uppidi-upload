@@ -23,6 +23,7 @@
   "historyEmpty": "No upload history yet",
   "enableInsecure": "Allow insecure connections",
   "proxyUrl": "Proxy URL",
+  "navProviders": "Providers",
   "providersSection": "Provider Configuration",
   "historyClearAll": "Clear all",
   "historyClearConfirm": "Delete all history?",

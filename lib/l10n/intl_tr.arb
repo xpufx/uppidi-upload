@@ -23,6 +23,7 @@
   "historyEmpty": "Henüz yükleme geçmişi yok",
   "enableInsecure": "Güvensiz bağlantılara izin ver",
   "proxyUrl": "Proxy URL",
+  "navProviders": "Sağlayıcılar",
   "providersSection": "Sağlayıcı Yapılandırması",
   "historyClearAll": "Tümünü temizle",
   "historyClearConfirm": "Tüm geçmiş silinsin mi?",

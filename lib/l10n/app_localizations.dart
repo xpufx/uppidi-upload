@@ -250,6 +250,8 @@ abstract class AppLocalizations {
   /// **'Provider Configuration'**
   String get providersSection;
 
+  String get navProviders;
+
   /// No description provided for @historyClearAll.
   ///
   /// In en, this message translates to:

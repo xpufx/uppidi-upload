@@ -23,6 +23,7 @@
   "historyEmpty": "Nessun caricamento precedente",
   "enableInsecure": "Consenti connessioni insicure",
   "proxyUrl": "Proxy URL",
+  "navProviders": "Provider",
   "providersSection": "Configurazione Servizi",
   "historyClearAll": "Cancella tutto",
   "historyClearConfirm": "Eliminare toda la cronologia?",

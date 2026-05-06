@@ -88,6 +88,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get providersSection => 'Provider Configuration';
 
   @override
+  String get navProviders => 'Providers';
+
+  @override
   String get historyClearAll => 'Clear all';
 
   @override
