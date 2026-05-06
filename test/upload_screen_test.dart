@@ -21,6 +21,7 @@ import 'package:uppidi_upload/core/settings_service.dart';
 /// Mock UploadNotifier to control initial state
 class MockUploadNotifier extends UploadNotifier {
   final UploadState initialTestState;
+  bool uploadSelectedCalled = false;
 
   MockUploadNotifier({
     required this.initialTestState,
@@ -29,6 +30,12 @@ class MockUploadNotifier extends UploadNotifier {
 
   @override
   UploadState build() => initialTestState;
+
+  @override
+  Future<void> uploadSelected() async {
+    uploadSelectedCalled = true;
+    await super.uploadSelected();
+  }
 }
 
 /// Mock uploader for testing
@@ -36,11 +43,13 @@ class MockUploader implements BaseUploader {
   final String id;
   final String name;
   final bool isImageProvider;
+  final Duration? uploadDelay;
 
   MockUploader({
     this.id = 'mock_provider',
     this.name = 'Mock Provider',
     this.isImageProvider = false,
+    this.uploadDelay,
   });
 
   @override
@@ -80,8 +89,12 @@ class MockUploader implements BaseUploader {
     UploadProgressCallback? onProgress,
     CancelToken? cancelToken,
     Map<String, String> config = const {},
-  }) async =>
-      UploadResult(success: true);
+  }) async {
+    if (uploadDelay != null) {
+      await Future.delayed(uploadDelay!);
+    }
+    return UploadResult(success: true);
+  }
 }
 
 /// Mock provider health info
@@ -636,6 +649,281 @@ void main() {
       expect(find.byType(SettingsScreen), findsOneWidget);
       // The version check icon may or may not be present depending on cdnUrl environment variable
       // Just verify the screen renders without errors
+    });
+  });
+
+  group('Tap Interaction Tests', () {
+    testWidgets('1. Tap quality selector changes value to Medium (1)', (WidgetTester tester) async {
+      final imageUploader = MockUploader(isImageProvider: true);
+      final notifier = MockUploadNotifier(
+        initialTestState: UploadFileSelected(
+          fileName: 'test.png',
+          fileSizeBytes: 1024,
+          mimeType: 'image/png',
+          fileBytes: Uint8List(0),
+          quality: 0,
+          providers: [imageUploader],
+          selectedProviderIndex: 0,
+        ),
+        providers: [imageUploader],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            uploadProvider.overrideWith(() => notifier),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: const UploadScreen()),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify initial quality is 0 (Original)
+      expect(notifier.state, isA<UploadFileSelected>());
+      expect((notifier.state as UploadFileSelected).quality, 0);
+
+      // Find and tap the "Medium" quality option (quality value 1)
+      final mediumOption = find.text('Medium');
+      expect(mediumOption, findsOneWidget);
+      await tester.tap(mediumOption);
+      await tester.pump();
+
+      // Verify quality changed to 1 (Medium)
+      expect(notifier.state, isA<UploadFileSelected>());
+      expect((notifier.state as UploadFileSelected).quality, 1);
+    });
+
+    testWidgets('2. Tap Upload button calls uploadSelected()', (WidgetTester tester) async {
+      final mockUploaders = [MockUploader()];
+      final notifier = MockUploadNotifier(
+        initialTestState: UploadFileSelected(
+          fileName: 'test.pdf',
+          fileSizeBytes: 1024,
+          mimeType: 'application/pdf',
+          fileBytes: Uint8List(0),
+          quality: 0,
+          providers: mockUploaders,
+          selectedProviderIndex: 0,
+        ),
+        providers: mockUploaders,
+      );
+      // Reset spy flag
+      notifier.uploadSelectedCalled = false;
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            uploadProvider.overrideWith(() => notifier),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: const UploadScreen()),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Upload button is present and enabled
+      final uploadButton = find.widgetWithText(ElevatedButton, l10n.upload);
+      expect(uploadButton, findsOneWidget);
+      expect(tester.widget<ElevatedButton>(uploadButton).onPressed, isNotNull);
+
+      // Tap the Upload button
+      await tester.tap(uploadButton);
+      await tester.pump();
+
+      // Verify uploadSelected() was called
+      expect(notifier.uploadSelectedCalled, isTrue);
+    });
+
+    testWidgets('3. Tap Clear button returns to UploadIdle', (WidgetTester tester) async {
+      final mockUploaders = [MockUploader()];
+      final notifier = MockUploadNotifier(
+        initialTestState: UploadFileSelected(
+          fileName: 'test.pdf',
+          fileSizeBytes: 1024,
+          mimeType: 'application/pdf',
+          fileBytes: Uint8List(0),
+          quality: 0,
+          providers: mockUploaders,
+          selectedProviderIndex: 0,
+        ),
+        providers: mockUploaders,
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            uploadProvider.overrideWith(() => notifier),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: const UploadScreen()),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Clear button (close icon) is present
+      final clearButton = find.byIcon(Icons.close);
+      expect(clearButton, findsOneWidget);
+
+      // Tap the Clear button
+      await tester.tap(clearButton);
+      await tester.pumpAndSettle();
+
+      // Verify state is UploadIdle (pick button reappears)
+      expect(notifier.state, isA<UploadIdle>());
+      expect(find.text(l10n.pickAndUpload), findsOneWidget);
+    });
+
+    testWidgets('4. Tap Cancel during upload returns to UploadIdle', (WidgetTester tester) async {
+      final mockUploaders = [MockUploader()];
+      final cancelToken = CancelToken();
+      final notifier = MockUploadNotifier(
+        initialTestState: UploadInProgress(
+          progress: 0.5,
+          cancelToken: cancelToken,
+          sentBytes: 512,
+          totalBytes: 1024,
+          speedLabel: '100 B/s',
+          fileName: 'test.pdf',
+          fileSizeBytes: 1024,
+          mimeType: 'application/pdf',
+          fileBytes: Uint8List(0),
+          providers: mockUploaders,
+          selectedProviderIndex: 0,
+        ),
+        providers: mockUploaders,
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            uploadProvider.overrideWith(() => notifier),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: const UploadScreen()),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Cancel button is present
+      final cancelButton = find.text(l10n.cancelUpload);
+      expect(cancelButton, findsOneWidget);
+
+      // Tap the Cancel button
+      await tester.tap(cancelButton);
+      await tester.pumpAndSettle();
+
+      // Verify state is UploadIdle
+      expect(notifier.state, isA<UploadIdle>());
+      expect(find.text(l10n.pickAndUpload), findsOneWidget);
+    });
+
+    testWidgets('5. Tap Retry on failure calls uploadSelected()', (WidgetTester tester) async {
+      final mockUploaders = [MockUploader()];
+      final notifier = MockUploadNotifier(
+        initialTestState: UploadCompleted(
+          lastResult: UploadResult(success: false, errorMessage: 'Test error'),
+          errorMessage: 'Test error',
+          fileName: 'test.pdf',
+          fileSizeBytes: 1024,
+          mimeType: 'application/pdf',
+          fileBytes: Uint8List(0),
+          providers: mockUploaders,
+          selectedProviderIndex: 0,
+        ),
+        providers: mockUploaders,
+      );
+      // Reset the spy flag
+      notifier.uploadSelectedCalled = false;
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            uploadProvider.overrideWith(() => notifier),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: const UploadScreen()),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Retry button is present
+      final retryButton = find.text(l10n.retry);
+      expect(retryButton, findsOneWidget);
+
+      // Tap the Retry button
+      await tester.tap(retryButton);
+      await tester.pumpAndSettle();
+
+      // Verify uploadSelected() was called
+      expect(notifier.uploadSelectedCalled, isTrue);
+    });
+
+    testWidgets('6. Tap Debug icon shows error dialog', (WidgetTester tester) async {
+      final mockUploaders = [MockUploader()];
+      const errorMessage = 'Test upload error';
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            uploadProvider.overrideWith(() {
+              return MockUploadNotifier(
+                initialTestState: UploadCompleted(
+                  lastResult: UploadResult(success: false, errorMessage: errorMessage),
+                  errorMessage: errorMessage,
+                  fileName: 'test.pdf',
+                  fileSizeBytes: 1024,
+                  mimeType: 'application/pdf',
+                  fileBytes: Uint8List(0),
+                  providers: mockUploaders,
+                  selectedProviderIndex: 0,
+                ),
+                providers: mockUploaders,
+              );
+            }),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: const UploadScreen()),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify Debug icon is present
+      final debugIcon = find.byIcon(Icons.bug_report);
+      expect(debugIcon, findsWidgets);
+
+      // Tap the Debug icon
+      await tester.tap(debugIcon.first);
+      await tester.pumpAndSettle();
+
+      // Verify dialog is shown (AlertDialog)
+      expect(find.byType(AlertDialog), findsOneWidget);
+      // Verify error message is shown in the dialog
+      expect(find.text(errorMessage), findsWidgets);
     });
   });
 }

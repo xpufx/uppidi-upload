@@ -12,7 +12,11 @@ Uppidi Upload is a cross-platform file upload application that lets you upload i
 - Upload history with link management
 - Share uploaded links with templated messages
 - Customizable themes and language settings
-- Provider management with connectivity testing
+- Provider management with health checks and connectivity testing
+- Image quality selector for image uploads to reduce file size
+- File preview with metadata for selected files
+- In-app version checking and one-click updates (Android/Linux)
+- System info capture and sharing
 
 ---
 
@@ -29,13 +33,21 @@ If you're using a web browser and select an unsupported provider, a warning bar 
 ### Step 2: Pick a File
 Tap the **Pick and Upload** button to select a file from your device. On desktop platforms, you can also drag and drop a file anywhere in the app window for quick uploads.
 
-### Step 3: Preview Your File
+### Step 3: Image Quality Selector (Image Files Only)
+When uploading an image, you can choose the desired quality before uploading to reduce file size:
+- **Original**: Full image quality, no compression
+- **Medium (50%)**: Reduces file size by approximately 50% with minimal quality loss
+- **Low (25%)**: Maximum file size reduction, suitable for quick sharing
+
+This selector appears automatically when an image file is selected. The chosen quality applies only to the current upload.
+
+### Step 4: Preview Your File
 Once selected, the app displays:
-- File name, size, and type
+- File name, size, and MIME type
 - Image preview for supported image files
 - Warnings if the file exceeds the provider's size limit or uses an unsupported file type
 
-### Step 4: Start the Upload
+### Step 5: Start the Upload
 Tap the **Upload** button to begin. The upload progress screen shows:
 - Progress percentage and animated progress bar
 - Upload speed (MB/s)
@@ -75,15 +87,19 @@ In the History tab, tap the share icon next to any successful upload entry to sh
 
 ## 5. Provider Management
 
-Access the **Providers** tab (network check icon) to manage your upload providers:
+Access the **Providers** tab (network check icon), formerly the Test tab and positioned before the Settings tab, to manage your upload providers. This page shows all providers, both enabled and disabled.
+
+### Provider Health & Status
+- Broken providers are automatically marked with a warning icon and reason text, appearing disabled by default
+- You can manually override this by toggling the enable switch next to the provider
 
 ### Enable/Disable Providers
 Toggle the switch next to each provider to enable or disable it. Disabled providers will not appear in the Upload tab's provider dropdown.
 
 ### Test Connectivity
-- Tap the **Play** arrow button next to a provider to test its connection
+- Tap the **Play** arrow button next to a provider to test its connection (available for both enabled and disabled providers)
 - Results display online status (green checkmark or red error icon), latency in milliseconds, or specific connection error messages
-- Tap **Test All** to run connectivity checks for all enabled providers at once
+- Tap **Test All** to run connectivity checks for all providers at once
 
 ### Provider Details
 Each provider entry shows:
@@ -91,6 +107,7 @@ Each provider entry shows:
 - Maximum file size limit
 - Allowed file types
 - Expiry information (if the provider automatically deletes files after a period)
+- Current health status and metadata
 
 ---
 
@@ -131,9 +148,6 @@ Switch between available languages using the language dropdown:
 - Türkçe (Turkish)
 - Italiano (Italian)
 
-### Custom Logo
-Tap **Choose Logo** to select a custom image for the app's logo. Once set, tap **Change Logo** to update it.
-
 ### Sharing Preferences
 Set a **Default Share Provider** to automatically use a specific provider when sharing links, or select "Last Used" to remember your most recent choice.
 
@@ -144,11 +158,16 @@ Set a **Default Share Provider** to automatically use a specific provider when s
 ### Provider Configuration
 For providers that require setup (such as Immich, which needs a server URL and API key), enter the required details in the provider's configuration card. Changes are saved automatically as you type.
 
-### Version & Updates
-- View the current app version, Git hash, and number of available providers
-- Tap the refresh icon next to the version info to check for updates
-- If updates are available, download Android APK or Linux builds directly from the Settings screen
-- Tap **View Changelog** to see recent updates and bug fixes
+### About Card (Version & Updates)
+The About card in Settings displays:
+- Current app version, Git hash, and number of available providers
+- **Version Check Button**: Tap to check for available updates
+  - If a new version is available, an orange badge appears showing the new Git hash and a download icon
+  - **Android**: Tapping the download icon installs the update directly via APK
+  - **Linux**: Tapping the download icon provides a direct download link
+  - A download progress dialog shows transfer speed and file size
+- **System Info Button**: Captures build details, platform information, provider states, and current theme configuration. You can copy this information to your clipboard or share it directly
+- **View Changelog**: Tap to see recent updates and bug fixes
 
 ---
 
