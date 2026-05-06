@@ -18,17 +18,17 @@ Widget metadataBadges(ProviderMetadata meta) {
     chips.add(_buildBadge(meta.fileSizeLabel, icon: Icons.storage));
   }
   if (meta.allowedMimeTypes != null) {
-    chips.add(_buildBadge(meta.mimeTypeLabel, icon: mimeIcon(meta)));
+    chips.add(_buildBadge(null, icon: mimeIcon(meta)));
   }
   if (meta.expiryInfo != null && meta.expiryInfo!.isNotEmpty) {
-    chips.add(_buildBadge(meta.expiryInfo!, icon: Icons.timer));
+    chips.add(_buildBadge(meta.expiryInfo!, icon: Icons.calendar_today));
   }
 
   if (chips.isEmpty) return const SizedBox.shrink();
   return Row(mainAxisSize: MainAxisSize.min, children: chips);
 }
 
-Widget _buildBadge(String label, {IconData? icon}) {
+Widget _buildBadge(String? label, {IconData? icon}) {
   return Padding(
     padding: const EdgeInsets.only(left: 4),
     child: Container(
@@ -40,11 +40,12 @@ Widget _buildBadge(String label, {IconData? icon}) {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) ...[
+          if (icon != null)
             Icon(icon, size: 14, color: Colors.blue),
+          if (label != null && label.isNotEmpty) ...[
             const SizedBox(width: 2),
+            Text(label, style: const TextStyle(fontSize: 10, color: Colors.blue)),
           ],
-          Text(label, style: const TextStyle(fontSize: 10, color: Colors.blue)),
         ],
       ),
     ),

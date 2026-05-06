@@ -8,7 +8,7 @@ class TempShProvider extends BaseHttpProvider {
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
     maxFileSizeBytes: 4 * 1024 * 1024 * 1024,
-    expiryInfo: 'Files expire after 3 days',
+    expiryInfo: '3 days',
     supportsDirectLink: true,
   );
 
