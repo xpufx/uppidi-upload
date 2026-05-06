@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' show Platform;
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -355,6 +354,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
     super.initState();
     _proxyController = TextEditingController();
     Future.microtask(_load);
+    Future.microtask(() => ref.read(versionCheckProvider.notifier).check());
     rootBundle.loadString('CHANGELOG.md').then((t) {
       if (mounted) setState(() => _changelogText = t);
     }).catchError((_) {});
@@ -451,38 +451,6 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           }).toList(),
         ),
         const SizedBox(height: 16),
-        // Custom logo
-        Text(l10n.themeCustomLogo, style: Theme.of(context).textTheme.titleSmall),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: AppLogo(size: 72),
-            ),
-            const SizedBox(width: 12),
-            OutlinedButton.icon(
-              onPressed: () async {
-                final result = await FilePicker.pickFiles(type: FileType.image);
-                if (result != null && result.files.isNotEmpty) {
-                  final path = result.files.single.path;
-                  ref.read(logoPathProvider.notifier).setPath(path);
-                }
-              },
-              icon: const Icon(Icons.image, size: 18),
-              label: Text(ref.watch(logoPathProvider) != null ? l10n.changeLogo : l10n.chooseLogo),
-            ),
-            if (ref.watch(logoPathProvider) != null) ...[
-              const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(Icons.restore, size: 18),
-                tooltip: 'Reset to default',
-                onPressed: () => ref.read(logoPathProvider.notifier).setPath(null),
-              ),
-            ],
-          ],
-        ),
-        const SizedBox(height: 8),
         Row(
           children: [
             Text(l10n.language),

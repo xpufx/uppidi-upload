@@ -199,7 +199,7 @@ class UploadNotifier extends Notifier<UploadState> {
               dataStream: Stream.value(outBytes),
             );
             request = newRequest;
-            _log.info('Resized to ${newW}x${newH} ($ratio ratio, ${outBytes.length} bytes)');
+            _log.info('Resized to ${newW}x${newH} ($ratio ratio, $outBytes.length bytes)');
           }
         } catch (e) {
           _log.warn('Resize failed, using original: $e');
