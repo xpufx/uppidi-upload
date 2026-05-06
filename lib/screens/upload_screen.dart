@@ -266,29 +266,9 @@ class _ProviderInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = provider;
     if (p == null) return const SizedBox.shrink();
-    final meta = p.metadata;
-    final infos = <String>[];
-
-    if (meta.fileSizeLabel.isNotEmpty) {
-      infos.add('Max file size: ${meta.fileSizeLabel}');
-    }
-    if (meta.expiryInfo != null && meta.expiryInfo!.isNotEmpty) {
-      infos.add(meta.expiryInfo!);
-    }
-    if (meta.allowedMimeTypes != null) {
-      infos.add(meta.mimeTypeLabel);
-    }
-
-    if (infos.isEmpty) return const SizedBox.shrink();
-
     return Padding(
       padding: const EdgeInsets.only(top: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: infos.map((info) => Text(info,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
-        )).toList(),
-      ),
+      child: _metadataBadges(p.metadata),
     );
   }
 }

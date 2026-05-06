@@ -14,7 +14,13 @@ final localeCodeProvider = FutureProvider<String>((ref) async {
 });
 
 final disabledProviderIdsProvider = FutureProvider<Set<String>>((ref) async {
-  return ref.read(settingsServiceProvider).getDisabledProviders();
+  final userDisabled = await ref.read(settingsServiceProvider).getDisabledProviders();
+  final health = await ref.read(providerHealthProvider.future);
+  final healthDisabled = health.entries
+      .where((e) => e.value.disabled)
+      .map((e) => e.key)
+      .toSet();
+  return {...userDisabled, ...healthDisabled};
 });
 
 final providerHealthProvider = FutureProvider<Map<String, ProviderHealthInfo>>((ref) async {
