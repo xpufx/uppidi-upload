@@ -65,7 +65,6 @@ void main() {
       String describe(UploadState state) => switch (state) {
             UploadIdle() => 'idle',
             UploadFileSelected() => 'file_selected',
-            UploadStarting() => 'starting',
             UploadInProgress() => 'in_progress',
             UploadCompleted() => 'completed',
           };
@@ -75,7 +74,6 @@ void main() {
         describe(UploadFileSelected(fileName: 'a', fileSizeBytes: 1)),
         'file_selected',
       );
-      expect(describe(const UploadStarting()), 'starting');
       expect(
         describe(UploadInProgress(progress: 0, cancelToken: CancelToken())),
         'in_progress',
