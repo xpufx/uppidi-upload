@@ -237,6 +237,8 @@ class UploadNotifier extends Notifier<UploadState> {
       final previewBytes = await ioFile.readAsBytes();
       _log.info('Shared file: $filePath ($mimeType)');
 
+      _lastFilePath = filePath;
+      _lastFileBytes = null;
       state = UploadFileSelected(
         fileName: fileName,
         fileSizeBytes: size,
