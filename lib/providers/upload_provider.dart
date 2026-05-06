@@ -177,35 +177,6 @@ class UploadNotifier extends Notifier<UploadState> {
       var request = await createUploadRequest(file);
       _log.info('File: ${file.name}, size: ${request.sizeInBytes}, mime: ${request.mimeType}');
 
-      // Resize image if quality selected
-      if (_selectedQuality > 0 && request.mimeType?.startsWith('image/') == true) {
-        try {
-          final bytes = file.bytes ?? await File(file.path!).readAsBytes();
-          final src = img.decodeImage(bytes);
-          if (src != null) {
-            final ratio = _selectedQuality == 1 ? 0.5 : 0.25;
-            final newW = (src.width * ratio).round();
-            final newH = (src.height * ratio).round();
-            final resized = img.copyResize(src, width: newW, height: newH);
-            final outBytes = img.encodeJpg(resized, quality: 85);
-            final fileName = file.name.replaceAll(RegExp(r'\.\w+$'), '.jpg');
-            _lastFilePath = null;
-            _lastFileBytes = outBytes;
-            // Recreate request with resized bytes
-            final newRequest = FileUploadRequest(
-              fileName: fileName,
-              mimeType: 'image/jpeg',
-              sizeInBytes: outBytes.length,
-              dataStream: Stream.value(outBytes),
-            );
-            request = newRequest;
-            _log.info('Resized to ${newW}x${newH} ($ratio ratio, $outBytes.length bytes)');
-          }
-        } catch (e) {
-          _log.warn('Resize failed, using original: $e');
-        }
-      }
-
       // Read preview bytes
       Uint8List? previewBytes;
       if (_lastFileBytes != null) {
@@ -263,7 +234,33 @@ class UploadNotifier extends Notifier<UploadState> {
       );
     }
     if (request == null) return;
-    await _executeUpload(request);
+    var finalReq = request;
+
+    // Resize image if quality selected
+    if (_selectedQuality > 0 && finalReq.mimeType?.startsWith('image/') == true && _lastFileBytes != null) {
+      try {
+        final src = img.decodeImage(_lastFileBytes!);
+        if (src != null) {
+          final ratio = _selectedQuality == 1 ? 0.5 : 0.25;
+          final newW = (src.width * ratio).round();
+          final newH = (src.height * ratio).round();
+          final resized = img.copyResize(src, width: newW, height: newH);
+          final outBytes = img.encodeJpg(resized, quality: 85);
+          final fileName = (finalReq.fileName ?? 'image').replaceAll(RegExp(r'\.\w+$'), '.jpg');
+          finalReq = FileUploadRequest(
+            fileName: fileName,
+            mimeType: 'image/jpeg',
+            sizeInBytes: outBytes.length,
+            dataStream: Stream.value(outBytes),
+          );
+          _log.info('Resized to ${newW}x${newH} ($ratio ratio, $outBytes.length bytes)');
+        }
+      } catch (e) {
+        _log.warn('Resize failed, using original: $e');
+      }
+    }
+
+    await _executeUpload(finalReq);
   }
 
   Future<void> uploadFromFile(String filePath, String? mimeType) async {
