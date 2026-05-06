@@ -159,6 +159,9 @@ class MockHistoryService implements HistoryService {
     _storage.clear();
     records.clear();
   }
+
+  @override
+  Future<void> close() async {}
 }
 
 // End mock classes
