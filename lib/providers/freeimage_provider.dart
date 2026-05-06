@@ -54,6 +54,15 @@ class FreeImageHostProvider extends BaseHttpProvider {
 
   @override
   UploadResult parseResponse(Response response) {
+    final body = response.data.toString();
+    if (body.trimLeft().startsWith('<!DOCTYPE') || body.trimLeft().startsWith('<html')) {
+      return UploadResult(
+        success: false,
+        errorMessage: 'genericError',
+        rawError: 'Unexpected HTML response — API endpoint may have changed.',
+        statusCode: response.statusCode,
+      );
+    }
     if (response.statusCode == 200 && response.data is Map) {
       final data = response.data as Map<String, dynamic>;
       final image = data['image'] as Map<String, dynamic>?;
