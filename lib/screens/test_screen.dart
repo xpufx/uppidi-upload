@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/connectivity.dart';
+import '../core/metadata_badges.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
 import '../l10n/app_localizations.dart';
@@ -77,21 +78,6 @@ class _ProviderRow extends ConsumerWidget {
   final ProviderHealthInfo? health;
   const _ProviderRow({required this.provider, required this.isEnabled, this.health});
 
-  String _buildMetadataString() {
-    final meta = provider.metadata;
-    final parts = <String>[];
-    if (meta.fileSizeLabel.isNotEmpty) {
-      parts.add('Max: ${meta.fileSizeLabel}');
-    }
-    if (meta.mimeTypeLabel.isNotEmpty) {
-      parts.add(meta.mimeTypeLabel);
-    }
-    if (meta.expiryInfo != null && meta.expiryInfo!.isNotEmpty) {
-      parts.add(meta.expiryInfo!);
-    }
-    return parts.join(' · ');
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
@@ -99,8 +85,6 @@ class _ProviderRow extends ConsumerWidget {
     final testState = testStates[provider.providerId];
     final isLoading = testState != null && testState.isLoading;
     final result = testState?.maybeWhen(data: (r) => r, orElse: () => null);
-
-    final metadataStr = _buildMetadataString();
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -141,10 +125,7 @@ class _ProviderRow extends ConsumerWidget {
                             ],
                           ),
                         ),
-                      if (metadataStr.isNotEmpty) ...[
-                        const SizedBox(height: 2),
-                        Text(metadataStr, style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
-                      ],
+                      metadataBadges(provider.metadata),
                     ],
                   ),
                 ),

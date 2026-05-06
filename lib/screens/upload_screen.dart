@@ -9,8 +9,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../core/format.dart';
 import '../core/interfaces/uploader.dart';
+import '../core/metadata_badges.dart';
 import '../core/models/upload_result.dart';
-import '../core/models/provider_metadata.dart';
 import '../core/share_message_dialog.dart';
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
@@ -198,64 +198,13 @@ class _ProviderDropdown extends StatelessWidget {
               const SizedBox(width: 8),
               Text(p.providerName,
                 style: online ? null : TextStyle(color: Theme.of(context).disabledColor)),
-              _metadataBadges(p.metadata),
+              metadataBadges(p.metadata),
             ],
           ),
         );
       }).toList(),
     );
   }
-}
-
-Widget _metadataBadges(ProviderMetadata meta) {
-  final chips = <Widget>[];
-
-  if (meta.fileSizeLabel.isNotEmpty) {
-    chips.add(_buildBadge(meta.fileSizeLabel, icon: Icons.storage));
-  }
-  if (meta.allowedMimeTypes != null) {
-    chips.add(_buildBadge(meta.mimeTypeLabel, icon: _mimeIcon(meta)));
-  }
-  if (meta.expiryInfo != null && meta.expiryInfo!.isNotEmpty) {
-    chips.add(_buildBadge(meta.expiryInfo!, icon: Icons.timer));
-  }
-
-  if (chips.isEmpty) return const SizedBox.shrink();
-
-  return Row(mainAxisSize: MainAxisSize.min, children: chips);
-}
-
-IconData _mimeIcon(ProviderMetadata meta) {
-  final types = meta.allowedMimeTypes;
-  if (types == null || types.isEmpty) return Icons.insert_drive_file;
-  final allImages = types.every((t) => t.startsWith('image/'));
-  if (allImages) return Icons.image;
-  final allVideo = types.every((t) => t.startsWith('video/'));
-  if (allVideo) return Icons.video_file;
-  return Icons.insert_drive_file;
-}
-
-Widget _buildBadge(String label, {IconData? icon}) {
-  return Padding(
-    padding: const EdgeInsets.only(left: 4),
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 14, color: Colors.blue),
-            const SizedBox(width: 2),
-          ],
-          Text(label, style: const TextStyle(fontSize: 10, color: Colors.blue)),
-        ],
-      ),
-    ),
-  );
 }
 
 class _ProviderInfo extends StatelessWidget {
@@ -268,7 +217,7 @@ class _ProviderInfo extends StatelessWidget {
     if (p == null) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(top: 8),
-      child: _metadataBadges(p.metadata),
+      child: metadataBadges(p.metadata),
     );
   }
 }
