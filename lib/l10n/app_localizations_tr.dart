@@ -236,4 +236,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get customizeMessage => 'Özelleştir:';
+
+  @override
+  String get qualityOriginal => 'Orijinal';
+
+  @override
+  String get qualityMedium => 'Orta (1920px)';
+
+  @override
+  String get qualityLow => 'Düşük (800px)';
 }

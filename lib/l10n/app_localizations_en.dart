@@ -234,4 +234,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get customizeMessage => 'Customize:';
+
+  @override
+  String get qualityOriginal => 'Original';
+
+  @override
+  String get qualityMedium => 'Medium (1920px)';
+
+  @override
+  String get qualityLow => 'Low (800px)';
 }
