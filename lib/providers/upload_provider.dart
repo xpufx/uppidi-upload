@@ -262,16 +262,22 @@ class UploadNotifier extends Notifier<UploadState> {
           final ratio = _selectedQuality == 1 ? 0.5 : 0.25;
           final newW = (src.width * ratio).round();
           final newH = (src.height * ratio).round();
+          final jpegQuality = _selectedQuality == 1 ? 75 : 50;
           final resized = img.copyResize(src, width: newW, height: newH);
-          final outBytes = img.encodeJpg(resized, quality: 85);
-          final fileName = (finalReq.fileName ?? 'image').replaceAll(RegExp(r'\.\w+$'), '.jpg');
-          finalReq = FileUploadRequest(
-            fileName: fileName,
-            mimeType: 'image/jpeg',
-            sizeInBytes: outBytes.length,
-            dataStream: Stream.value(outBytes),
-          );
-          _log.info('Resized to ${newW}x${newH} ($ratio ratio, $outBytes.length bytes)');
+          final outBytes = img.encodeJpg(resized, quality: jpegQuality);
+          // Skip resize if output isn't meaningfully smaller
+          if (outBytes.length >= (finalReq.sizeInBytes * 0.9)) {
+            _log.info('Resize skipped — output not smaller than original');
+          } else {
+            final fileName = (finalReq.fileName ?? 'image').replaceAll(RegExp(r'\.\w+$'), '.jpg');
+            finalReq = FileUploadRequest(
+              fileName: fileName,
+              mimeType: 'image/jpeg',
+              sizeInBytes: outBytes.length,
+              dataStream: Stream.value(outBytes),
+            );
+            _log.info('Resized to ${newW}x${newH} ($ratio ratio, $outBytes.length bytes, Q$jpegQuality)');
+          }
         }
       } catch (e) {
         _log.warn('Resize failed, using original: $e');
