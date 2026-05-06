@@ -17,14 +17,6 @@ import '../core/version.dart';
 import '../core/version_check_provider.dart';
 import '../l10n/app_localizations.dart';
 
-String _readChangelog() {
-  try {
-    return File('CHANGELOG.md').readAsStringSync();
-  } catch (_) {
-    return 'Changelog not available';
-  }
-}
-
 final providerConfigsProvider = FutureProvider.family<Map<String, String>, String>(
   (ref, providerId) async {
     final svc = ref.read(settingsServiceProvider);
@@ -323,13 +315,16 @@ class _GlobalToggles extends ConsumerStatefulWidget {
 class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
   late TextEditingController _proxyController;
   Timer? _proxyDebounce;
+  String _changelogText = 'Changelog not available';
 
   @override
   void initState() {
     super.initState();
     _proxyController = TextEditingController();
     Future.microtask(_load);
-    Future.microtask(() => ref.read(versionCheckProvider.notifier).check());
+    rootBundle.loadString('CHANGELOG.md').then((t) {
+      if (mounted) setState(() => _changelogText = t);
+    }).catchError((_) {});
   }
 
   @override
@@ -644,7 +639,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                     builder: (ctx) => AlertDialog(
                       title: Text(l10n.changelogTitle),
                       content: SingleChildScrollView(
-                        child: Text(_readChangelog()),
+                        child: Text(_changelogText),
                       ),
                       actions: [
                         TextButton(

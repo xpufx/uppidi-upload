@@ -73,10 +73,11 @@ class FreeImageHostProvider extends BaseHttpProvider {
       }
     }
 
+    final raw = response.data.toString();
     return UploadResult(
       success: false,
       errorMessage: 'genericError',
-      rawError: response.data.toString().substring(0, 5000),
+      rawError: raw.length > 5000 ? '${raw.substring(0, 5000)}\n[truncated]' : raw,
       statusCode: response.statusCode,
     );
   }
