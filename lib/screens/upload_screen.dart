@@ -237,22 +237,16 @@ IconData _mimeIcon(ProviderMetadata meta) {
 
 Widget _buildBadge(String label, {IconData? icon}) {
   return Padding(
-    padding: const EdgeInsets.only(left: 4),
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 12, color: Colors.blue),
-            const SizedBox(width: 2),
-          ],
-          Text(label, style: const TextStyle(fontSize: 10, color: Colors.blue)),
-        ],
+    padding: const EdgeInsets.only(left: 2),
+    child: Tooltip(
+      message: label,
+      child: Container(
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: Colors.blue.shade50,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Icon(icon ?? Icons.info, size: 14, color: Colors.blue),
       ),
     ),
   );
