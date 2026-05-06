@@ -1,5 +1,6 @@
 # Changelog
 
+- docs: auto-update changelog
 - fix: changelog from assets (runtime load), rootBundle instead of File
 - fix: increase raw response capture to 5000 chars for freeimage debug
 - fix: freeimage parseResponse — include raw response on failure, Providers nav label
@@ -29,4 +30,3 @@
 - fix: broken test import — package renamed from uppidi to uppidi_upload
 - docs: auto-update changelog
 - feat: share button on upload debug modal — consistent with system info
-- docs: auto-update changelog
