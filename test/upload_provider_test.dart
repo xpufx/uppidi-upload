@@ -395,4 +395,81 @@ void main() {
       expect(state.selectedProviderIndex, 0); // Provider selection preserved
     });
   });
+
+  group('UploadCompleted Regression Tests', () {
+    test('Successful upload sets lastResult.url to expected value', () async {
+      final notifier = container.read(uploadProvider.notifier);
+      mockUploaders[0].uploadCallback = (request, {onProgress, cancelToken, config = const {}}) async {
+        return UploadResult(success: true, url: 'https://example.com/test.png', completedAt: DateTime.now());
+      };
+      await notifier.uploadFromFile(testFile.path, 'text/plain');
+      await notifier.uploadSelected();
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      expect(notifier.state, isA<UploadCompleted>());
+      final state = notifier.state as UploadCompleted;
+      expect(state.lastResult.url, isNotNull);
+      expect(state.lastResult.url, 'https://example.com/test.png');
+    });
+
+    test('Successful upload sets isSuccess to true', () async {
+      final notifier = container.read(uploadProvider.notifier);
+      mockUploaders[0].uploadCallback = (request, {onProgress, cancelToken, config = const {}}) async {
+        return UploadResult(success: true, url: 'https://example.com/test.png', completedAt: DateTime.now());
+      };
+      await notifier.uploadFromFile(testFile.path, 'text/plain');
+      await notifier.uploadSelected();
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      expect(notifier.state, isA<UploadCompleted>());
+      final state = notifier.state as UploadCompleted;
+      expect(state.isSuccess, isTrue);
+      expect(state.lastResult.success, isTrue);
+    });
+
+    test('Successful upload preserves file info in UploadCompleted', () async {
+      final notifier = container.read(uploadProvider.notifier);
+      mockUploaders[0].uploadCallback = (request, {onProgress, cancelToken, config = const {}}) async {
+        return UploadResult(success: true, url: 'https://example.com/test.png', completedAt: DateTime.now());
+      };
+      const testMimeType = 'text/plain';
+      await notifier.uploadFromFile(testFile.path, testMimeType);
+      final expectedFileName = testFile.uri.pathSegments.last;
+      final expectedFileSize = await testFile.length();
+
+      await notifier.uploadSelected();
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      expect(notifier.state, isA<UploadCompleted>());
+      final state = notifier.state as UploadCompleted;
+      expect(state.fileName, expectedFileName);
+      expect(state.fileSizeBytes, expectedFileSize);
+      expect(state.mimeType, testMimeType);
+    });
+
+    test('setProvider preserves file info when transitioning from UploadCompleted', () async {
+      final notifier = container.read(uploadProvider.notifier);
+      mockUploaders[0].uploadCallback = (request, {onProgress, cancelToken, config = const {}}) async {
+        return UploadResult(success: true, url: 'https://example.com/test.png', completedAt: DateTime.now());
+      };
+      await notifier.uploadFromFile(testFile.path, 'text/plain');
+      await notifier.uploadSelected();
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      expect(notifier.state, isA<UploadCompleted>());
+      final completedState = notifier.state as UploadCompleted;
+      final originalFileName = completedState.fileName;
+      final originalFileSize = completedState.fileSizeBytes;
+      final originalMimeType = completedState.mimeType;
+
+      notifier.setProvider(1);
+
+      expect(notifier.state, isA<UploadFileSelected>());
+      final selectedState = notifier.state as UploadFileSelected;
+      expect(selectedState.fileName, originalFileName);
+      expect(selectedState.fileSizeBytes, originalFileSize);
+      expect(selectedState.mimeType, originalMimeType);
+      expect(selectedState.selectedProviderIndex, 1);
+    });
+  });
 }

@@ -26,10 +26,8 @@ echo "   ✅ No hardcoded strings found"
 
 # ── Auto-generate changelog ──────────────────────────────────
 echo "==> Updating CHANGELOG.md..."
-cat > CHANGELOG.md <<'CHANGELOG_HEADER'
-# Changelog
-
-CHANGELOG_HEADER
+echo "# Changelog" > CHANGELOG.md
+echo "" >> CHANGELOG.md
 
 git log --oneline --format="- %s" | head -30 >> CHANGELOG.md
 git add CHANGELOG.md 2>/dev/null
