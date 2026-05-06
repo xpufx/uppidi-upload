@@ -69,5 +69,8 @@
   "includeMessage": "Includi messaggio",
   "templateVars": "Variabili Template",
   "templateExamples": "Esempi:",
-  "customizeMessage": "Personalizza:"
+  "customizeMessage": "Personalizza:",
+  "qualityOriginal": "Originale",
+  "qualityMedium": "Media (1920px)",
+  "qualityLow": "Bassa (800px)"
 }

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image/image.dart' as img;
 
 import '../core/history_service.dart';
 import '../core/interfaces/uploader.dart';
@@ -107,10 +108,18 @@ class UploadNotifier extends Notifier<UploadState> {
     List<BaseUploader>? providers,
   })  : _injectedProviders = providers;
 
+  int _selectedQuality = 0; // 0=original, 1=medium (50%), 2=low (25%)
+
   String? _lastFilePath;
   Uint8List? _lastFileBytes;
   DateTime _lastSpeedSample = DateTime.now();
   int _lastSampleBytes = 0;
+
+  int get quality => _selectedQuality;
+
+  void setQuality(int q) {
+    _selectedQuality = q;
+  }
 
   @override
   UploadState build() {
@@ -165,12 +174,43 @@ class UploadNotifier extends Notifier<UploadState> {
     _lastFileBytes = file.bytes;
 
     try {
-      final request = await createUploadRequest(file);
+      var request = await createUploadRequest(file);
       _log.info('File: ${file.name}, size: ${request.sizeInBytes}, mime: ${request.mimeType}');
+
+      // Resize image if quality selected
+      if (_selectedQuality > 0 && request.mimeType?.startsWith('image/') == true) {
+        try {
+          final bytes = file.bytes ?? await File(file.path!).readAsBytes();
+          final src = img.decodeImage(bytes);
+          if (src != null) {
+            final ratio = _selectedQuality == 1 ? 0.5 : 0.25;
+            final newW = (src.width * ratio).round();
+            final newH = (src.height * ratio).round();
+            final resized = img.copyResize(src, width: newW, height: newH);
+            final outBytes = img.encodeJpg(resized, quality: 85);
+            final fileName = file.name.replaceAll(RegExp(r'\.\w+$'), '.jpg');
+            _lastFilePath = null;
+            _lastFileBytes = outBytes;
+            // Recreate request with resized bytes
+            final newRequest = FileUploadRequest(
+              fileName: fileName,
+              mimeType: 'image/jpeg',
+              sizeInBytes: outBytes.length,
+              dataStream: Stream.value(outBytes),
+            );
+            request = newRequest;
+            _log.info('Resized to ${newW}x${newH} ($ratio ratio, ${outBytes.length} bytes)');
+          }
+        } catch (e) {
+          _log.warn('Resize failed, using original: $e');
+        }
+      }
 
       // Read preview bytes
       Uint8List? previewBytes;
-      if (file.bytes != null) {
+      if (_lastFileBytes != null) {
+        previewBytes = _lastFileBytes;
+      } else if (file.bytes != null) {
         previewBytes = file.bytes;
       } else if (file.path != null) {
         previewBytes = await File(file.path!).readAsBytes();

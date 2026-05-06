@@ -333,14 +333,44 @@ class _FileSelectedButtons extends ConsumerWidget {
   const _FileSelectedButtons({required this.notifier});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Row(
+    final state = ref.watch(uploadProvider);
+    final mimeType = state is UploadFileSelected ? state.mimeType : null;
+    final showQuality = mimeType?.startsWith('image/') == true;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _UploadButton(notifier: notifier)),
-        const SizedBox(width: 8),
-        IconButton(
-          icon: const Icon(Icons.close, size: 20),
-          tooltip: 'Clear selection',
-          onPressed: () => notifier.clearSelection(),
+        if (showQuality) ...[
+          Row(
+            children: [
+              const Text('Quality: ', style: TextStyle(fontSize: 12)),
+              const SizedBox(width: 8),
+              SegmentedButton<int>(
+                segments: const [
+                  ButtonSegment(value: 0, label: Text('Original'), icon: Icon(Icons.high_quality, size: 16)),
+                  ButtonSegment(value: 1, label: Text('Medium'), icon: Icon(Icons.photo_size_select_large, size: 16)),
+                  ButtonSegment(value: 2, label: Text('Low'), icon: Icon(Icons.photo_size_select_small, size: 16)),
+                ],
+                selected: {notifier.quality},
+                onSelectionChanged: (v) => notifier.setQuality(v.first),
+                style: ButtonStyle(
+                  visualDensity: VisualDensity.compact,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+        ],
+        Row(
+          children: [
+            Expanded(child: _UploadButton(notifier: notifier)),
+            const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.close, size: 20),
+              tooltip: 'Clear selection',
+              onPressed: () => notifier.clearSelection(),
+            ),
+          ],
         ),
       ],
     );

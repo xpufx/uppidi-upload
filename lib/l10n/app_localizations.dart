@@ -525,6 +525,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Customize:'**
   String get customizeMessage;
+
+  /// No description provided for @qualityOriginal.
+  ///
+  /// In en, this message translates to:
+  /// **'Original'**
+  String get qualityOriginal;
+
+  /// No description provided for @qualityMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium (1920px)'**
+  String get qualityMedium;
+
+  /// No description provided for @qualityLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low (800px)'**
+  String get qualityLow;
 }
 
 class _AppLocalizationsDelegate

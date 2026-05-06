@@ -69,5 +69,8 @@
   "includeMessage": "Mesaj ekle",
   "templateVars": "Şablon Değişkenleri",
   "templateExamples": "Örnekler:",
-  "customizeMessage": "Özelleştir:"
+  "customizeMessage": "Özelleştir:",
+  "qualityOriginal": "Orijinal",
+  "qualityMedium": "Orta (1920px)",
+  "qualityLow": "Düşük (800px)"
 }
