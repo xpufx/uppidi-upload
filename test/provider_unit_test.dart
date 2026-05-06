@@ -415,9 +415,9 @@ void main() {
       expect(result.success, isFalse);
     });
 
-    test('endpoint includes format query param', () {
+    test('endpoint includes format and api key', () {
       expect(provider.uploadEndpoint, contains('format=json'));
-      expect(provider.uploadEndpoint, isNot(contains('key='))); // No API key by default
+      expect(provider.uploadEndpoint, contains('key='));
     });
 
     test('client uses correct baseUrl', () async {
