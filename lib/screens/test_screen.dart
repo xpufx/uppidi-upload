@@ -14,6 +14,7 @@ class TestScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final allProviders = ProviderRegistry.all;
     final enabled = ref.watch(enabledProvidersProvider);
+    final health = ref.watch(providerHealthProvider).asData?.value ?? {};
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -40,6 +41,7 @@ class TestScreen extends ConsumerWidget {
         ...allProviders.map((p) => _ProviderRow(
           provider: p,
           isEnabled: enabled.any((e) => e.providerId == p.providerId),
+          health: health[p.providerId],
         )),
       ],
     );
@@ -72,7 +74,8 @@ class _TestResult {
 class _ProviderRow extends ConsumerWidget {
   final BaseUploader provider;
   final bool isEnabled;
-  const _ProviderRow({required this.provider, required this.isEnabled});
+  final ProviderHealthInfo? health;
+  const _ProviderRow({required this.provider, required this.isEnabled, this.health});
 
   String _buildMetadataString() {
     final meta = provider.metadata;
@@ -124,6 +127,20 @@ class _ProviderRow extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(provider.providerName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      if (health?.disabled == true)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Row(
+                            children: [
+                              Icon(Icons.warning_amber, size: 12, color: Colors.orange),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(health?.reason ?? 'Currently unavailable',
+                                  style: const TextStyle(fontSize: 10, color: Colors.orange)),
+                              ),
+                            ],
+                          ),
+                        ),
                       if (metadataStr.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(metadataStr, style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
