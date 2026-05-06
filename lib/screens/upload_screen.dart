@@ -211,13 +211,13 @@ Widget _metadataBadges(ProviderMetadata meta) {
   final chips = <Widget>[];
 
   if (meta.fileSizeLabel is String && (meta.fileSizeLabel as String).isNotEmpty) {
-    chips.add(_buildBadge(meta.fileSizeLabel as String));
+    chips.add(_buildBadge(meta.fileSizeLabel as String, icon: Icons.storage));
   }
   if (meta.allowedMimeTypes != null) {
-    chips.add(_buildBadge(meta.mimeTypeLabel as String));
+    chips.add(_buildBadge(meta.mimeTypeLabel as String, icon: _mimeIcon(meta)));
   }
   if (meta.expiryInfo is String && (meta.expiryInfo as String).isNotEmpty) {
-    chips.add(_buildBadge(meta.expiryInfo as String));
+    chips.add(_buildBadge(meta.expiryInfo as String, icon: Icons.timer));
   }
 
   if (chips.isEmpty) return const SizedBox.shrink();
@@ -225,7 +225,17 @@ Widget _metadataBadges(ProviderMetadata meta) {
   return Row(mainAxisSize: MainAxisSize.min, children: chips);
 }
 
-Widget _buildBadge(String label) {
+IconData _mimeIcon(ProviderMetadata meta) {
+  final types = meta.allowedMimeTypes;
+  if (types == null || types.isEmpty) return Icons.insert_drive_file;
+  final allImages = types.every((t) => t.startsWith('image/'));
+  if (allImages) return Icons.image;
+  final allVideo = types.every((t) => t.startsWith('video/'));
+  if (allVideo) return Icons.video_file;
+  return Icons.insert_drive_file;
+}
+
+Widget _buildBadge(String label, {IconData? icon}) {
   return Padding(
     padding: const EdgeInsets.only(left: 4),
     child: Container(
@@ -234,7 +244,16 @@ Widget _buildBadge(String label) {
         color: Colors.blue.shade50,
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(label, style: const TextStyle(fontSize: 10, color: Colors.blue)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 12, color: Colors.blue),
+            const SizedBox(width: 2),
+          ],
+          Text(label, style: const TextStyle(fontSize: 10, color: Colors.blue)),
+        ],
+      ),
     ),
   );
 }
