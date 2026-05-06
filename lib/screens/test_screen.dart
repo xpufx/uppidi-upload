@@ -158,7 +158,7 @@ class _ProviderRow extends ConsumerWidget {
                 ),
                 Switch(
                   value: isEnabled,
-                  onChanged: (v) async {
+                  onChanged: health?.disabled == true ? null : (v) async {
                     final svc = ref.read(settingsServiceProvider);
                     final current = await svc.getDisabledProviders();
                     if (v) {

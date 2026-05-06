@@ -39,12 +39,14 @@ final class UploadFileSelected extends UploadState {
   final int fileSizeBytes;
   final String? mimeType;
   final Uint8List? fileBytes;
+  final int quality;
 
   const UploadFileSelected({
     required this.fileName,
     required this.fileSizeBytes,
     this.mimeType,
     this.fileBytes,
+    this.quality = 0,
     super.results,
     super.selectedProviderIndex,
     super.providers,
@@ -119,6 +121,20 @@ class UploadNotifier extends Notifier<UploadState> {
 
   void setQuality(int q) {
     _selectedQuality = q;
+    // Update state if file is selected
+    if (state is UploadFileSelected) {
+      final prev = state as UploadFileSelected;
+      state = UploadFileSelected(
+        fileName: prev.fileName,
+        fileSizeBytes: prev.fileSizeBytes,
+        mimeType: prev.mimeType,
+        fileBytes: prev.fileBytes,
+        quality: q,
+        results: prev.results,
+        selectedProviderIndex: prev.selectedProviderIndex,
+        providers: prev.providers,
+      );
+    }
   }
 
   @override
@@ -136,6 +152,7 @@ class UploadNotifier extends Notifier<UploadState> {
           fileSizeBytes: prev.fileSizeBytes,
           mimeType: prev.mimeType,
           fileBytes: prev.fileBytes,
+          quality: prev.quality,
           results: prev.results,
           selectedProviderIndex: index,
           providers: prev.providers,
@@ -193,6 +210,7 @@ class UploadNotifier extends Notifier<UploadState> {
         fileSizeBytes: request.sizeInBytes,
         mimeType: request.mimeType,
         fileBytes: previewBytes,
+        quality: _selectedQuality,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -281,6 +299,7 @@ class UploadNotifier extends Notifier<UploadState> {
         fileSizeBytes: size,
         mimeType: mimeType,
         fileBytes: previewBytes,
+        quality: _selectedQuality,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,

@@ -310,7 +310,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                           },
                           child: Padding(
                             padding: const EdgeInsets.only(right: 4),
-                            child: Icon(Icons.download, size: 16, color: Colors.orange.shade600),
+                            child: Icon(Icons.download, size: 24, color: Colors.orange.shade600),
                           ),
                         ),
                       Container(

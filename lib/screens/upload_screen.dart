@@ -248,7 +248,7 @@ Widget _buildBadge(String label, {IconData? icon}) {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 12, color: Colors.blue),
+            Icon(icon, size: 14, color: Colors.blue),
             const SizedBox(width: 2),
           ],
           Text(label, style: const TextStyle(fontSize: 10, color: Colors.blue)),
@@ -315,6 +315,7 @@ class _FileSelectedButtons extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(uploadProvider);
     final mimeType = state is UploadFileSelected ? state.mimeType : null;
+    final quality = state is UploadFileSelected ? state.quality : 0;
     final showQuality = mimeType?.startsWith('image/') == true;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,7 +331,7 @@ class _FileSelectedButtons extends ConsumerWidget {
                   ButtonSegment(value: 1, label: Text('Medium'), icon: Icon(Icons.photo_size_select_large, size: 16)),
                   ButtonSegment(value: 2, label: Text('Low'), icon: Icon(Icons.photo_size_select_small, size: 16)),
                 ],
-                selected: {notifier.quality},
+                selected: {quality},
                 onSelectionChanged: (v) => notifier.setQuality(v.first),
                 style: ButtonStyle(
                   visualDensity: VisualDensity.compact,
