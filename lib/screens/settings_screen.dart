@@ -256,7 +256,7 @@ class _VersionCheckWidget extends ConsumerWidget {
     }
 
     return SizedBox(
-      width: 90,
+      width: 120,
       height: 32,
       child: Align(
         alignment: Alignment.centerRight,
@@ -273,16 +273,34 @@ class _VersionCheckWidget extends ConsumerWidget {
                     child: CircularProgressIndicator(strokeWidth: 1.5),
                   ),
                 VersionCheckState.upToDate => const Icon(Icons.check_circle, size: 14, color: Colors.green),
-                VersionCheckState.updateAvailable => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade100,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      notifier.latestHash ?? '',
-                      style: const TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.w600),
-                    ),
+                VersionCheckState.updateAvailable => Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade100,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          notifier.latestHash ?? '',
+                          style: const TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      if (cdnUrl.isNotEmpty) GestureDetector(
+                        onTap: () {
+                          if (Platform.isAndroid) {
+                            downloadAndInstallApk('$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk');
+                          } else {
+                            launchUrl(Uri.parse('$cdnUrl/uppidi-upload-latest-linux.tar.gz'), mode: LaunchMode.externalApplication);
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: Icon(Icons.download, size: 14, color: Colors.orange.shade600),
+                        ),
+                      ),
+                    ],
                   ),
               },
               if (ageText != null)
@@ -545,9 +563,51 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                         icon: const Icon(Icons.android, size: 20),
                         tooltip: 'Download Android APK',
                         onPressed: () async {
+                          var received = 0;
+                          var total = 0;
+                          var speed = 0;
+                          void Function(void Function())? update;
+
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (_) => StatefulBuilder(
+                              builder: (ctx, setState) {
+                                update = setState;
+                                final totalStr = total > 0 ? '${(total / 1048576).toStringAsFixed(1)} MB' : '?';
+                                final speedStr = speed > 0 ? '${(speed / 1048576).toStringAsFixed(1)} MB/s' : '';
+                                final pct = total > 0 ? received / total : null;
+                                return AlertDialog(
+                                  title: const Text('Downloading APK'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (pct != null)
+                                        LinearProgressIndicator(value: pct)
+                                      else
+                                        const LinearProgressIndicator(),
+                                      const SizedBox(height: 8),
+                                      Text('${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
+                                        style: const TextStyle(fontSize: 12)),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          );
                           try {
-                            await downloadAndInstallApk('$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk');
+                            await downloadAndInstallApk(
+                              '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk',
+                              onProgress: (r, t, s) {
+                                received = r;
+                                total = t;
+                                speed = s;
+                                update?.call(() {});
+                              },
+                            );
+                            if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
                           } catch (e) {
+                            if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('Download failed: $e')),
