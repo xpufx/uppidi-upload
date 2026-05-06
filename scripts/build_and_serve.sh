@@ -5,7 +5,7 @@ export ANDROID_HOME="$HOME/.android"
 export ANDROID_SDK_ROOT="$ANDROID_HOME"
 export PATH="$HOME/.flutter/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
 
-cd /home/oktay/code/uppidi
+cd /home/xpufx/code/uppidi
 
 # ── Hardcoded string check ──────────────────────────────────
 echo "==> Checking for hardcoded strings..."

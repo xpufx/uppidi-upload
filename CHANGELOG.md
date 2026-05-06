@@ -1,1 +1,32 @@
 # Changelog
+
+- fix: changelog from assets (runtime load), rootBundle instead of File
+- fix: increase raw response capture to 5000 chars for freeimage debug
+- fix: freeimage parseResponse — include raw response on failure, Providers nav label
+- feat: download progress dialog, install icon on version badge, icon+text metadata badges
+- feat: icon-only metadata badges with tooltips, Archie switched to DeepSeek Flash
+- feat: live changelog from file, nav reorder — Providers before Settings
+- feat: icon-based metadata badges — storage, image/video, timer icons replace text labels
+- fix: add close() to MockHistoryService, brace cleanup in upload provider tests
+- fix: share intent upload button — store _lastFilePath so uploadSelected() can recreate request
+- fix: restore UploadCompleted case accidentally deleted when removing UploadStarting dead code
+- docs: auto-update changelog
+- fix: remove dead UploadStarting state, _pendingRequest, dynamic types; add proxy validation, Hive close()
+- fix: remove UploadStarting dead code, replace dynamic types in _metadataBadges
+- docs: auto-update changelog
+- test: UploadNotifier state machine tests, skip flaky live tests, cleanup stale imports
+- docs: auto-update changelog
+- add public-facing content policy
+- docs: auto-update changelog
+- fix: test imports — package renamed from uppidi to uppidi_upload
+- docs: auto-update changelog
+- update .gitignore
+- docs: auto-update changelog
+- fix: indent _mapException properly, add invalidMimeType + fileSystemError ARB keys
+- docs: auto-update changelog
+- fix: base_http_provider — FormatException handling, extended error mapping, docs (by Ivy)
+- docs: promote Intern (Hy3) as primary executor, Jeb (MiniMax) as backup
+- fix: broken test import — package renamed from uppidi to uppidi_upload
+- docs: auto-update changelog
+- feat: share button on upload debug modal — consistent with system info
+- docs: auto-update changelog
