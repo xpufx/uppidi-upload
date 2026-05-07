@@ -1,5 +1,7 @@
 # Changelog
 
+- docs: add mermaid diagrams to user manual
+- docs: auto-update changelog
 - feat: 3-way navigation layout on desktop, debug logging indication, catbox error mapping
 - docs: auto-update changelog
 - feat: add debug logging and navigation layout toggles to settings; improve catbox error mapping
@@ -28,5 +30,3 @@
 - docs: auto-update changelog
 - fix: changelog from assets (runtime load), rootBundle instead of File
 - fix: increase raw response capture to 5000 chars for freeimage debug
-- fix: freeimage parseResponse — include raw response on failure, Providers nav label
-- feat: download progress dialog, install icon on version badge, icon+text metadata badges
