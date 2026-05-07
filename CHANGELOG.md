@@ -1,5 +1,6 @@
 # Changelog
 
+- docs: auto-update changelog
 - badges: icon-only for mime type, calendar icon for expiry
 - fix: extract metadata badges to shared lib, use in upload screen + providers screen
 - fix: quality-dependent JPEG compression (Q75/Q50), skip resize if not smaller than original
@@ -29,4 +30,3 @@
 - feat: live changelog from file, nav reorder — Providers before Settings
 - feat: icon-based metadata badges — storage, image/video, timer icons replace text labels
 - fix: add close() to MockHistoryService, brace cleanup in upload provider tests
-- fix: share intent upload button — store _lastFilePath so uploadSelected() can recreate request
