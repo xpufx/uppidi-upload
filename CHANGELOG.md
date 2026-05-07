@@ -1,5 +1,7 @@
 # Changelog
 
+- feat: in-app download for desktop (no browser redirect)
+- docs: auto-update changelog
 - docs: add mermaid diagrams to user manual
 - docs: auto-update changelog
 - feat: 3-way navigation layout on desktop, debug logging indication, catbox error mapping
@@ -28,5 +30,3 @@
 - fix: remove stale oktay paths from build script
 - docs: auto-update changelog
 - docs: auto-update changelog
-- fix: changelog from assets (runtime load), rootBundle instead of File
-- fix: increase raw response capture to 5000 chars for freeimage debug
