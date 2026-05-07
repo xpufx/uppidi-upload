@@ -20,6 +20,22 @@ Uppidi Upload is a cross-platform file upload application that lets you upload i
 
 ---
 
+### Navigation Layout (Desktop)
+
+The app's interface is organized into four tabs, accessible from a bottom or side navigation bar:
+
+```mermaid
+flowchart LR
+    subgraph Desktop Navigation
+        A[Upload Tab<br>Cloud icon] --> B[Select provider<br>& upload file]
+        C[History Tab<br>Clock icon] --> D[View past uploads<br>& manage links]
+        E[Providers Tab<br>Network icon] --> F[Manage providers<br>& test connectivity]
+        G[Settings Tab<br>Gear icon] --> H[Customize theme,<br>language, network]
+    end
+```
+
+---
+
 ## 2. How to Upload a File
 
 ### Step 1: Choose a Provider
@@ -67,6 +83,23 @@ If an upload fails, a **Retry** button appears in the result banner. Tap it to a
 ### Change Provider
 Select a different provider from the dropdown menu before or after picking a file. Note: The provider dropdown is disabled during an active upload to prevent changes mid-transfer. Cancel the current upload first if you need to switch providers.
 
+### Upload Lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> SelectingFile: Pick a file
+    SelectingFile --> FileSelected: File chosen
+    FileSelected --> Uploading: Tap Upload
+    Uploading --> Completed: Success
+    Uploading --> Failed: Error
+    Uploading --> Cancelled: Cancel tapped
+    Failed --> Uploading: Retry
+    Failed --> Idle: Dismiss
+    Cancelled --> Idle
+    Completed --> Idle
+```
+
 ---
 
 ## 4. Sharing Uploaded Links
@@ -92,6 +125,22 @@ Access the **Providers** tab (network check icon), formerly the Test tab and pos
 ### Provider Health & Status
 - Broken providers are automatically marked with a warning icon and reason text, appearing disabled by default
 - You can manually override this by toggling the enable switch next to the provider
+
+### Provider Health Flow
+
+```mermaid
+flowchart TD
+    A[Provider registered] --> B{Health check runs}
+    B --> C[Online & responsive]
+    B --> D[Unreachable / error]
+    C --> E[Enabled by default<br>Green checkmark]
+    D --> F[Marked as broken<br>Warning icon + reason]
+    F --> G{User override?}
+    G -->|Toggle on| H[Provider enabled<br>despite broken status]
+    G -->|Leave off| I[Provider disabled<br>Hidden from upload tab]
+    E --> J[User can toggle off]
+    J --> K[Provider disabled]
+```
 
 ### Enable/Disable Providers
 Toggle the switch next to each provider to enable or disable it. Disabled providers will not appear in the Upload tab's provider dropdown.
