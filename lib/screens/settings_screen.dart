@@ -681,7 +681,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                             ),
                           );
                           try {
-                            await downloadAndInstallApk(
+                            final path = await downloadFile(
                               '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk',
                               onProgress: (r, t, s) {
                                 received = r;
@@ -690,10 +690,15 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                                 update?.call(() {});
                               },
                             );
-                            if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
-                          } catch (e) {
-                            if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
                             if (context.mounted) {
+                              Navigator.of(context, rootNavigator: true).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Downloaded to: $path')),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              Navigator.of(context, rootNavigator: true).pop();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('Download failed: $e')),
                               );
