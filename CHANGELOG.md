@@ -1,5 +1,25 @@
 # Changelog
 
+- badges: icon-only for mime type, calendar icon for expiry
+- fix: extract metadata badges to shared lib, use in upload screen + providers screen
+- fix: quality-dependent JPEG compression (Q75/Q50), skip resize if not smaller than original
+- docs: update user manual with quality selector, health manifest, in-app update, system info, providers page
+- fix: update FreeImage test to expect API key in endpoint
+- test: 23 widget tests — full state machine, providers screen, nav tabs
+- docs: architecture diagrams — state machine, navigation, upload lifecycle, error recovery
+- test: widget tests for upload screen — provider dropdown, quality selector, health lock, version check
+- fix: quality selector reactive via state, health-disabled switch blocked, badge icons 14px
+- fix: health-disabled providers now actually disabled, _ProviderInfo uses icon badges
+- feat: provider health manifest — fetch providers.json from CDN, show broken warnings
+- fix: move resize logic to uploadSelected() so quality selector works before upload
+- fix: custom logo removal, version check auto-fire, unused file_picker import
+- fix: restore freeimage.host API key (public key for anonymous uploads)
+- fix: freeimage parseResponse — detect HTML response, show clear error
+- add env_check.sh, remove stale UploadStarting test reference
+- fix: download icon before orange hash, progress dialog, removed duplicate
+- feat: image quality selector — Original / Medium (50%) / Low (25%) ratio-based resize
+- fix: remove stale oktay paths from build script
+- docs: auto-update changelog
 - docs: auto-update changelog
 - fix: changelog from assets (runtime load), rootBundle instead of File
 - fix: increase raw response capture to 5000 chars for freeimage debug
@@ -10,23 +30,3 @@
 - feat: icon-based metadata badges — storage, image/video, timer icons replace text labels
 - fix: add close() to MockHistoryService, brace cleanup in upload provider tests
 - fix: share intent upload button — store _lastFilePath so uploadSelected() can recreate request
-- fix: restore UploadCompleted case accidentally deleted when removing UploadStarting dead code
-- docs: auto-update changelog
-- fix: remove dead UploadStarting state, _pendingRequest, dynamic types; add proxy validation, Hive close()
-- fix: remove UploadStarting dead code, replace dynamic types in _metadataBadges
-- docs: auto-update changelog
-- test: UploadNotifier state machine tests, skip flaky live tests, cleanup stale imports
-- docs: auto-update changelog
-- add public-facing content policy
-- docs: auto-update changelog
-- fix: test imports — package renamed from uppidi to uppidi_upload
-- docs: auto-update changelog
-- update .gitignore
-- docs: auto-update changelog
-- fix: indent _mapException properly, add invalidMimeType + fileSystemError ARB keys
-- docs: auto-update changelog
-- fix: base_http_provider — FormatException handling, extended error mapping, docs (by Ivy)
-- docs: promote Intern (Hy3) as primary executor, Jeb (MiniMax) as backup
-- fix: broken test import — package renamed from uppidi to uppidi_upload
-- docs: auto-update changelog
-- feat: share button on upload debug modal — consistent with system info
