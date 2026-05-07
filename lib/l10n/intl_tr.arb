@@ -76,5 +76,12 @@
   "qualityMedium": "Orta (1920px)",
   "qualityLow": "Düşük (800px)",
   "navLayout": "Gezinme Düzeni",
-  "navLayoutDescription": "Masaüstü platformlarda her zaman alt gezinme çubuğunu göster"
+  "navLayoutDescription": "Masaüstü platformlarda her zaman alt gezinme çubuğunu göster",
+  "navigationLayout": "Gezinme Düzeni",
+  "navigationLayoutDescription": "Gezinmenin nerede görüneceğini seçin: Sol, Alt veya Sağ.",
+  "navigationLeft": "Sol",
+  "navigationBottom": "Alt",
+  "navigationRight": "Sağ",
+  "enabled": "Etkin",
+  "disabled": "Devre Dışı"
 }

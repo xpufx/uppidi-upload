@@ -76,5 +76,12 @@
   "qualityMedium": "Media (1920px)",
   "qualityLow": "Bassa (800px)",
   "navLayout": "Layout Navigazione",
-  "navLayoutDescription": "Mostra sempre la barra di navigazione in basso su desktop"
+  "navLayoutDescription": "Mostra sempre la barra di navigazione in basso su desktop",
+  "navigationLayout": "Layout Navigazione",
+  "navigationLayoutDescription": "Scegli dove visualizzare la navigazione: Sinistra, In basso o Destra.",
+  "navigationLeft": "Sinistra",
+  "navigationBottom": "In basso",
+  "navigationRight": "Destra",
+  "enabled": "Attivato",
+  "disabled": "Disattivato"
 }

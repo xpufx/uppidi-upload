@@ -97,23 +97,25 @@ class _AdaptiveHomePageState extends ConsumerState<AdaptiveHomePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final navLayoutAsync = ref.watch(navLayoutProvider);
+    final navLayoutAsync = ref.watch(navigationLayoutProvider);
+    final isDesktop = Platform.isWindows || Platform.isLinux || Platform.isMacOS;
 
+    if (isDesktop) {
+      final layout = navLayoutAsync.asData?.value ?? 'bottom';
+      return switch (layout) {
+        'left' => _buildLeftRailScaffold(context, l10n),
+        'right' => _buildRightRailScaffold(context, l10n),
+        _ => _buildBottomNavScaffold(context, l10n),
+      };
+    }
+
+    // Non-desktop: adaptive based on width
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isDesktop = Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-        final navLayoutEnabled = isDesktop ? (navLayoutAsync.asData?.value ?? false) : false;
-
-        // Desktop with bottom always enabled: ignore width, use bottom nav
-        if (isDesktop && navLayoutEnabled) {
-          return _buildBottomNavScaffold(context, l10n);
-        }
-
-        // Original adaptive logic based on width
         if (constraints.maxWidth < 600) {
           return _buildBottomNavScaffold(context, l10n);
         } else {
-          return _buildRailScaffold(context, l10n);
+          return _buildLeftRailScaffold(context, l10n);
         }
       },
     );
@@ -155,7 +157,7 @@ class _AdaptiveHomePageState extends ConsumerState<AdaptiveHomePage> {
     );
   }
 
-  Widget _buildRailScaffold(BuildContext context, AppLocalizations l10n) {
+  Widget _buildLeftRailScaffold(BuildContext context, AppLocalizations l10n) {
     return Scaffold(
       body: Row(
         children: [
@@ -201,6 +203,78 @@ class _AdaptiveHomePageState extends ConsumerState<AdaptiveHomePage> {
           ),
           const VerticalDivider(width: 1),
           Expanded(child: _buildBody()),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.3))),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            Text(l10n.appTitle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const Spacer(),
+            Text('v$appVersion',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRightRailScaffold(BuildContext context, AppLocalizations l10n) {
+    return Scaffold(
+      body: Row(
+        children: [
+          Expanded(child: _buildBody()),
+          const VerticalDivider(width: 1),
+          SizedBox(
+            width: 80,
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                AppLogo(size: 72),
+                const SizedBox(height: 4),
+                Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: NavigationRail(
+                    selectedIndex: _selected.index,
+                    onDestinationSelected: (i) =>
+                        setState(() => _selected = _NavTab.values[i]),
+                    labelType: NavigationRailLabelType.all,
+                    selectedIconTheme: IconThemeData(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    unselectedIconTheme: IconThemeData(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    selectedLabelTextStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 12,
+                    ),
+                    unselectedLabelTextStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                    destinations: _NavTab.values
+                        .map((t) => NavigationRailDestination(
+                              icon: Icon(t.icon),
+                              label: Text(t.label(l10n)),
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: Container(

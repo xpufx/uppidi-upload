@@ -263,4 +263,26 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get navLayoutDescription =>
       'Masaüstü platformlarda her zaman alt gezinme çubuğunu göster';
+
+  @override
+  String get navigationLayout => 'Gezinme Düzeni';
+
+  @override
+  String get navigationLayoutDescription =>
+      'Gezinmenin nerede görüneceğini seçin: Sol, Alt veya Sağ.';
+
+  @override
+  String get navigationLeft => 'Sol';
+
+  @override
+  String get navigationBottom => 'Alt';
+
+  @override
+  String get navigationRight => 'Sağ';
+
+  @override
+  String get enabled => 'Etkin';
+
+  @override
+  String get disabled => 'Devre Dışı';
 }

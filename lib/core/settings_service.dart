@@ -89,7 +89,7 @@ class SettingsService {
   static const logoPathKey = 'global.logo_path';
   static const disabledProvidersKey = 'global.disabled_providers';
   static const debugLoggingKey = 'global.debug_logging';
-  static const navLayoutKey = 'global.nav_layout';
+  static const navigationLayoutKey = 'global.navigation_layout';
 
   Future<bool> isInsecureConnAllowed() async {
     final val = await get(insecureConnKey);
@@ -140,12 +140,17 @@ class SettingsService {
     await set(debugLoggingKey, enabled ? 'true' : 'false');
   }
 
-  Future<bool> getNavLayoutEnabled() async {
-    final val = await get(navLayoutKey);
-    return val == 'true';
+  Future<String> getNavigationLayout() async {
+    final val = await get(navigationLayoutKey);
+    return val ?? 'bottom';
   }
 
-  Future<void> setNavLayoutEnabled(bool enabled) async {
-    await set(navLayoutKey, enabled ? 'true' : 'false');
+  Future<void> setNavigationLayout(String layout) async {
+    if (!['left', 'bottom', 'right'].contains(layout)) {
+      throw ArgumentError(
+        'Invalid navigation layout: $layout. Must be one of left, bottom, right.',
+      );
+    }
+    await set(navigationLayoutKey, layout);
   }
 }

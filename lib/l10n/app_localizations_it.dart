@@ -263,4 +263,26 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get navLayoutDescription =>
       'Mostra sempre la barra di navigazione in basso su desktop';
+
+  @override
+  String get navigationLayout => 'Layout Navigazione';
+
+  @override
+  String get navigationLayoutDescription =>
+      'Scegli dove visualizzare la navigazione: Sinistra, In basso o Destra.';
+
+  @override
+  String get navigationLeft => 'Sinistra';
+
+  @override
+  String get navigationBottom => 'In basso';
+
+  @override
+  String get navigationRight => 'Destra';
+
+  @override
+  String get enabled => 'Attivato';
+
+  @override
+  String get disabled => 'Disattivato';
 }

@@ -261,4 +261,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get navLayoutDescription =>
       'Always show bottom navigation bar on desktop platforms';
+
+  @override
+  String get navigationLayout => 'Navigation Layout';
+
+  @override
+  String get navigationLayoutDescription =>
+      'Choose where the navigation appears: Left, Bottom, or Right.';
+
+  @override
+  String get navigationLeft => 'Left';
+
+  @override
+  String get navigationBottom => 'Bottom';
+
+  @override
+  String get navigationRight => 'Right';
+
+  @override
+  String get enabled => 'Enabled';
+
+  @override
+  String get disabled => 'Disabled';
 }

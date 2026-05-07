@@ -38,20 +38,17 @@ final localeProvider = FutureProvider<String>((ref) async {
   final svc = ref.read(settingsServiceProvider);
   return (await svc.get(SettingsService.localeKey)) ?? 'en';
 });
-
 final _defaultShareProviderProvider = FutureProvider<String?>((ref) async {
   final svc = ref.read(settingsServiceProvider);
-  return svc.get(SettingsService.defaultShareProviderKey);
+  return await svc.get(SettingsService.defaultShareProviderKey);
 });
-
 final debugLoggingProvider = FutureProvider<bool>((ref) async {
   final svc = ref.read(settingsServiceProvider);
   return svc.isDebugLoggingEnabled();
 });
-
-final navLayoutProvider = FutureProvider<bool>((ref) async {
+final navigationLayoutProvider = FutureProvider<String>((ref) async {
   final svc = ref.read(settingsServiceProvider);
-  return svc.getNavLayoutEnabled();
+  return await svc.getNavigationLayout();
 });
 
 class SettingsScreen extends ConsumerWidget {
@@ -548,6 +545,17 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               onChanged: (v) async {
                 await svc.setDebugLoggingEnabled(v);
                 ref.invalidate(debugLoggingProvider);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        v
+                            ? '${l10n.debugLogging} ${l10n.enabled}'
+                            : '${l10n.debugLogging} ${l10n.disabled}',
+                      ),
+                    ),
+                  );
+                }
               },
             ),
           ],
@@ -568,13 +576,20 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               child: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
             ),
             const SizedBox(width: 8),
-            Expanded(child: Text(l10n.navLayout)),
-            Switch(
-              value: ref.watch(navLayoutProvider).asData?.value ?? false,
-              onChanged: (v) async {
-                await svc.setNavLayoutEnabled(v);
-                ref.invalidate(navLayoutProvider);
-              },
+            Expanded(
+              child: SegmentedButton<String>(
+                segments: [
+                  ButtonSegment(value: 'left', label: Text(l10n.navigationLeft)),
+                  ButtonSegment(value: 'bottom', label: Text(l10n.navigationBottom)),
+                  ButtonSegment(value: 'right', label: Text(l10n.navigationRight)),
+                ],
+                selected: {ref.watch(navigationLayoutProvider).asData?.value ?? 'bottom'},
+                onSelectionChanged: (Set<String> selected) async {
+                  final layout = selected.first;
+                  await svc.setNavigationLayout(layout);
+                  ref.invalidate(navigationLayoutProvider);
+                },
+              ),
             ),
           ],
         ),
