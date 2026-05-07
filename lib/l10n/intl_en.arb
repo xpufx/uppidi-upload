@@ -3,6 +3,7 @@
   "genericError": "An unexpected error occurred. Please try again.",
   "errorSessionExpired": "Your session has expired. Please check your credentials in Settings.",
   "errorFileTooLarge": "The file is too large for this provider.",
+  "errorInvalidUploader": "Invalid uploader configuration. Please check your settings or try again later.",
   "invalidMimeType": "Invalid or unsupported file type.",
   "fileSystemError": "Could not read the selected file.",
   "errorConnectionFailed": "Could not connect to the provider. It may be unreachable or blocked by your browser.",
@@ -70,7 +71,11 @@
   "templateVars": "Template Variables",
   "templateExamples": "Examples:",
   "customizeMessage": "Customize:",
+  "debugLogging": "Enable debug logging",
+  "debugLoggingDescription": "Logs full HTTP request/response details to the console for troubleshooting. Only enable when needed.",
   "qualityOriginal": "Original",
   "qualityMedium": "Medium (1920px)",
-  "qualityLow": "Low (800px)"
+  "qualityLow": "Low (800px)",
+  "navLayout": "Navigation Layout",
+  "navLayoutDescription": "Always show bottom navigation bar on desktop platforms"
 }

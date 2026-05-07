@@ -23,6 +23,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get errorFileTooLarge => 'Bu dosya bu sağlayıcı için çok büyük.';
 
   @override
+  String get errorInvalidUploader =>
+      'Invalid uploader configuration. Please check your settings or try again later.';
+
+  @override
   String get invalidMimeType => 'Geçersiz veya desteklenmeyen dosya türü.';
 
   @override
@@ -238,6 +242,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get customizeMessage => 'Özelleştir:';
 
   @override
+  String get debugLogging => 'Hata ayıklama günlüğünü etkinleştir';
+
+  @override
+  String get debugLoggingDescription =>
+      'Sorun giderme için tüm HTTP istek/yanıt detaylarını konsola kaydeder. Yalnızca gerektiğinde etkinleştirin.';
+
+  @override
   String get qualityOriginal => 'Orijinal';
 
   @override
@@ -245,4 +256,11 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get qualityLow => 'Düşük (800px)';
+
+  @override
+  String get navLayout => 'Gezinme Düzeni';
+
+  @override
+  String get navLayoutDescription =>
+      'Masaüstü platformlarda her zaman alt gezinme çubuğunu göster';
 }

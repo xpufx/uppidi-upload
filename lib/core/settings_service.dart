@@ -88,6 +88,8 @@ class SettingsService {
   static const seedColorKey = 'global.seed_color';
   static const logoPathKey = 'global.logo_path';
   static const disabledProvidersKey = 'global.disabled_providers';
+  static const debugLoggingKey = 'global.debug_logging';
+  static const navLayoutKey = 'global.nav_layout';
 
   Future<bool> isInsecureConnAllowed() async {
     final val = await get(insecureConnKey);
@@ -127,5 +129,23 @@ class SettingsService {
     } else {
       await set(disabledProvidersKey, ids.join(','));
     }
+  }
+
+  Future<bool> isDebugLoggingEnabled() async {
+    final val = await get(debugLoggingKey);
+    return val == 'true';
+  }
+
+  Future<void> setDebugLoggingEnabled(bool enabled) async {
+    await set(debugLoggingKey, enabled ? 'true' : 'false');
+  }
+
+  Future<bool> getNavLayoutEnabled() async {
+    final val = await get(navLayoutKey);
+    return val == 'true';
+  }
+
+  Future<void> setNavLayoutEnabled(bool enabled) async {
+    await set(navLayoutKey, enabled ? 'true' : 'false');
   }
 }

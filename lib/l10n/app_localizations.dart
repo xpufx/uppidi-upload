@@ -124,6 +124,12 @@ abstract class AppLocalizations {
   /// **'The file is too large for this provider.'**
   String get errorFileTooLarge;
 
+  /// No description provided for @errorInvalidUploader.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid uploader configuration. Please check your settings or try again later.'**
+  String get errorInvalidUploader;
+
   /// No description provided for @invalidMimeType.
   ///
   /// In en, this message translates to:
@@ -526,6 +532,18 @@ abstract class AppLocalizations {
   /// **'Customize:'**
   String get customizeMessage;
 
+  /// No description provided for @debugLogging.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable debug logging'**
+  String get debugLogging;
+
+  /// No description provided for @debugLoggingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Logs full HTTP request/response details to the console for troubleshooting. Only enable when needed.'**
+  String get debugLoggingDescription;
+
   /// No description provided for @qualityOriginal.
   ///
   /// In en, this message translates to:
@@ -543,6 +561,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Low (800px)'**
   String get qualityLow;
+
+  /// No description provided for @navLayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation Layout'**
+  String get navLayout;
+
+  /// No description provided for @navLayoutDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Always show bottom navigation bar on desktop platforms'**
+  String get navLayoutDescription;
 }
 
 class _AppLocalizationsDelegate

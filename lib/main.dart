@@ -84,126 +84,146 @@ extension on _NavTab {
       };
 }
 
-class AdaptiveHomePage extends StatefulWidget {
+class AdaptiveHomePage extends ConsumerStatefulWidget {
   const AdaptiveHomePage({super.key});
 
   @override
-  State<AdaptiveHomePage> createState() => _AdaptiveHomePageState();
+  ConsumerState<AdaptiveHomePage> createState() => _AdaptiveHomePageState();
 }
 
-class _AdaptiveHomePageState extends State<AdaptiveHomePage> {
+class _AdaptiveHomePageState extends ConsumerState<AdaptiveHomePage> {
   _NavTab _selected = _NavTab.upload;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final navLayoutAsync = ref.watch(navLayoutProvider);
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth < 600) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Row(
-                children: [
-                  AppLogo(size: 48),
-                  const SizedBox(width: 8),
-                  Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const Spacer(),
-                  Text(_selected.label(l10n), style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.w500,
-                  )),
-                ],
-              ),
-            ),
-            body: _buildBody(),
-            bottomNavigationBar: Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: BottomNavigationBar(
-                currentIndex: _selected.index,
-                onTap: (i) => setState(() => _selected = _NavTab.values[i]),
-                type: BottomNavigationBarType.fixed,
-                selectedItemColor: Theme.of(context).colorScheme.primary,
-                unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                items: _NavTab.values
-                    .map((t) => BottomNavigationBarItem(
-                          icon: Icon(t.icon),
-                          label: t.label(l10n),
-                        ))
-                    .toList(),
-              ),
-            ),
-          );
+        final isDesktop = Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+        final navLayoutEnabled = isDesktop ? (navLayoutAsync.asData?.value ?? false) : false;
+
+        // Desktop with bottom always enabled: ignore width, use bottom nav
+        if (isDesktop && navLayoutEnabled) {
+          return _buildBottomNavScaffold(context, l10n);
         }
-        return Scaffold(
-          body: Row(
-            children: [
-              SizedBox(
-                width: 80,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 16),
-                    AppLogo(size: 72),
-                    const SizedBox(height: 4),
-                    Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                    const SizedBox(height: 8),
-                    Expanded(
-                      child: NavigationRail(
-                        selectedIndex: _selected.index,
-                        onDestinationSelected: (i) =>
-                            setState(() => _selected = _NavTab.values[i]),
-                        labelType: NavigationRailLabelType.all,
-                        selectedIconTheme: IconThemeData(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        unselectedIconTheme: IconThemeData(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                        selectedLabelTextStyle: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 12,
-                        ),
-                        unselectedLabelTextStyle: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontSize: 12,
-                        ),
-                        destinations: _NavTab.values
-                            .map((t) => NavigationRailDestination(
-                                  icon: Icon(t.icon),
-                                  label: Text(t.label(l10n)),
-                                ))
-                            .toList(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const VerticalDivider(width: 1),
-              Expanded(child: _buildBody()),
-            ],
-          ),
-          bottomNavigationBar: Container(
-            height: 48,
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.3))),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
+
+        // Original adaptive logic based on width
+        if (constraints.maxWidth < 600) {
+          return _buildBottomNavScaffold(context, l10n);
+        } else {
+          return _buildRailScaffold(context, l10n);
+        }
+      },
+    );
+  }
+
+  Widget _buildBottomNavScaffold(BuildContext context, AppLocalizations l10n) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            AppLogo(size: 48),
+            const SizedBox(width: 8),
+            Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+            const Spacer(),
+            Text(_selected.label(l10n), style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w500,
+            )),
+          ],
+        ),
+      ),
+      body: _buildBody(),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: BottomNavigationBar(
+          currentIndex: _selected.index,
+          onTap: (i) => setState(() => _selected = _NavTab.values[i]),
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Theme.of(context).colorScheme.primary,
+          unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
+          items: _NavTab.values
+              .map((t) => BottomNavigationBarItem(
+                    icon: Icon(t.icon),
+                    label: t.label(l10n),
+                  ))
+              .toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRailScaffold(BuildContext context, AppLocalizations l10n) {
+    return Scaffold(
+      body: Row(
+        children: [
+          SizedBox(
+            width: 80,
+            child: Column(
               children: [
-                Text(l10n.appTitle,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w500,
+                const SizedBox(height: 16),
+                AppLogo(size: 72),
+                const SizedBox(height: 4),
+                Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: NavigationRail(
+                    selectedIndex: _selected.index,
+                    onDestinationSelected: (i) =>
+                        setState(() => _selected = _NavTab.values[i]),
+                    labelType: NavigationRailLabelType.all,
+                    selectedIconTheme: IconThemeData(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    unselectedIconTheme: IconThemeData(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    selectedLabelTextStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 12,
+                    ),
+                    unselectedLabelTextStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                    destinations: _NavTab.values
+                        .map((t) => NavigationRailDestination(
+                              icon: Icon(t.icon),
+                              label: Text(t.label(l10n)),
+                            ))
+                        .toList(),
                   ),
-                ),
-                const Spacer(),
-                Text('v$appVersion',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
                 ),
               ],
             ),
           ),
-        );
-      },
+          const VerticalDivider(width: 1),
+          Expanded(child: _buildBody()),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.3))),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            Text(l10n.appTitle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const Spacer(),
+            Text('v$appVersion',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

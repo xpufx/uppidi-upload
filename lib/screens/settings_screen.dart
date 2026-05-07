@@ -44,6 +44,16 @@ final _defaultShareProviderProvider = FutureProvider<String?>((ref) async {
   return svc.get(SettingsService.defaultShareProviderKey);
 });
 
+final debugLoggingProvider = FutureProvider<bool>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  return svc.isDebugLoggingEnabled();
+});
+
+final navLayoutProvider = FutureProvider<bool>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  return svc.getNavLayoutEnabled();
+});
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -515,6 +525,58 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               ref.invalidate(proxyUrlProvider);
             });
           },
+        ),
+        const SizedBox(height: 16),
+        // Debug logging toggle
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () => showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: Text(l10n.debugLogging),
+                  content: Text(l10n.debugLoggingDescription),
+                  actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok))],
+                ),
+              ),
+              child: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
+            ),
+            const SizedBox(width: 8),
+            Expanded(child: Text(l10n.debugLogging)),
+            Switch(
+              value: ref.watch(debugLoggingProvider).asData?.value ?? false,
+              onChanged: (v) async {
+                await svc.setDebugLoggingEnabled(v);
+                ref.invalidate(debugLoggingProvider);
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // Navigation layout toggle
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () => showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: Text(l10n.navLayout),
+                  content: Text(l10n.navLayoutDescription),
+                  actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok))],
+                ),
+              ),
+              child: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
+            ),
+            const SizedBox(width: 8),
+            Expanded(child: Text(l10n.navLayout)),
+            Switch(
+              value: ref.watch(navLayoutProvider).asData?.value ?? false,
+              onChanged: (v) async {
+                await svc.setNavLayoutEnabled(v);
+                ref.invalidate(navLayoutProvider);
+              },
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         const Divider(height: 32),

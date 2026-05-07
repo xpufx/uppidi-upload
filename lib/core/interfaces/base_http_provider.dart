@@ -8,6 +8,8 @@ import '../models/provider_metadata.dart';
 import '../models/upload_request.dart';
 import '../models/upload_result.dart';
 import '../platform/insecure_adapter.dart';
+import '../settings_service.dart';
+
 import 'uploader.dart';
 
 abstract class BaseHttpProvider implements BaseUploader {
@@ -65,12 +67,36 @@ abstract class BaseHttpProvider implements BaseUploader {
       final fields = Map<String, dynamic>.from(additionalFormFields);
       fields[fileFormFieldName] = _buildStreamFile(request);
 
+      // Opt-in debug logging: log request details if enabled
+      final settings = SettingsService();
+      final debugLogging = await settings.isDebugLoggingEnabled();
+      if (debugLogging) {
+        _log.info('=== DEBUG UPLOAD REQUEST ===');
+        _log.info('Provider: $providerId');
+        _log.info('URL: $baseUrl$uploadEndpoint');
+        _log.info('File: ${request.fileName} (${request.sizeInBytes} bytes, ${request.mimeType})');
+        _log.info('Form fields: $fields');
+        _log.info('Additional form fields: $additionalFormFields');
+        _log.info('Proxy: $proxyUrl');
+        _log.info('Allow insecure: $allowInsecure');
+        _log.info('=============================');
+      }
+
       final response = await dio.post(
         uploadEndpoint,
         data: FormData.fromMap(fields),
         onSendProgress: onProgress,
         cancelToken: cancelToken,
       );
+
+      // Log response if debug enabled
+      if (debugLogging) {
+        _log.info('=== DEBUG UPLOAD RESPONSE ===');
+        _log.info('Status: ${response.statusCode}');
+        _log.info('Headers: ${response.headers}');
+        _log.info('Data: ${response.data}');
+        _log.info('=============================');
+      }
 
       return parseResponse(response);
     } catch (e, stackTrace) {

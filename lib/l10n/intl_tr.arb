@@ -70,7 +70,11 @@
   "templateVars": "Şablon Değişkenleri",
   "templateExamples": "Örnekler:",
   "customizeMessage": "Özelleştir:",
+  "debugLogging": "Hata ayıklama günlüğünü etkinleştir",
+  "debugLoggingDescription": "Sorun giderme için tüm HTTP istek/yanıt detaylarını konsola kaydeder. Yalnızca gerektiğinde etkinleştirin.",
   "qualityOriginal": "Orijinal",
   "qualityMedium": "Orta (1920px)",
-  "qualityLow": "Düşük (800px)"
+  "qualityLow": "Düşük (800px)",
+  "navLayout": "Gezinme Düzeni",
+  "navLayoutDescription": "Masaüstü platformlarda her zaman alt gezinme çubuğunu göster"
 }

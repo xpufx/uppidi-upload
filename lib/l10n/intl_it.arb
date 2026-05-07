@@ -70,7 +70,11 @@
   "templateVars": "Variabili Template",
   "templateExamples": "Esempi:",
   "customizeMessage": "Personalizza:",
+  "debugLogging": "Abilita debug logging",
+  "debugLoggingDescription": "Registra tutti i dettagli di richiesta/risposta HTTP nella console per il debug. Attivalo solo se necessario.",
   "qualityOriginal": "Originale",
   "qualityMedium": "Media (1920px)",
-  "qualityLow": "Bassa (800px)"
+  "qualityLow": "Bassa (800px)",
+  "navLayout": "Layout Navigazione",
+  "navLayoutDescription": "Mostra sempre la barra di navigazione in basso su desktop"
 }

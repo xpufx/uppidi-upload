@@ -58,7 +58,10 @@ class CatboxProvider extends BaseHttpProvider {
     if (lower.contains('file is too large') || lower.contains('too large')) {
       return 'errorFileTooLarge';
     }
-    if (lower.contains('invalid') || lower.contains('auth')) {
+    if (lower.contains('invalid uploader') || lower.contains('invalid')) {
+      return 'errorInvalidUploader';
+    }
+    if (lower.contains('auth')) {
       return 'errorSessionExpired';
     }
     return 'genericError';

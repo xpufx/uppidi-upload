@@ -126,6 +126,18 @@ class MockSettingsService implements SettingsService {
 
   @override
   Future<void> setDisabledProviders(Set<String> ids) async {}
+
+  @override
+  Future<bool> isDebugLoggingEnabled() async => false;
+
+  @override
+  Future<void> setDebugLoggingEnabled(bool enabled) async {}
+
+  @override
+  Future<bool> getNavLayoutEnabled() async => false;
+
+  @override
+  Future<void> setNavLayoutEnabled(bool enabled) async {}
 }
 
 class MockHistoryService implements HistoryService {

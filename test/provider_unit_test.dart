@@ -218,11 +218,23 @@ void main() {
       final response = Response(
         requestOptions: RequestOptions(path: '/user/api.php'),
         statusCode: 200,
-        data: 12345, // number instead of string
+        data: 123, // int
       );
       final result = provider.parseResponse(response);
-      // 12345.toString() is "12345", which doesn't start with https://
+      // 123.toString() is '123', which doesn't start with https://
       expect(result.success, isFalse);
+      expect(result.errorMessage, 'genericError');
+    });
+
+    test('parseResponse returns error for invalid uploader response', () {
+      final response = Response(
+        requestOptions: RequestOptions(path: '/user/api.php'),
+        statusCode: 200,
+        data: 'Invalid uploader',
+      );
+      final result = provider.parseResponse(response);
+      expect(result.success, isFalse);
+      expect(result.errorMessage, 'errorInvalidUploader');
     });
 
     test('upload includes reqtype in form fields', () async {

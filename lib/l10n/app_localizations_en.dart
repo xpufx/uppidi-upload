@@ -22,6 +22,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorFileTooLarge => 'The file is too large for this provider.';
 
   @override
+  String get errorInvalidUploader =>
+      'Invalid uploader configuration. Please check your settings or try again later.';
+
+  @override
   String get invalidMimeType => 'Invalid or unsupported file type.';
 
   @override
@@ -236,6 +240,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customizeMessage => 'Customize:';
 
   @override
+  String get debugLogging => 'Enable debug logging';
+
+  @override
+  String get debugLoggingDescription =>
+      'Logs full HTTP request/response details to the console for troubleshooting. Only enable when needed.';
+
+  @override
   String get qualityOriginal => 'Original';
 
   @override
@@ -243,4 +254,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qualityLow => 'Low (800px)';
+
+  @override
+  String get navLayout => 'Navigation Layout';
+
+  @override
+  String get navLayoutDescription =>
+      'Always show bottom navigation bar on desktop platforms';
 }
