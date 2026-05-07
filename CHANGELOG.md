@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: manual download buttons save file without auto-install
+- docs: auto-update changelog
 - feat: in-app download for desktop (no browser redirect)
 - docs: auto-update changelog
 - docs: add mermaid diagrams to user manual
@@ -28,5 +30,3 @@
 - fix: download icon before orange hash, progress dialog, removed duplicate
 - feat: image quality selector — Original / Medium (50%) / Low (25%) ratio-based resize
 - fix: remove stale oktay paths from build script
-- docs: auto-update changelog
-- docs: auto-update changelog
