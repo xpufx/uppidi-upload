@@ -1,5 +1,7 @@
 # Changelog
 
+- feat: add debug logging and navigation layout toggles to settings; improve catbox error mapping
+- docs: auto-update changelog
 - docs: auto-update changelog
 - badges: icon-only for mime type, calendar icon for expiry
 - fix: extract metadata badges to shared lib, use in upload screen + providers screen
@@ -28,5 +30,3 @@
 - feat: download progress dialog, install icon on version badge, icon+text metadata badges
 - feat: icon-only metadata badges with tooltips, Archie switched to DeepSeek Flash
 - feat: live changelog from file, nav reorder — Providers before Settings
-- feat: icon-based metadata badges — storage, image/video, timer icons replace text labels
-- fix: add close() to MockHistoryService, brace cleanup in upload provider tests
