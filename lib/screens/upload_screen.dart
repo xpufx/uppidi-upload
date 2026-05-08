@@ -479,33 +479,27 @@ class _FileSelectedButtons extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (showQuality) ...[
-          Row(
-            children: [
-              const Text('Quality: ', style: TextStyle(fontSize: 12)),
-              const SizedBox(width: 8),
-              SegmentedButton<int>(
-                segments: const [
-                  ButtonSegment(
-                      value: 0,
-                      label: Text('Original'),
-                      icon: Icon(Icons.high_quality, size: 16)),
-                  ButtonSegment(
-                      value: 1,
-                      label: Text('Medium'),
-                      icon: Icon(Icons.photo_size_select_large, size: 16)),
-                  ButtonSegment(
-                      value: 2,
-                      label: Text('Low'),
-                      icon: Icon(Icons.photo_size_select_small, size: 16)),
-                ],
-                selected: {quality},
-                onSelectionChanged: (v) => notifier.setQuality(v.first),
-                style: ButtonStyle(
-                  visualDensity: VisualDensity.compact,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-              ),
+          SegmentedButton<int>(
+            segments: const [
+              ButtonSegment(
+                  value: 0,
+                  label: Text('Original'),
+                  icon: Icon(Icons.high_quality, size: 16)),
+              ButtonSegment(
+                  value: 1,
+                  label: Text('Medium'),
+                  icon: Icon(Icons.photo_size_select_large, size: 16)),
+              ButtonSegment(
+                  value: 2,
+                  label: Text('Low'),
+                  icon: Icon(Icons.photo_size_select_small, size: 16)),
             ],
+            selected: {quality},
+            onSelectionChanged: (v) => notifier.setQuality(v.first),
+            style: ButtonStyle(
+              visualDensity: VisualDensity.compact,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
           ),
           const SizedBox(height: 8),
         ],

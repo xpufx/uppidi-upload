@@ -238,9 +238,8 @@ void main() {
 
       await tester.pumpAndSettle();
       // Quality selector should be shown for image files
-      expect(find.text('Quality: '), findsOneWidget,
-          reason: 'Quality text should be present for image files');
-      expect(find.byType(SegmentedButton<int>), findsOneWidget);
+      expect(find.byType(SegmentedButton<int>), findsOneWidget,
+          reason: 'Quality segmented button should be present for image files');
     });
   });
 
@@ -355,7 +354,6 @@ void main() {
       await tester.pumpAndSettle();
 
       // Quality selector should be shown for image files
-      expect(find.text('Quality: '), findsOneWidget);
       expect(find.byType(SegmentedButton<int>), findsOneWidget);
       // Check for quality options
       expect(find.text('Original'), findsOneWidget);
