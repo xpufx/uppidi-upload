@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:dio/dio.dart';
 
 import 'package:uppidi_upload/screens/upload_screen.dart';
@@ -106,6 +107,12 @@ void main() {
 
   setUpAll(() async {
     l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    Hive.init('.hive_test_upload_screen');
+    await Hive.openBox<String>('settings');
+  });
+
+  tearDownAll(() async {
+    await Hive.deleteBoxFromDisk('settings');
   });
 
   group('Upload Screen Widget Tests', () {
@@ -162,7 +169,8 @@ void main() {
       expect(find.byType(ElevatedButton), findsWidgets);
     });
 
-    testWidgets('3a. Quality selector hidden for non-images', (WidgetTester tester) async {
+    testWidgets('3a. Quality selector hidden for non-images',
+        (WidgetTester tester) async {
       final mockUploaders = [MockUploader()];
 
       // Test non-image file (PDF)
@@ -197,7 +205,8 @@ void main() {
       expect(find.byType(SegmentedButton<int>), findsNothing);
     });
 
-    testWidgets('3b. Quality selector shown for images', (WidgetTester tester) async {
+    testWidgets('3b. Quality selector shown for images',
+        (WidgetTester tester) async {
       final imageUploader = MockUploader(isImageProvider: true);
 
       // Test image file (PNG)
@@ -229,13 +238,15 @@ void main() {
 
       await tester.pumpAndSettle();
       // Quality selector should be shown for image files
-      expect(find.text('Quality: '), findsOneWidget, reason: 'Quality text should be present for image files');
+      expect(find.text('Quality: '), findsOneWidget,
+          reason: 'Quality text should be present for image files');
       expect(find.byType(SegmentedButton<int>), findsOneWidget);
     });
   });
 
   group('FileSelected State Tests', () {
-    testWidgets('Upload button and Clear button visible when file selected', (WidgetTester tester) async {
+    testWidgets('Upload button and Clear button visible when file selected',
+        (WidgetTester tester) async {
       final mockUploaders = [MockUploader()];
 
       await tester.pumpWidget(
@@ -274,7 +285,8 @@ void main() {
       expect(find.byIcon(Icons.close), findsOneWidget);
     });
 
-    testWidgets('File preview visible when file selected', (WidgetTester tester) async {
+    testWidgets('File preview visible when file selected',
+        (WidgetTester tester) async {
       final mockUploaders = [MockUploader()];
 
       await tester.pumpWidget(
@@ -310,7 +322,8 @@ void main() {
       expect(find.byType(Card), findsWidgets); // File preview is in a Card
     });
 
-    testWidgets('Quality selector shown for image files', (WidgetTester tester) async {
+    testWidgets('Quality selector shown for image files',
+        (WidgetTester tester) async {
       final imageUploader = MockUploader(isImageProvider: true);
 
       await tester.pumpWidget(
@@ -350,7 +363,8 @@ void main() {
       expect(find.text('Low'), findsOneWidget);
     });
 
-    testWidgets('Quality selector NOT shown for non-image files', (WidgetTester tester) async {
+    testWidgets('Quality selector NOT shown for non-image files',
+        (WidgetTester tester) async {
       final mockUploaders = [MockUploader()];
 
       await tester.pumpWidget(
@@ -387,7 +401,9 @@ void main() {
   });
 
   group('InProgress State Tests', () {
-    testWidgets('Progress bar, speed label, cancel button visible during upload', (WidgetTester tester) async {
+    testWidgets(
+        'Progress bar, speed label, cancel button visible during upload',
+        (WidgetTester tester) async {
       final mockUploaders = [MockUploader()];
       final cancelToken = CancelToken();
 
@@ -437,7 +453,8 @@ void main() {
   });
 
   group('Completed State Tests - Success', () {
-    testWidgets('URL text, share icon, copy icon, open icon visible on success', (WidgetTester tester) async {
+    testWidgets('URL text, share icon, copy icon, open icon visible on success',
+        (WidgetTester tester) async {
       final mockUploaders = [MockUploader()];
       const testUrl = 'https://example.com/test.pdf';
 
@@ -488,7 +505,9 @@ void main() {
   });
 
   group('Completed State Tests - Failure', () {
-    testWidgets('Error text, retry button, cancel button, debug icon visible on failure', (WidgetTester tester) async {
+    testWidgets(
+        'Error text, retry button, cancel button, debug icon visible on failure',
+        (WidgetTester tester) async {
       final mockUploaders = [MockUploader()];
       const errorMessage = 'Upload failed: Connection timeout';
 
@@ -498,7 +517,8 @@ void main() {
             uploadProvider.overrideWith(() {
               return MockUploadNotifier(
                 initialTestState: UploadCompleted(
-                  lastResult: UploadResult(success: false, errorMessage: errorMessage),
+                  lastResult:
+                      UploadResult(success: false, errorMessage: errorMessage),
                   errorMessage: errorMessage,
                   fileName: 'test.pdf',
                   fileSizeBytes: 1024,
@@ -540,7 +560,9 @@ void main() {
   });
 
   group('Provider Change During FileSelected', () {
-    testWidgets('Provider dropdown changes but preview stays when provider changes', (WidgetTester tester) async {
+    testWidgets(
+        'Provider dropdown changes but preview stays when provider changes',
+        (WidgetTester tester) async {
       final mockUploader1 = MockUploader(id: 'provider1', name: 'Provider 1');
       final mockUploader2 = MockUploader(id: 'provider2', name: 'Provider 2');
       final mockUploaders = [mockUploader1, mockUploader2];
@@ -596,7 +618,9 @@ void main() {
   });
 
   group('Health Disabled Provider Test', () {
-    testWidgets('Health-disabled provider switch is toggleable and shows warning', (WidgetTester tester) async {
+    testWidgets(
+        'Health-disabled provider switch is toggleable and shows warning',
+        (WidgetTester tester) async {
       const testProviderId = 'httpbin'; // Matches existing HttpBinProvider ID
       const reason = 'Maintenance';
       final mockHealth = {
@@ -607,9 +631,11 @@ void main() {
         ProviderScope(
           overrides: [
             // Mock health provider to return disabled status for test provider
-            providerHealthProvider.overrideWith((ref) => Future.value(mockHealth)),
+            providerHealthProvider
+                .overrideWith((ref) => Future.value(mockHealth)),
             // No user-disabled providers (so provider appears enabled)
-            disabledProviderIdsProvider.overrideWith((ref) => Future.value(<String>{})),
+            disabledProviderIdsProvider
+                .overrideWith((ref) => Future.value(<String>{})),
           ],
           child: MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -638,7 +664,8 @@ void main() {
   });
 
   group('Version Check Test', () {
-    testWidgets('Version check widget renders in SettingsScreen', (WidgetTester tester) async {
+    testWidgets('Version check widget renders in SettingsScreen',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -660,7 +687,8 @@ void main() {
   });
 
   group('Tap Interaction Tests', () {
-    testWidgets('1. Tap quality selector changes value to Medium (1)', (WidgetTester tester) async {
+    testWidgets('1. Tap quality selector changes value to Medium (1)',
+        (WidgetTester tester) async {
       final imageUploader = MockUploader(isImageProvider: true);
       final notifier = MockUploadNotifier(
         initialTestState: UploadFileSelected(
@@ -708,7 +736,8 @@ void main() {
       expect((notifier.state as UploadFileSelected).quality, 1);
     });
 
-    testWidgets('2. Tap Upload button calls uploadSelected()', (WidgetTester tester) async {
+    testWidgets('2. Tap Upload button calls uploadSelected()',
+        (WidgetTester tester) async {
       final mockUploaders = [MockUploader()];
       final notifier = MockUploadNotifier(
         initialTestState: UploadFileSelected(
@@ -756,7 +785,8 @@ void main() {
       expect(notifier.uploadSelectedCalled, isTrue);
     });
 
-    testWidgets('3. Tap Clear button returns to UploadIdle', (WidgetTester tester) async {
+    testWidgets('3. Tap Clear button returns to UploadIdle',
+        (WidgetTester tester) async {
       final mockUploaders = [MockUploader()];
       final notifier = MockUploadNotifier(
         initialTestState: UploadFileSelected(
@@ -802,7 +832,8 @@ void main() {
       expect(find.text(l10n.pickAndUpload), findsOneWidget);
     });
 
-    testWidgets('4. Tap Cancel during upload returns to UploadIdle', (WidgetTester tester) async {
+    testWidgets('4. Tap Cancel during upload returns to UploadIdle',
+        (WidgetTester tester) async {
       final mockUploaders = [MockUploader()];
       final cancelToken = CancelToken();
       final notifier = MockUploadNotifier(
@@ -853,7 +884,8 @@ void main() {
       expect(find.text(l10n.pickAndUpload), findsOneWidget);
     });
 
-    testWidgets('5. Tap Retry on failure calls uploadSelected()', (WidgetTester tester) async {
+    testWidgets('5. Tap Retry on failure calls uploadSelected()',
+        (WidgetTester tester) async {
       final mockUploaders = [MockUploader()];
       final notifier = MockUploadNotifier(
         initialTestState: UploadCompleted(
@@ -902,7 +934,8 @@ void main() {
       expect(notifier.uploadSelectedCalled, isTrue);
     });
 
-    testWidgets('6. Tap Debug icon shows error dialog', (WidgetTester tester) async {
+    testWidgets('6. Tap Debug icon shows error dialog',
+        (WidgetTester tester) async {
       final mockUploaders = [MockUploader()];
       const errorMessage = 'Test upload error';
 
@@ -912,7 +945,8 @@ void main() {
             uploadProvider.overrideWith(() {
               return MockUploadNotifier(
                 initialTestState: UploadCompleted(
-                  lastResult: UploadResult(success: false, errorMessage: errorMessage),
+                  lastResult:
+                      UploadResult(success: false, errorMessage: errorMessage),
                   errorMessage: errorMessage,
                   fileName: 'test.pdf',
                   fileSizeBytes: 1024,

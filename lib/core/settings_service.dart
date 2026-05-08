@@ -4,9 +4,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-final settingsServiceProvider = Provider<SettingsService>((ref) => SettingsService());
+final settingsServiceProvider =
+    Provider<SettingsService>((ref) => SettingsService());
 
 final localeCodeProvider = FutureProvider<String>((ref) async {
   final svc = ref.read(settingsServiceProvider);
@@ -17,7 +18,8 @@ final disabledProviderIdsProvider = FutureProvider<Set<String>>((ref) async {
   return ref.read(settingsServiceProvider).getDisabledProviders();
 });
 
-final providerHealthProvider = FutureProvider<Map<String, ProviderHealthInfo>>((ref) async {
+final providerHealthProvider =
+    FutureProvider<Map<String, ProviderHealthInfo>>((ref) async {
   final cdnUrl = const String.fromEnvironment('CDN_URL', defaultValue: '');
   if (cdnUrl.isEmpty) return {};
   try {
@@ -30,11 +32,13 @@ final providerHealthProvider = FutureProvider<Map<String, ProviderHealthInfo>>((
       client.close();
       return json.map((k, v) {
         final info = v as Map<String, dynamic>;
-        return MapEntry(k, ProviderHealthInfo(
-          disabled: info['disabled'] as bool? ?? false,
-          since: info['since'] as String?,
-          reason: info['reason'] as String?,
-        ));
+        return MapEntry(
+            k,
+            ProviderHealthInfo(
+              disabled: info['disabled'] as bool? ?? false,
+              since: info['since'] as String?,
+              reason: info['reason'] as String?,
+            ));
       });
     }
     client.close();
@@ -50,22 +54,46 @@ class ProviderHealthInfo {
 }
 
 class SettingsService {
-  final FlutterSecureStorage _storage;
+  Box<String>? _box;
 
-  SettingsService({FlutterSecureStorage? storage})
-      : _storage = storage ?? const FlutterSecureStorage();
+  SettingsService();
 
-  Future<String?> get(String key) => _storage.read(key: key);
-  Future<void> set(String key, String value) => _storage.write(key: key, value: value);
-  Future<void> remove(String key) => _storage.delete(key: key);
-  Future<bool> containsKey(String key) => _storage.containsKey(key: key);
-  Future<Map<String, String>> readAll() => _storage.readAll();
+  Future<Box<String>> _getBox() async {
+    if (_box != null && _box!.isOpen) return _box!;
+    _box = await Hive.openBox<String>('settings');
+    return _box!;
+  }
+
+  Future<String?> get(String key) async {
+    final box = await _getBox();
+    return box.get(key);
+  }
+
+  Future<void> set(String key, String value) async {
+    final box = await _getBox();
+    await box.put(key, value);
+  }
+
+  Future<void> remove(String key) async {
+    final box = await _getBox();
+    await box.delete(key);
+  }
+
+  Future<bool> containsKey(String key) async {
+    final box = await _getBox();
+    return box.containsKey(key);
+  }
+
+  Future<Map<String, String>> readAll() async {
+    final box = await _getBox();
+    return Map<String, String>.from(box.toMap());
+  }
 
   String providerKey(String providerId, String configKey) =>
       '$providerId.$configKey';
 
-  Future<Map<String, String>> loadProviderConfig(String providerId,
-      List<String> configKeys) async {
+  Future<Map<String, String>> loadProviderConfig(
+      String providerId, List<String> configKeys) async {
     final config = <String, String>{};
     for (final key in configKeys) {
       final value = await get(providerKey(providerId, key));

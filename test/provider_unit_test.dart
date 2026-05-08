@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 import 'package:uppidi_upload/core/models/upload_request.dart';
 import 'package:uppidi_upload/providers/catbox_provider.dart';
 import 'package:uppidi_upload/providers/freeimage_provider.dart';
@@ -9,6 +10,15 @@ import 'package:uppidi_upload/providers/tmpfilelink_provider.dart';
 import 'package:uppidi_upload/providers/uguu_provider.dart';
 
 void main() {
+  setUpAll(() async {
+    Hive.init('.hive_test_provider');
+    await Hive.openBox<String>('settings');
+  });
+
+  tearDownAll(() async {
+    await Hive.deleteBoxFromDisk('settings');
+  });
+
   final testRequest = FileUploadRequest(
     fileName: 'test.png',
     mimeType: 'image/png',
@@ -63,7 +73,9 @@ void main() {
       expect(result.success, isFalse);
     });
 
-    test('parseResponse handles wrong data type (string instead of Map) (failure)', () {
+    test(
+        'parseResponse handles wrong data type (string instead of Map) (failure)',
+        () {
       final response = Response(
         requestOptions: RequestOptions(path: '/post'),
         statusCode: 200,
@@ -77,7 +89,8 @@ void main() {
       final cancelToken = CancelToken();
       final client = await provider.createHttpClient({});
       expect(client.options.baseUrl, 'https://httpbin.org');
-      final result = await provider.upload(testRequest, cancelToken: cancelToken);
+      final result =
+          await provider.upload(testRequest, cancelToken: cancelToken);
       expect(result.success, anyOf(isTrue, isFalse));
       expect(result.completedAt, isNotNull);
     });
@@ -140,7 +153,9 @@ void main() {
       expect(result.success, isFalse);
     });
 
-    test('parseResponse handles wrong data type (string instead of Map) (failure)', () {
+    test(
+        'parseResponse handles wrong data type (string instead of Map) (failure)',
+        () {
       final response = Response(
         requestOptions: RequestOptions(path: '/api/upload'),
         statusCode: 200,
@@ -167,7 +182,8 @@ void main() {
       expect(provider.providerId, 'catbox');
       expect(provider.providerName, 'Catbox.moe');
       expect(provider.supportsWeb, isFalse);
-      expect(provider.requiredConfigKeys, isEmpty); // Fixed: actual code returns empty list
+      expect(provider.requiredConfigKeys,
+          isEmpty); // Fixed: actual code returns empty list
     });
 
     test('parseResponse returns success for valid URL', () {
@@ -238,7 +254,8 @@ void main() {
     });
 
     test('upload includes reqtype in form fields', () async {
-      expect(provider.additionalFormFields, containsPair('reqtype', 'fileupload'));
+      expect(
+          provider.additionalFormFields, containsPair('reqtype', 'fileupload'));
     });
 
     test('client uses correct baseUrl', () async {
@@ -308,7 +325,9 @@ void main() {
       expect(result.success, isFalse);
     });
 
-    test('parseResponse handles wrong data type (string instead of Map) (failure)', () {
+    test(
+        'parseResponse handles wrong data type (string instead of Map) (failure)',
+        () {
       final response = Response(
         requestOptions: RequestOptions(path: '/upload'),
         statusCode: 200,
@@ -391,7 +410,10 @@ void main() {
       final response = Response(
         requestOptions: RequestOptions(path: '/api/1/upload'),
         statusCode: 400,
-        data: {'status_code': 400, 'error': {'message': 'fail'}},
+        data: {
+          'status_code': 400,
+          'error': {'message': 'fail'}
+        },
       );
       final result = provider.parseResponse(response);
       expect(result.success, isFalse);
@@ -417,7 +439,9 @@ void main() {
       expect(result.success, isFalse);
     });
 
-    test('parseResponse handles wrong data type (string instead of Map) (failure)', () {
+    test(
+        'parseResponse handles wrong data type (string instead of Map) (failure)',
+        () {
       final response = Response(
         requestOptions: RequestOptions(path: '/api/1/upload'),
         statusCode: 200,
