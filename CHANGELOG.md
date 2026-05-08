@@ -1,5 +1,7 @@
 # Changelog
 
+- Remove redundant 'Quality:' label from image quality selector
+- docs: auto-update changelog
 - Remove provider config card, icon legend, and redundant title from upload screen
 - docs: auto-update changelog
 - Remove compact UI variant
@@ -28,5 +30,3 @@
 - Allow users to enable providers even when server reports them as down
 - docs: auto-update changelog
 - fix: manual download buttons save file without auto-install
-- docs: auto-update changelog
-- feat: in-app download for desktop (no browser redirect)
