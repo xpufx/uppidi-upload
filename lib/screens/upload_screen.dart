@@ -7,6 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'dart:typed_data';
+
+import 'package:image/image.dart' as img;
+
 import '../core/format.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/metadata_badges.dart';
@@ -16,6 +20,7 @@ import '../core/version.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 import '../screens/settings_screen.dart';
+import '../widgets/image_crop_overlay.dart';
 
 IconData _providerIcon(String id) => switch (id) {
       'httpbin' => Icons.science_outlined,
@@ -83,7 +88,8 @@ class UploadScreen extends ConsumerWidget {
                       fileSize: s,
                       mimeType: m,
                       fileBytes: b,
-                      provider: provider),
+                      provider: provider,
+                      notifier: notifier),
                 ),
               UploadInProgress(
                 fileName: final fn,
@@ -97,7 +103,8 @@ class UploadScreen extends ConsumerWidget {
                     fileSize: fs,
                     mimeType: m,
                     fileBytes: fb,
-                    provider: provider),
+                    provider: provider,
+                    notifier: notifier),
               UploadCompleted(
                 fileName: final fn,
                 fileSizeBytes: final fs,
@@ -110,7 +117,8 @@ class UploadScreen extends ConsumerWidget {
                     fileSize: fs,
                     mimeType: m,
                     fileBytes: fb,
-                    provider: provider),
+                    provider: provider,
+                    notifier: notifier),
               _ => const SizedBox.shrink(),
             },
             const SizedBox(height: 12),
@@ -519,12 +527,13 @@ class _FileSelectedButtons extends ConsumerWidget {
   }
 }
 
-class _FilePreview extends StatelessWidget {
+class _FilePreview extends StatefulWidget {
   final String fileName;
   final int fileSize;
   final String? mimeType;
   final Uint8List? fileBytes;
   final BaseUploader? provider;
+  final UploadNotifier notifier;
 
   const _FilePreview({
     required this.fileName,
@@ -532,10 +541,21 @@ class _FilePreview extends StatelessWidget {
     this.mimeType,
     this.fileBytes,
     this.provider,
+    required this.notifier,
   });
 
+  @override
+  State<_FilePreview> createState() => _FilePreviewState();
+}
+
+class _FilePreviewState extends State<_FilePreview> {
+  bool _isCropMode = false;
+  bool _hasCropped = false;
+  int _cropImageWidth = 0;
+  int _cropImageHeight = 0;
+
   bool get _isImage {
-    final mime = mimeType ?? '';
+    final mime = widget.mimeType ?? '';
     return mime.startsWith('image/');
   }
 
@@ -553,31 +573,8 @@ class _FilePreview extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (fileBytes != null && _isImage) ...[
-                // Image preview
-                Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 260),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Theme.of(context)
-                                .dividerColor
-                                .withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Image.memory(
-                          fileBytes!,
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) =>
-                              const Icon(Icons.broken_image, size: 64),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              if (widget.fileBytes != null && _isImage) ...[
+                _buildImagePreview(),
                 const SizedBox(height: 12),
               ] else if (_isImage) ...[
                 // Image without bytes (shouldn't happen, but fallback)
@@ -607,7 +604,7 @@ class _FilePreview extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      fileName,
+                      widget.fileName,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -624,16 +621,16 @@ class _FilePreview extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      formatSize(fileSize),
+                      formatSize(widget.fileSize),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
                 ],
               ),
-              if (mimeType != null) ...[
+              if (widget.mimeType != null) ...[
                 const SizedBox(height: 4),
                 Text(
-                  mimeType!,
+                  widget.mimeType!,
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall
@@ -652,20 +649,127 @@ class _FilePreview extends StatelessWidget {
     );
   }
 
+  Widget _buildImagePreview() {
+    if (_isCropMode) {
+      return Center(
+        child: SizedBox(
+          width: double.infinity,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 360),
+            child: ImageCropOverlay(
+              imageBytes: widget.fileBytes!,
+              imageWidth: _cropImageWidth,
+              imageHeight: _cropImageHeight,
+              onConfirm: _onCropConfirm,
+              onCancel: () => setState(() => _isCropMode = false),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // Image
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 260),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color:
+                        Theme.of(context).dividerColor.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Image.memory(
+                  widget.fileBytes!,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) =>
+                      const Icon(Icons.broken_image, size: 64),
+                ),
+              ),
+            ),
+          ),
+        ),
+        // Crop / Reset button
+        Positioned(
+          top: 4,
+          right: 4,
+          child: IconButton(
+            icon: Icon(_hasCropped ? Icons.restore : Icons.crop),
+            tooltip: _hasCropped ? 'Reset crop' : 'Crop',
+            onPressed: _hasCropped
+                ? () {
+                    widget.notifier.resetCrop();
+                    setState(() => _hasCropped = false);
+                  }
+                : _enterCropMode,
+            style: IconButton.styleFrom(
+              backgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainerHighest,
+              foregroundColor: Theme.of(context).colorScheme.primary,
+              padding: const EdgeInsets.all(6),
+              minimumSize: const Size(32, 32),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _enterCropMode() {
+    if (widget.fileBytes == null) return;
+    final decoded = img.decodeImage(widget.fileBytes!);
+    if (decoded == null) return;
+    _cropImageWidth = decoded.width;
+    _cropImageHeight = decoded.height;
+    setState(() => _isCropMode = true);
+  }
+
+  void _onCropConfirm(Rect cropRect) {
+    if (widget.fileBytes == null) return;
+    final src = img.decodeImage(widget.fileBytes!);
+    if (src == null) return;
+
+    // Perform the crop
+    final cropped = img.copyCrop(
+      src,
+      x: cropRect.left.toInt(),
+      y: cropRect.top.toInt(),
+      width: cropRect.width.toInt(),
+      height: cropRect.height.toInt(),
+    );
+
+    // Encode as JPEG
+    final outBytes = img.encodeJpg(cropped, quality: 90);
+
+    // Push to provider
+    widget.notifier.applyCrop(outBytes);
+
+    setState(() {
+      _isCropMode = false;
+      _hasCropped = true;
+    });
+  }
+
   List<Widget> _buildWarnings() {
     final warnings = <Widget>[];
-    final p = provider;
+    final p = widget.provider;
     if (p == null) return warnings;
     final meta = p.metadata;
 
-    if (meta.allowedMimeTypes != null && mimeType != null) {
-      if (!meta.allowsMimeType(mimeType!)) {
+    if (meta.allowedMimeTypes != null && widget.mimeType != null) {
+      if (!meta.allowsMimeType(widget.mimeType!)) {
         warnings
             .add(_warningRow('Provider only accepts: ${meta.mimeTypeLabel}'));
       }
     }
 
-    if (meta.maxFileSizeBytes != null && fileSize > meta.maxFileSizeBytes!) {
+    if (meta.maxFileSizeBytes != null &&
+        widget.fileSize > meta.maxFileSizeBytes!) {
       warnings.add(_warningRow('File exceeds ${meta.fileSizeLabel} limit'));
     }
 

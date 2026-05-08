@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:dio/dio.dart';
+import 'package:image/image.dart' as img;
 
 import 'package:uppidi_upload/screens/upload_screen.dart';
 import 'package:uppidi_upload/screens/test_screen.dart';
@@ -18,6 +19,7 @@ import 'package:uppidi_upload/core/models/upload_request.dart';
 import 'package:uppidi_upload/l10n/app_localizations.dart';
 import 'package:uppidi_upload/core/version_check_provider.dart';
 import 'package:uppidi_upload/core/settings_service.dart';
+import 'package:uppidi_upload/widgets/image_crop_overlay.dart';
 
 /// Mock UploadNotifier to control initial state
 class MockUploadNotifier extends UploadNotifier {
@@ -983,6 +985,153 @@ void main() {
       expect(find.byType(AlertDialog), findsOneWidget);
       // Verify error message is shown in the dialog
       expect(find.text(errorMessage), findsWidgets);
+    });
+  });
+
+  group('Crop Tool Tests', () {
+    /// Generate valid PNG bytes for testing image decode.
+    Uint8List _validPngBytes() {
+      final image = img.Image(width: 100, height: 100);
+      for (int y = 0; y < 100; y++) {
+        for (int x = 0; x < 100; x++) {
+          image.setPixelRgba(x, y, 255, 0, 0, 255);
+        }
+      }
+      return Uint8List.fromList(img.encodePng(image));
+    }
+
+    testWidgets('Crop icon visible when image file selected', (tester) async {
+      final imageUploader = MockUploader(isImageProvider: true);
+      final notifier = MockUploadNotifier(
+        initialTestState: UploadFileSelected(
+          fileName: 'test.png',
+          fileSizeBytes: 67,
+          mimeType: 'image/png',
+          fileBytes: _validPngBytes(),
+          quality: 0,
+          providers: [imageUploader],
+          selectedProviderIndex: 0,
+        ),
+        providers: [imageUploader],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            uploadProvider.overrideWith(() => notifier),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: const UploadScreen()),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Crop icon should be visible for image files
+      expect(find.byIcon(Icons.crop), findsOneWidget);
+    });
+
+    testWidgets('Crop icon NOT visible for non-image files', (tester) async {
+      final mockUploaders = [MockUploader()];
+      final notifier = MockUploadNotifier(
+        initialTestState: UploadFileSelected(
+          fileName: 'test.pdf',
+          fileSizeBytes: 1024,
+          mimeType: 'application/pdf',
+          fileBytes: null,
+          quality: 0,
+          providers: mockUploaders,
+          selectedProviderIndex: 0,
+        ),
+        providers: mockUploaders,
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            uploadProvider.overrideWith(() => notifier),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: const UploadScreen()),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Crop icon should NOT be present for non-image files
+      expect(find.byIcon(Icons.crop), findsNothing);
+    });
+
+    testWidgets('ImageCropOverlay shows Apply and Cancel buttons',
+        (tester) async {
+      final bytes = _validPngBytes();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 300,
+                height: 300,
+                child: ImageCropOverlay(
+                  imageBytes: bytes,
+                  imageWidth: 100,
+                  imageHeight: 100,
+                  onConfirm: (_) {},
+                  onCancel: () {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Apply and Cancel buttons should be present
+      expect(find.text('Apply'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
+    });
+
+    testWidgets('ImageCropOverlay Cancel button triggers callback',
+        (tester) async {
+      final bytes = _validPngBytes();
+      bool cancelCalled = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 300,
+                height: 300,
+                child: ImageCropOverlay(
+                  imageBytes: bytes,
+                  imageWidth: 100,
+                  imageHeight: 100,
+                  onConfirm: (_) {},
+                  onCancel: () {
+                    cancelCalled = true;
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Tap Cancel button
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(cancelCalled, isTrue);
     });
   });
 }

@@ -31,8 +31,11 @@ sealed class UploadState {
 }
 
 final class UploadIdle extends UploadState {
-  const UploadIdle(
-      {super.results, super.selectedProviderIndex, super.providers});
+  const UploadIdle({
+    super.results,
+    super.selectedProviderIndex,
+    super.providers,
+  });
 }
 
 final class UploadFileSelected extends UploadState {
@@ -107,11 +110,11 @@ final class UploadCompleted extends UploadState {
 class UploadNotifier extends Notifier<UploadState> {
   final List<BaseUploader>? _injectedProviders;
 
-  UploadNotifier({
-    List<BaseUploader>? providers,
-  }) : _injectedProviders = providers;
+  UploadNotifier({List<BaseUploader>? providers})
+    : _injectedProviders = providers;
 
   int _selectedQuality = 0; // 0=original, 1=medium (50%), 2=low (25%)
+  Uint8List? _originalFileBytes; // saved for crop reset
 
   String? _lastFilePath;
   Uint8List? _lastFileBytes;
@@ -150,35 +153,35 @@ class UploadNotifier extends Notifier<UploadState> {
     final prev = state;
     state = switch (prev) {
       UploadFileSelected() => UploadFileSelected(
-          fileName: prev.fileName,
-          fileSizeBytes: prev.fileSizeBytes,
-          mimeType: prev.mimeType,
-          fileBytes: prev.fileBytes,
-          quality: prev.quality,
-          results: prev.results,
-          selectedProviderIndex: index,
-          providers: prev.providers,
-        ),
+        fileName: prev.fileName,
+        fileSizeBytes: prev.fileSizeBytes,
+        mimeType: prev.mimeType,
+        fileBytes: prev.fileBytes,
+        quality: prev.quality,
+        results: prev.results,
+        selectedProviderIndex: index,
+        providers: prev.providers,
+      ),
       UploadIdle() => UploadIdle(
-          results: prev.results,
-          selectedProviderIndex: index,
-          providers: prev.providers,
-        ),
+        results: prev.results,
+        selectedProviderIndex: index,
+        providers: prev.providers,
+      ),
       UploadInProgress() => prev,
       UploadCompleted() when prev.fileName != null => UploadFileSelected(
-          fileName: prev.fileName!,
-          fileSizeBytes: prev.fileSizeBytes,
-          mimeType: prev.mimeType,
-          fileBytes: prev.fileBytes,
-          results: prev.results,
-          selectedProviderIndex: index,
-          providers: prev.providers,
-        ),
+        fileName: prev.fileName!,
+        fileSizeBytes: prev.fileSizeBytes,
+        mimeType: prev.mimeType,
+        fileBytes: prev.fileBytes,
+        results: prev.results,
+        selectedProviderIndex: index,
+        providers: prev.providers,
+      ),
       UploadCompleted() => UploadIdle(
-          results: prev.results,
-          selectedProviderIndex: index,
-          providers: prev.providers,
-        ),
+        results: prev.results,
+        selectedProviderIndex: index,
+        providers: prev.providers,
+      ),
     };
   }
 
@@ -195,7 +198,8 @@ class UploadNotifier extends Notifier<UploadState> {
     try {
       var request = await createUploadRequest(file);
       _log.info(
-          'File: ${file.name}, size: ${request.sizeInBytes}, mime: ${request.mimeType}');
+        'File: ${file.name}, size: ${request.sizeInBytes}, mime: ${request.mimeType}',
+      );
 
       // Read preview bytes
       Uint8List? previewBytes;
@@ -208,6 +212,7 @@ class UploadNotifier extends Notifier<UploadState> {
       }
 
       // Store request for later upload
+      _originalFileBytes = previewBytes;
       state = UploadFileSelected(
         fileName: file.name,
         fileSizeBytes: request.sizeInBytes,
@@ -280,8 +285,10 @@ class UploadNotifier extends Notifier<UploadState> {
           if (outBytes.length >= (finalReq.sizeInBytes * 0.9)) {
             _log.info('Resize skipped — output not smaller than original');
           } else {
-            final fileName = (finalReq.fileName ?? 'image')
-                .replaceAll(RegExp(r'\.\w+$'), '.jpg');
+            final fileName = (finalReq.fileName ?? 'image').replaceAll(
+              RegExp(r'\.\w+$'),
+              '.jpg',
+            );
             finalReq = FileUploadRequest(
               fileName: fileName,
               mimeType: 'image/jpeg',
@@ -289,7 +296,8 @@ class UploadNotifier extends Notifier<UploadState> {
               dataStream: Stream.value(outBytes),
             );
             _log.info(
-                'Resized to ${newW}x${newH} ($ratio ratio, $outBytes.length bytes, Q$jpegQuality)');
+              'Resized to ${newW}x${newH} ($ratio ratio, $outBytes.length bytes, Q$jpegQuality)',
+            );
           }
         }
       } catch (e) {
@@ -313,6 +321,7 @@ class UploadNotifier extends Notifier<UploadState> {
 
       _lastFilePath = filePath;
       _lastFileBytes = null;
+      _originalFileBytes = previewBytes;
       state = UploadFileSelected(
         fileName: fileName,
         fileSizeBytes: size,
@@ -347,8 +356,9 @@ class UploadNotifier extends Notifier<UploadState> {
         lastResult: UploadResult(success: false),
         errorMessage: 'No upload providers configured',
         fileName: info.fileName ?? request.fileName,
-        fileSizeBytes:
-            info.fileSizeBytes > 0 ? info.fileSizeBytes : request.sizeInBytes,
+        fileSizeBytes: info.fileSizeBytes > 0
+            ? info.fileSizeBytes
+            : request.sizeInBytes,
         mimeType: info.mimeType ?? request.mimeType,
         fileBytes: info.fileBytes,
         results: state.results,
@@ -360,7 +370,8 @@ class UploadNotifier extends Notifier<UploadState> {
 
     final provider = state.providers[state.selectedProviderIndex];
     _log.info(
-        'Using provider: ${provider.providerName} (${provider.providerId})');
+      'Using provider: ${provider.providerName} (${provider.providerId})',
+    );
 
     final info = _extractFileInfo(state);
     final cancelToken = CancelToken();
@@ -382,8 +393,9 @@ class UploadNotifier extends Notifier<UploadState> {
     _lastSampleBytes = 0;
 
     final currentFileName = info.fileName ?? request.fileName;
-    final currentFileSize =
-        info.fileSizeBytes > 0 ? info.fileSizeBytes : request.sizeInBytes;
+    final currentFileSize = info.fileSizeBytes > 0
+        ? info.fileSizeBytes
+        : request.sizeInBytes;
     final currentMimeType = info.mimeType ?? request.mimeType;
     final currentFileBytes = info.fileBytes;
 
@@ -450,11 +462,19 @@ class UploadNotifier extends Notifier<UploadState> {
               final speed = _formatSpeed(bytesPerSec);
               _lastSpeedSample = now;
               _lastSampleBytes = sent;
-              state =
-                  current.copyWithProgress(sent / total, sent, total, speed);
+              state = current.copyWithProgress(
+                sent / total,
+                sent,
+                total,
+                speed,
+              );
             } else {
               state = current.copyWithProgress(
-                  sent / total, sent, total, current.speedLabel);
+                sent / total,
+                sent,
+                total,
+                current.speedLabel,
+              );
             }
           }
         },
@@ -463,7 +483,8 @@ class UploadNotifier extends Notifier<UploadState> {
       );
 
       _log.info(
-          'Result: success=${result.success}, url=${result.url}, error=${result.errorMessage}');
+        'Result: success=${result.success}, url=${result.url}, error=${result.errorMessage}',
+      );
 
       state = UploadCompleted(
         lastResult: result,
@@ -508,19 +529,24 @@ class UploadNotifier extends Notifier<UploadState> {
   }
 
   Future<void> _saveToHistory(
-      UploadResult result, BaseUploader provider, String fileName) async {
+    UploadResult result,
+    BaseUploader provider,
+    String fileName,
+  ) async {
     try {
       final history = ref.read(historyServiceProvider);
-      await history.add(UploadRecord(
-        fileName: fileName,
-        url: result.url,
-        providerId: provider.providerId,
-        providerName: provider.providerName,
-        success: result.success,
-        errorMessage: result.errorMessage,
-        statusCode: result.statusCode,
-        completedAt: result.completedAt,
-      ));
+      await history.add(
+        UploadRecord(
+          fileName: fileName,
+          url: result.url,
+          providerId: provider.providerId,
+          providerName: provider.providerName,
+          success: result.success,
+          errorMessage: result.errorMessage,
+          statusCode: result.statusCode,
+          completedAt: result.completedAt,
+        ),
+      );
       ref.invalidate(uploadHistoryProvider);
     } catch (e) {
       _log.warn('Failed to save history: $e');
@@ -539,9 +565,52 @@ class UploadNotifier extends Notifier<UploadState> {
     );
   }
 
+  /// Applies a crop operation: replaces file bytes with the cropped version.
+  /// [croppedBytes] should be JPEG-encoded bytes ready for upload/preview.
+  void applyCrop(Uint8List croppedBytes) {
+    _lastFileBytes = croppedBytes;
+    _lastFilePath = null; // cropped data is no longer a file path
+    if (state is UploadFileSelected) {
+      final prev = state as UploadFileSelected;
+      final croppedName =
+          prev.fileName.replaceAll(RegExp(r'\.\w+$'), '') + '.jpg';
+      state = UploadFileSelected(
+        fileName: croppedName,
+        fileSizeBytes: croppedBytes.length,
+        mimeType: 'image/jpeg',
+        fileBytes: croppedBytes,
+        quality: prev.quality,
+        results: prev.results,
+        selectedProviderIndex: prev.selectedProviderIndex,
+        providers: prev.providers,
+      );
+    }
+  }
+
+  /// Resets the image back to the original pre-crop bytes.
+  void resetCrop() {
+    if (_originalFileBytes == null) return;
+    _lastFileBytes = _originalFileBytes;
+    _lastFilePath = null;
+    if (state is UploadFileSelected) {
+      final prev = state as UploadFileSelected;
+      state = UploadFileSelected(
+        fileName: prev.fileName.replaceAll('.jpg', '_original'),
+        fileSizeBytes: _originalFileBytes!.length,
+        mimeType: 'image/png',
+        fileBytes: _originalFileBytes,
+        quality: prev.quality,
+        results: prev.results,
+        selectedProviderIndex: prev.selectedProviderIndex,
+        providers: prev.providers,
+      );
+    }
+  }
+
   void clearSelection() {
     _lastFilePath = null;
     _lastFileBytes = null;
+    _originalFileBytes = null;
     state = UploadIdle(
       results: state.results,
       selectedProviderIndex: state.selectedProviderIndex,
@@ -552,7 +621,11 @@ class UploadNotifier extends Notifier<UploadState> {
 
 extension UploadInProgressX on UploadInProgress {
   UploadInProgress copyWithProgress(
-      double progress, int sent, int total, String speedLabel) {
+    double progress,
+    int sent,
+    int total,
+    String speedLabel,
+  ) {
     return UploadInProgress(
       progress: progress,
       cancelToken: cancelToken,
@@ -583,8 +656,7 @@ String _mapDioException(DioException e) {
     DioExceptionType.cancel => 'Upload cancelled',
     DioExceptionType.connectionTimeout ||
     DioExceptionType.sendTimeout ||
-    DioExceptionType.receiveTimeout =>
-      'Connection timed out',
+    DioExceptionType.receiveTimeout => 'Connection timed out',
     DioExceptionType.connectionError =>
       'Connection failed: ${e.message ?? "server unreachable"}',
     DioExceptionType.badResponse =>
@@ -595,7 +667,7 @@ String _mapDioException(DioException e) {
 
 /// Helper to extract file info from current state for passing to UploadCompleted
 ({String? fileName, int fileSizeBytes, String? mimeType, Uint8List? fileBytes})
-    _extractFileInfo(UploadState current) {
+_extractFileInfo(UploadState current) {
   if (current is UploadFileSelected) {
     return (
       fileName: current.fileName,
