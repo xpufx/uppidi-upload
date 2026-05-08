@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: rename UI variant options to reflect what they do
+- docs: auto-update changelog
 - fix: hide navigation layout setting on narrow screens (<600dp)
 - docs: auto-update changelog
 - refactor: replace flutter_secure_storage with Hive, downgrade file_picker/share_plus
@@ -28,5 +30,3 @@
 - docs: auto-update changelog
 - feat: add debug logging and navigation layout toggles to settings; improve catbox error mapping
 - docs: auto-update changelog
-- docs: auto-update changelog
-- badges: icon-only for mime type, calendar icon for expiry
