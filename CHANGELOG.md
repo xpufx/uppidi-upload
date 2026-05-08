@@ -1,5 +1,7 @@
 # Changelog
 
+- Remove compact UI variant
+- docs: auto-update changelog
 - docs: auto-update changelog
 - feat: add swappable shell navigation strategies
 - docs: auto-update changelog
@@ -28,5 +30,3 @@
 - feat: in-app download for desktop (no browser redirect)
 - docs: auto-update changelog
 - docs: add mermaid diagrams to user manual
-- docs: auto-update changelog
-- feat: 3-way navigation layout on desktop, debug logging indication, catbox error mapping
