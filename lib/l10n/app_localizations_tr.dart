@@ -285,13 +285,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get uiVariantDescription =>
-      'Ana ekran düzenini seçin: Varsayılan veya Kompakt.';
+      'Ana ekran sağlayıcı düzenini seçin: Liste veya Çip.';
 
   @override
-  String get uiVariantDefault => 'Varsayılan';
+  String get uiVariantDefault => 'Sağlayıcı Listesi';
 
   @override
-  String get uiVariantCompact => 'Kompakt';
+  String get uiVariantCompact => 'Sağlayıcı Çipleri';
 
   @override
   String get iconLegendWarning => 'Uyarı';

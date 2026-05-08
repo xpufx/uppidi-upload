@@ -7,35 +7,42 @@ export PATH="$HOME/.flutter/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_
 
 cd /home/xpufx/code/uppidi
 
+# ── Version sync ──────────────────────────────────────────────
+VERSION=$(grep 'version:' pubspec.yaml | head -1 | awk '{print $2}')
+VERSION_FILE="lib/core/version.dart"
+echo "==> Syncing version to ${VERSION_FILE} (${VERSION})..."
+sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${VERSION}';/" "$VERSION_FILE"
+git add "$VERSION_FILE" 2>/dev/null
+echo "   ✅ Version synced"
+
 # ── Hardcoded string check ──────────────────────────────────
 echo "==> Checking for hardcoded strings..."
-HARDCODED=$(grep -rn "Text(\'\|label: \'\|title: \'\|hintText: \'\|tooltip: \'\|child: Text(\'\|subtitle: Text(\'" lib/ --include="*.dart" \
-  | grep -v "l10n\." \
-  | grep -v "const\|static\|final\|String \|AppLocalizations\|RegExp\|gitHash\|appVersion\|GIT_HASH\|CHANGELOG\|changeLogText\|Proxy\|URL\|API\|OK\|iOS\|HTTP\|SOCKS\|FormatException\|Upload\|Provider\|Settings\|History\|Test\|Share\|Shared\|formatSize\|formatTime\|AppLogo\|Icon(\|Icons\." \
-  | grep -v "English\|Türkçe\|Italiano\|Uppidi\|uppidi" \
-  | grep -v "share_template\|template\|variables\|examples\|[\"']%[a-z]" \
-  | grep -E "['\"][A-Za-z]{3,}" \
-  || true)
+HARDCODED=$(grep -rn "Text(\'\|label: \'\|title: \'\|hintText: \'\|tooltip: \'\|child: Text(\'\|subtitle: Text(\'" lib/ --include="*.dart" |
+	grep -v "l10n\." |
+	grep -v "const\|static\|final\|String \|AppLocalizations\|RegExp\|gitHash\|appVersion\|GIT_HASH\|CHANGELOG\|changeLogText\|Proxy\|URL\|API\|OK\|iOS\|HTTP\|SOCKS\|FormatException\|Upload\|Provider\|Settings\|History\|Test\|Share\|Shared\|formatSize\|formatTime\|AppLogo\|Icon(\|Icons\." |
+	grep -v "English\|Türkçe\|Italiano\|Uppidi\|uppidi" |
+	grep -v "share_template\|template\|variables\|examples\|[\"']%[a-z]" |
+	grep -E "['\"][A-Za-z]{3,}" ||
+	true)
 if [ -n "$HARDCODED" ]; then
-  echo "❌ Found hardcoded English strings in UI code:"
-  echo "$HARDCODED"
-  echo "   Replace with l10n.* or add to ARB files."
-  exit 1
+	echo "❌ Found hardcoded English strings in UI code:"
+	echo "$HARDCODED"
+	echo "   Replace with l10n.* or add to ARB files."
+	exit 1
 fi
 echo "   ✅ No hardcoded strings found"
 
 # ── Auto-generate changelog ──────────────────────────────────
 echo "==> Updating CHANGELOG.md..."
-echo "# Changelog" > CHANGELOG.md
-echo "" >> CHANGELOG.md
+echo "# Changelog" >CHANGELOG.md
+echo "" >>CHANGELOG.md
 
-git log --oneline --format="- %s" | head -30 >> CHANGELOG.md
+git log --oneline --format="- %s" | head -30 >>CHANGELOG.md
 git add CHANGELOG.md 2>/dev/null
 git commit -m "docs: auto-update changelog" --no-verify 2>/dev/null || true
 echo "   ✅ Changelog updated"
 
 GIT_HASH=$(git rev-parse --short HEAD)
-VERSION=$(grep 'version:' pubspec.yaml | head -1 | awk '{print $2}')
 ARTIFACTS_DIR="/home/xpufx/code/uppidi/.caddy-artifacts"
 mkdir -p "$ARTIFACTS_DIR"
 
@@ -54,7 +61,7 @@ echo "==> Updating latest symlink..."
 ln -sf "${DST}" "${ARTIFACTS_DIR}/uppidi-upload-latest-android-arm64-v8a.apk"
 
 echo "==> Writing version file..."
-echo "$GIT_HASH" > "${ARTIFACTS_DIR}/latest.txt"
+echo "$GIT_HASH" >"${ARTIFACTS_DIR}/latest.txt"
 
 echo "==> Cleaning old APKs (keep latest 5)..."
 ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-android-*.apk 2>/dev/null | tail -n +6 | xargs -r rm -f
@@ -104,4 +111,4 @@ CHECKLIST
 echo ""
 echo "Happy testing!"
 
-true  # ensure script always exits 0 after checklist
+true # ensure script always exits 0 after checklist

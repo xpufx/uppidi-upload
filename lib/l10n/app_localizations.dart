@@ -613,19 +613,19 @@ abstract class AppLocalizations {
   /// No description provided for @uiVariantDescription.
   ///
   /// In en, this message translates to:
-  /// **'Choose the main screen layout: Default or Compact.'**
+  /// **'Choose the main screen provider layout: List or Chips.'**
   String get uiVariantDescription;
 
   /// No description provided for @uiVariantDefault.
   ///
   /// In en, this message translates to:
-  /// **'Default'**
+  /// **'Provider List'**
   String get uiVariantDefault;
 
   /// No description provided for @uiVariantCompact.
   ///
   /// In en, this message translates to:
-  /// **'Compact'**
+  /// **'Provider Chips'**
   String get uiVariantCompact;
 
   /// No description provided for @iconLegendWarning.

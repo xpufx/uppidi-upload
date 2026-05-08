@@ -285,13 +285,13 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get uiVariantDescription =>
-      'Scegli il layout della schermata principale: Default o Compatta.';
+      'Scegli il layout dei provider nella schermata principale: Lista o Chip.';
 
   @override
-  String get uiVariantDefault => 'Default';
+  String get uiVariantDefault => 'Lista Provider';
 
   @override
-  String get uiVariantCompact => 'Compatta';
+  String get uiVariantCompact => 'Chip Provider';
 
   @override
   String get iconLegendWarning => 'Avvertenza';

@@ -283,13 +283,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get uiVariantDescription =>
-      'Choose the main screen layout: Default or Compact.';
+      'Choose the main screen provider layout: List or Chips.';
 
   @override
-  String get uiVariantDefault => 'Default';
+  String get uiVariantDefault => 'Provider List';
 
   @override
-  String get uiVariantCompact => 'Compact';
+  String get uiVariantCompact => 'Provider Chips';
 
   @override
   String get iconLegendWarning => 'Warning';
