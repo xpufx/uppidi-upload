@@ -197,25 +197,31 @@ class _ProviderDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButton<int>(
-      value: selectedIndex,
-      isExpanded: true,
-      onChanged: isUploading ? null : onChanged,
-      items: providers.asMap().entries.map((entry) {
-        final p = entry.value;
-        final online = !kIsWeb || p.supportsWeb;
-        return DropdownMenuItem(
-          value: entry.key,
+    final selectedProvider = selectedIndex < providers.length ? providers[selectedIndex] : null;
+    return Tooltip(
+      message: selectedProvider?.providerName ?? '',
+      child: DropdownButton<int>(
+        value: selectedIndex,
+        isExpanded: true,
+        onChanged: isUploading ? null : onChanged,
+        items: providers.asMap().entries.map((entry) {
+          final p = entry.value;
+          final online = !kIsWeb || p.supportsWeb;
+          return DropdownMenuItem(
+            value: entry.key,
             enabled: online,
             child: Row(
               children: [
                 Icon(_providerIcon(p.providerId), size: 20,
-                  color: online ? Theme.of(context).colorScheme.primary : Theme.of(context).disabledColor),
+                  color: online ? Theme.of(context).colorScheme.primary : Theme.of(context).disabledColor,
+                ),
+                const SizedBox(width: 8),
                 metadataBadges(p.metadata),
               ],
             ),
-        );
-      }).toList(),
+          );
+        }        ).toList(),
+      ),
     );
   }
 }
