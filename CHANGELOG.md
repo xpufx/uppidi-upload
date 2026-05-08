@@ -1,5 +1,8 @@
 # Changelog
 
+- Expand icon legend to all icons, make provider dropdown icon-only
+- Add UI variant system with compact layout option
+- docs: auto-update changelog
 - Improve main screen UI with app description, enhanced provider info, and icon legend
 - Allow users to enable providers even when server reports them as down
 - docs: auto-update changelog
@@ -27,6 +30,3 @@
 - feat: provider health manifest — fetch providers.json from CDN, show broken warnings
 - fix: move resize logic to uploadSelected() so quality selector works before upload
 - fix: custom logo removal, version check auto-fire, unused file_picker import
-- fix: restore freeimage.host API key (public key for anonymous uploads)
-- fix: freeimage parseResponse — detect HTML response, show clear error
-- add env_check.sh, remove stale UploadStarting test reference
