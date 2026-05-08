@@ -1,5 +1,7 @@
 # Changelog
 
+- Fix dropdown: show provider name, remove metadata text
+- docs: auto-update changelog
 - Fix provider dropdown - remove broken selectedItemBuilder, use default behavior
 - docs: auto-update changelog
 - Fix missing translations for errorInvalidUploader in IT and TR
@@ -28,5 +30,3 @@
 - fix: update FreeImage test to expect API key in endpoint
 - test: 23 widget tests — full state machine, providers screen, nav tabs
 - docs: architecture diagrams — state machine, navigation, upload lifecycle, error recovery
-- test: widget tests for upload screen — provider dropdown, quality selector, health lock, version check
-- fix: quality selector reactive via state, health-disabled switch blocked, badge icons 14px
