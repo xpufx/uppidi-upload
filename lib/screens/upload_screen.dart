@@ -216,7 +216,9 @@ class _ProviderDropdown extends StatelessWidget {
                   color: online ? Theme.of(context).colorScheme.primary : Theme.of(context).disabledColor,
                 ),
                 const SizedBox(width: 8),
-                metadataBadges(p.metadata),
+                Expanded(child: Text(p.providerName, overflow: TextOverflow.ellipsis,
+                  style: online ? null : TextStyle(color: Theme.of(context).disabledColor),
+                )),
               ],
             ),
           );
