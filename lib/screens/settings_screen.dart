@@ -16,16 +16,6 @@ import '../core/version.dart';
 import '../core/version_check_provider.dart';
 import '../l10n/app_localizations.dart';
 
-final providerConfigsProvider =
-    FutureProvider.family<Map<String, String>, String>(
-  (ref, providerId) async {
-    final svc = ref.read(settingsServiceProvider);
-    final provider =
-        ProviderRegistry.all.firstWhere((p) => p.providerId == providerId);
-    return svc.loadProviderConfig(providerId, provider.requiredConfigKeys);
-  },
-);
-
 final insecureConnProvider = FutureProvider<bool>((ref) async {
   final svc = ref.read(settingsServiceProvider);
   return svc.isInsecureConnAllowed();
@@ -64,46 +54,10 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final svc = ref.read(settingsServiceProvider);
-    final configurableProviders = ProviderRegistry.all
-        .where((p) => p.requiredConfigKeys.isNotEmpty)
-        .toList();
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        if (configurableProviders.isNotEmpty) ...[
-          Text(l10n.providersSection,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
-          ...configurableProviders.map((provider) {
-            final configAsync =
-                ref.watch(providerConfigsProvider(provider.providerId));
-            final saved = configAsync.asData?.value ?? {};
-            final labels = provider.configLabels;
-
-            return _ProviderConfigCard(
-              providerName: provider.providerName,
-              providerId: provider.providerId,
-              configKeys: provider.requiredConfigKeys,
-              labels: labels,
-              saved: saved,
-              onSave: (key, value) => svc.set(
-                svc.providerKey(provider.providerId, key),
-                value,
-              ),
-              onClear: (key) => svc.remove(
-                svc.providerKey(provider.providerId, key),
-              ),
-            );
-          }),
-          const SizedBox(height: 24),
-          const Divider(),
-          const SizedBox(height: 8),
-        ],
         Text(l10n.settings,
             style: Theme.of(context)
                 .textTheme
@@ -112,82 +66,6 @@ class SettingsScreen extends ConsumerWidget {
         const SizedBox(height: 12),
         _GlobalToggles(),
       ],
-    );
-  }
-}
-
-class _ProviderConfigCard extends StatefulWidget {
-  final String providerName;
-  final String providerId;
-  final List<String> configKeys;
-  final Map<String, String> labels;
-  final Map<String, String> saved;
-  final void Function(String key, String value) onSave;
-  final void Function(String key) onClear;
-
-  const _ProviderConfigCard({
-    required this.providerName,
-    required this.providerId,
-    required this.configKeys,
-    required this.labels,
-    required this.saved,
-    required this.onSave,
-    required this.onClear,
-  });
-
-  @override
-  State<_ProviderConfigCard> createState() => _ProviderConfigCardState();
-}
-
-class _ProviderConfigCardState extends State<_ProviderConfigCard> {
-  final _controllers = <String, TextEditingController>{};
-
-  @override
-  void initState() {
-    super.initState();
-    for (final key in widget.configKeys) {
-      _controllers[key] = TextEditingController(text: widget.saved[key] ?? '');
-    }
-  }
-
-  @override
-  void dispose() {
-    for (final c in _controllers.values) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.providerName,
-                style: const TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            ...widget.configKeys.map((key) {
-              final label = widget.labels[key] ?? key;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: TextField(
-                  controller: _controllers[key],
-                  decoration: InputDecoration(
-                    labelText: label,
-                    border: const OutlineInputBorder(),
-                    isDense: true,
-                  ),
-                  onChanged: (value) => widget.onSave(key, value),
-                ),
-              );
-            }),
-          ],
-        ),
-      ),
     );
   }
 }

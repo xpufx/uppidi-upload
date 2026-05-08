@@ -65,7 +65,6 @@ class UploadScreen extends ConsumerWidget {
             ],
             if (provider != null) ...[
               const SizedBox(height: 8),
-              _ProviderIconLegend(),
             ],
             if (webUnsupported) const _WebWarning(),
             switch (uploadState) {
@@ -417,13 +416,6 @@ class _AppDescription extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l10n.appTitle,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
                     l10n.appDescription,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -437,84 +429,6 @@ class _AppDescription extends StatelessWidget {
       ),
     );
   }
-}
-
-class _ProviderIconLegend extends StatelessWidget {
-  const _ProviderIconLegend();
-
-  static final _legendItems = [
-    (Icons.science_outlined, 'iconLegendTest'),
-    (Icons.folder_outlined, 'iconLegendFiles'),
-    (Icons.link, 'iconLegendLinks'),
-    (Icons.image_outlined, 'iconLegendImages'),
-    (Icons.cloud_upload, 'iconLegendOther'),
-    (Icons.calendar_today_outlined, 'iconLegendExpiry'),
-    (Icons.file_present_outlined, 'iconLegendFileSize'),
-    (Icons.check_circle_outline, 'iconLegendAcceptedFiles'),
-    (Icons.link, 'iconLegendDirectLinks'),
-    (Icons.account_circle_outlined, 'iconLegendAccount'),
-    (Icons.warning_amber, 'iconLegendWarning'),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Card(
-      elevation: 0,
-      color: Theme.of(context)
-          .colorScheme
-          .surfaceContainerHighest
-          .withValues(alpha: 0.3),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.iconLegendTitle,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 16,
-              runSpacing: 8,
-              children: _legendItems.map((item) {
-                final (icon, key) = item;
-                final label = _localizedLabel(key, l10n);
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(icon,
-                        size: 16, color: Theme.of(context).colorScheme.primary),
-                    const SizedBox(width: 4),
-                    Text(label, style: Theme.of(context).textTheme.bodySmall),
-                  ],
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _localizedLabel(String key, AppLocalizations l10n) => switch (key) {
-        'iconLegendTest' => l10n.iconLegendTest,
-        'iconLegendFiles' => l10n.iconLegendFiles,
-        'iconLegendLinks' => l10n.iconLegendLinks,
-        'iconLegendImages' => l10n.iconLegendImages,
-        'iconLegendOther' => l10n.iconLegendOther,
-        'iconLegendExpiry' => l10n.iconLegendExpiry,
-        'iconLegendFileSize' => l10n.iconLegendFileSize,
-        'iconLegendAcceptedFiles' => l10n.iconLegendAcceptedFiles,
-        'iconLegendDirectLinks' => l10n.iconLegendDirectLinks,
-        'iconLegendAccount' => l10n.iconLegendAccount,
-        'iconLegendWarning' => l10n.iconLegendWarning,
-        _ => key,
-      };
 }
 
 class _PickButton extends ConsumerWidget {
