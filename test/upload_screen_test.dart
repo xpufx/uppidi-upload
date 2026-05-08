@@ -584,8 +584,10 @@ void main() {
       await tester.tap(dropdown);
       await tester.pumpAndSettle();
 
-      // Tap on the second provider
-      await tester.tap(find.text('Provider 2').last);
+      // Tap on the second dropdown item (by icon, since text was removed)
+      final items = find.byType(DropdownMenuItem<int>);
+      expect(items, findsWidgets);
+      await tester.tap(items.at(1));
       await tester.pumpAndSettle();
 
       // File preview should still be visible (file stays selected)

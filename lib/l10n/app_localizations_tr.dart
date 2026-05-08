@@ -12,19 +12,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get appTitle => 'Uppidi Upload';
 
   @override
-  String get genericError =>
-      'Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.';
+  String get genericError => 'Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.';
 
   @override
-  String get errorSessionExpired =>
-      'Oturumunuzun süresi doldu. Lütfen Ayarlar\'dan kimlik bilgilerinizi kontrol edin.';
+  String get errorSessionExpired => 'Oturumunuzun süresi doldu. Lütfen Ayarlar\'dan kimlik bilgilerinizi kontrol edin.';
 
   @override
   String get errorFileTooLarge => 'Bu dosya bu sağlayıcı için çok büyük.';
 
   @override
-  String get errorInvalidUploader =>
-      'Invalid uploader configuration. Please check your settings or try again later.';
+  String get errorInvalidUploader => 'Invalid uploader configuration. Please check your settings or try again later.';
 
   @override
   String get invalidMimeType => 'Geçersiz veya desteklenmeyen dosya türü.';
@@ -33,19 +30,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get fileSystemError => 'Seçilen dosya okunamadı.';
 
   @override
-  String get errorConnectionFailed =>
-      'Sağlayıcıya bağlanılamadı. Erişilemiyor olabilir veya tarayıcınız tarafından engellenmiş olabilir.';
+  String get errorConnectionFailed => 'Sağlayıcıya bağlanılamadı. Erişilemiyor olabilir veya tarayıcınız tarafından engellenmiş olabilir.';
 
   @override
   String get uploadCancelled => 'Yükleme iptal edildi.';
 
   @override
-  String get providerWebNotSupported =>
-      'Bu sağlayıcı web tarayıcısında doğrudan kullanılamaz. Ayarlardan deneysel proxy\'yi etkinleştirin.';
+  String get providerWebNotSupported => 'Bu sağlayıcı web tarayıcısında doğrudan kullanılamaz. Ayarlardan deneysel proxy\'yi etkinleştirin.';
 
   @override
-  String get selfSignedCertWarning =>
-      'Güvensiz bağlantı modu sertifika doğrulamasını atlar. Bu seçeneği yalnızca güvenilen kendi barındırılan sunucular için etkinleştirin.';
+  String get selfSignedCertWarning => 'Güvensiz bağlantı modu sertifika doğrulamasını atlar. Bu seçeneği yalnızca güvenilen kendi barındırılan sunucular için etkinleştirin.';
 
   @override
   String get upload => 'Yükle';
@@ -113,8 +107,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get openInBrowser => 'Tarayıcıda aç';
 
   @override
-  String get noProviders =>
-      'Hiç sağlayıcı yapılandırılmamış. Ayarlardan bir tane ekleyin.';
+  String get noProviders => 'Hiç sağlayıcı yapılandırılmamış. Ayarlardan bir tane ekleyin.';
 
   @override
   String disclaimer(Object provider) {
@@ -245,8 +238,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get debugLogging => 'Hata ayıklama günlüğünü etkinleştir';
 
   @override
-  String get debugLoggingDescription =>
-      'Sorun giderme için tüm HTTP istek/yanıt detaylarını konsola kaydeder. Yalnızca gerektiğinde etkinleştirin.';
+  String get debugLoggingDescription => 'Sorun giderme için tüm HTTP istek/yanıt detaylarını konsola kaydeder. Yalnızca gerektiğinde etkinleştirin.';
 
   @override
   String get qualityOriginal => 'Orijinal';
@@ -261,15 +253,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get navLayout => 'Gezinme Düzeni';
 
   @override
-  String get navLayoutDescription =>
-      'Masaüstü platformlarda her zaman alt gezinme çubuğunu göster';
+  String get navLayoutDescription => 'Masaüstü platformlarda her zaman alt gezinme çubuğunu göster';
 
   @override
   String get navigationLayout => 'Gezinme Düzeni';
 
   @override
-  String get navigationLayoutDescription =>
-      'Gezinmenin nerede görüneceğini seçin: Sol, Alt veya Sağ.';
+  String get navigationLayoutDescription => 'Gezinmenin nerede görüneceğini seçin: Sol, Alt veya Sağ.';
 
   @override
   String get navigationLeft => 'Sol';
@@ -284,8 +274,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get uiVariant => 'UI Varyantı';
 
   @override
-  String get uiVariantDescription =>
-      'Ana ekran düzenini seçin: Varsayılan veya Kompakt.';
+  String get uiVariantDescription => 'Ana ekran düzenini seçin: Varsayılan veya Kompakt.';
 
   @override
   String get uiVariantDefault => 'Varsayılan';
@@ -294,14 +283,31 @@ class AppLocalizationsTr extends AppLocalizations {
   String get uiVariantCompact => 'Kompakt';
 
   @override
+  String get iconLegendWarning => 'Uyarı';
+
+  @override
+  String get iconLegendExpiry => 'Süre';
+
+  @override
+  String get iconLegendFileSize => 'Dosya boyutu';
+
+  @override
+  String get iconLegendAcceptedFiles => 'Kabul edilen dosyalar';
+
+  @override
+  String get iconLegendDirectLinks => 'Doğrudan linkler';
+
+  @override
+  String get iconLegendAccount => 'Hesap gerekli';
+
+  @override
   String get enabled => 'Etkin';
 
   @override
   String get disabled => 'Devre Dışı';
 
   @override
-  String get appDescription =>
-      'Birden fazla ücretsiz barındırma servisine dosya yükleyin. Hızlı, basit ve birçok sağlayıcıyı destekler.';
+  String get appDescription => 'Birden fazla ücretsiz barındırma servisine dosya yükleyin. Hızlı, basit ve birçok sağlayıcıyı destekler.';
 
   @override
   String get providerInfoTitle => 'Sağlayıcı Bilgisi';

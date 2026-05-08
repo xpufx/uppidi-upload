@@ -206,17 +206,14 @@ class _ProviderDropdown extends StatelessWidget {
         final online = !kIsWeb || p.supportsWeb;
         return DropdownMenuItem(
           value: entry.key,
-          enabled: online,
-          child: Row(
-            children: [
-              Icon(_providerIcon(p.providerId), size: 20,
-                color: online ? Theme.of(context).colorScheme.primary : Theme.of(context).disabledColor),
-              const SizedBox(width: 8),
-              Text(p.providerName,
-                style: online ? null : TextStyle(color: Theme.of(context).disabledColor)),
-              metadataBadges(p.metadata),
-            ],
-          ),
+            enabled: online,
+            child: Row(
+              children: [
+                Icon(_providerIcon(p.providerId), size: 20,
+                  color: online ? Theme.of(context).colorScheme.primary : Theme.of(context).disabledColor),
+                metadataBadges(p.metadata),
+              ],
+            ),
         );
       }).toList(),
     );
@@ -374,6 +371,12 @@ class _ProviderIconLegend extends StatelessWidget {
     (Icons.link, 'iconLegendLinks'),
     (Icons.image_outlined, 'iconLegendImages'),
     (Icons.cloud_upload, 'iconLegendOther'),
+    (Icons.calendar_today_outlined, 'iconLegendExpiry'),
+    (Icons.file_present_outlined, 'iconLegendFileSize'),
+    (Icons.check_circle_outline, 'iconLegendAcceptedFiles'),
+    (Icons.link, 'iconLegendDirectLinks'),
+    (Icons.account_circle_outlined, 'iconLegendAccount'),
+    (Icons.warning_amber, 'iconLegendWarning'),
   ];
 
   @override
@@ -399,13 +402,7 @@ class _ProviderIconLegend extends StatelessWidget {
               runSpacing: 8,
               children: _legendItems.map((item) {
                 final (icon, key) = item;
-                final label = switch (key) {
-                  'iconLegendTest' => l10n.iconLegendTest,
-                  'iconLegendFiles' => l10n.iconLegendFiles,
-                  'iconLegendLinks' => l10n.iconLegendLinks,
-                  'iconLegendImages' => l10n.iconLegendImages,
-                  _ => l10n.iconLegendOther,
-                };
+                final label = _localizedLabel(key, l10n);
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -421,6 +418,21 @@ class _ProviderIconLegend extends StatelessWidget {
       ),
     );
   }
+
+  String _localizedLabel(String key, AppLocalizations l10n) => switch (key) {
+        'iconLegendTest' => l10n.iconLegendTest,
+        'iconLegendFiles' => l10n.iconLegendFiles,
+        'iconLegendLinks' => l10n.iconLegendLinks,
+        'iconLegendImages' => l10n.iconLegendImages,
+        'iconLegendOther' => l10n.iconLegendOther,
+        'iconLegendExpiry' => l10n.iconLegendExpiry,
+        'iconLegendFileSize' => l10n.iconLegendFileSize,
+        'iconLegendAcceptedFiles' => l10n.iconLegendAcceptedFiles,
+        'iconLegendDirectLinks' => l10n.iconLegendDirectLinks,
+        'iconLegendAccount' => l10n.iconLegendAccount,
+        'iconLegendWarning' => l10n.iconLegendWarning,
+        _ => key,
+      };
 }
 
 class _PickButton extends ConsumerWidget {

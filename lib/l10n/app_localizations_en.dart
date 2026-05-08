@@ -15,15 +15,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get genericError => 'An unexpected error occurred. Please try again.';
 
   @override
-  String get errorSessionExpired =>
-      'Your session has expired. Please check your credentials in Settings.';
+  String get errorSessionExpired => 'Your session has expired. Please check your credentials in Settings.';
 
   @override
   String get errorFileTooLarge => 'The file is too large for this provider.';
 
   @override
-  String get errorInvalidUploader =>
-      'Invalid uploader configuration. Please check your settings or try again later.';
+  String get errorInvalidUploader => 'Invalid uploader configuration. Please check your settings or try again later.';
 
   @override
   String get invalidMimeType => 'Invalid or unsupported file type.';
@@ -32,19 +30,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fileSystemError => 'Could not read the selected file.';
 
   @override
-  String get errorConnectionFailed =>
-      'Could not connect to the provider. It may be unreachable or blocked by your browser.';
+  String get errorConnectionFailed => 'Could not connect to the provider. It may be unreachable or blocked by your browser.';
 
   @override
   String get uploadCancelled => 'Upload cancelled.';
 
   @override
-  String get providerWebNotSupported =>
-      'This provider cannot be used directly in a web browser. Enable the experimental proxy in settings.';
+  String get providerWebNotSupported => 'This provider cannot be used directly in a web browser. Enable the experimental proxy in settings.';
 
   @override
-  String get selfSignedCertWarning =>
-      'Insecure connection mode bypasses certificate validation. Only enable this for trusted self-hosted servers.';
+  String get selfSignedCertWarning => 'Insecure connection mode bypasses certificate validation. Only enable this for trusted self-hosted servers.';
 
   @override
   String get upload => 'Upload';
@@ -243,8 +238,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get debugLogging => 'Enable debug logging';
 
   @override
-  String get debugLoggingDescription =>
-      'Logs full HTTP request/response details to the console for troubleshooting. Only enable when needed.';
+  String get debugLoggingDescription => 'Logs full HTTP request/response details to the console for troubleshooting. Only enable when needed.';
 
   @override
   String get qualityOriginal => 'Original';
@@ -259,15 +253,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navLayout => 'Navigation Layout';
 
   @override
-  String get navLayoutDescription =>
-      'Always show bottom navigation bar on desktop platforms';
+  String get navLayoutDescription => 'Always show bottom navigation bar on desktop platforms';
 
   @override
   String get navigationLayout => 'Navigation Layout';
 
   @override
-  String get navigationLayoutDescription =>
-      'Choose where the navigation appears: Left, Bottom, or Right.';
+  String get navigationLayoutDescription => 'Choose where the navigation appears: Left, Bottom, or Right.';
 
   @override
   String get navigationLeft => 'Left';
@@ -282,8 +274,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get uiVariant => 'UI Variant';
 
   @override
-  String get uiVariantDescription =>
-      'Choose the main screen layout: Default or Compact.';
+  String get uiVariantDescription => 'Choose the main screen layout: Default or Compact.';
 
   @override
   String get uiVariantDefault => 'Default';
@@ -292,14 +283,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get uiVariantCompact => 'Compact';
 
   @override
+  String get iconLegendWarning => 'Warning';
+
+  @override
+  String get iconLegendExpiry => 'Expiry days';
+
+  @override
+  String get iconLegendFileSize => 'File size';
+
+  @override
+  String get iconLegendAcceptedFiles => 'Accepted files';
+
+  @override
+  String get iconLegendDirectLinks => 'Direct links';
+
+  @override
+  String get iconLegendAccount => 'Account required';
+
+  @override
   String get enabled => 'Enabled';
 
   @override
   String get disabled => 'Disabled';
 
   @override
-  String get appDescription =>
-      'Upload files to multiple free hosting services. Fast, simple, and supports many providers.';
+  String get appDescription => 'Upload files to multiple free hosting services. Fast, simple, and supports many providers.';
 
   @override
   String get providerInfoTitle => 'Provider Info';

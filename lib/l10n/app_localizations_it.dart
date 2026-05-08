@@ -15,16 +15,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get genericError => 'Si è verificato un errore imprevisto. Riprova.';
 
   @override
-  String get errorSessionExpired =>
-      'La sessione è scaduta. Controlla le credenziali nelle Impostazioni.';
+  String get errorSessionExpired => 'La sessione è scaduta. Controlla le credenziali nelle Impostazioni.';
 
   @override
-  String get errorFileTooLarge =>
-      'Il file è troppo grande per questo servizio.';
+  String get errorFileTooLarge => 'Il file è troppo grande per questo servizio.';
 
   @override
-  String get errorInvalidUploader =>
-      'Invalid uploader configuration. Please check your settings or try again later.';
+  String get errorInvalidUploader => 'Invalid uploader configuration. Please check your settings or try again later.';
 
   @override
   String get invalidMimeType => 'Tipo di file non valido o non supportato.';
@@ -33,19 +30,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get fileSystemError => 'Impossibile leggere il file selezionato.';
 
   @override
-  String get errorConnectionFailed =>
-      'Impossibile connettersi al servizio. Potrebbe essere irraggiungibile o bloccato dal browser.';
+  String get errorConnectionFailed => 'Impossibile connettersi al servizio. Potrebbe essere irraggiungibile o bloccato dal browser.';
 
   @override
   String get uploadCancelled => 'Caricamento annullato.';
 
   @override
-  String get providerWebNotSupported =>
-      'Questo servizio non può essere usato direttamente dal browser. Attiva il proxy sperimentale nelle Impostazioni.';
+  String get providerWebNotSupported => 'Questo servizio non può essere usato direttamente dal browser. Attiva il proxy sperimentale nelle Impostazioni.';
 
   @override
-  String get selfSignedCertWarning =>
-      'La connessione insicura bypassa la validazione del certificato. Attivala solo per server fidati.';
+  String get selfSignedCertWarning => 'La connessione insicura bypassa la validazione del certificato. Attivala solo per server fidati.';
 
   @override
   String get upload => 'Carica';
@@ -113,8 +107,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get openInBrowser => 'Apri nel browser';
 
   @override
-  String get noProviders =>
-      'Nessun servizio configurato. Aggiungine uno nelle Impostazioni.';
+  String get noProviders => 'Nessun servizio configurato. Aggiungine uno nelle Impostazioni.';
 
   @override
   String disclaimer(Object provider) {
@@ -245,8 +238,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get debugLogging => 'Abilita debug logging';
 
   @override
-  String get debugLoggingDescription =>
-      'Registra tutti i dettagli di richiesta/risposta HTTP nella console per il debug. Attivalo solo se necessario.';
+  String get debugLoggingDescription => 'Registra tutti i dettagli di richiesta/risposta HTTP nella console per il debug. Attivalo solo se necessario.';
 
   @override
   String get qualityOriginal => 'Originale';
@@ -261,15 +253,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get navLayout => 'Layout Navigazione';
 
   @override
-  String get navLayoutDescription =>
-      'Mostra sempre la barra di navigazione in basso su desktop';
+  String get navLayoutDescription => 'Mostra sempre la barra di navigazione in basso su desktop';
 
   @override
   String get navigationLayout => 'Layout Navigazione';
 
   @override
-  String get navigationLayoutDescription =>
-      'Scegli dove visualizzare la navigazione: Sinistra, In basso o Destra.';
+  String get navigationLayoutDescription => 'Scegli dove visualizzare la navigazione: Sinistra, In basso o Destra.';
 
   @override
   String get navigationLeft => 'Sinistra';
@@ -284,8 +274,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get uiVariant => 'Variante UI';
 
   @override
-  String get uiVariantDescription =>
-      'Scegli il layout della schermata principale: Default o Compatta.';
+  String get uiVariantDescription => 'Scegli il layout della schermata principale: Default o Compatta.';
 
   @override
   String get uiVariantDefault => 'Default';
@@ -294,14 +283,31 @@ class AppLocalizationsIt extends AppLocalizations {
   String get uiVariantCompact => 'Compatta';
 
   @override
+  String get iconLegendWarning => 'Avvertenza';
+
+  @override
+  String get iconLegendExpiry => 'Giorni scadenza';
+
+  @override
+  String get iconLegendFileSize => 'Dimensione file';
+
+  @override
+  String get iconLegendAcceptedFiles => 'File accettati';
+
+  @override
+  String get iconLegendDirectLinks => 'Link diretti';
+
+  @override
+  String get iconLegendAccount => 'Account richiesto';
+
+  @override
   String get enabled => 'Attivato';
 
   @override
   String get disabled => 'Disattivato';
 
   @override
-  String get appDescription =>
-      'Carica file su molti servizi di hosting gratuiti. Veloce, semplice e supporta molti provider.';
+  String get appDescription => 'Carica file su molti servizi di hosting gratuiti. Veloce, semplice e supporta molti provider.';
 
   @override
   String get providerInfoTitle => 'Info Provider';
