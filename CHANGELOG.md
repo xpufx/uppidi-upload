@@ -1,5 +1,7 @@
 # Changelog
 
+- Remove provider config card, icon legend, and redundant title from upload screen
+- docs: auto-update changelog
 - Remove compact UI variant
 - docs: auto-update changelog
 - docs: auto-update changelog
@@ -28,5 +30,3 @@
 - fix: manual download buttons save file without auto-install
 - docs: auto-update changelog
 - feat: in-app download for desktop (no browser redirect)
-- docs: auto-update changelog
-- docs: add mermaid diagrams to user manual
