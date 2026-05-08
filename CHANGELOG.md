@@ -1,5 +1,7 @@
 # Changelog
 
+- refactor: replace flutter_secure_storage with Hive, downgrade file_picker/share_plus
+- docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
 - Fix dropdown: show provider name, remove metadata text
@@ -28,5 +30,3 @@
 - badges: icon-only for mime type, calendar icon for expiry
 - fix: extract metadata badges to shared lib, use in upload screen + providers screen
 - fix: quality-dependent JPEG compression (Q75/Q50), skip resize if not smaller than original
-- docs: update user manual with quality selector, health manifest, in-app update, system info, providers page
-- fix: update FreeImage test to expect API key in endpoint
