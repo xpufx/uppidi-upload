@@ -58,6 +58,11 @@ final uiVariantProvider = FutureProvider<String>((ref) async {
   return await svc.getUiVariant();
 });
 
+final shellTypeProvider = FutureProvider<String>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  return await svc.getShellType();
+});
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -768,6 +773,51 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                   final variant = selected.first;
                   await svc.setUiVariant(variant);
                   ref.invalidate(uiVariantProvider);
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // Shell type selector (tabs vs modals)
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () => showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Shell Layout'),
+                  content: const Text(
+                    'Choose how screens are organized: "Tabs" uses a tab bar for navigation. "Modals" shows the upload screen always and opens other screens as dialogs.',
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text(l10n.ok))
+                  ],
+                ),
+              ),
+              child: Icon(Icons.info_outline,
+                  size: 16,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.5)),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment(value: 'tabs', label: Text('Tabs')),
+                  ButtonSegment(value: 'modals', label: Text('Modals')),
+                ],
+                selected: {
+                  ref.watch(shellTypeProvider).asData?.value ?? 'tabs'
+                },
+                onSelectionChanged: (Set<String> selected) async {
+                  final type = selected.first;
+                  await svc.setShellType(type);
+                  ref.invalidate(shellTypeProvider);
                 },
               ),
             ),

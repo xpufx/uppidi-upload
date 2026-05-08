@@ -3,10 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:uppidi_upload/core/settings_service.dart';
 import 'package:uppidi_upload/main.dart';
+import 'package:uppidi_upload/screens/tab_nav_strategy.dart';
 
 void main() {
   setUpAll(() async {
-    Hive.init('.hive_test');
+    Hive.init('.hive_test_widget');
     await Hive.openBox<String>('settings');
   });
 
@@ -25,11 +26,11 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.byType(AdaptiveHomePage), findsOneWidget);
+    // Default shell type is 'tabs' — renders TabNavStrategy
+    expect(find.byType(TabNavStrategy), findsOneWidget);
   });
 }
 
-/// Minimal in-memory settings for tests that don't need real Hive.
 class InMemorySettingsService extends SettingsService {
   final Map<String, String> _store = {};
 
@@ -47,4 +48,10 @@ class InMemorySettingsService extends SettingsService {
 
   @override
   Future<Map<String, String>> readAll() async => Map.from(_store);
+
+  @override
+  Future<String> getShellType() async => 'tabs';
+
+  @override
+  Future<void> setShellType(String type) async {}
 }

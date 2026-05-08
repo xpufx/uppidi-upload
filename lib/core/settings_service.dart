@@ -113,6 +113,7 @@ class SettingsService {
   static const debugLoggingKey = 'global.debug_logging';
   static const navigationLayoutKey = 'global.navigation_layout';
   static const uiVariantKey = 'global.ui_variant';
+  static const shellTypeKey = 'global.shell_type';
 
   Future<bool> isInsecureConnAllowed() async {
     final val = await get(insecureConnKey);
@@ -189,5 +190,19 @@ class SettingsService {
       );
     }
     await set(uiVariantKey, variant);
+  }
+
+  Future<String> getShellType() async {
+    final val = await get(shellTypeKey);
+    return val ?? 'tabs';
+  }
+
+  Future<void> setShellType(String type) async {
+    if (!['tabs', 'modals'].contains(type)) {
+      throw ArgumentError(
+        'Invalid shell type: $type. Must be one of tabs, modals.',
+      );
+    }
+    await set(shellTypeKey, type);
   }
 }

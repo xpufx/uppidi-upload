@@ -17,7 +17,10 @@ import 'package:uppidi_upload/providers/upload_provider.dart';
 
 // Mock classes
 class MockBaseUploader implements BaseUploader {
-  Future<UploadResult> Function(FileUploadRequest, {UploadProgressCallback? onProgress, CancelToken? cancelToken, Map<String, String> config})? uploadCallback;
+  Future<UploadResult> Function(FileUploadRequest,
+      {UploadProgressCallback? onProgress,
+      CancelToken? cancelToken,
+      Map<String, String> config})? uploadCallback;
   final ProviderMetadata _metadata;
   final String _providerId;
   final String _providerName;
@@ -36,7 +39,8 @@ class MockBaseUploader implements BaseUploader {
     List<String> requiredConfigKeys = const [],
     Map<String, String> configLabels = const {},
     bool supportsWeb = false,
-  })  : _metadata = metadata ?? const ProviderMetadata(maxFileSizeBytes: 10 * 1024 * 1024),
+  })  : _metadata = metadata ??
+            const ProviderMetadata(maxFileSizeBytes: 10 * 1024 * 1024),
         _providerId = providerId,
         _providerName = providerName,
         _requiredConfigKeys = requiredConfigKeys,
@@ -65,7 +69,8 @@ class MockBaseUploader implements BaseUploader {
   ProviderMetadata get metadata => _metadata;
 
   @override
-  Future<Dio> createHttpClient(Map<String, String> config, {bool allowInsecureConn = false, String? proxyUrl}) async {
+  Future<Dio> createHttpClient(Map<String, String> config,
+      {bool allowInsecureConn = false, String? proxyUrl}) async {
     return Dio();
   }
 
@@ -78,15 +83,21 @@ class MockBaseUploader implements BaseUploader {
   }) async {
     _uploadCalled = true;
     if (uploadCallback != null) {
-      return uploadCallback!(request, onProgress: onProgress, cancelToken: cancelToken, config: config);
+      return uploadCallback!(request,
+          onProgress: onProgress, cancelToken: cancelToken, config: config);
     }
-    return UploadResult(success: true, url: 'https://mock.url/${request.fileName}', completedAt: DateTime.now());
+    return UploadResult(
+        success: true,
+        url: 'https://mock.url/${request.fileName}',
+        completedAt: DateTime.now());
   }
 }
 
 class MockSettingsService implements SettingsService {
   @override
-  Future<Map<String, String>> loadProviderConfig(String providerId, List<String> requiredKeys) async => {};
+  Future<Map<String, String>> loadProviderConfig(
+          String providerId, List<String> requiredKeys) async =>
+      {};
 
   @override
   Future<bool> isInsecureConnAllowed() async => false;
@@ -110,7 +121,8 @@ class MockSettingsService implements SettingsService {
   Future<Map<String, String>> readAll() async => {};
 
   @override
-  String providerKey(String providerId, String configKey) => '$providerId.$configKey';
+  String providerKey(String providerId, String configKey) =>
+      '$providerId.$configKey';
 
   @override
   Future<ThemeMode> getThemeMode() async => ThemeMode.system;
@@ -138,12 +150,18 @@ class MockSettingsService implements SettingsService {
 
   @override
   Future<void> setNavigationLayout(String layout) async {}
-  
+
   @override
   Future<String> getUiVariant() async => 'default';
-  
+
   @override
   Future<void> setUiVariant(String variant) async {}
+
+  @override
+  Future<String> getShellType() async => 'tabs';
+
+  @override
+  Future<void> setShellType(String type) async {}
 }
 
 class MockHistoryService implements HistoryService {
@@ -240,20 +258,24 @@ void main() {
       expect(notifier.state, isA<UploadFileSelected>());
 
       // Set a slow upload to capture the InProgress state
-      mockUploaders[0].uploadCallback = (request, {onProgress, cancelToken, config = const {}}) async {
+      mockUploaders[0].uploadCallback =
+          (request, {onProgress, cancelToken, config = const {}}) async {
         await Future.delayed(const Duration(milliseconds: 500));
-        return UploadResult(success: true, url: 'https://mock.url', completedAt: DateTime.now());
+        return UploadResult(
+            success: true,
+            url: 'https://mock.url',
+            completedAt: DateTime.now());
       };
 
       // Start upload without awaiting to check intermediate state
       final uploadFuture = notifier.uploadSelected();
       await Future.delayed(const Duration(milliseconds: 100));
-      
+
       expect(notifier.state, isA<UploadInProgress>());
       final state = notifier.state as UploadInProgress;
       expect(state.progress, 0.0);
       expect(state.cancelToken, isNotNull);
-      
+
       await uploadFuture; // Clean up
     });
 
@@ -271,8 +293,12 @@ void main() {
     });
 
     test('UploadInProgress → UploadCompleted on upload failure', () async {
-      mockUploaders[0].uploadCallback = (request, {onProgress, cancelToken, config = const {}}) async {
-        return UploadResult(success: false, errorMessage: 'Upload failed', completedAt: DateTime.now());
+      mockUploaders[0].uploadCallback =
+          (request, {onProgress, cancelToken, config = const {}}) async {
+        return UploadResult(
+            success: false,
+            errorMessage: 'Upload failed',
+            completedAt: DateTime.now());
       };
       final notifier = container.read(uploadProvider.notifier);
       await notifier.uploadFromFile(testFile.path, 'text/plain');
@@ -341,8 +367,12 @@ void main() {
     });
 
     test('Upload failure → error with retry possible', () async {
-      mockUploaders[0].uploadCallback = (request, {onProgress, cancelToken, config = const {}}) async {
-        return UploadResult(success: false, errorMessage: 'Server error', completedAt: DateTime.now());
+      mockUploaders[0].uploadCallback =
+          (request, {onProgress, cancelToken, config = const {}}) async {
+        return UploadResult(
+            success: false,
+            errorMessage: 'Server error',
+            completedAt: DateTime.now());
       };
       final notifier = container.read(uploadProvider.notifier);
       await notifier.uploadFromFile(testFile.path, 'text/plain');
@@ -362,9 +392,13 @@ void main() {
 
     test('Cancel during upload → returns to idle', () async {
       // Create a slow upload to allow cancellation
-      mockUploaders[0].uploadCallback = (request, {onProgress, cancelToken, config = const {}}) async {
+      mockUploaders[0].uploadCallback =
+          (request, {onProgress, cancelToken, config = const {}}) async {
         await Future.delayed(const Duration(seconds: 5));
-        return UploadResult(success: true, url: 'https://mock.url', completedAt: DateTime.now());
+        return UploadResult(
+            success: true,
+            url: 'https://mock.url',
+            completedAt: DateTime.now());
       };
       final notifier = container.read(uploadProvider.notifier);
       await notifier.uploadFromFile(testFile.path, 'text/plain');
@@ -378,7 +412,8 @@ void main() {
   });
 
   group('Chain Uploads', () {
-    test('After success, change provider, upload again with recreated stream', () async {
+    test('After success, change provider, upload again with recreated stream',
+        () async {
       final notifier = container.read(uploadProvider.notifier);
       await notifier.uploadFromFile(testFile.path, 'text/plain');
       await notifier.uploadSelected();
@@ -420,8 +455,12 @@ void main() {
   group('UploadCompleted Regression Tests', () {
     test('Successful upload sets lastResult.url to expected value', () async {
       final notifier = container.read(uploadProvider.notifier);
-      mockUploaders[0].uploadCallback = (request, {onProgress, cancelToken, config = const {}}) async {
-        return UploadResult(success: true, url: 'https://example.com/test.png', completedAt: DateTime.now());
+      mockUploaders[0].uploadCallback =
+          (request, {onProgress, cancelToken, config = const {}}) async {
+        return UploadResult(
+            success: true,
+            url: 'https://example.com/test.png',
+            completedAt: DateTime.now());
       };
       await notifier.uploadFromFile(testFile.path, 'text/plain');
       await notifier.uploadSelected();
@@ -435,8 +474,12 @@ void main() {
 
     test('Successful upload sets isSuccess to true', () async {
       final notifier = container.read(uploadProvider.notifier);
-      mockUploaders[0].uploadCallback = (request, {onProgress, cancelToken, config = const {}}) async {
-        return UploadResult(success: true, url: 'https://example.com/test.png', completedAt: DateTime.now());
+      mockUploaders[0].uploadCallback =
+          (request, {onProgress, cancelToken, config = const {}}) async {
+        return UploadResult(
+            success: true,
+            url: 'https://example.com/test.png',
+            completedAt: DateTime.now());
       };
       await notifier.uploadFromFile(testFile.path, 'text/plain');
       await notifier.uploadSelected();
@@ -450,8 +493,12 @@ void main() {
 
     test('Successful upload preserves file info in UploadCompleted', () async {
       final notifier = container.read(uploadProvider.notifier);
-      mockUploaders[0].uploadCallback = (request, {onProgress, cancelToken, config = const {}}) async {
-        return UploadResult(success: true, url: 'https://example.com/test.png', completedAt: DateTime.now());
+      mockUploaders[0].uploadCallback =
+          (request, {onProgress, cancelToken, config = const {}}) async {
+        return UploadResult(
+            success: true,
+            url: 'https://example.com/test.png',
+            completedAt: DateTime.now());
       };
       const testMimeType = 'text/plain';
       await notifier.uploadFromFile(testFile.path, testMimeType);
@@ -468,10 +515,16 @@ void main() {
       expect(state.mimeType, testMimeType);
     });
 
-    test('setProvider preserves file info when transitioning from UploadCompleted', () async {
+    test(
+        'setProvider preserves file info when transitioning from UploadCompleted',
+        () async {
       final notifier = container.read(uploadProvider.notifier);
-      mockUploaders[0].uploadCallback = (request, {onProgress, cancelToken, config = const {}}) async {
-        return UploadResult(success: true, url: 'https://example.com/test.png', completedAt: DateTime.now());
+      mockUploaders[0].uploadCallback =
+          (request, {onProgress, cancelToken, config = const {}}) async {
+        return UploadResult(
+            success: true,
+            url: 'https://example.com/test.png',
+            completedAt: DateTime.now());
       };
       await notifier.uploadFromFile(testFile.path, 'text/plain');
       await notifier.uploadSelected();
