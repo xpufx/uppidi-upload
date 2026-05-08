@@ -193,7 +193,7 @@ void main() {
       expect(find.text(reason), findsOneWidget);
     });
 
-    testWidgets('Health-disabled provider switch cannot be toggled', (WidgetTester tester) async {
+    testWidgets('Health-disabled provider switch is still toggleable', (WidgetTester tester) async {
       final mockHealth = {
         'httpbin': ProviderHealthInfo(disabled: true, reason: 'Maintenance'),
       };
@@ -218,9 +218,9 @@ void main() {
       final switches = tester.widgetList<Switch>(find.byType(Switch));
       expect(switches, isNotEmpty);
 
-      // At least one switch should be disabled (onChanged is null) due to health status
-      final hasDisabledSwitch = switches.any((s) => s.onChanged == null);
-      expect(hasDisabledSwitch, isTrue);
+      // All switches should be toggleable even when health-disabled (user override is allowed)
+      final allToggleable = switches.every((s) => s.onChanged != null);
+      expect(allToggleable, isTrue);
     });
   });
 

@@ -594,10 +594,11 @@ void main() {
   });
 
   group('Health Disabled Provider Test', () {
-    testWidgets('Health-disabled provider shows switch as disabled', (WidgetTester tester) async {
+    testWidgets('Health-disabled provider switch is toggleable and shows warning', (WidgetTester tester) async {
       const testProviderId = 'httpbin'; // Matches existing HttpBinProvider ID
+      const reason = 'Maintenance';
       final mockHealth = {
-        testProviderId: ProviderHealthInfo(disabled: true, reason: 'Maintenance'),
+        testProviderId: ProviderHealthInfo(disabled: true, reason: reason),
       };
 
       await tester.pumpWidget(
@@ -623,10 +624,14 @@ void main() {
       final switches = find.byType(Switch);
       expect(switches, findsWidgets);
 
-      // The first switch corresponds to httpbin provider (first in ProviderRegistry)
+      // The switch should be toggleable (onChanged != null) even when health-disabled
+      // User override is allowed
       final firstSwitch = tester.widget<Switch>(switches.first);
-      // Switch should be disabled (onChanged is null) due to health disabled status
-      expect(firstSwitch.onChanged, isNull);
+      expect(firstSwitch.onChanged, isNotNull);
+
+      // Warning icon should still be shown
+      expect(find.byIcon(Icons.warning_amber), findsWidgets);
+      expect(find.text(reason), findsOneWidget);
     });
   });
 

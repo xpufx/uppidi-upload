@@ -134,10 +134,10 @@ class MockSettingsService implements SettingsService {
   Future<void> setDebugLoggingEnabled(bool enabled) async {}
 
   @override
-  Future<bool> getNavLayoutEnabled() async => false;
+  Future<String> getNavigationLayout() async => 'bottom';
 
   @override
-  Future<void> setNavLayoutEnabled(bool enabled) async {}
+  Future<void> setNavigationLayout(String layout) async {}
 }
 
 class MockHistoryService implements HistoryService {
