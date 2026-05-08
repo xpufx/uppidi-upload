@@ -2,6 +2,7 @@
   "appTitle": "Uppidi Upload",
   "genericError": "Si è verificato un errore imprevisto. Riprova.",
   "errorSessionExpired": "La sessione è scaduta. Controlla le credenziali nelle Impostazioni.",
+  "errorInvalidUploader": "Configurazione uploader non valida. Controlla le impostazioni o riprova più tardi.",
   "errorFileTooLarge": "Il file è troppo grande per questo servizio.",
   "invalidMimeType": "Tipo di file non valido o non supportato.",
   "fileSystemError": "Impossibile leggere il file selezionato.",

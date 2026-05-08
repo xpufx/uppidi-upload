@@ -2,6 +2,7 @@
   "appTitle": "Uppidi Upload",
   "genericError": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.",
   "errorSessionExpired": "Oturumunuzun süresi doldu. Lütfen Ayarlar'dan kimlik bilgilerinizi kontrol edin.",
+  "errorInvalidUploader": "Geçersiz yükleyici yapılandırması. Lütfen ayarları kontrol edin veya daha sonra tekrar deneyin.",
   "errorFileTooLarge": "Bu dosya bu sağlayıcı için çok büyük.",
   "invalidMimeType": "Geçersiz veya desteklenmeyen dosya türü.",
   "fileSystemError": "Seçilen dosya okunamadı.",
