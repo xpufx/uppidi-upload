@@ -1,5 +1,6 @@
 # Changelog
 
+- docs: auto-update changelog
 - Fix dropdown: show provider name, remove metadata text
 - docs: auto-update changelog
 - Fix provider dropdown - remove broken selectedItemBuilder, use default behavior
@@ -29,4 +30,3 @@
 - docs: update user manual with quality selector, health manifest, in-app update, system info, providers page
 - fix: update FreeImage test to expect API key in endpoint
 - test: 23 widget tests — full state machine, providers screen, nav tabs
-- docs: architecture diagrams — state machine, navigation, upload lifecycle, error recovery
