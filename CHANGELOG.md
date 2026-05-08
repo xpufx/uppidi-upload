@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: hide navigation layout setting on narrow screens (<600dp)
+- docs: auto-update changelog
 - refactor: replace flutter_secure_storage with Hive, downgrade file_picker/share_plus
 - docs: auto-update changelog
 - docs: auto-update changelog
@@ -28,5 +30,3 @@
 - docs: auto-update changelog
 - docs: auto-update changelog
 - badges: icon-only for mime type, calendar icon for expiry
-- fix: extract metadata badges to shared lib, use in upload screen + providers screen
-- fix: quality-dependent JPEG compression (Q75/Q50), skip resize if not smaller than original
