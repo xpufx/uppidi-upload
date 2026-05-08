@@ -16,10 +16,12 @@ import '../core/version.dart';
 import '../core/version_check_provider.dart';
 import '../l10n/app_localizations.dart';
 
-final providerConfigsProvider = FutureProvider.family<Map<String, String>, String>(
+final providerConfigsProvider =
+    FutureProvider.family<Map<String, String>, String>(
   (ref, providerId) async {
     final svc = ref.read(settingsServiceProvider);
-    final provider = ProviderRegistry.all.firstWhere((p) => p.providerId == providerId);
+    final provider =
+        ProviderRegistry.all.firstWhere((p) => p.providerId == providerId);
     return svc.loadProviderConfig(providerId, provider.requiredConfigKeys);
   },
 );
@@ -63,17 +65,23 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final svc = ref.read(settingsServiceProvider);
-    final configurableProviders = ProviderRegistry.all.where((p) => p.requiredConfigKeys.isNotEmpty).toList();
+    final configurableProviders = ProviderRegistry.all
+        .where((p) => p.requiredConfigKeys.isNotEmpty)
+        .toList();
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         if (configurableProviders.isNotEmpty) ...[
           Text(l10n.providersSection,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           ...configurableProviders.map((provider) {
-            final configAsync = ref.watch(providerConfigsProvider(provider.providerId));
+            final configAsync =
+                ref.watch(providerConfigsProvider(provider.providerId));
             final saved = configAsync.asData?.value ?? {};
             final labels = provider.configLabels;
 
@@ -97,7 +105,10 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 8),
         ],
         Text(l10n.settings,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         _GlobalToggles(),
       ],
@@ -135,8 +146,7 @@ class _ProviderConfigCardState extends State<_ProviderConfigCard> {
   void initState() {
     super.initState();
     for (final key in widget.configKeys) {
-      _controllers[key] =
-          TextEditingController(text: widget.saved[key] ?? '');
+      _controllers[key] = TextEditingController(text: widget.saved[key] ?? '');
     }
   }
 
@@ -198,15 +208,18 @@ void _showSystemInfo(BuildContext context, WidgetRef ref) {
   final disabled = ref.read(disabledProviderIdsProvider).asData?.value ?? {};
   for (final p in ProviderRegistry.all) {
     final enabled = !disabled.contains(p.providerId);
-    buffer.writeln('${enabled ? "✓" : "✗"} ${p.providerName} (${p.providerId})');
+    buffer
+        .writeln('${enabled ? "✓" : "✗"} ${p.providerName} (${p.providerId})');
   }
   buffer.writeln('');
   buffer.writeln('=== THEME ===');
   final theme = ref.read(themeModeProvider);
   final seed = ref.read(seedColorProvider);
   buffer.writeln('Mode: ${theme.name}');
-  buffer.writeln('Seed: 0x${seed.toARGB32().toRadixString(16).padLeft(8, '0')}');
-  buffer.writeln('Custom Logo: ${ref.read(logoPathProvider) != null ? "yes" : "no"}');
+  buffer
+      .writeln('Seed: 0x${seed.toARGB32().toRadixString(16).padLeft(8, '0')}');
+  buffer.writeln(
+      'Custom Logo: ${ref.read(logoPathProvider) != null ? "yes" : "no"}');
 
   final text = buffer.toString();
 
@@ -221,7 +234,8 @@ void _showSystemInfo(BuildContext context, WidgetRef ref) {
         ],
       ),
       content: SingleChildScrollView(
-        child: SelectableText(text, style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
+        child: SelectableText(text,
+            style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
       ),
       actions: [
         TextButton.icon(
@@ -238,7 +252,8 @@ void _showSystemInfo(BuildContext context, WidgetRef ref) {
           },
           child: const Text('Copy All'),
         ),
-        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+        TextButton(
+            onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
       ],
     ),
   );
@@ -264,18 +279,23 @@ class _VersionCheckWidget extends ConsumerWidget {
       child: Align(
         alignment: Alignment.centerRight,
         child: GestureDetector(
-          onTap: state == VersionCheckState.checking ? null : () => ref.read(versionCheckProvider.notifier).check(),
+          onTap: state == VersionCheckState.checking
+              ? null
+              : () => ref.read(versionCheckProvider.notifier).check(),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               switch (state) {
-                VersionCheckState.idle => const Icon(Icons.refresh, size: 14, color: Colors.grey),
+                VersionCheckState.idle =>
+                  const Icon(Icons.refresh, size: 14, color: Colors.grey),
                 VersionCheckState.checking => const SizedBox(
-                    width: 14, height: 14,
+                    width: 14,
+                    height: 14,
                     child: CircularProgressIndicator(strokeWidth: 1.5),
                   ),
-                VersionCheckState.upToDate => const Icon(Icons.check_circle, size: 14, color: Colors.green),
+                VersionCheckState.upToDate =>
+                  const Icon(Icons.check_circle, size: 14, color: Colors.green),
                 VersionCheckState.updateAvailable => Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -296,18 +316,28 @@ class _VersionCheckWidget extends ConsumerWidget {
                               builder: (_) => StatefulBuilder(
                                 builder: (ctx, setState) {
                                   update = setState;
-                                  final totalStr = total > 0 ? '${(total / 1048576).toStringAsFixed(1)} MB' : '?';
-                                  final speedStr = speed > 0 ? '${(speed / 1048576).toStringAsFixed(1)} MB/s' : '';
-                                  final pct = total > 0 ? received / total : null;
+                                  final totalStr = total > 0
+                                      ? '${(total / 1048576).toStringAsFixed(1)} MB'
+                                      : '?';
+                                  final speedStr = speed > 0
+                                      ? '${(speed / 1048576).toStringAsFixed(1)} MB/s'
+                                      : '';
+                                  final pct =
+                                      total > 0 ? received / total : null;
                                   return AlertDialog(
                                     title: Text('Downloading $label'),
                                     content: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        if (pct != null) LinearProgressIndicator(value: pct) else const LinearProgressIndicator(),
+                                        if (pct != null)
+                                          LinearProgressIndicator(value: pct)
+                                        else
+                                          const LinearProgressIndicator(),
                                         const SizedBox(height: 8),
-                                        Text('${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
-                                          style: const TextStyle(fontSize: 12)),
+                                        Text(
+                                            '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
+                                            style:
+                                                const TextStyle(fontSize: 12)),
                                       ],
                                     ),
                                   );
@@ -317,42 +347,63 @@ class _VersionCheckWidget extends ConsumerWidget {
                             try {
                               if (isMobile) {
                                 await downloadAndInstallApk(url,
-                                  onProgress: (r, t, s) { received = r; total = t; speed = s; update?.call(() {}); });
+                                    onProgress: (r, t, s) {
+                                  received = r;
+                                  total = t;
+                                  speed = s;
+                                  update?.call(() {});
+                                });
                               } else {
                                 final path = await downloadFile(url,
-                                  onProgress: (r, t, s) { received = r; total = t; speed = s; update?.call(() {}); });
+                                    onProgress: (r, t, s) {
+                                  received = r;
+                                  total = t;
+                                  speed = s;
+                                  update?.call(() {});
+                                });
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Downloaded to: $path')),
+                                    SnackBar(
+                                        content: Text('Downloaded to: $path')),
                                   );
                                 }
                               }
-                              if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
+                              if (context.mounted)
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop();
                             } catch (e) {
-                              if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
+                              if (context.mounted)
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop();
                             }
                           },
                           child: Padding(
                             padding: const EdgeInsets.only(right: 4),
-                            child: Icon(Icons.download, size: 24, color: Colors.orange.shade600),
+                            child: Icon(Icons.download,
+                                size: 24, color: Colors.orange.shade600),
                           ),
                         ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: Colors.orange.shade100,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           notifier.latestHash ?? '',
-                          style: const TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.w600),
+                          style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.orange,
+                              fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
                   ),
               },
               if (ageText != null)
-                Text(ageText, style: TextStyle(fontSize: 9, color: Colors.grey.shade500)),
+                Text(ageText,
+                    style: TextStyle(fontSize: 9, color: Colors.grey.shade500)),
             ],
           ),
         ),
@@ -413,10 +464,19 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                 builder: (ctx) => AlertDialog(
                   title: Text(l10n.enableInsecure),
                   content: Text(l10n.selfSignedCertWarning),
-                  actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok))],
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text(l10n.ok))
+                  ],
                 ),
               ),
-              child: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
+              child: Icon(Icons.info_outline,
+                  size: 16,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.5)),
             ),
             const SizedBox(width: 8),
             Expanded(child: Text(l10n.enableInsecure)),
@@ -436,38 +496,67 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         Center(
           child: SegmentedButton<ThemeMode>(
             segments: [
-              ButtonSegment(value: ThemeMode.system, label: Text(l10n.themeSystem), icon: const Icon(Icons.brightness_auto)),
-              ButtonSegment(value: ThemeMode.light, label: Text(l10n.themeLight), icon: const Icon(Icons.light_mode)),
-              ButtonSegment(value: ThemeMode.dark, label: Text(l10n.themeDark), icon: const Icon(Icons.dark_mode)),
+              ButtonSegment(
+                  value: ThemeMode.system,
+                  label: Text(l10n.themeSystem),
+                  icon: const Icon(Icons.brightness_auto)),
+              ButtonSegment(
+                  value: ThemeMode.light,
+                  label: Text(l10n.themeLight),
+                  icon: const Icon(Icons.light_mode)),
+              ButtonSegment(
+                  value: ThemeMode.dark,
+                  label: Text(l10n.themeDark),
+                  icon: const Icon(Icons.dark_mode)),
             ],
             selected: {ref.watch(themeModeProvider)},
-            onSelectionChanged: (sel) => ref.read(themeModeProvider.notifier).setMode(sel.first),
+            onSelectionChanged: (sel) =>
+                ref.read(themeModeProvider.notifier).setMode(sel.first),
           ),
         ),
         const SizedBox(height: 16),
         // Seed color
-        Text(l10n.themeSeedColor, style: Theme.of(context).textTheme.titleSmall),
+        Text(l10n.themeSeedColor,
+            style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
         Row(
           children: const [
-            Colors.deepPurple, Colors.blue, Colors.teal,
-            Colors.orange, Colors.pink, Colors.indigo,
-            Colors.red, Colors.green, Colors.amber,
-            Colors.cyan, Colors.brown, Colors.deepOrange,
+            Colors.deepPurple,
+            Colors.blue,
+            Colors.teal,
+            Colors.orange,
+            Colors.pink,
+            Colors.indigo,
+            Colors.red,
+            Colors.green,
+            Colors.amber,
+            Colors.cyan,
+            Colors.brown,
+            Colors.deepOrange,
           ].map((color) {
             final selected = ref.watch(seedColorProvider);
             final isSelected = selected.toARGB32() == color.toARGB32();
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: GestureDetector(
-                onTap: () => ref.read(seedColorProvider.notifier).setColor(color),
+                onTap: () =>
+                    ref.read(seedColorProvider.notifier).setColor(color),
                 child: Container(
-                  width: 36, height: 36,
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
                     color: color,
                     shape: BoxShape.circle,
-                    border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
-                    boxShadow: isSelected ? [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 6)] : null,
+                    border: isSelected
+                        ? Border.all(color: Colors.white, width: 2)
+                        : null,
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                                color: color.withValues(alpha: 0.5),
+                                blurRadius: 6)
+                          ]
+                        : null,
                   ),
                 ),
               ),
@@ -506,9 +595,9 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           items: [
             DropdownMenuItem(value: null, child: Text(l10n.lastUsed)),
             ...ProviderRegistry.all.map((p) => DropdownMenuItem(
-              value: p.providerId,
-              child: Text(p.providerName),
-            )),
+                  value: p.providerId,
+                  child: Text(p.providerName),
+                )),
           ],
           onChanged: (v) {
             if (v == null) {
@@ -550,10 +639,19 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                 builder: (ctx) => AlertDialog(
                   title: Text(l10n.debugLogging),
                   content: Text(l10n.debugLoggingDescription),
-                  actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok))],
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text(l10n.ok))
+                  ],
                 ),
               ),
-              child: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
+              child: Icon(Icons.info_outline,
+                  size: 16,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.5)),
             ),
             const SizedBox(width: 8),
             Expanded(child: Text(l10n.debugLogging)),
@@ -578,37 +676,57 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           ],
         ),
         const SizedBox(height: 16),
-        // Navigation layout toggle
-        Row(
-          children: [
-            GestureDetector(
-              onTap: () => showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: Text(l10n.navLayout),
-                  content: Text(l10n.navLayoutDescription),
-                  actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok))],
+        // Navigation layout toggle — only shown on wide screens (desktop/tablet)
+        LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 600) return const SizedBox.shrink();
+            return Row(
+              children: [
+                GestureDetector(
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text(l10n.navLayout),
+                      content: Text(l10n.navLayoutDescription),
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: Text(l10n.ok))
+                      ],
+                    ),
+                  ),
+                  child: Icon(Icons.info_outline,
+                      size: 16,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.5)),
                 ),
-              ),
-              child: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: SegmentedButton<String>(
-                segments: [
-                  ButtonSegment(value: 'left', label: Text(l10n.navigationLeft)),
-                  ButtonSegment(value: 'bottom', label: Text(l10n.navigationBottom)),
-                  ButtonSegment(value: 'right', label: Text(l10n.navigationRight)),
-                ],
-                selected: {ref.watch(navigationLayoutProvider).asData?.value ?? 'bottom'},
-                onSelectionChanged: (Set<String> selected) async {
-                  final layout = selected.first;
-                  await svc.setNavigationLayout(layout);
-                  ref.invalidate(navigationLayoutProvider);
-                },
-              ),
-            ),
-          ],
+                const SizedBox(width: 8),
+                Expanded(
+                  child: SegmentedButton<String>(
+                    segments: [
+                      ButtonSegment(
+                          value: 'left', label: Text(l10n.navigationLeft)),
+                      ButtonSegment(
+                          value: 'bottom', label: Text(l10n.navigationBottom)),
+                      ButtonSegment(
+                          value: 'right', label: Text(l10n.navigationRight)),
+                    ],
+                    selected: {
+                      ref.watch(navigationLayoutProvider).asData?.value ??
+                          'bottom'
+                    },
+                    onSelectionChanged: (Set<String> selected) async {
+                      final layout = selected.first;
+                      await svc.setNavigationLayout(layout);
+                      ref.invalidate(navigationLayoutProvider);
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 16),
         // UI variant selector
@@ -620,19 +738,32 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                 builder: (ctx) => AlertDialog(
                   title: Text(l10n.uiVariant),
                   content: Text(l10n.uiVariantDescription),
-                  actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok))],
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text(l10n.ok))
+                  ],
                 ),
               ),
-              child: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
+              child: Icon(Icons.info_outline,
+                  size: 16,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.5)),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: SegmentedButton<String>(
                 segments: [
-                  ButtonSegment(value: 'default', label: Text(l10n.uiVariantDefault)),
-                  ButtonSegment(value: 'compact', label: Text(l10n.uiVariantCompact)),
+                  ButtonSegment(
+                      value: 'default', label: Text(l10n.uiVariantDefault)),
+                  ButtonSegment(
+                      value: 'compact', label: Text(l10n.uiVariantCompact)),
                 ],
-                selected: {ref.watch(uiVariantProvider).asData?.value ?? 'default'},
+                selected: {
+                  ref.watch(uiVariantProvider).asData?.value ?? 'default'
+                },
                 onSelectionChanged: (Set<String> selected) async {
                   final variant = selected.first;
                   await svc.setUiVariant(variant);
@@ -661,12 +792,19 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Uppidi Upload v$appVersion',
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              Text('${l10n.providersCount(ProviderRegistry.all.length)} · $gitHash',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
+                              Text(
+                                  '${l10n.providersCount(ProviderRegistry.all.length)} · $gitHash',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(color: Colors.grey)),
                               const SizedBox(width: 4),
                               if (cdnUrl.isNotEmpty) _VersionCheckWidget(),
                             ],
@@ -696,8 +834,12 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                             builder: (_) => StatefulBuilder(
                               builder: (ctx, setState) {
                                 update = setState;
-                                final totalStr = total > 0 ? '${(total / 1048576).toStringAsFixed(1)} MB' : '?';
-                                final speedStr = speed > 0 ? '${(speed / 1048576).toStringAsFixed(1)} MB/s' : '';
+                                final totalStr = total > 0
+                                    ? '${(total / 1048576).toStringAsFixed(1)} MB'
+                                    : '?';
+                                final speedStr = speed > 0
+                                    ? '${(speed / 1048576).toStringAsFixed(1)} MB/s'
+                                    : '';
                                 final pct = total > 0 ? received / total : null;
                                 return AlertDialog(
                                   title: const Text('Downloading APK'),
@@ -709,8 +851,9 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                                       else
                                         const LinearProgressIndicator(),
                                       const SizedBox(height: 8),
-                                      Text('${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
-                                        style: const TextStyle(fontSize: 12)),
+                                      Text(
+                                          '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
+                                          style: const TextStyle(fontSize: 12)),
                                     ],
                                   ),
                                 );
@@ -756,18 +899,26 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                             builder: (_) => StatefulBuilder(
                               builder: (ctx, setState) {
                                 update = setState;
-                                final totalStr = total > 0 ? '${(total / 1048576).toStringAsFixed(1)} MB' : '?';
-                                final speedStr = speed > 0 ? '${(speed / 1048576).toStringAsFixed(1)} MB/s' : '';
+                                final totalStr = total > 0
+                                    ? '${(total / 1048576).toStringAsFixed(1)} MB'
+                                    : '?';
+                                final speedStr = speed > 0
+                                    ? '${(speed / 1048576).toStringAsFixed(1)} MB/s'
+                                    : '';
                                 final pct = total > 0 ? received / total : null;
                                 return AlertDialog(
                                   title: const Text('Downloading Linux'),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      if (pct != null) LinearProgressIndicator(value: pct) else const LinearProgressIndicator(),
+                                      if (pct != null)
+                                        LinearProgressIndicator(value: pct)
+                                      else
+                                        const LinearProgressIndicator(),
                                       const SizedBox(height: 8),
-                                      Text('${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
-                                        style: const TextStyle(fontSize: 12)),
+                                      Text(
+                                          '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
+                                          style: const TextStyle(fontSize: 12)),
                                     ],
                                   ),
                                 );
@@ -775,8 +926,14 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                             ),
                           );
                           try {
-                            final path = await downloadFile('$cdnUrl/uppidi-upload-latest-linux.tar.gz',
-                              onProgress: (r, t, s) { received = r; total = t; speed = s; update?.call(() {}); });
+                            final path = await downloadFile(
+                                '$cdnUrl/uppidi-upload-latest-linux.tar.gz',
+                                onProgress: (r, t, s) {
+                              received = r;
+                              total = t;
+                              speed = s;
+                              update?.call(() {});
+                            });
                             if (context.mounted) {
                               Navigator.of(context, rootNavigator: true).pop();
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -784,7 +941,8 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                               );
                             }
                           } catch (e) {
-                            if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
+                            if (context.mounted)
+                              Navigator.of(context, rootNavigator: true).pop();
                           }
                         },
                       ),
@@ -792,7 +950,8 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                       IconButton(
                         icon: const Icon(Icons.list_alt, size: 20),
                         tooltip: 'Browse all builds',
-                        onPressed: () => launchUrl(Uri.parse(cdnUrl), mode: LaunchMode.externalApplication),
+                        onPressed: () => launchUrl(Uri.parse(cdnUrl),
+                            mode: LaunchMode.externalApplication),
                       ),
                     ],
                   ),
