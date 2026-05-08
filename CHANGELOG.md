@@ -1,5 +1,8 @@
 # Changelog
 
+- Improve main screen UI with app description, enhanced provider info, and icon legend
+- Allow users to enable providers even when server reports them as down
+- docs: auto-update changelog
 - fix: manual download buttons save file without auto-install
 - docs: auto-update changelog
 - feat: in-app download for desktop (no browser redirect)
@@ -27,6 +30,3 @@
 - fix: restore freeimage.host API key (public key for anonymous uploads)
 - fix: freeimage parseResponse — detect HTML response, show clear error
 - add env_check.sh, remove stale UploadStarting test reference
-- fix: download icon before orange hash, progress dialog, removed duplicate
-- feat: image quality selector — Original / Medium (50%) / Low (25%) ratio-based resize
-- fix: remove stale oktay paths from build script
