@@ -1,5 +1,6 @@
 # Changelog
 
+- docs: auto-update changelog
 - feat: add swappable shell navigation strategies
 - docs: auto-update changelog
 - fix: rename UI variant options to reflect what they do
@@ -29,4 +30,3 @@
 - docs: add mermaid diagrams to user manual
 - docs: auto-update changelog
 - feat: 3-way navigation layout on desktop, debug logging indication, catbox error mapping
-- docs: auto-update changelog
