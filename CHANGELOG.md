@@ -1,5 +1,7 @@
 # Changelog
 
+- Fix provider dropdown - remove broken selectedItemBuilder, use default behavior
+- docs: auto-update changelog
 - Fix missing translations for errorInvalidUploader in IT and TR
 - docs: auto-update changelog
 - Expand icon legend to all icons, make provider dropdown icon-only
@@ -28,5 +30,3 @@
 - docs: architecture diagrams — state machine, navigation, upload lifecycle, error recovery
 - test: widget tests for upload screen — provider dropdown, quality selector, health lock, version check
 - fix: quality selector reactive via state, health-disabled switch blocked, badge icons 14px
-- fix: health-disabled providers now actually disabled, _ProviderInfo uses icon badges
-- feat: provider health manifest — fetch providers.json from CDN, show broken warnings
