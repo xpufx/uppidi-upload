@@ -51,6 +51,11 @@ final navigationLayoutProvider = FutureProvider<String>((ref) async {
   return await svc.getNavigationLayout();
 });
 
+final uiVariantProvider = FutureProvider<String>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  return await svc.getUiVariant();
+});
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -600,6 +605,38 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                   final layout = selected.first;
                   await svc.setNavigationLayout(layout);
                   ref.invalidate(navigationLayoutProvider);
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // UI variant selector
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () => showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: Text(l10n.uiVariant),
+                  content: Text(l10n.uiVariantDescription),
+                  actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok))],
+                ),
+              ),
+              child: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: SegmentedButton<String>(
+                segments: [
+                  ButtonSegment(value: 'default', label: Text(l10n.uiVariantDefault)),
+                  ButtonSegment(value: 'compact', label: Text(l10n.uiVariantCompact)),
+                ],
+                selected: {ref.watch(uiVariantProvider).asData?.value ?? 'default'},
+                onSelectionChanged: (Set<String> selected) async {
+                  final variant = selected.first;
+                  await svc.setUiVariant(variant);
+                  ref.invalidate(uiVariantProvider);
                 },
               ),
             ),

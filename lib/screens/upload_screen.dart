@@ -15,6 +15,8 @@ import '../core/share_message_dialog.dart';
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
+import 'upload_screen_compact.dart';
+import '../screens/settings_screen.dart';
 
 IconData _providerIcon(String id) => switch (id) {
       'httpbin' => Icons.science_outlined,
@@ -30,6 +32,11 @@ class UploadScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final variant = ref.watch(uiVariantProvider).asData?.value ?? 'default';
+    if (variant == 'compact') {
+      return const CompactUploadLayout();
+    }
+
     final uploadState = ref.watch(uploadProvider);
     final notifier = ref.read(uploadProvider.notifier);
     final providers = uploadState.providers;

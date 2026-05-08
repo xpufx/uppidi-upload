@@ -604,6 +604,30 @@ abstract class AppLocalizations {
   /// **'Right'**
   String get navigationRight;
 
+  /// No description provided for @uiVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'UI Variant'**
+  String get uiVariant;
+
+  /// No description provided for @uiVariantDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the main screen layout: Default or Compact.'**
+  String get uiVariantDescription;
+
+  /// No description provided for @uiVariantDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get uiVariantDefault;
+
+  /// No description provided for @uiVariantCompact.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact'**
+  String get uiVariantCompact;
+
   /// No description provided for @enabled.
   ///
   /// In en, this message translates to:

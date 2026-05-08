@@ -279,6 +279,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navigationRight => 'Right';
 
   @override
+  String get uiVariant => 'UI Variant';
+
+  @override
+  String get uiVariantDescription =>
+      'Choose the main screen layout: Default or Compact.';
+
+  @override
+  String get uiVariantDefault => 'Default';
+
+  @override
+  String get uiVariantCompact => 'Compact';
+
+  @override
   String get enabled => 'Enabled';
 
   @override

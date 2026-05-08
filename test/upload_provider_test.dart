@@ -138,6 +138,12 @@ class MockSettingsService implements SettingsService {
 
   @override
   Future<void> setNavigationLayout(String layout) async {}
+  
+  @override
+  Future<String> getUiVariant() async => 'default';
+  
+  @override
+  Future<void> setUiVariant(String variant) async {}
 }
 
 class MockHistoryService implements HistoryService {

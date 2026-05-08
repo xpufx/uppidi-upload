@@ -84,6 +84,7 @@ class SettingsService {
   static const disabledProvidersKey = 'global.disabled_providers';
   static const debugLoggingKey = 'global.debug_logging';
   static const navigationLayoutKey = 'global.navigation_layout';
+  static const uiVariantKey = 'global.ui_variant';
 
   Future<bool> isInsecureConnAllowed() async {
     final val = await get(insecureConnKey);
@@ -146,5 +147,19 @@ class SettingsService {
       );
     }
     await set(navigationLayoutKey, layout);
+  }
+
+  Future<String> getUiVariant() async {
+    final val = await get(uiVariantKey);
+    return val ?? 'default';
+  }
+
+  Future<void> setUiVariant(String variant) async {
+    if (!['default', 'compact'].contains(variant)) {
+      throw ArgumentError(
+        'Invalid UI variant: $variant. Must be one of default, compact.',
+      );
+    }
+    await set(uiVariantKey, variant);
   }
 }

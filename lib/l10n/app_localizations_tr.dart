@@ -281,6 +281,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get navigationRight => 'Sağ';
 
   @override
+  String get uiVariant => 'UI Varyantı';
+
+  @override
+  String get uiVariantDescription =>
+      'Ana ekran düzenini seçin: Varsayılan veya Kompakt.';
+
+  @override
+  String get uiVariantDefault => 'Varsayılan';
+
+  @override
+  String get uiVariantCompact => 'Kompakt';
+
+  @override
   String get enabled => 'Etkin';
 
   @override

@@ -281,6 +281,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get navigationRight => 'Destra';
 
   @override
+  String get uiVariant => 'Variante UI';
+
+  @override
+  String get uiVariantDescription =>
+      'Scegli il layout della schermata principale: Default o Compatta.';
+
+  @override
+  String get uiVariantDefault => 'Default';
+
+  @override
+  String get uiVariantCompact => 'Compatta';
+
+  @override
   String get enabled => 'Attivato';
 
   @override
