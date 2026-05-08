@@ -1,5 +1,7 @@
 # Changelog
 
+- feat: add swappable shell navigation strategies
+- docs: auto-update changelog
 - fix: rename UI variant options to reflect what they do
 - docs: auto-update changelog
 - fix: hide navigation layout setting on narrow screens (<600dp)
@@ -27,6 +29,4 @@
 - docs: add mermaid diagrams to user manual
 - docs: auto-update changelog
 - feat: 3-way navigation layout on desktop, debug logging indication, catbox error mapping
-- docs: auto-update changelog
-- feat: add debug logging and navigation layout toggles to settings; improve catbox error mapping
 - docs: auto-update changelog
