@@ -152,12 +152,6 @@ class MockSettingsService implements SettingsService {
   Future<void> setNavigationLayout(String layout) async {}
 
   @override
-  Future<String> getUiVariant() async => 'default';
-
-  @override
-  Future<void> setUiVariant(String variant) async {}
-
-  @override
   Future<String> getShellType() async => 'tabs';
 
   @override

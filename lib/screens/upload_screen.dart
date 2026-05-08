@@ -15,7 +15,6 @@ import '../core/share_message_dialog.dart';
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
-import 'upload_screen_compact.dart';
 import '../screens/settings_screen.dart';
 
 IconData _providerIcon(String id) => switch (id) {
@@ -32,11 +31,6 @@ class UploadScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final variant = ref.watch(uiVariantProvider).asData?.value ?? 'default';
-    if (variant == 'compact') {
-      return const CompactUploadLayout();
-    }
-
     final uploadState = ref.watch(uploadProvider);
     final notifier = ref.read(uploadProvider.notifier);
     final providers = uploadState.providers;
@@ -46,8 +40,8 @@ class UploadScreen extends ConsumerWidget {
     final webUnsupported = kIsWeb && provider != null && !provider.supportsWeb;
     final isDesktop = !kIsWeb &&
         (defaultTargetPlatform == TargetPlatform.linux ||
-         defaultTargetPlatform == TargetPlatform.macOS ||
-         defaultTargetPlatform == TargetPlatform.windows);
+            defaultTargetPlatform == TargetPlatform.macOS ||
+            defaultTargetPlatform == TargetPlatform.windows);
 
     final content = Padding(
       padding: const EdgeInsets.all(16.0),
@@ -75,19 +69,49 @@ class UploadScreen extends ConsumerWidget {
             ],
             if (webUnsupported) const _WebWarning(),
             switch (uploadState) {
-              UploadFileSelected(fileName: final n, fileSizeBytes: final s, mimeType: final m, fileBytes: final b) =>
+              UploadFileSelected(
+                fileName: final n,
+                fileSizeBytes: final s,
+                mimeType: final m,
+                fileBytes: final b
+              ) =>
                 Dismissible(
                   key: const ValueKey('file-preview'),
                   direction: DismissDirection.horizontal,
                   onDismissed: (_) => notifier.clearSelection(),
-                  child: _FilePreview(fileName: n, fileSize: s, mimeType: m, fileBytes: b, provider: provider),
+                  child: _FilePreview(
+                      fileName: n,
+                      fileSize: s,
+                      mimeType: m,
+                      fileBytes: b,
+                      provider: provider),
                 ),
-              UploadInProgress(fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb)
+              UploadInProgress(
+                fileName: final fn,
+                fileSizeBytes: final fs,
+                mimeType: final m,
+                fileBytes: final fb
+              )
                   when fn != null =>
-                _FilePreview(fileName: fn, fileSize: fs, mimeType: m, fileBytes: fb, provider: provider),
-              UploadCompleted(fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb)
+                _FilePreview(
+                    fileName: fn,
+                    fileSize: fs,
+                    mimeType: m,
+                    fileBytes: fb,
+                    provider: provider),
+              UploadCompleted(
+                fileName: final fn,
+                fileSizeBytes: final fs,
+                mimeType: final m,
+                fileBytes: final fb
+              )
                   when fn != null =>
-                _FilePreview(fileName: fn, fileSize: fs, mimeType: m, fileBytes: fb, provider: provider),
+                _FilePreview(
+                    fileName: fn,
+                    fileSize: fs,
+                    mimeType: m,
+                    fileBytes: fb,
+                    provider: provider),
               _ => const SizedBox.shrink(),
             },
             const SizedBox(height: 12),
@@ -97,27 +121,40 @@ class UploadScreen extends ConsumerWidget {
               _ => const SizedBox.shrink(),
             },
             switch (uploadState) {
-              UploadInProgress(progress: final p, speedLabel: final sp, sentBytes: final sb, totalBytes: final tb) => _ProgressSection(
+              UploadInProgress(
+                progress: final p,
+                speedLabel: final sp,
+                sentBytes: final sb,
+                totalBytes: final tb
+              ) =>
+                _ProgressSection(
                   progress: p,
                   speedLabel: sp,
                   sentBytes: sb,
                   totalBytes: tb,
-              onCancel: notifier.cancelUpload,
-            ),
-            UploadCompleted(errorMessage: final e, lastResult: final r, fileName: final fn, fileSizeBytes: final fs, mimeType: final m, fileBytes: final fb) =>
-              _ResultBanner(
-                url: r.url,
-                errorMessage: e,
-                fileName: fn,
-                fileSizeBytes: fs,
-                mimeType: m,
-                fileBytes: fb,
-                provider: provider,
-                lastResult: r,
-                onRetry: e != null ? () => notifier.uploadSelected() : null,
-                onCancel: e != null ? () => notifier.clearSelection() : null,
-              ),
-            _ => const SizedBox.shrink(),
+                  onCancel: notifier.cancelUpload,
+                ),
+              UploadCompleted(
+                errorMessage: final e,
+                lastResult: final r,
+                fileName: final fn,
+                fileSizeBytes: final fs,
+                mimeType: final m,
+                fileBytes: final fb
+              ) =>
+                _ResultBanner(
+                  url: r.url,
+                  errorMessage: e,
+                  fileName: fn,
+                  fileSizeBytes: fs,
+                  mimeType: m,
+                  fileBytes: fb,
+                  provider: provider,
+                  lastResult: r,
+                  onRetry: e != null ? () => notifier.uploadSelected() : null,
+                  onCancel: e != null ? () => notifier.clearSelection() : null,
+                ),
+              _ => const SizedBox.shrink(),
             },
             const SizedBox(height: 8),
           ],
@@ -148,10 +185,14 @@ class UploadScreen extends ConsumerWidget {
               if (isHovering)
                 Positioned.fill(
                   child: Container(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.08),
                     child: Center(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 16),
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.primaryContainer,
                           borderRadius: BorderRadius.circular(16),
@@ -159,9 +200,11 @@ class UploadScreen extends ConsumerWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.cloud_upload, color: Theme.of(context).colorScheme.primary),
+                            Icon(Icons.cloud_upload,
+                                color: Theme.of(context).colorScheme.primary),
                             const SizedBox(width: 12),
-                            Text(l10n.dropFileToUpload,
+                            Text(
+                              l10n.dropFileToUpload,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.w600,
@@ -197,7 +240,8 @@ class _ProviderDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedProvider = selectedIndex < providers.length ? providers[selectedIndex] : null;
+    final selectedProvider =
+        selectedIndex < providers.length ? providers[selectedIndex] : null;
     return Tooltip(
       message: selectedProvider?.providerName ?? '',
       child: DropdownButton<int>(
@@ -212,17 +256,26 @@ class _ProviderDropdown extends StatelessWidget {
             enabled: online,
             child: Row(
               children: [
-                Icon(_providerIcon(p.providerId), size: 20,
-                  color: online ? Theme.of(context).colorScheme.primary : Theme.of(context).disabledColor,
+                Icon(
+                  _providerIcon(p.providerId),
+                  size: 20,
+                  color: online
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).disabledColor,
                 ),
                 const SizedBox(width: 8),
-                Expanded(child: Text(p.providerName, overflow: TextOverflow.ellipsis,
-                  style: online ? null : TextStyle(color: Theme.of(context).disabledColor),
+                Expanded(
+                    child: Text(
+                  p.providerName,
+                  overflow: TextOverflow.ellipsis,
+                  style: online
+                      ? null
+                      : TextStyle(color: Theme.of(context).disabledColor),
                 )),
               ],
             ),
           );
-        }        ).toList(),
+        }).toList(),
       ),
     );
   }
@@ -246,10 +299,11 @@ class _ProviderInfo extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.providerInfoTitle,
+            Text(
+              l10n.providerInfoTitle,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
             const SizedBox(height: 8),
             metadataBadges(meta),
@@ -257,9 +311,11 @@ class _ProviderInfo extends StatelessWidget {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.file_present_outlined, size: 14, color: Colors.grey.shade600),
+                  Icon(Icons.file_present_outlined,
+                      size: 14, color: Colors.grey.shade600),
                   const SizedBox(width: 6),
-                  Text(l10n.maxFileSize(formatSize(meta.maxFileSizeBytes!)),
+                  Text(
+                    l10n.maxFileSize(formatSize(meta.maxFileSizeBytes!)),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -269,10 +325,12 @@ class _ProviderInfo extends StatelessWidget {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.check_circle_outline, size: 14, color: Colors.grey.shade600),
+                  Icon(Icons.check_circle_outline,
+                      size: 14, color: Colors.grey.shade600),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: Text(l10n.acceptedFiles(meta.mimeTypeLabel),
+                    child: Text(
+                      l10n.acceptedFiles(meta.mimeTypeLabel),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
@@ -283,9 +341,11 @@ class _ProviderInfo extends StatelessWidget {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.timer_outlined, size: 14, color: Colors.grey.shade600),
+                  Icon(Icons.timer_outlined,
+                      size: 14, color: Colors.grey.shade600),
                   const SizedBox(width: 6),
-                  Text(l10n.expiryInfo(meta.expiryInfo!),
+                  Text(
+                    l10n.expiryInfo(meta.expiryInfo!),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -297,10 +357,11 @@ class _ProviderInfo extends StatelessWidget {
                 children: [
                   Icon(Icons.link, size: 14, color: Colors.green.shade600),
                   const SizedBox(width: 6),
-                  Text(l10n.supportsDirectLinks,
+                  Text(
+                    l10n.supportsDirectLinks,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.green.shade700,
-                    ),
+                          color: Colors.green.shade700,
+                        ),
                   ),
                 ],
               ),
@@ -309,12 +370,14 @@ class _ProviderInfo extends StatelessWidget {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.account_circle_outlined, size: 14, color: Colors.orange.shade600),
+                  Icon(Icons.account_circle_outlined,
+                      size: 14, color: Colors.orange.shade600),
                   const SizedBox(width: 6),
-                  Text(l10n.requiresAccount,
+                  Text(
+                    l10n.requiresAccount,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.orange.shade700,
-                    ),
+                          color: Colors.orange.shade700,
+                        ),
                   ),
                 ],
               ),
@@ -334,13 +397,17 @@ class _AppDescription extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+      color: Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest
+          .withValues(alpha: 0.5),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(Icons.cloud_upload_outlined,
+            Icon(
+              Icons.cloud_upload_outlined,
               size: 36,
               color: Theme.of(context).colorScheme.primary,
             ),
@@ -349,16 +416,18 @@ class _AppDescription extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n.appTitle,
+                  Text(
+                    l10n.appTitle,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 4),
-                  Text(l10n.appDescription,
+                  Text(
+                    l10n.appDescription,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                   ),
                 ],
               ),
@@ -392,17 +461,21 @@ class _ProviderIconLegend extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+      color: Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest
+          .withValues(alpha: 0.3),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.iconLegendTitle,
+            Text(
+              l10n.iconLegendTitle,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -414,7 +487,8 @@ class _ProviderIconLegend extends StatelessWidget {
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(icon, size: 16, color: Theme.of(context).colorScheme.primary),
+                    Icon(icon,
+                        size: 16, color: Theme.of(context).colorScheme.primary),
                     const SizedBox(width: 4),
                     Text(label, style: Theme.of(context).textTheme.bodySmall),
                   ],
@@ -497,9 +571,18 @@ class _FileSelectedButtons extends ConsumerWidget {
               const SizedBox(width: 8),
               SegmentedButton<int>(
                 segments: const [
-                  ButtonSegment(value: 0, label: Text('Original'), icon: Icon(Icons.high_quality, size: 16)),
-                  ButtonSegment(value: 1, label: Text('Medium'), icon: Icon(Icons.photo_size_select_large, size: 16)),
-                  ButtonSegment(value: 2, label: Text('Low'), icon: Icon(Icons.photo_size_select_small, size: 16)),
+                  ButtonSegment(
+                      value: 0,
+                      label: Text('Original'),
+                      icon: Icon(Icons.high_quality, size: 16)),
+                  ButtonSegment(
+                      value: 1,
+                      label: Text('Medium'),
+                      icon: Icon(Icons.photo_size_select_large, size: 16)),
+                  ButtonSegment(
+                      value: 2,
+                      label: Text('Low'),
+                      icon: Icon(Icons.photo_size_select_small, size: 16)),
                 ],
                 selected: {quality},
                 onSelectionChanged: (v) => notifier.setQuality(v.first),
@@ -572,13 +655,16 @@ class _FilePreview extends StatelessWidget {
                       child: Container(
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
+                            color: Theme.of(context)
+                                .dividerColor
+                                .withValues(alpha: 0.3),
                           ),
                         ),
                         child: Image.memory(
                           fileBytes!,
                           fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 64),
+                          errorBuilder: (_, __, ___) =>
+                              const Icon(Icons.broken_image, size: 64),
                         ),
                       ),
                     ),
@@ -587,7 +673,9 @@ class _FilePreview extends StatelessWidget {
                 const SizedBox(height: 12),
               ] else if (_isImage) ...[
                 // Image without bytes (shouldn't happen, but fallback)
-                const Center(child: Icon(Icons.image_outlined, size: 80, color: Colors.grey)),
+                const Center(
+                    child: Icon(Icons.image_outlined,
+                        size: 80, color: Colors.grey)),
                 const SizedBox(height: 12),
               ] else ...[
                 // Non-image file icon
@@ -596,10 +684,12 @@ class _FilePreview extends StatelessWidget {
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      color:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Icon(Icons.insert_drive_file, size: 48, color: Colors.grey),
+                    child: const Icon(Icons.insert_drive_file,
+                        size: 48, color: Colors.grey),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -608,21 +698,25 @@ class _FilePreview extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: Text(fileName,
+                    child: Text(
+                      fileName,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                            fontWeight: FontWeight.w600,
+                          ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      color:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(formatSize(fileSize),
+                    child: Text(
+                      formatSize(fileSize),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
@@ -630,8 +724,12 @@ class _FilePreview extends StatelessWidget {
               ),
               if (mimeType != null) ...[
                 const SizedBox(height: 4),
-                Text(mimeType!,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                Text(
+                  mimeType!,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: Colors.grey),
                 ),
               ],
               if (warnings.isNotEmpty) ...[
@@ -654,7 +752,8 @@ class _FilePreview extends StatelessWidget {
 
     if (meta.allowedMimeTypes != null && mimeType != null) {
       if (!meta.allowsMimeType(mimeType!)) {
-        warnings.add(_warningRow('Provider only accepts: ${meta.mimeTypeLabel}'));
+        warnings
+            .add(_warningRow('Provider only accepts: ${meta.mimeTypeLabel}'));
       }
     }
 
@@ -670,10 +769,12 @@ class _FilePreview extends StatelessWidget {
       padding: const EdgeInsets.only(top: 4),
       child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, size: 16, color: Colors.orange.shade700),
+          Icon(Icons.warning_amber_rounded,
+              size: 16, color: Colors.orange.shade700),
           const SizedBox(width: 6),
           Expanded(
-            child: Text(msg,
+            child: Text(
+              msg,
               style: TextStyle(fontSize: 12, color: Colors.orange.shade800),
             ),
           ),
@@ -698,8 +799,10 @@ class _WebWarning extends StatelessWidget {
           children: [
             const Icon(Icons.warning_amber, size: 18),
             const SizedBox(width: 8),
-            Expanded(child: Text(l10n.providerWebNotSupported,
-              style: TextStyle(color: Colors.orange.shade900, fontSize: 13))),
+            Expanded(
+                child: Text(l10n.providerWebNotSupported,
+                    style: TextStyle(
+                        color: Colors.orange.shade900, fontSize: 13))),
           ],
         ),
       ),
@@ -782,22 +885,26 @@ class _ProgressSectionState extends State<_ProgressSection>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('$pct%',
+                  Text(
+                    '$pct%',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                   ),
                   if (hasData && widget.speedLabel.isNotEmpty)
                     Row(
                       children: [
-                        Icon(Icons.speed, size: 16, color: Colors.grey.shade600),
+                        Icon(Icons.speed,
+                            size: 16, color: Colors.grey.shade600),
                         const SizedBox(width: 4),
-                        Text(widget.speedLabel,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey.shade600,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        Text(
+                          widget.speedLabel,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.grey.shade600,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                         ),
                       ],
                     ),
@@ -827,15 +934,17 @@ class _ProgressSectionState extends State<_ProgressSection>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(formatSize(widget.sentBytes),
+                    Text(
+                      formatSize(widget.sentBytes),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade600,
-                      ),
+                            color: Colors.grey.shade600,
+                          ),
                     ),
-                    Text(formatSize(widget.totalBytes),
+                    Text(
+                      formatSize(widget.totalBytes),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade500,
-                      ),
+                            color: Colors.grey.shade500,
+                          ),
                     ),
                   ],
                 ),
@@ -903,7 +1012,8 @@ class _ResultBannerState extends State<_ResultBanner> {
     // File info
     buffer.writeln('=== FILE ===');
     buffer.writeln('Name: ${widget.fileName ?? "none"}');
-    buffer.writeln('Size: ${formatSize(widget.fileSizeBytes)} (${widget.fileSizeBytes} bytes)');
+    buffer.writeln(
+        'Size: ${formatSize(widget.fileSizeBytes)} (${widget.fileSizeBytes} bytes)');
     buffer.writeln('MIME: ${widget.mimeType ?? "unknown"}');
 
     // Error details
@@ -911,7 +1021,8 @@ class _ResultBannerState extends State<_ResultBanner> {
     buffer.writeln('Message: ${widget.errorMessage ?? "none"}');
     buffer.writeln('Raw Error: ${result?.rawError ?? "none"}');
     buffer.writeln('Status Code: ${result?.statusCode ?? "none"}');
-    buffer.writeln('Timestamp: ${result?.completedAt.toIso8601String() ?? "none"}');
+    buffer.writeln(
+        'Timestamp: ${result?.completedAt.toIso8601String() ?? "none"}');
     if (result?.stackTrace != null) {
       buffer.writeln('Stack Trace: ${result!.stackTrace}');
     }
@@ -940,7 +1051,8 @@ class _ResultBannerState extends State<_ResultBanner> {
           ],
         ),
         content: SingleChildScrollView(
-          child: SelectableText(text, style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
+          child: SelectableText(text,
+              style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
         ),
         actions: [
           TextButton.icon(
@@ -957,7 +1069,8 @@ class _ResultBannerState extends State<_ResultBanner> {
             },
             child: const Text('Copy All'),
           ),
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
         ],
       ),
     );
@@ -977,7 +1090,7 @@ class _ResultBannerState extends State<_ResultBanner> {
           Row(
             children: [
               Icon(hasError ? Icons.error : Icons.check_circle,
-                color: hasError ? Colors.red : Colors.green, size: 20),
+                  color: hasError ? Colors.red : Colors.green, size: 20),
               const SizedBox(width: 8),
               Text(hasError ? l10n.uploadFailed : l10n.uploadComplete),
             ],
@@ -988,7 +1101,8 @@ class _ResultBannerState extends State<_ResultBanner> {
               children: [
                 Expanded(
                   child: Text(widget.errorMessage!,
-                    style: TextStyle(color: Colors.red.shade700, fontSize: 13)),
+                      style:
+                          TextStyle(color: Colors.red.shade700, fontSize: 13)),
                 ),
                 IconButton(
                   icon: const Icon(Icons.bug_report, size: 16),
@@ -1005,7 +1119,8 @@ class _ResultBannerState extends State<_ResultBanner> {
             Row(
               children: [
                 Expanded(
-                  child: SelectableText(widget.url!,
+                  child: SelectableText(
+                    widget.url!,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                       fontSize: 13,
@@ -1018,7 +1133,8 @@ class _ResultBannerState extends State<_ResultBanner> {
                   onPressed: () async {
                     final uri = Uri.tryParse(widget.url!);
                     if (uri != null) {
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      await launchUrl(uri,
+                          mode: LaunchMode.externalApplication);
                     }
                   },
                   tooltip: l10n.openInBrowser,
