@@ -1,5 +1,7 @@
 # Changelog
 
+- Fix missing translations for errorInvalidUploader in IT and TR
+- docs: auto-update changelog
 - Expand icon legend to all icons, make provider dropdown icon-only
 - Add UI variant system with compact layout option
 - docs: auto-update changelog
@@ -28,5 +30,3 @@
 - fix: quality selector reactive via state, health-disabled switch blocked, badge icons 14px
 - fix: health-disabled providers now actually disabled, _ProviderInfo uses icon badges
 - feat: provider health manifest — fetch providers.json from CDN, show broken warnings
-- fix: move resize logic to uploadSelected() so quality selector works before upload
-- fix: custom logo removal, version check auto-fire, unused file_picker import
