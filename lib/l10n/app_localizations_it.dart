@@ -285,4 +285,50 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get disabled => 'Disattivato';
+
+  @override
+  String get appDescription =>
+      'Carica file su molti servizi di hosting gratuiti. Veloce, semplice e supporta molti provider.';
+
+  @override
+  String get providerInfoTitle => 'Info Provider';
+
+  @override
+  String maxFileSize(Object size) {
+    return 'Dimensione massima file: $size';
+  }
+
+  @override
+  String acceptedFiles(Object types) {
+    return 'File accettati: $types';
+  }
+
+  @override
+  String expiryInfo(Object info) {
+    return 'I file scadono: $info';
+  }
+
+  @override
+  String get supportsDirectLinks => 'Supporta link diretti';
+
+  @override
+  String get requiresAccount => 'Richiede account';
+
+  @override
+  String get iconLegendTitle => 'Icone Provider';
+
+  @override
+  String get iconLegendTest => 'Test';
+
+  @override
+  String get iconLegendFiles => 'File';
+
+  @override
+  String get iconLegendLinks => 'Link';
+
+  @override
+  String get iconLegendImages => 'Immagini';
+
+  @override
+  String get iconLegendOther => 'Altro';
 }

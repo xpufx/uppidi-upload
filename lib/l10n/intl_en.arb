@@ -84,5 +84,18 @@
   "navigationBottom": "Bottom",
   "navigationRight": "Right",
   "enabled": "Enabled",
-  "disabled": "Disabled"
+  "disabled": "Disabled",
+  "appDescription": "Upload files to multiple free hosting services. Fast, simple, and supports many providers.",
+  "providerInfoTitle": "Provider Info",
+  "maxFileSize": "Max file size: {size}",
+  "acceptedFiles": "Accepted files: {types}",
+  "expiryInfo": "Files expire: {info}",
+  "supportsDirectLinks": "Supports direct links",
+  "requiresAccount": "Requires account",
+  "iconLegendTitle": "Provider Icons",
+  "iconLegendTest": "Test",
+  "iconLegendFiles": "Files",
+  "iconLegendLinks": "Links",
+  "iconLegendImages": "Images",
+  "iconLegendOther": "Other"
 }

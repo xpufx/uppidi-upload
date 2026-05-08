@@ -83,5 +83,18 @@
   "navigationBottom": "In basso",
   "navigationRight": "Destra",
   "enabled": "Attivato",
-  "disabled": "Disattivato"
+  "disabled": "Disattivato",
+  "appDescription": "Carica file su molti servizi di hosting gratuiti. Veloce, semplice e supporta molti provider.",
+  "providerInfoTitle": "Info Provider",
+  "maxFileSize": "Dimensione massima file: {size}",
+  "acceptedFiles": "File accettati: {types}",
+  "expiryInfo": "I file scadono: {info}",
+  "supportsDirectLinks": "Supporta link diretti",
+  "requiresAccount": "Richiede account",
+  "iconLegendTitle": "Icone Provider",
+  "iconLegendTest": "Test",
+  "iconLegendFiles": "File",
+  "iconLegendLinks": "Link",
+  "iconLegendImages": "Immagini",
+  "iconLegendOther": "Altro"
 }

@@ -285,4 +285,50 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get disabled => 'Devre Dışı';
+
+  @override
+  String get appDescription =>
+      'Birden fazla ücretsiz barındırma servisine dosya yükleyin. Hızlı, basit ve birçok sağlayıcıyı destekler.';
+
+  @override
+  String get providerInfoTitle => 'Sağlayıcı Bilgisi';
+
+  @override
+  String maxFileSize(Object size) {
+    return 'Maksimum dosya boyutu: $size';
+  }
+
+  @override
+  String acceptedFiles(Object types) {
+    return 'Kabul edilen dosyalar: $types';
+  }
+
+  @override
+  String expiryInfo(Object info) {
+    return 'Dosyaların süresi: $info';
+  }
+
+  @override
+  String get supportsDirectLinks => 'Doğrudan linkleri destekler';
+
+  @override
+  String get requiresAccount => 'Hesap gerektirir';
+
+  @override
+  String get iconLegendTitle => 'Sağlayıcı Simgeleri';
+
+  @override
+  String get iconLegendTest => 'Test';
+
+  @override
+  String get iconLegendFiles => 'Dosyalar';
+
+  @override
+  String get iconLegendLinks => 'Linkler';
+
+  @override
+  String get iconLegendImages => 'Görseller';
+
+  @override
+  String get iconLegendOther => 'Diğer';
 }

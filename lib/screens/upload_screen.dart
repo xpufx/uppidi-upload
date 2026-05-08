@@ -48,6 +48,8 @@ class UploadScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            _AppDescription(),
+            const SizedBox(height: 16),
             _ProviderDropdown(
               selectedIndex: uploadState.selectedProviderIndex,
               providers: providers,
@@ -56,7 +58,14 @@ class UploadScreen extends ConsumerWidget {
                 if (i != null) notifier.setProvider(i);
               },
             ),
-            if (provider != null) _ProviderInfo(provider: provider),
+            if (provider != null) ...[
+              const SizedBox(height: 8),
+              _ProviderInfo(provider: provider),
+            ],
+            if (provider != null) ...[
+              const SizedBox(height: 8),
+              _ProviderIconLegend(),
+            ],
             if (webUnsupported) const _WebWarning(),
             switch (uploadState) {
               UploadFileSelected(fileName: final n, fileSizeBytes: final s, mimeType: final m, fileBytes: final b) =>
@@ -215,9 +224,194 @@ class _ProviderInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = provider;
     if (p == null) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: metadataBadges(p.metadata),
+    final meta = p.metadata;
+    final l10n = AppLocalizations.of(context);
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.providerInfoTitle,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            metadataBadges(meta),
+            if (meta.maxFileSizeBytes != null) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.file_present_outlined, size: 14, color: Colors.grey.shade600),
+                  const SizedBox(width: 6),
+                  Text(l10n.maxFileSize(formatSize(meta.maxFileSizeBytes!)),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ],
+            if (meta.allowedMimeTypes != null) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.check_circle_outline, size: 14, color: Colors.grey.shade600),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(l10n.acceptedFiles(meta.mimeTypeLabel),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            if (meta.expiryInfo != null) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.timer_outlined, size: 14, color: Colors.grey.shade600),
+                  const SizedBox(width: 6),
+                  Text(l10n.expiryInfo(meta.expiryInfo!),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ],
+            if (meta.supportsDirectLink) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.link, size: 14, color: Colors.green.shade600),
+                  const SizedBox(width: 6),
+                  Text(l10n.supportsDirectLinks,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.green.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            if (meta.requiresAccount) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.account_circle_outlined, size: 14, color: Colors.orange.shade600),
+                  const SizedBox(width: 6),
+                  Text(l10n.requiresAccount,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.orange.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AppDescription extends StatelessWidget {
+  const _AppDescription();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
+      elevation: 0,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(Icons.cloud_upload_outlined,
+              size: 36,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.appTitle,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(l10n.appDescription,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProviderIconLegend extends StatelessWidget {
+  const _ProviderIconLegend();
+
+  static final _legendItems = [
+    (Icons.science_outlined, 'iconLegendTest'),
+    (Icons.folder_outlined, 'iconLegendFiles'),
+    (Icons.link, 'iconLegendLinks'),
+    (Icons.image_outlined, 'iconLegendImages'),
+    (Icons.cloud_upload, 'iconLegendOther'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
+      elevation: 0,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.iconLegendTitle,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 16,
+              runSpacing: 8,
+              children: _legendItems.map((item) {
+                final (icon, key) = item;
+                final label = switch (key) {
+                  'iconLegendTest' => l10n.iconLegendTest,
+                  'iconLegendFiles' => l10n.iconLegendFiles,
+                  'iconLegendLinks' => l10n.iconLegendLinks,
+                  'iconLegendImages' => l10n.iconLegendImages,
+                  _ => l10n.iconLegendOther,
+                };
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(icon, size: 16, color: Theme.of(context).colorScheme.primary),
+                    const SizedBox(width: 4),
+                    Text(label, style: Theme.of(context).textTheme.bodySmall),
+                  ],
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

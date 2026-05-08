@@ -615,6 +615,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Disabled'**
   String get disabled;
+
+  /// No description provided for @appDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload files to multiple free hosting services. Fast, simple, and supports many providers.'**
+  String get appDescription;
+
+  /// No description provided for @providerInfoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider Info'**
+  String get providerInfoTitle;
+
+  /// No description provided for @maxFileSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Max file size: {size}'**
+  String maxFileSize(Object size);
+
+  /// No description provided for @acceptedFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted files: {types}'**
+  String acceptedFiles(Object types);
+
+  /// No description provided for @expiryInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Files expire: {info}'**
+  String expiryInfo(Object info);
+
+  /// No description provided for @supportsDirectLinks.
+  ///
+  /// In en, this message translates to:
+  /// **'Supports direct links'**
+  String get supportsDirectLinks;
+
+  /// No description provided for @requiresAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Requires account'**
+  String get requiresAccount;
+
+  /// No description provided for @iconLegendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider Icons'**
+  String get iconLegendTitle;
+
+  /// No description provided for @iconLegendTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Test'**
+  String get iconLegendTest;
+
+  /// No description provided for @iconLegendFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Files'**
+  String get iconLegendFiles;
+
+  /// No description provided for @iconLegendLinks.
+  ///
+  /// In en, this message translates to:
+  /// **'Links'**
+  String get iconLegendLinks;
+
+  /// No description provided for @iconLegendImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get iconLegendImages;
+
+  /// No description provided for @iconLegendOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get iconLegendOther;
 }
 
 class _AppLocalizationsDelegate

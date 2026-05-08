@@ -283,4 +283,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get disabled => 'Disabled';
+
+  @override
+  String get appDescription =>
+      'Upload files to multiple free hosting services. Fast, simple, and supports many providers.';
+
+  @override
+  String get providerInfoTitle => 'Provider Info';
+
+  @override
+  String maxFileSize(Object size) {
+    return 'Max file size: $size';
+  }
+
+  @override
+  String acceptedFiles(Object types) {
+    return 'Accepted files: $types';
+  }
+
+  @override
+  String expiryInfo(Object info) {
+    return 'Files expire: $info';
+  }
+
+  @override
+  String get supportsDirectLinks => 'Supports direct links';
+
+  @override
+  String get requiresAccount => 'Requires account';
+
+  @override
+  String get iconLegendTitle => 'Provider Icons';
+
+  @override
+  String get iconLegendTest => 'Test';
+
+  @override
+  String get iconLegendFiles => 'Files';
+
+  @override
+  String get iconLegendLinks => 'Links';
+
+  @override
+  String get iconLegendImages => 'Images';
+
+  @override
+  String get iconLegendOther => 'Other';
 }

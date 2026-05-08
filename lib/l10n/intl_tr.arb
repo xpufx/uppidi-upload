@@ -83,5 +83,18 @@
   "navigationBottom": "Alt",
   "navigationRight": "Sağ",
   "enabled": "Etkin",
-  "disabled": "Devre Dışı"
+  "disabled": "Devre Dışı",
+  "appDescription": "Birden fazla ücretsiz barındırma servisine dosya yükleyin. Hızlı, basit ve birçok sağlayıcıyı destekler.",
+  "providerInfoTitle": "Sağlayıcı Bilgisi",
+  "maxFileSize": "Maksimum dosya boyutu: {size}",
+  "acceptedFiles": "Kabul edilen dosyalar: {types}",
+  "expiryInfo": "Dosyaların süresi: {info}",
+  "supportsDirectLinks": "Doğrudan linkleri destekler",
+  "requiresAccount": "Hesap gerektirir",
+  "iconLegendTitle": "Sağlayıcı Simgeleri",
+  "iconLegendTest": "Test",
+  "iconLegendFiles": "Dosyalar",
+  "iconLegendLinks": "Linkler",
+  "iconLegendImages": "Görseller",
+  "iconLegendOther": "Diğer"
 }

@@ -695,6 +695,9 @@ void main() {
       // Find and tap the "Medium" quality option (quality value 1)
       final mediumOption = find.text('Medium');
       expect(mediumOption, findsOneWidget);
+      // Scroll to the Medium option (might be off-screen due to new UI elements)
+      await tester.ensureVisible(mediumOption);
+      await tester.pumpAndSettle();
       await tester.tap(mediumOption);
       await tester.pump();
 
@@ -741,6 +744,9 @@ void main() {
       expect(tester.widget<ElevatedButton>(uploadButton).onPressed, isNotNull);
 
       // Tap the Upload button
+      // Scroll to the Upload button (might be off-screen due to new UI elements)
+      await tester.ensureVisible(uploadButton);
+      await tester.pumpAndSettle();
       await tester.tap(uploadButton);
       await tester.pump();
 
@@ -783,6 +789,9 @@ void main() {
       expect(clearButton, findsOneWidget);
 
       // Tap the Clear button
+      // Scroll to the Clear button (might be off-screen due to new UI elements)
+      await tester.ensureVisible(clearButton);
+      await tester.pumpAndSettle();
       await tester.tap(clearButton);
       await tester.pumpAndSettle();
 
@@ -831,6 +840,9 @@ void main() {
       expect(cancelButton, findsOneWidget);
 
       // Tap the Cancel button
+      // Scroll to the Cancel button (might be off-screen due to new UI elements)
+      await tester.ensureVisible(cancelButton);
+      await tester.pumpAndSettle();
       await tester.tap(cancelButton);
       await tester.pumpAndSettle();
 
@@ -876,6 +888,10 @@ void main() {
       final retryButton = find.text(l10n.retry);
       expect(retryButton, findsOneWidget);
 
+      // Scroll to the Retry button (might be off-screen due to new UI elements)
+      await tester.ensureVisible(retryButton);
+      await tester.pumpAndSettle();
+
       // Tap the Retry button
       await tester.tap(retryButton);
       await tester.pumpAndSettle();
@@ -920,6 +936,10 @@ void main() {
       // Verify Debug icon is present
       final debugIcon = find.byIcon(Icons.bug_report);
       expect(debugIcon, findsWidgets);
+
+      // Scroll to the debug icon (might be off-screen due to new UI elements)
+      await tester.ensureVisible(debugIcon.first);
+      await tester.pumpAndSettle();
 
       // Tap the Debug icon
       await tester.tap(debugIcon.first);
