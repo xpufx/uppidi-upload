@@ -1,5 +1,8 @@
 # Changelog
 
+- chore: bump version to 1.1.0+1
+- feat: add image crop tool with draggable/resizable overlay
+- docs: auto-update changelog
 - Remove redundant 'Quality:' label from image quality selector
 - docs: auto-update changelog
 - Remove provider config card, icon legend, and redundant title from upload screen
@@ -27,6 +30,3 @@
 - Add UI variant system with compact layout option
 - docs: auto-update changelog
 - Improve main screen UI with app description, enhanced provider info, and icon legend
-- Allow users to enable providers even when server reports them as down
-- docs: auto-update changelog
-- fix: manual download buttons save file without auto-install
