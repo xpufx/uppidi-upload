@@ -43,7 +43,8 @@ class HistoryScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: Row(
                 children: [
-                  Text(l10n.historyRecords(records.length), style: Theme.of(context).textTheme.bodySmall),
+                  Text(l10n.historyRecords(records.length),
+                      style: Theme.of(context).textTheme.bodySmall),
                   const Spacer(),
                   TextButton.icon(
                     icon: const Icon(Icons.delete_sweep, size: 18),
@@ -55,8 +56,12 @@ class HistoryScreen extends ConsumerWidget {
                           title: Text(l10n.clearHistory),
                           content: Text(l10n.historyClearConfirm),
                           actions: [
-                            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
-                            TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.ok)),
+                            TextButton(
+                                onPressed: () => Navigator.pop(ctx, false),
+                                child: Text(l10n.cancel)),
+                            TextButton(
+                                onPressed: () => Navigator.pop(ctx, true),
+                                child: Text(l10n.ok)),
                           ],
                         ),
                       );
@@ -128,49 +133,77 @@ class _HistoryTile extends StatelessWidget {
       onDismissed: (_) => onDelete(),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 4),
-          child: ListTile(
-            leading: Icon(
-              r.success ? Icons.check_circle : Icons.error,
-              color: r.success ? Colors.green : Colors.red,
-            ),
-            title: Text(r.fileName, overflow: TextOverflow.ellipsis),
-            onLongPress: () async {
-              final confirmed = await showDialog<bool>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: Text(r.fileName),
-                  content: Text(l10n.deleteThisRecord),
-                  actions: [
-                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
-                    TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.ok)),
-                  ],
+        child: ListTile(
+          leading: r.thumbnailBytes != null && r.success
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Image.memory(
+                      r.thumbnailBytes!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Icon(
+                        r.success ? Icons.check_circle : Icons.error,
+                        color: r.success ? Colors.green : Colors.red,
+                      ),
+                    ),
+                  ),
+                )
+              : Icon(
+                  r.success ? Icons.check_circle : Icons.error,
+                  color: r.success ? Colors.green : Colors.red,
                 ),
-              );
-              if (confirmed == true) onDelete();
-            },
+          title: Text(r.fileName, overflow: TextOverflow.ellipsis),
+          onLongPress: () async {
+            final confirmed = await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: Text(r.fileName),
+                content: Text(l10n.deleteThisRecord),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: Text(l10n.cancel)),
+                  TextButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: Text(l10n.ok)),
+                ],
+              ),
+            );
+            if (confirmed == true) onDelete();
+          },
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(r.providerName, style: const TextStyle(fontSize: 12)),
               if (r.url != null)
-                Text(r.url!, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
-              Text(formatTime(r.completedAt,
-                justNow: l10n.timeJustNow,
-                minutesAgo: (m) => l10n.timeMinutesAgo(m),
-                hoursAgo: (h) => l10n.timeHoursAgo(h),
-              ), style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                Text(r.url!,
+                    style: const TextStyle(fontSize: 12),
+                    overflow: TextOverflow.ellipsis),
+              Text(
+                  formatTime(
+                    r.completedAt,
+                    justNow: l10n.timeJustNow,
+                    minutesAgo: (m) => l10n.timeMinutesAgo(m),
+                    hoursAgo: (h) => l10n.timeHoursAgo(h),
+                  ),
+                  style: const TextStyle(fontSize: 11, color: Colors.grey)),
             ],
           ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               if (r.url != null)
-                IconButton(icon: const Icon(Icons.open_in_new, size: 18),
-                  onPressed: () async {
-                    final uri = Uri.tryParse(r.url!);
-                    if (uri != null) await launchUrl(uri, mode: LaunchMode.externalApplication);
-                  },
-                  tooltip: l10n.openInBrowser),
+                IconButton(
+                    icon: const Icon(Icons.open_in_new, size: 18),
+                    onPressed: () async {
+                      final uri = Uri.tryParse(r.url!);
+                      if (uri != null)
+                        await launchUrl(uri,
+                            mode: LaunchMode.externalApplication);
+                    },
+                    tooltip: l10n.openInBrowser),
               IconButton(
                 icon: const Icon(Icons.copy, size: 18),
                 onPressed: onCopy,

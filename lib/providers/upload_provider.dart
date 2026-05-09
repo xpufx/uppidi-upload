@@ -111,7 +111,7 @@ class UploadNotifier extends Notifier<UploadState> {
   final List<BaseUploader>? _injectedProviders;
 
   UploadNotifier({List<BaseUploader>? providers})
-    : _injectedProviders = providers;
+      : _injectedProviders = providers;
 
   int _selectedQuality = 0; // 0=original, 1=medium (50%), 2=low (25%)
   Uint8List? _originalFileBytes; // saved for crop reset
@@ -153,35 +153,35 @@ class UploadNotifier extends Notifier<UploadState> {
     final prev = state;
     state = switch (prev) {
       UploadFileSelected() => UploadFileSelected(
-        fileName: prev.fileName,
-        fileSizeBytes: prev.fileSizeBytes,
-        mimeType: prev.mimeType,
-        fileBytes: prev.fileBytes,
-        quality: prev.quality,
-        results: prev.results,
-        selectedProviderIndex: index,
-        providers: prev.providers,
-      ),
+          fileName: prev.fileName,
+          fileSizeBytes: prev.fileSizeBytes,
+          mimeType: prev.mimeType,
+          fileBytes: prev.fileBytes,
+          quality: prev.quality,
+          results: prev.results,
+          selectedProviderIndex: index,
+          providers: prev.providers,
+        ),
       UploadIdle() => UploadIdle(
-        results: prev.results,
-        selectedProviderIndex: index,
-        providers: prev.providers,
-      ),
+          results: prev.results,
+          selectedProviderIndex: index,
+          providers: prev.providers,
+        ),
       UploadInProgress() => prev,
       UploadCompleted() when prev.fileName != null => UploadFileSelected(
-        fileName: prev.fileName!,
-        fileSizeBytes: prev.fileSizeBytes,
-        mimeType: prev.mimeType,
-        fileBytes: prev.fileBytes,
-        results: prev.results,
-        selectedProviderIndex: index,
-        providers: prev.providers,
-      ),
+          fileName: prev.fileName!,
+          fileSizeBytes: prev.fileSizeBytes,
+          mimeType: prev.mimeType,
+          fileBytes: prev.fileBytes,
+          results: prev.results,
+          selectedProviderIndex: index,
+          providers: prev.providers,
+        ),
       UploadCompleted() => UploadIdle(
-        results: prev.results,
-        selectedProviderIndex: index,
-        providers: prev.providers,
-      ),
+          results: prev.results,
+          selectedProviderIndex: index,
+          providers: prev.providers,
+        ),
     };
   }
 
@@ -356,9 +356,8 @@ class UploadNotifier extends Notifier<UploadState> {
         lastResult: UploadResult(success: false),
         errorMessage: 'No upload providers configured',
         fileName: info.fileName ?? request.fileName,
-        fileSizeBytes: info.fileSizeBytes > 0
-            ? info.fileSizeBytes
-            : request.sizeInBytes,
+        fileSizeBytes:
+            info.fileSizeBytes > 0 ? info.fileSizeBytes : request.sizeInBytes,
         mimeType: info.mimeType ?? request.mimeType,
         fileBytes: info.fileBytes,
         results: state.results,
@@ -393,9 +392,8 @@ class UploadNotifier extends Notifier<UploadState> {
     _lastSampleBytes = 0;
 
     final currentFileName = info.fileName ?? request.fileName;
-    final currentFileSize = info.fileSizeBytes > 0
-        ? info.fileSizeBytes
-        : request.sizeInBytes;
+    final currentFileSize =
+        info.fileSizeBytes > 0 ? info.fileSizeBytes : request.sizeInBytes;
     final currentMimeType = info.mimeType ?? request.mimeType;
     final currentFileBytes = info.fileBytes;
 
@@ -497,7 +495,8 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
-      _saveToHistory(result, provider, request.fileName);
+      _saveToHistory(result, provider, request.fileName, currentFileBytes,
+          currentMimeType);
     } catch (e) {
       if (cancelToken.isCancelled) {
         state = UploadIdle(
@@ -524,7 +523,8 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
-      _saveToHistory(failResult, provider, request.fileName);
+      _saveToHistory(failResult, provider, request.fileName, currentFileBytes,
+          currentMimeType);
     }
   }
 
@@ -532,9 +532,12 @@ class UploadNotifier extends Notifier<UploadState> {
     UploadResult result,
     BaseUploader provider,
     String fileName,
+    Uint8List? fileBytes,
+    String? mimeType,
   ) async {
     try {
       final history = ref.read(historyServiceProvider);
+      final thumb = _generateThumbnail(fileBytes, mimeType);
       await history.add(
         UploadRecord(
           fileName: fileName,
@@ -545,6 +548,7 @@ class UploadNotifier extends Notifier<UploadState> {
           errorMessage: result.errorMessage,
           statusCode: result.statusCode,
           completedAt: result.completedAt,
+          thumbnailBytes: thumb,
         ),
       );
       ref.invalidate(uploadHistoryProvider);
@@ -656,7 +660,8 @@ String _mapDioException(DioException e) {
     DioExceptionType.cancel => 'Upload cancelled',
     DioExceptionType.connectionTimeout ||
     DioExceptionType.sendTimeout ||
-    DioExceptionType.receiveTimeout => 'Connection timed out',
+    DioExceptionType.receiveTimeout =>
+      'Connection timed out',
     DioExceptionType.connectionError =>
       'Connection failed: ${e.message ?? "server unreachable"}',
     DioExceptionType.badResponse =>
@@ -665,9 +670,29 @@ String _mapDioException(DioException e) {
   };
 }
 
+/// Generates a small JPEG thumbnail (max 200px wide) for image bytes.
+/// Returns null for non-images or if processing fails.
+Uint8List? _generateThumbnail(Uint8List? fileBytes, String? mimeType) {
+  if (fileBytes == null || mimeType == null || !mimeType.startsWith('image/')) {
+    return null;
+  }
+  try {
+    final src = img.decodeImage(fileBytes);
+    if (src == null) return null;
+    const maxW = 200;
+    final w = src.width > maxW ? maxW : src.width;
+    final ratio = w / src.width;
+    final h = (src.height * ratio).round();
+    final thumb = img.copyResize(src, width: w, height: h);
+    return img.encodeJpg(thumb, quality: 70);
+  } catch (_) {
+    return null;
+  }
+}
+
 /// Helper to extract file info from current state for passing to UploadCompleted
 ({String? fileName, int fileSizeBytes, String? mimeType, Uint8List? fileBytes})
-_extractFileInfo(UploadState current) {
+    _extractFileInfo(UploadState current) {
   if (current is UploadFileSelected) {
     return (
       fileName: current.fileName,

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:hive/hive.dart';
 
 class UploadRecord {
@@ -9,6 +11,7 @@ class UploadRecord {
   final String? errorMessage;
   final int? statusCode;
   final DateTime completedAt;
+  final Uint8List? thumbnailBytes;
 
   UploadRecord({
     required this.fileName,
@@ -19,6 +22,7 @@ class UploadRecord {
     this.errorMessage,
     this.statusCode,
     required this.completedAt,
+    this.thumbnailBytes,
   });
 }
 
@@ -28,7 +32,7 @@ class UploadRecordAdapter extends TypeAdapter<UploadRecord> {
 
   @override
   UploadRecord read(BinaryReader reader) {
-    return UploadRecord(
+    final record = UploadRecord(
       fileName: reader.readString(),
       url: reader.readBool() ? reader.readString() : null,
       providerId: reader.readString(),
@@ -38,6 +42,27 @@ class UploadRecordAdapter extends TypeAdapter<UploadRecord> {
       statusCode: reader.readBool() ? reader.readInt() : null,
       completedAt: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
     );
+
+    // Backward compat: old records won't have thumbnailBytes
+    try {
+      final thumbList = reader.readByteList();
+      if (thumbList != null && thumbList.isNotEmpty) {
+        return UploadRecord(
+          fileName: record.fileName,
+          url: record.url,
+          providerId: record.providerId,
+          providerName: record.providerName,
+          success: record.success,
+          errorMessage: record.errorMessage,
+          statusCode: record.statusCode,
+          completedAt: record.completedAt,
+          thumbnailBytes: Uint8List.fromList(thumbList),
+        );
+      }
+    } catch (_) {
+      // Old record without thumbnail data — return as-is
+    }
+    return record;
   }
 
   @override
@@ -53,5 +78,7 @@ class UploadRecordAdapter extends TypeAdapter<UploadRecord> {
     writer.writeBool(obj.statusCode != null);
     if (obj.statusCode != null) writer.writeInt(obj.statusCode!);
     writer.writeInt(obj.completedAt.millisecondsSinceEpoch);
+    // thumbnailBytes appended at end for backward compat
+    writer.writeByteList(obj.thumbnailBytes ?? []);
   }
 }
