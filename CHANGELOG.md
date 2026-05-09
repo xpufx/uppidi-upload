@@ -1,5 +1,7 @@
 # Changelog
 
+- Fix nav overflow on Android landscape: always use bottom nav on mobile, remove layout setting
+- docs: auto-update changelog
 - Explicitly declare assets/favicons/ in pubspec.yaml
 - docs: auto-update changelog
 - Remove favicon re-download from release build
@@ -28,5 +30,3 @@
 - feat: add swappable shell navigation strategies
 - docs: auto-update changelog
 - fix: rename UI variant options to reflect what they do
-- docs: auto-update changelog
-- fix: hide navigation layout setting on narrow screens (<600dp)
