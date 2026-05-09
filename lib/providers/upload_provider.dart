@@ -115,6 +115,8 @@ class UploadNotifier extends Notifier<UploadState> {
 
   int _selectedQuality = 0; // 0=original, 1=medium (50%), 2=low (25%)
   Uint8List? _originalFileBytes; // saved for crop reset
+  Uint8List?
+      _lastUncompressedBytes; // bytes after crop, before quality compression
 
   String? _lastFilePath;
   Uint8List? _lastFileBytes;
@@ -125,9 +127,10 @@ class UploadNotifier extends Notifier<UploadState> {
 
   void setQuality(int q) {
     _selectedQuality = q;
-    // Update state if file is selected
-    if (state is UploadFileSelected) {
-      final prev = state as UploadFileSelected;
+    if (state is! UploadFileSelected) return;
+    final prev = state as UploadFileSelected;
+    if (prev.mimeType?.startsWith('image/') != true ||
+        _lastUncompressedBytes == null) {
       state = UploadFileSelected(
         fileName: prev.fileName,
         fileSizeBytes: prev.fileSizeBytes,
@@ -138,7 +141,65 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: prev.selectedProviderIndex,
         providers: prev.providers,
       );
+      return;
     }
+
+    if (q == 0) {
+      // Restore to pre-quality bytes (preserving crop)
+      _lastFileBytes = _lastUncompressedBytes;
+      state = UploadFileSelected(
+        fileName: prev.fileName,
+        fileSizeBytes: _lastUncompressedBytes!.length,
+        mimeType: 'image/jpeg',
+        fileBytes: _lastUncompressedBytes,
+        quality: 0,
+        results: prev.results,
+        selectedProviderIndex: prev.selectedProviderIndex,
+        providers: prev.providers,
+      );
+      return;
+    }
+
+    // Apply quality resize immediately
+    try {
+      final src = img.decodeImage(_lastUncompressedBytes!);
+      if (src != null) {
+        final ratio = q == 1 ? 0.5 : 0.25;
+        final newW = (src.width * ratio).round();
+        final newH = (src.height * ratio).round();
+        final jpegQuality = q == 1 ? 75 : 50;
+        final resized = img.copyResize(src, width: newW, height: newH);
+        final outBytes = img.encodeJpg(resized, quality: jpegQuality);
+        // Skip if not meaningfully smaller
+        if (outBytes.length < (_lastUncompressedBytes!.length * 0.9)) {
+          _lastFileBytes = outBytes;
+          state = UploadFileSelected(
+            fileName: prev.fileName.replaceAll(RegExp(r'\.\w+$'), '') + '.jpg',
+            fileSizeBytes: outBytes.length,
+            mimeType: 'image/jpeg',
+            fileBytes: outBytes,
+            quality: q,
+            results: prev.results,
+            selectedProviderIndex: prev.selectedProviderIndex,
+            providers: prev.providers,
+          );
+          return;
+        }
+      }
+    } catch (_) {
+      // Fall through to update state without resize
+    }
+    // Resize skipped — just update quality
+    state = UploadFileSelected(
+      fileName: prev.fileName,
+      fileSizeBytes: prev.fileSizeBytes,
+      mimeType: prev.mimeType,
+      fileBytes: prev.fileBytes,
+      quality: q,
+      results: prev.results,
+      selectedProviderIndex: prev.selectedProviderIndex,
+      providers: prev.providers,
+    );
   }
 
   @override
@@ -213,6 +274,7 @@ class UploadNotifier extends Notifier<UploadState> {
 
       // Store request for later upload
       _originalFileBytes = previewBytes;
+      _lastUncompressedBytes = previewBytes;
       state = UploadFileSelected(
         fileName: file.name,
         fileSizeBytes: request.sizeInBytes,
@@ -266,46 +328,8 @@ class UploadNotifier extends Notifier<UploadState> {
       );
     }
     if (request == null) return;
-    var finalReq = request;
 
-    // Resize image if quality selected
-    if (_selectedQuality > 0 &&
-        finalReq.mimeType?.startsWith('image/') == true &&
-        _lastFileBytes != null) {
-      try {
-        final src = img.decodeImage(_lastFileBytes!);
-        if (src != null) {
-          final ratio = _selectedQuality == 1 ? 0.5 : 0.25;
-          final newW = (src.width * ratio).round();
-          final newH = (src.height * ratio).round();
-          final jpegQuality = _selectedQuality == 1 ? 75 : 50;
-          final resized = img.copyResize(src, width: newW, height: newH);
-          final outBytes = img.encodeJpg(resized, quality: jpegQuality);
-          // Skip resize if output isn't meaningfully smaller
-          if (outBytes.length >= (finalReq.sizeInBytes * 0.9)) {
-            _log.info('Resize skipped — output not smaller than original');
-          } else {
-            final fileName = (finalReq.fileName ?? 'image').replaceAll(
-              RegExp(r'\.\w+$'),
-              '.jpg',
-            );
-            finalReq = FileUploadRequest(
-              fileName: fileName,
-              mimeType: 'image/jpeg',
-              sizeInBytes: outBytes.length,
-              dataStream: Stream.value(outBytes),
-            );
-            _log.info(
-              'Resized to ${newW}x${newH} ($ratio ratio, $outBytes.length bytes, Q$jpegQuality)',
-            );
-          }
-        }
-      } catch (e) {
-        _log.warn('Resize failed, using original: $e');
-      }
-    }
-
-    await _executeUpload(finalReq);
+    await _executeUpload(request);
   }
 
   Future<void> uploadFromFile(String filePath, String? mimeType) async {
@@ -322,6 +346,7 @@ class UploadNotifier extends Notifier<UploadState> {
       _lastFilePath = filePath;
       _lastFileBytes = null;
       _originalFileBytes = previewBytes;
+      _lastUncompressedBytes = previewBytes;
       state = UploadFileSelected(
         fileName: fileName,
         fileSizeBytes: size,
@@ -573,6 +598,7 @@ class UploadNotifier extends Notifier<UploadState> {
   /// [croppedBytes] should be JPEG-encoded bytes ready for upload/preview.
   void applyCrop(Uint8List croppedBytes) {
     _lastFileBytes = croppedBytes;
+    _lastUncompressedBytes = croppedBytes;
     _lastFilePath = null; // cropped data is no longer a file path
     if (state is UploadFileSelected) {
       final prev = state as UploadFileSelected;
@@ -595,6 +621,7 @@ class UploadNotifier extends Notifier<UploadState> {
   void resetCrop() {
     if (_originalFileBytes == null) return;
     _lastFileBytes = _originalFileBytes;
+    _lastUncompressedBytes = _originalFileBytes;
     _lastFilePath = null;
     if (state is UploadFileSelected) {
       final prev = state as UploadFileSelected;
@@ -615,6 +642,7 @@ class UploadNotifier extends Notifier<UploadState> {
     _lastFilePath = null;
     _lastFileBytes = null;
     _originalFileBytes = null;
+    _lastUncompressedBytes = null;
     state = UploadIdle(
       results: state.results,
       selectedProviderIndex: state.selectedProviderIndex,
