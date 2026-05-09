@@ -298,24 +298,6 @@ class _ProviderInfo extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Provider favicon + name row
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                children: [
-                  ProviderFavicon(providerId: p.providerId, size: 18),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      p.providerName,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             metadataBadges(meta),
             if (meta.maxFileSizeBytes != null) ...[
               const SizedBox(height: 4),
