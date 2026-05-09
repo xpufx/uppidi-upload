@@ -21,15 +21,7 @@ import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 import '../screens/settings_screen.dart';
 import '../widgets/image_crop_overlay.dart';
-
-IconData _providerIcon(String id) => switch (id) {
-      'httpbin' => Icons.science_outlined,
-      'catbox' => Icons.folder_outlined,
-      'tmpfilelink' => Icons.link,
-      'uguu_uguu_se' || 'uguu_safe_uguu_se' => Icons.burst_mode_outlined,
-      'freeimage_freeimage_host' => Icons.image_outlined,
-      _ => Icons.cloud_upload,
-    };
+import '../widgets/provider_favicon.dart';
 
 class UploadScreen extends ConsumerWidget {
   const UploadScreen({super.key});
@@ -263,10 +255,10 @@ class _ProviderDropdown extends StatelessWidget {
             enabled: online,
             child: Row(
               children: [
-                Icon(
-                  _providerIcon(p.providerId),
+                ProviderFavicon(
+                  providerId: p.providerId,
                   size: 20,
-                  color: online
+                  iconColor: online
                       ? Theme.of(context).colorScheme.primary
                       : Theme.of(context).disabledColor,
                 ),
@@ -306,6 +298,24 @@ class _ProviderInfo extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Provider favicon + name row
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                children: [
+                  ProviderFavicon(providerId: p.providerId, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      p.providerName,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             metadataBadges(meta),
             if (meta.maxFileSizeBytes != null) ...[
               const SizedBox(height: 4),

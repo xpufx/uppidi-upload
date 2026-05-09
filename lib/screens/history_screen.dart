@@ -7,6 +7,7 @@ import '../core/format.dart';
 import '../core/history_service.dart';
 import '../core/share_message_dialog.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/provider_favicon.dart';
 
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
@@ -176,7 +177,13 @@ class _HistoryTile extends StatelessWidget {
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(r.providerName, style: const TextStyle(fontSize: 12)),
+              Row(
+                children: [
+                  ProviderFavicon(providerId: r.providerId, size: 14),
+                  const SizedBox(width: 4),
+                  Text(r.providerName, style: const TextStyle(fontSize: 12)),
+                ],
+              ),
               if (r.url != null)
                 Text(r.url!,
                     style: const TextStyle(fontSize: 12),

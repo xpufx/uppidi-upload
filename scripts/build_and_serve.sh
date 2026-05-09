@@ -46,6 +46,10 @@ GIT_HASH=$(git rev-parse --short HEAD)
 ARTIFACTS_DIR="/home/xpufx/code/uppidi/.caddy-artifacts"
 mkdir -p "$ARTIFACTS_DIR"
 
+# ── Download provider favicons ───────────────────────────────
+echo "==> Downloading provider favicons..."
+bash scripts/download_favicons.sh
+
 # ── Android APK ────────────────────────────────────────────
 echo "==> Building Android APK (arm64) @ ${GIT_HASH}..."
 flutter build apk --release --target-platform android-arm64 --dart-define=GIT_HASH=$GIT_HASH --dart-define=CDN_URL=http://10.20.30.24
