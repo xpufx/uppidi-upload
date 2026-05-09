@@ -37,5 +37,5 @@ flutter:
   assets:
     - lib/l10n/
     - assets/
-    - CHANGELOG.md
+    - assets/favicons/
     - CHANGELOG.md
