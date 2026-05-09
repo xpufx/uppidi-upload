@@ -1,5 +1,10 @@
 # Changelog
 
+- Add provider favicons to dropdown, metadata card, and history
+- Fix upload progress to track actual processed size
+- Store small image thumbnail in upload history
+- Remove redundant title from provider details card
+- docs: auto-update changelog
 - chore: bump version to 1.1.0+1
 - feat: add image crop tool with draggable/resizable overlay
 - docs: auto-update changelog
@@ -25,8 +30,3 @@
 - Fix provider dropdown - remove broken selectedItemBuilder, use default behavior
 - docs: auto-update changelog
 - Fix missing translations for errorInvalidUploader in IT and TR
-- docs: auto-update changelog
-- Expand icon legend to all icons, make provider dropdown icon-only
-- Add UI variant system with compact layout option
-- docs: auto-update changelog
-- Improve main screen UI with app description, enhanced provider info, and icon legend
