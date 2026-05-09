@@ -151,7 +151,7 @@ class UploadScreen extends ConsumerWidget {
                   provider: provider,
                   lastResult: r,
                   onRetry: e != null ? () => notifier.uploadSelected() : null,
-                  onCancel: e != null ? () => notifier.clearSelection() : null,
+                  onCancel: () => notifier.clearSelection(),
                 ),
               _ => const SizedBox.shrink(),
             },
@@ -1142,35 +1142,33 @@ class _ResultBannerState extends State<_ResultBanner> {
               ],
             ),
           ],
-          // Retry button on error
-          if (hasError) ...[
-            const SizedBox(height: 8),
-            Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (widget.onRetry != null)
-                    ElevatedButton.icon(
-                      onPressed: widget.onRetry,
-                      icon: const Icon(Icons.refresh, size: 18),
-                      label: Text(l10n.retry),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange.shade100,
-                        foregroundColor: Colors.orange.shade800,
-                      ),
+          // Action buttons
+          const SizedBox(height: 8),
+          Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (hasError && widget.onRetry != null) ...[
+                  ElevatedButton.icon(
+                    onPressed: widget.onRetry,
+                    icon: const Icon(Icons.refresh, size: 18),
+                    label: Text(l10n.retry),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange.shade100,
+                      foregroundColor: Colors.orange.shade800,
                     ),
-                  if (widget.onCancel != null) ...[
-                    const SizedBox(width: 12),
-                    OutlinedButton.icon(
-                      onPressed: widget.onCancel,
-                      icon: const Icon(Icons.close, size: 18),
-                      label: Text(l10n.cancel),
-                    ),
-                  ],
+                  ),
+                  const SizedBox(width: 12),
                 ],
-              ),
+                if (widget.onCancel != null)
+                  OutlinedButton.icon(
+                    onPressed: widget.onCancel,
+                    icon: const Icon(Icons.close, size: 18),
+                    label: Text(l10n.cancel),
+                  ),
+              ],
             ),
-          ],
+          ),
         ],
       ),
     );
