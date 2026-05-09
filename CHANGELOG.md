@@ -1,5 +1,7 @@
 # Changelog
 
+- Remove redundant provider name from info card (visible in dropdown)
+- docs: auto-update changelog
 - Add provider favicons to dropdown, metadata card, and history
 - Fix upload progress to track actual processed size
 - Store small image thumbnail in upload history
@@ -28,5 +30,3 @@
 - Fix dropdown: show provider name, remove metadata text
 - docs: auto-update changelog
 - Fix provider dropdown - remove broken selectedItemBuilder, use default behavior
-- docs: auto-update changelog
-- Fix missing translations for errorInvalidUploader in IT and TR
