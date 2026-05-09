@@ -86,6 +86,6 @@ void _showScreen(BuildContext context, AppScreen screen) {
 class _AppLogo48 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return AppLogo(size: 56);
+    return AppLogo(size: 64);
   }
 }
