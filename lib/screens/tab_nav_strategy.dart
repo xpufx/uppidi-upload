@@ -55,7 +55,7 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
       appBar: AppBar(
         title: Row(
           children: [
-            AppLogo(size: 64),
+            AppLogo(size: 72),
             const SizedBox(width: 8),
             Text(l10n.appTitle,
                 style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -97,7 +97,7 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
             child: Column(
               children: [
                 const SizedBox(height: 16),
-                AppLogo(size: 96),
+                AppLogo(size: 112),
                 const SizedBox(height: 4),
                 Text(l10n.appTitle,
                     style: const TextStyle(

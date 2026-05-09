@@ -604,7 +604,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: AppLogo(size: 72),
+                      child: AppLogo(size: 80),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
