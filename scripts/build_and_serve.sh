@@ -46,9 +46,11 @@ GIT_HASH=$(git rev-parse --short HEAD)
 ARTIFACTS_DIR="/home/xpufx/code/uppidi/.caddy-artifacts"
 mkdir -p "$ARTIFACTS_DIR"
 
-# ── Download provider favicons ───────────────────────────────
-echo "==> Downloading provider favicons..."
-bash scripts/download_favicons.sh
+# ── Provider favicons (from repo, no re-download needed) ────
+# Favicons are tracked in git under assets/favicons/.
+# To refresh them, run: bash scripts/download_favicons.sh
+echo "==> Using provider favicons from repo (assets/favicons/)..."
+ls assets/favicons/*.png 2>/dev/null || echo "   (none found)"
 
 # ── Android APK ────────────────────────────────────────────
 echo "==> Building Android APK (arm64) @ ${GIT_HASH}..."
