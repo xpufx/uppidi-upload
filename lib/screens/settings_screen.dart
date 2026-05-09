@@ -777,30 +777,81 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                   ),
                 ],
                 const SizedBox(height: 8),
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: () => _showSystemInfo(context, ref),
-                  icon: const Icon(Icons.bug_report, size: 16),
-                  label: const Text('System Info'),
-                ),
-                OutlinedButton.icon(
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: Text(l10n.changelogTitle),
-                      content: SingleChildScrollView(
-                        child: Text(_changelogText),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          child: Text(l10n.ok),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _showSystemInfo(context, ref),
+                        icon: const Icon(Icons.bug_report, size: 14),
+                        label: const Text('System Info',
+                            style: TextStyle(fontSize: 12)),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 6),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                  icon: const Icon(Icons.list_alt, size: 16),
-                  label: Text(l10n.viewChangelog),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: Text(l10n.changelogTitle),
+                            content: SingleChildScrollView(
+                              child: Text(_changelogText),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: Text(l10n.ok),
+                              ),
+                            ],
+                          ),
+                        ),
+                        icon: const Icon(Icons.list_alt, size: 14),
+                        label: Text(l10n.viewChangelog,
+                            style: const TextStyle(fontSize: 12)),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 6),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('License'),
+                            content: const Text(
+                              'This project is licensed under the MIT License.',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: Text(l10n.ok),
+                              ),
+                            ],
+                          ),
+                        ),
+                        icon: const Icon(Icons.description, size: 14),
+                        label: const Text('License',
+                            style: TextStyle(fontSize: 12)),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 6),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
