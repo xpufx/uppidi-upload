@@ -1,5 +1,7 @@
 # Changelog
 
+- Remove favicon re-download from release build
+- docs: auto-update changelog
 - Add clear/dismiss button after upload completes or fails
 - docs: auto-update changelog
 - Rewrite crop overlay as full-screen dialog with l10n support
@@ -28,5 +30,3 @@
 - fix: hide navigation layout setting on narrow screens (<600dp)
 - docs: auto-update changelog
 - refactor: replace flutter_secure_storage with Hive, downgrade file_picker/share_plus
-- docs: auto-update changelog
-- docs: auto-update changelog
