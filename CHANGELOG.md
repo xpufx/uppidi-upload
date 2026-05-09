@@ -1,5 +1,7 @@
 # Changelog
 
+- Add clear/dismiss button after upload completes or fails
+- docs: auto-update changelog
 - Rewrite crop overlay as full-screen dialog with l10n support
 - docs: auto-update changelog
 - Remove redundant provider name from info card (visible in dropdown)
@@ -28,5 +30,3 @@
 - refactor: replace flutter_secure_storage with Hive, downgrade file_picker/share_plus
 - docs: auto-update changelog
 - docs: auto-update changelog
-- docs: auto-update changelog
-- Fix dropdown: show provider name, remove metadata text
