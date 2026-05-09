@@ -1,5 +1,7 @@
 # Changelog
 
+- Rewrite crop overlay as full-screen dialog with l10n support
+- docs: auto-update changelog
 - Remove redundant provider name from info card (visible in dropdown)
 - docs: auto-update changelog
 - Add provider favicons to dropdown, metadata card, and history
@@ -28,5 +30,3 @@
 - docs: auto-update changelog
 - docs: auto-update changelog
 - Fix dropdown: show provider name, remove metadata text
-- docs: auto-update changelog
-- Fix provider dropdown - remove broken selectedItemBuilder, use default behavior
