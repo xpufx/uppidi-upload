@@ -261,29 +261,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get qualityLow => 'Düşük (800px)';
 
   @override
-  String get navLayout => 'Gezinme Düzeni';
-
-  @override
-  String get navLayoutDescription =>
-      'Masaüstü platformlarda her zaman alt gezinme çubuğunu göster';
-
-  @override
-  String get navigationLayout => 'Gezinme Düzeni';
-
-  @override
-  String get navigationLayoutDescription =>
-      'Gezinmenin nerede görüneceğini seçin: Sol, Alt veya Sağ.';
-
-  @override
-  String get navigationLeft => 'Sol';
-
-  @override
-  String get navigationBottom => 'Alt';
-
-  @override
-  String get navigationRight => 'Sağ';
-
-  @override
   String get uiVariant => 'UI Varyantı';
 
   @override

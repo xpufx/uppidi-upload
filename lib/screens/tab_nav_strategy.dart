@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/app_logo.dart';
-import '../core/settings_service.dart';
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
-import '../screens/settings_screen.dart' show navigationLayoutProvider;
 import 'shell_strategy.dart';
 
 /// Tab-based navigation strategy — implements ShellStrategy.
@@ -33,20 +31,14 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final navLayoutAsync = ref.watch(navigationLayoutProvider);
     final isDesktop =
         Platform.isWindows || Platform.isLinux || Platform.isMacOS;
 
     if (isDesktop) {
-      final layout = navLayoutAsync.asData?.value ?? 'bottom';
-      return switch (layout) {
-        'left' => _buildLeftRailScaffold(context, l10n),
-        'right' => _buildRightRailScaffold(context, l10n),
-        _ => _buildBottomNavScaffold(context, l10n),
-      };
+      return _buildLeftRailScaffold(context, l10n);
     }
 
-    // Non-desktop: adaptive based on width
+    // Mobile/tablet: bottom nav on narrow screens, left rail on wide
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 600) {
@@ -144,88 +136,6 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
           ),
           const VerticalDivider(width: 1),
           Expanded(child: _buildBody()),
-        ],
-      ),
-      bottomNavigationBar: Container(
-        height: 48,
-        decoration: BoxDecoration(
-          border: Border(
-              top: BorderSide(
-                  color:
-                      Theme.of(context).dividerColor.withValues(alpha: 0.3))),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          children: [
-            Text(
-              l10n.appTitle,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: Colors.grey, fontWeight: FontWeight.w500),
-            ),
-            const Spacer(),
-            Text(
-              'v$appVersion',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: Colors.grey),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRightRailScaffold(BuildContext context, AppLocalizations l10n) {
-    return Scaffold(
-      body: Row(
-        children: [
-          Expanded(child: _buildBody()),
-          const VerticalDivider(width: 1),
-          SizedBox(
-            width: 80,
-            child: Column(
-              children: [
-                const SizedBox(height: 16),
-                AppLogo(size: 72),
-                const SizedBox(height: 4),
-                Text(l10n.appTitle,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 12)),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: NavigationRail(
-                    selectedIndex: _selected.index,
-                    onDestinationSelected: (i) =>
-                        setState(() => _selected = _NavTab.values[i]),
-                    labelType: NavigationRailLabelType.all,
-                    selectedIconTheme: IconThemeData(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    unselectedIconTheme: IconThemeData(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    selectedLabelTextStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontSize: 12,
-                    ),
-                    unselectedLabelTextStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontSize: 12,
-                    ),
-                    destinations: _NavTab.values
-                        .map((t) => NavigationRailDestination(
-                              icon: Icon(t.icon),
-                              label: Text(t.label(l10n)),
-                            ))
-                        .toList(),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
       bottomNavigationBar: Container(

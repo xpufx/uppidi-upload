@@ -38,11 +38,6 @@ final debugLoggingProvider = FutureProvider<bool>((ref) async {
   final svc = ref.read(settingsServiceProvider);
   return svc.isDebugLoggingEnabled();
 });
-final navigationLayoutProvider = FutureProvider<String>((ref) async {
-  final svc = ref.read(settingsServiceProvider);
-  return await svc.getNavigationLayout();
-});
-
 final shellTypeProvider = FutureProvider<String>((ref) async {
   final svc = ref.read(settingsServiceProvider);
   return await svc.getShellType();
@@ -552,59 +547,6 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               },
             ),
           ],
-        ),
-        const SizedBox(height: 16),
-        // Navigation layout toggle — only shown on wide screens (desktop/tablet)
-        LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.maxWidth < 600) return const SizedBox.shrink();
-            return Row(
-              children: [
-                GestureDetector(
-                  onTap: () => showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: Text(l10n.navLayout),
-                      content: Text(l10n.navLayoutDescription),
-                      actions: [
-                        TextButton(
-                            onPressed: () => Navigator.pop(ctx),
-                            child: Text(l10n.ok))
-                      ],
-                    ),
-                  ),
-                  child: Icon(Icons.info_outline,
-                      size: 16,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.5)),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: SegmentedButton<String>(
-                    segments: [
-                      ButtonSegment(
-                          value: 'left', label: Text(l10n.navigationLeft)),
-                      ButtonSegment(
-                          value: 'bottom', label: Text(l10n.navigationBottom)),
-                      ButtonSegment(
-                          value: 'right', label: Text(l10n.navigationRight)),
-                    ],
-                    selected: {
-                      ref.watch(navigationLayoutProvider).asData?.value ??
-                          'bottom'
-                    },
-                    onSelectionChanged: (Set<String> selected) async {
-                      final layout = selected.first;
-                      await svc.setNavigationLayout(layout);
-                      ref.invalidate(navigationLayoutProvider);
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
         ),
         const SizedBox(height: 16),
         // Shell type selector (tabs vs modals)

@@ -111,7 +111,6 @@ class SettingsService {
   static const logoPathKey = 'global.logo_path';
   static const disabledProvidersKey = 'global.disabled_providers';
   static const debugLoggingKey = 'global.debug_logging';
-  static const navigationLayoutKey = 'global.navigation_layout';
   static const shellTypeKey = 'global.shell_type';
 
   Future<bool> isInsecureConnAllowed() async {
@@ -161,20 +160,6 @@ class SettingsService {
 
   Future<void> setDebugLoggingEnabled(bool enabled) async {
     await set(debugLoggingKey, enabled ? 'true' : 'false');
-  }
-
-  Future<String> getNavigationLayout() async {
-    final val = await get(navigationLayoutKey);
-    return val ?? 'bottom';
-  }
-
-  Future<void> setNavigationLayout(String layout) async {
-    if (!['left', 'bottom', 'right'].contains(layout)) {
-      throw ArgumentError(
-        'Invalid navigation layout: $layout. Must be one of left, bottom, right.',
-      );
-    }
-    await set(navigationLayoutKey, layout);
   }
 
   Future<String> getShellType() async {

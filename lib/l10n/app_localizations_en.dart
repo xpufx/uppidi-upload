@@ -259,29 +259,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qualityLow => 'Low (800px)';
 
   @override
-  String get navLayout => 'Navigation Layout';
-
-  @override
-  String get navLayoutDescription =>
-      'Always show bottom navigation bar on desktop platforms';
-
-  @override
-  String get navigationLayout => 'Navigation Layout';
-
-  @override
-  String get navigationLayoutDescription =>
-      'Choose where the navigation appears: Left, Bottom, or Right.';
-
-  @override
-  String get navigationLeft => 'Left';
-
-  @override
-  String get navigationBottom => 'Bottom';
-
-  @override
-  String get navigationRight => 'Right';
-
-  @override
   String get uiVariant => 'UI Variant';
 
   @override

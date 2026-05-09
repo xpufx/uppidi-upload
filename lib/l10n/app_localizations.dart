@@ -568,48 +568,6 @@ abstract class AppLocalizations {
   /// **'Low (800px)'**
   String get qualityLow;
 
-  /// No description provided for @navLayout.
-  ///
-  /// In en, this message translates to:
-  /// **'Navigation Layout'**
-  String get navLayout;
-
-  /// No description provided for @navLayoutDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Always show bottom navigation bar on desktop platforms'**
-  String get navLayoutDescription;
-
-  /// No description provided for @navigationLayout.
-  ///
-  /// In en, this message translates to:
-  /// **'Navigation Layout'**
-  String get navigationLayout;
-
-  /// No description provided for @navigationLayoutDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose where the navigation appears: Left, Bottom, or Right.'**
-  String get navigationLayoutDescription;
-
-  /// No description provided for @navigationLeft.
-  ///
-  /// In en, this message translates to:
-  /// **'Left'**
-  String get navigationLeft;
-
-  /// No description provided for @navigationBottom.
-  ///
-  /// In en, this message translates to:
-  /// **'Bottom'**
-  String get navigationBottom;
-
-  /// No description provided for @navigationRight.
-  ///
-  /// In en, this message translates to:
-  /// **'Right'**
-  String get navigationRight;
-
   /// No description provided for @uiVariant.
   ///
   /// In en, this message translates to:
