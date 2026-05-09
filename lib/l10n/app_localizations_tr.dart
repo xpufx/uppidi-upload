@@ -161,6 +161,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get cancel => 'İptal';
 
   @override
+  String get apply => 'Uygula';
+
+  @override
   String get timeJustNow => 'az önce';
 
   @override

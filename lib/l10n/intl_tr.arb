@@ -46,6 +46,7 @@
   "language": "Dil",
   "ok": "Tamam",
   "cancel": "İptal",
+  "apply": "Uygula",
   "timeJustNow": "az önce",
   "timeMinutesAgo": "{minutes}dk önce",
   "timeHoursAgo": "{hours}s önce",

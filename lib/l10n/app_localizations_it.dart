@@ -161,6 +161,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get cancel => 'Annulla';
 
   @override
+  String get apply => 'Applica';
+
+  @override
   String get timeJustNow => 'proprio ora';
 
   @override

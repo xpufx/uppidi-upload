@@ -46,6 +46,7 @@
   "language": "Lingua",
   "ok": "OK",
   "cancel": "Annulla",
+  "apply": "Applica",
   "timeJustNow": "proprio ora",
   "timeMinutesAgo": "{minutes} min fa",
   "timeHoursAgo": "{hours} h fa",

@@ -1073,65 +1073,48 @@ void main() {
       final bytes = _validPngBytes();
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: SizedBox(
-                width: 300,
-                height: 300,
-                child: ImageCropOverlay(
-                  imageBytes: bytes,
-                  imageWidth: 100,
-                  imageHeight: 100,
-                  onConfirm: (_) {},
-                  onCancel: () {},
-                ),
-              ),
-            ),
-          ),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          home: const Scaffold(body: Center(child: SizedBox())),
         ),
       );
 
+      ImageCropOverlay.show(
+        context: tester.element(find.byType(SizedBox)),
+        imageBytes: bytes,
+        imageWidth: 100,
+        imageHeight: 100,
+      );
       await tester.pumpAndSettle();
 
       // Apply and Cancel buttons should be present
       expect(find.text('Apply'), findsOneWidget);
-      expect(find.text('Cancel'), findsOneWidget);
+      expect(find.byTooltip('Cancel'), findsOneWidget);
     });
 
-    testWidgets('ImageCropOverlay Cancel button triggers callback',
+    testWidgets('ImageCropOverlay Cancel button closes the dialog',
         (tester) async {
       final bytes = _validPngBytes();
-      bool cancelCalled = false;
-
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: SizedBox(
-                width: 300,
-                height: 300,
-                child: ImageCropOverlay(
-                  imageBytes: bytes,
-                  imageWidth: 100,
-                  imageHeight: 100,
-                  onConfirm: (_) {},
-                  onCancel: () {
-                    cancelCalled = true;
-                  },
-                ),
-              ),
-            ),
-          ),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          home: const Scaffold(body: Center(child: SizedBox())),
         ),
       );
 
+      ImageCropOverlay.show(
+        context: tester.element(find.byType(SizedBox)),
+        imageBytes: bytes,
+        imageWidth: 100,
+        imageHeight: 100,
+      );
       await tester.pumpAndSettle();
 
-      // Tap Cancel button
-      await tester.tap(find.text('Cancel'));
+      // Tap Cancel (X icon button in leading)
+      await tester.tap(find.byTooltip('Cancel'));
       await tester.pumpAndSettle();
 
-      expect(cancelCalled, isTrue);
+      // Dialog should be dismissed
+      expect(find.byType(ImageCropOverlay), findsNothing);
     });
   });
 }

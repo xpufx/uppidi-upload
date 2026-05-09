@@ -1,30 +1,47 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
-/// A crop overlay that displays an image with a draggable/resizable selection
-/// rectangle. Calls [onConfirm] with the crop region in original-image
-/// coordinates when the user taps Apply.
+/// A full-screen image crop overlay shown as a dialog.
+/// Returns the crop region in original-image coordinates via [Navigator.pop],
+/// or null if cancelled.
 class ImageCropOverlay extends StatefulWidget {
   final Uint8List imageBytes;
   final int imageWidth;
   final int imageHeight;
-  final ValueChanged<Rect> onConfirm;
-  final VoidCallback onCancel;
 
   const ImageCropOverlay({
     super.key,
     required this.imageBytes,
     required this.imageWidth,
     required this.imageHeight,
-    required this.onConfirm,
-    required this.onCancel,
   });
+
+  /// Shows the crop overlay as a full-screen dialog.
+  /// Returns the crop [Rect] in original-image coordinates, or `null` if cancelled.
+  static Future<Rect?> show({
+    required BuildContext context,
+    required Uint8List imageBytes,
+    required int imageWidth,
+    required int imageHeight,
+  }) {
+    return showDialog<Rect>(
+      context: context,
+      barrierDismissible: false,
+      useSafeArea: false,
+      builder: (_) => ImageCropOverlay(
+        imageBytes: imageBytes,
+        imageWidth: imageWidth,
+        imageHeight: imageHeight,
+      ),
+    );
+  }
 
   @override
   State<ImageCropOverlay> createState() => _ImageCropOverlayState();
 }
 
-/// Enum for identifying which drag handle (or the interior) is being dragged.
+/// Identifies which part of the crop rect is being dragged.
 enum _DragHandle {
   move,
   topLeft,
@@ -47,104 +64,116 @@ class _ImageCropOverlayState extends State<ImageCropOverlay> {
   Offset _dragStart = Offset.zero;
   Rect _rectAtDragStart = Rect.zero;
 
-  static const double _handleRadius = 8.0;
-  static const double _edgeHandleRadius = 6.0;
-  static const double _handleHitArea = 24.0;
-  static const double _minCropSize = 40.0;
+  static const double _handleRadius = 14.0;
+  static const double _handleHitArea = 32.0;
+  static const double _minCropSize = 60.0;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final maxWidth = constraints.maxWidth;
-        final maxHeight = constraints.maxHeight;
-        final imageAspect = widget.imageWidth / widget.imageHeight;
-        final containerAspect = maxWidth / maxHeight;
-
-        double displayWidth, displayHeight;
-        if (imageAspect > containerAspect) {
-          displayWidth = maxWidth;
-          displayHeight = maxWidth / imageAspect;
-        } else {
-          displayHeight = maxHeight;
-          displayWidth = maxHeight * imageAspect;
-        }
-
-        final dispSize = Size(displayWidth, displayHeight);
-
-        // Initialize or re-initialize crop rect when display size changes
-        if (!_initialized || _displaySize != dispSize) {
-          _cropRect = _initialCropRect(dispSize);
-          _displaySize = dispSize;
-          _initialized = true;
-        }
-
-        return Center(
-          child: SizedBox.fromSize(
-            size: dispSize,
-            child: Stack(
-              clipBehavior: Clip.hardEdge,
-              children: [
-                // Image layer
-                Image.memory(
-                  widget.imageBytes,
-                  width: displayWidth,
-                  height: displayHeight,
-                  fit: BoxFit.fill,
-                  errorBuilder: (_, __, ___) => const Icon(
-                    Icons.broken_image,
-                    size: 64,
-                  ),
-                ),
-                // Dark mask with crop hole
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: _CropOverlayPainter(
-                      cropRect: _cropRect,
-                      handleRadius: _handleRadius,
-                      edgeHandleRadius: _edgeHandleRadius,
-                    ),
-                  ),
-                ),
-                // Gesture layer
-                Positioned.fill(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onPanStart: _onPanStart,
-                    onPanUpdate: _onPanUpdate,
-                    onPanEnd: (_) => setState(() => _activeHandle = null),
-                  ),
-                ),
-                // Confirm/Cancel buttons
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 8,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton.icon(
-                        onPressed: widget.onCancel,
-                        icon: const Icon(Icons.close, size: 18),
-                        label: const Text('Cancel'),
-                      ),
-                      const SizedBox(width: 16),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          final region = _toImageCoordinates();
-                          widget.onConfirm(region);
-                        },
-                        icon: const Icon(Icons.check, size: 18),
-                        label: const Text('Apply'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+    final l10n = AppLocalizations.of(context);
+    final cancelLabel = l10n?.cancel ?? 'Cancel';
+    final applyLabel = l10n?.apply ?? 'Apply';
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          tooltip: cancelLabel,
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Crop',
+          style: const TextStyle(color: Colors.white),
+        ),
+        actions: [
+          TextButton.icon(
+            onPressed: () {
+              final region = _toImageCoordinates();
+              Navigator.pop(context, region);
+            },
+            icon: const Icon(Icons.check, color: Colors.white),
+            label: Text(
+              applyLabel,
+              style: const TextStyle(color: Colors.white),
             ),
           ),
-        );
-      },
+        ],
+      ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final maxWidth = constraints.maxWidth;
+            final maxHeight = constraints.maxHeight;
+            final imageAspect = widget.imageWidth / widget.imageHeight;
+            final containerAspect = maxWidth / maxHeight;
+
+            double displayWidth, displayHeight;
+            if (imageAspect > containerAspect) {
+              displayWidth = maxWidth;
+              displayHeight = maxWidth / imageAspect;
+            } else {
+              displayHeight = maxHeight;
+              displayWidth = maxHeight * imageAspect;
+            }
+
+            final dispSize = Size(displayWidth, displayHeight);
+
+            // Initialize when size changes
+            if (!_initialized || _displaySize != dispSize) {
+              _cropRect = _initialCropRect(dispSize);
+              _displaySize = dispSize;
+              _initialized = true;
+            }
+
+            return Center(
+              child: SizedBox.fromSize(
+                size: dispSize,
+                child: Stack(
+                  clipBehavior: Clip.hardEdge,
+                  children: [
+                    // Image
+                    Image.memory(
+                      widget.imageBytes,
+                      width: displayWidth,
+                      height: displayHeight,
+                      fit: BoxFit.fill,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.broken_image,
+                        size: 64,
+                        color: Colors.white54,
+                      ),
+                    ),
+                    // Dark mask with crop hole + handles
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: _CropOverlayPainter(
+                          cropRect: _cropRect,
+                          activeHandle: _activeHandle,
+                          handleRadius: _handleRadius,
+                        ),
+                      ),
+                    ),
+                    // Gesture layer
+                    Positioned.fill(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onPanStart: _onPanStart,
+                        onPanUpdate: _onPanUpdate,
+                        onPanEnd: (_) => setState(() => _activeHandle = null),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -194,7 +223,7 @@ class _ImageCropOverlayState extends State<ImageCropOverlay> {
       _activeHandle = _DragHandle.move;
     } else {
       _activeHandle = null;
-      return; // no interaction
+      return;
     }
     _dragStart = localPos;
     _rectAtDragStart = _cropRect;
@@ -214,12 +243,10 @@ class _ImageCropOverlayState extends State<ImageCropOverlay> {
 
     switch (handle) {
       case _DragHandle.move:
-        final dx = delta.dx;
-        final dy = delta.dy;
-        l += dx;
-        r += dx;
-        t += dy;
-        b += dy;
+        l += delta.dx;
+        r += delta.dx;
+        t += delta.dy;
+        b += delta.dy;
       case _DragHandle.topLeft:
         l += delta.dx;
         t += delta.dy;
@@ -273,8 +300,6 @@ class _ImageCropOverlayState extends State<ImageCropOverlay> {
     return Rect.fromLTRB(l, t, r, b);
   }
 
-  /// Converts the current crop rect from display coordinates to
-  /// original-image coordinates, then calls [onConfirm].
   Rect _toImageCoordinates() {
     final scaleX = widget.imageWidth / _displaySize.width;
     final scaleY = widget.imageHeight / _displaySize.height;
@@ -287,82 +312,124 @@ class _ImageCropOverlayState extends State<ImageCropOverlay> {
   }
 }
 
-/// Paints the semi-transparent dark mask and the crop rectangle border + handles.
+/// Paints the semi-transparent dark mask, crop border, and drag handles.
 class _CropOverlayPainter extends CustomPainter {
   final Rect cropRect;
+  final _DragHandle? activeHandle;
   final double handleRadius;
-  final double edgeHandleRadius;
 
   _CropOverlayPainter({
     required this.cropRect,
+    required this.activeHandle,
     required this.handleRadius,
-    required this.edgeHandleRadius,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final maskPaint = Paint()..color = Colors.black.withValues(alpha: 0.45);
+    final maskPaint = Paint()..color = Colors.black.withValues(alpha: 0.5);
 
     // Draw 4 dark rectangles around the crop hole
-    // Top
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, cropRect.top), maskPaint);
-    // Bottom
     canvas.drawRect(
       Rect.fromLTWH(
-        0,
-        cropRect.bottom,
-        size.width,
-        size.height - cropRect.bottom,
-      ),
+          0, cropRect.bottom, size.width, size.height - cropRect.bottom),
       maskPaint,
     );
-    // Left
     canvas.drawRect(
       Rect.fromLTWH(0, cropRect.top, cropRect.left, cropRect.height),
       maskPaint,
     );
-    // Right
     canvas.drawRect(
-      Rect.fromLTWH(
-        cropRect.right,
-        cropRect.top,
-        size.width - cropRect.right,
-        cropRect.height,
-      ),
+      Rect.fromLTWH(cropRect.right, cropRect.top, size.width - cropRect.right,
+          cropRect.height),
       maskPaint,
     );
 
-    // Crop rectangle border
+    // Crop rectangle border (white, slightly thicker)
     final borderPaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
+      ..strokeWidth = 2.5;
     canvas.drawRect(cropRect, borderPaint);
 
-    // Corner handles (white filled circles)
-    final cornerPaint = Paint()..color = Colors.white;
-    for (final corner in [
+    // Grid lines inside crop area (subtle)
+    final gridPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.25)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.5;
+
+    final thirdW = cropRect.width / 3;
+    final thirdH = cropRect.height / 3;
+    for (int i = 1; i < 3; i++) {
+      final x = cropRect.left + thirdW * i;
+      canvas.drawLine(
+          Offset(x, cropRect.top), Offset(x, cropRect.bottom), gridPaint);
+    }
+    for (int i = 1; i < 3; i++) {
+      final y = cropRect.top + thirdH * i;
+      canvas.drawLine(
+          Offset(cropRect.left, y), Offset(cropRect.right, y), gridPaint);
+    }
+
+    // Corner handle positions
+    final corners = [
       cropRect.topLeft,
       cropRect.topRight,
       cropRect.bottomRight,
       cropRect.bottomLeft,
-    ]) {
-      canvas.drawCircle(corner, handleRadius, cornerPaint);
-    }
+    ];
 
-    // Edge handles (slightly smaller circles)
-    final edgePaint = Paint()..color = Colors.white;
-    for (final pt in [
+    // Edge handle positions
+    final edges = [
       Offset(cropRect.center.dx, cropRect.top),
       Offset(cropRect.center.dx, cropRect.bottom),
       Offset(cropRect.left, cropRect.center.dy),
       Offset(cropRect.right, cropRect.center.dy),
-    ]) {
-      canvas.drawCircle(pt, edgeHandleRadius, edgePaint);
+    ];
+
+    // All handle positions mapped to their DragHandle type
+    final Map<_DragHandle, Offset> allHandles = {
+      _DragHandle.topLeft: cropRect.topLeft,
+      _DragHandle.topRight: cropRect.topRight,
+      _DragHandle.bottomRight: cropRect.bottomRight,
+      _DragHandle.bottomLeft: cropRect.bottomLeft,
+      _DragHandle.top: Offset(cropRect.center.dx, cropRect.top),
+      _DragHandle.bottom: Offset(cropRect.center.dx, cropRect.bottom),
+      _DragHandle.left: Offset(cropRect.left, cropRect.center.dy),
+      _DragHandle.right: Offset(cropRect.right, cropRect.center.dy),
+    };
+
+    // Draw edge handles first (behind corners)
+    final edgePaint = Paint()..color = Colors.white;
+    final edgeHandleR = handleRadius * 0.55;
+    for (final edgePos in edges) {
+      canvas.drawCircle(edgePos, edgeHandleR, edgePaint);
+    }
+
+    // Draw corner handles
+    final cornerPaint = Paint()..color = Colors.white;
+    for (final cornerPos in corners) {
+      canvas.drawCircle(cornerPos, handleRadius, cornerPaint);
+    }
+
+    // Draw active handle highlight
+    if (activeHandle != null && allHandles.containsKey(activeHandle)) {
+      final pos = allHandles[activeHandle]!;
+      final isCorner = activeHandle == _DragHandle.topLeft ||
+          activeHandle == _DragHandle.topRight ||
+          activeHandle == _DragHandle.bottomRight ||
+          activeHandle == _DragHandle.bottomLeft;
+      final glowRadius = isCorner ? handleRadius + 6 : edgeHandleR + 6;
+
+      final glowPaint = Paint()
+        ..color = Colors.white.withValues(alpha: 0.5)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+      canvas.drawCircle(pos, glowRadius, glowPaint);
     }
   }
 
   @override
   bool shouldRepaint(_CropOverlayPainter oldDelegate) =>
-      oldDelegate.cropRect != cropRect;
+      oldDelegate.cropRect != cropRect ||
+      oldDelegate.activeHandle != activeHandle;
 }

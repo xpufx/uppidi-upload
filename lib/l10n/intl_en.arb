@@ -46,6 +46,7 @@
   "language": "Language",
   "ok": "OK",
   "cancel": "Cancel",
+  "apply": "Apply",
   "timeJustNow": "just now",
   "timeMinutesAgo": "{minutes}m ago",
   "timeHoursAgo": "{hours}h ago",

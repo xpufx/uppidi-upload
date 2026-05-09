@@ -534,10 +534,7 @@ class _FilePreview extends StatefulWidget {
 }
 
 class _FilePreviewState extends State<_FilePreview> {
-  bool _isCropMode = false;
   bool _hasCropped = false;
-  int _cropImageWidth = 0;
-  int _cropImageHeight = 0;
 
   bool get _isImage {
     final mime = widget.mimeType ?? '';
@@ -635,24 +632,6 @@ class _FilePreviewState extends State<_FilePreview> {
   }
 
   Widget _buildImagePreview() {
-    if (_isCropMode) {
-      return Center(
-        child: SizedBox(
-          width: double.infinity,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 360),
-            child: ImageCropOverlay(
-              imageBytes: widget.fileBytes!,
-              imageWidth: _cropImageWidth,
-              imageHeight: _cropImageHeight,
-              onConfirm: _onCropConfirm,
-              onCancel: () => setState(() => _isCropMode = false),
-            ),
-          ),
-        ),
-      );
-    }
-
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -705,21 +684,27 @@ class _FilePreviewState extends State<_FilePreview> {
     );
   }
 
-  void _enterCropMode() {
+  Future<void> _enterCropMode() async {
     if (widget.fileBytes == null) return;
     final decoded = img.decodeImage(widget.fileBytes!);
     if (decoded == null) return;
-    _cropImageWidth = decoded.width;
-    _cropImageHeight = decoded.height;
-    setState(() => _isCropMode = true);
-  }
+    final cropW = decoded.width;
+    final cropH = decoded.height;
 
-  void _onCropConfirm(Rect cropRect) {
-    if (widget.fileBytes == null) return;
-    final src = img.decodeImage(widget.fileBytes!);
-    if (src == null) return;
+    if (!mounted) return;
+    final cropRect = await ImageCropOverlay.show(
+      context: context,
+      imageBytes: widget.fileBytes!,
+      imageWidth: cropW,
+      imageHeight: cropH,
+    );
+
+    if (cropRect == null) return; // user cancelled
 
     // Perform the crop
+    final src = img.decodeImage(widget.fileBytes!);
+    if (src == null || !mounted) return;
+
     final cropped = img.copyCrop(
       src,
       x: cropRect.left.toInt(),
@@ -728,16 +713,10 @@ class _FilePreviewState extends State<_FilePreview> {
       height: cropRect.height.toInt(),
     );
 
-    // Encode as JPEG
     final outBytes = img.encodeJpg(cropped, quality: 90);
-
-    // Push to provider
     widget.notifier.applyCrop(outBytes);
-
-    setState(() {
-      _isCropMode = false;
-      _hasCropped = true;
-    });
+    if (!mounted) return;
+    setState(() => _hasCropped = true);
   }
 
   List<Widget> _buildWarnings() {
