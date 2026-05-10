@@ -112,6 +112,7 @@ class SettingsService {
   static const disabledProvidersKey = 'global.disabled_providers';
   static const debugLoggingKey = 'global.debug_logging';
   static const shellTypeKey = 'global.shell_type';
+  static const insecureMutedKey = 'global.insecure_muted_providers';
 
   Future<bool> isInsecureConnAllowed() async {
     final val = await get(insecureConnKey);
@@ -151,6 +152,23 @@ class SettingsService {
     } else {
       await set(disabledProvidersKey, ids.join(','));
     }
+  }
+
+  Future<Set<String>> getInsecureMutedProviders() async {
+    final raw = await get(insecureMutedKey);
+    if (raw == null || raw.isEmpty) return {};
+    return raw.split(',').toSet();
+  }
+
+  Future<void> muteInsecureWarning(String providerId) async {
+    final muted = await getInsecureMutedProviders();
+    muted.add(providerId);
+    await set(insecureMutedKey, muted.join(','));
+  }
+
+  Future<bool> isInsecureWarningMuted(String providerId) async {
+    final muted = await getInsecureMutedProviders();
+    return muted.contains(providerId);
   }
 
   Future<bool> isDebugLoggingEnabled() async {

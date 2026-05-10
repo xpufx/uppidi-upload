@@ -166,6 +166,42 @@ abstract class AppLocalizations {
   /// **'Insecure connection mode bypasses certificate validation. Only enable this for trusted self-hosted servers.'**
   String get selfSignedCertWarning;
 
+  /// No description provided for @insecureWarningTitle.
+  String get insecureWarningTitle;
+
+  /// No description provided for @insecureWarningHttp.
+  String insecureWarningHttp(String providerName, String url);
+
+  /// No description provided for @insecureWarningHttps.
+  String insecureWarningHttps(String providerName, String url);
+
+  /// No description provided for @viewCertificate.
+  String get viewCertificate;
+
+  /// No description provided for @certificateDialogTitle.
+  String get certificateDialogTitle;
+
+  /// No description provided for @certSubject.
+  String get certSubject;
+
+  /// No description provided for @certIssuer.
+  String get certIssuer;
+
+  /// No description provided for @certValidFrom.
+  String get certValidFrom;
+
+  /// No description provided for @certValidUntil.
+  String get certValidUntil;
+
+  /// No description provided for @certFingerprint.
+  String get certFingerprint;
+
+  /// No description provided for @proceedAnyway.
+  String get proceedAnyway;
+
+  /// No description provided for @dontShowAgain.
+  String get dontShowAgain;
+
   /// No description provided for @upload.
   ///
   /// In en, this message translates to:
@@ -549,6 +585,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Logs full HTTP request/response details to the console for troubleshooting. Only enable when needed.'**
   String get debugLoggingDescription;
+
+  /// No description provided for @viewDebugLog.
+  ///
+  /// In en, this message translates to:
+  /// **'View debug log'**
+  String get viewDebugLog;
 
   /// No description provided for @qualityOriginal.
   ///

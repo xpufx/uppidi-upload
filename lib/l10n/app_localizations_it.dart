@@ -48,6 +48,46 @@ class AppLocalizationsIt extends AppLocalizations {
       'La connessione insicura bypassa la validazione del certificato. Attivala solo per server fidati.';
 
   @override
+  String get insecureWarningTitle => 'Connessione non sicura';
+
+  @override
+  String insecureWarningHttp(String providerName, String url) =>
+      '$providerName ($url) usa HTTP semplice. '
+      'Il file verrà caricato senza crittografia e potrebbe essere intercettato.';
+
+  @override
+  String insecureWarningHttps(String providerName, String url) =>
+      'La validazione del certificato è disattivata per $providerName ($url). '
+      'La connessione è crittografata ma l\'identità del server non è verificata.';
+
+  @override
+  String get viewCertificate => 'Visualizza certificato';
+
+  @override
+  String get certificateDialogTitle => 'Certificato del server';
+
+  @override
+  String get certSubject => 'Soggetto:';
+
+  @override
+  String get certIssuer => 'Emittente:';
+
+  @override
+  String get certValidFrom => 'Valido dal:';
+
+  @override
+  String get certValidUntil => 'Valido fino al:';
+
+  @override
+  String get certFingerprint => 'Impronta SHA-1:';
+
+  @override
+  String get proceedAnyway => 'Procedi comunque';
+
+  @override
+  String get dontShowAgain => 'Procedi e non mostrare più';
+
+  @override
   String get upload => 'Carica';
 
   @override
@@ -250,6 +290,9 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get debugLoggingDescription =>
       'Registra tutti i dettagli di richiesta/risposta HTTP nella console per il debug. Attivalo solo se necessario.';
+
+  @override
+  String get viewDebugLog => 'Visualizza log di debug';
 
   @override
   String get qualityOriginal => 'Originale';

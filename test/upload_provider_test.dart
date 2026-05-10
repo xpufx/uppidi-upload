@@ -146,6 +146,15 @@ class MockSettingsService implements SettingsService {
   Future<void> setDebugLoggingEnabled(bool enabled) async {}
 
   @override
+  Future<Set<String>> getInsecureMutedProviders() async => {};
+
+  @override
+  Future<void> muteInsecureWarning(String providerId) async {}
+
+  @override
+  Future<bool> isInsecureWarningMuted(String providerId) async => false;
+
+  @override
   Future<String> getNavigationLayout() async => 'bottom';
 
   @override

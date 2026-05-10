@@ -12,6 +12,7 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
 import '../core/format.dart';
+import '../core/insecure_upload_warning.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/metadata_badges.dart';
 import '../core/models/upload_result.dart';
@@ -150,7 +151,13 @@ class UploadScreen extends ConsumerWidget {
                   fileBytes: fb,
                   provider: provider,
                   lastResult: r,
-                  onRetry: e != null ? () => notifier.uploadSelected() : null,
+                  onRetry: e != null
+                      ? () async {
+                          final proceed = await checkInsecureWarning(
+                              context, provider!, ref);
+                          if (proceed) notifier.uploadSelected();
+                        }
+                      : null,
                   onCancel: () => notifier.clearSelection(),
                 ),
               _ => const SizedBox.shrink(),
@@ -447,6 +454,9 @@ class _UploadButton extends ConsumerWidget {
       onPressed: () async {
         final state = ref.read(uploadProvider);
         if (state is! UploadFileSelected) return;
+        final provider = state.providers[state.selectedProviderIndex];
+        final proceed = await checkInsecureWarning(context, provider, ref);
+        if (!proceed) return;
         notifier.uploadSelected();
       },
       icon: const Icon(Icons.cloud_upload),

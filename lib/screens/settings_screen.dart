@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../core/apk_installer.dart' show downloadAndInstallApk, downloadFile;
 import '../core/app_logo.dart';
+import '../core/logging/log.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
 import '../core/theme_provider.dart';
@@ -546,6 +547,11 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                 }
               },
             ),
+            IconButton(
+              icon: const Icon(Icons.list_alt, size: 20),
+              tooltip: l10n.viewDebugLog,
+              onPressed: () => _showDebugLog(context),
+            ),
           ],
         ),
         const SizedBox(height: 16),
@@ -879,6 +885,80 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showDebugLog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.list_alt, size: 20),
+            const SizedBox(width: 8),
+            Text(l10n.viewDebugLog),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: FutureBuilder<String>(
+            future: Log.fullLog,
+            builder: (ctx, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final text = snapshot.data ?? '';
+              if (text.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No log entries yet.',
+                    style: TextStyle(
+                        color: Theme.of(ctx).colorScheme.onSurfaceVariant),
+                  ),
+                );
+              }
+              return SingleChildScrollView(
+                child: SelectableText(
+                  text,
+                  style: const TextStyle(fontSize: 11, fontFamily: 'monospace'),
+                ),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              final text = await Log.fullLog;
+              if (text.isEmpty) return;
+              Clipboard.setData(ClipboardData(text: text));
+              if (ctx.mounted) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  SnackBar(
+                      content:
+                          Text('${l10n.viewDebugLog} — copied to clipboard')),
+                );
+              }
+            },
+            child: const Text('Copy'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final text = await Log.fullLog;
+              if (text.isNotEmpty) {
+                SharePlus.instance.share(ShareParams(text: text));
+              }
+            },
+            child: const Text('Share'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.ok),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -47,6 +47,47 @@ class AppLocalizationsEn extends AppLocalizations {
       'Insecure connection mode bypasses certificate validation. Only enable this for trusted self-hosted servers.';
 
   @override
+  String get insecureWarningTitle => 'Insecure Connection';
+
+  @override
+  String insecureWarningHttp(String providerName, String url) =>
+      '$providerName ($url) uses plain HTTP. '
+      'Your file will be uploaded without encryption and could be intercepted by anyone on the same network.';
+
+  @override
+  String insecureWarningHttps(String providerName, String url) =>
+      'Certificate validation is bypassed for $providerName ($url). '
+      'Your connection is encrypted, but the server\'s identity has not been verified. '
+      'Only proceed if you trust this server.';
+
+  @override
+  String get viewCertificate => 'View Certificate';
+
+  @override
+  String get certificateDialogTitle => 'Server Certificate';
+
+  @override
+  String get certSubject => 'Subject:';
+
+  @override
+  String get certIssuer => 'Issuer:';
+
+  @override
+  String get certValidFrom => 'Valid from:';
+
+  @override
+  String get certValidUntil => 'Valid until:';
+
+  @override
+  String get certFingerprint => 'SHA-1 fingerprint:';
+
+  @override
+  String get proceedAnyway => 'Proceed Anyway';
+
+  @override
+  String get dontShowAgain => 'Proceed & Don\'t warn again';
+
+  @override
   String get upload => 'Upload';
 
   @override
@@ -248,6 +289,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get debugLoggingDescription =>
       'Logs full HTTP request/response details to the console for troubleshooting. Only enable when needed.';
+
+  @override
+  String get viewDebugLog => 'View debug log';
 
   @override
   String get qualityOriginal => 'Original';
