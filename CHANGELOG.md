@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: add missing l10n strings for insecure warning and debug log viewer to ARB files
+- docs: auto-update changelog
 - feat: insecure connection warning, debug log viewer, and session-persistent logging
 - Switch icon background to white/black for light/dark theme
 - Fix adaptive icon: solid background + centered 66px foreground
@@ -28,5 +30,3 @@
 - docs: auto-update changelog
 - chore: bump version to 1.1.0+1
 - feat: add image crop tool with draggable/resizable overlay
-- docs: auto-update changelog
-- Remove redundant 'Quality:' label from image quality selector
