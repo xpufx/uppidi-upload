@@ -533,6 +533,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               value: ref.watch(debugLoggingProvider).asData?.value ?? false,
               onChanged: (v) async {
                 await svc.setDebugLoggingEnabled(v);
+                Log.enableFileLogging(v);
                 ref.invalidate(debugLoggingProvider);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -667,8 +668,11 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                                     ? '${(speed / 1048576).toStringAsFixed(1)} MB/s'
                                     : '';
                                 final pct = total > 0 ? received / total : null;
+                                final theme = Theme.of(ctx);
                                 return AlertDialog(
-                                  title: const Text('Downloading APK'),
+                                  title: Text('Downloading Latest APK',
+                                      style: TextStyle(
+                                          color: theme.colorScheme.onSurface)),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -679,7 +683,11 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                                       const SizedBox(height: 8),
                                       Text(
                                           '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
-                                          style: const TextStyle(fontSize: 12)),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: theme
+                                                .colorScheme.onSurfaceVariant,
+                                          )),
                                     ],
                                   ),
                                 );

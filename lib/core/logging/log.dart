@@ -33,7 +33,7 @@ final class Log {
   final LogLevel _minLevel;
 
   static File? _logFile;
-  static bool _fileReady = false;
+  static bool _fileLoggingEnabled = false;
   static final List<LogEntry> _buffer = [];
 
   /// Max entries kept in the in-memory buffer (for instant display).
@@ -42,15 +42,31 @@ final class Log {
 
   Log(this.tag, {LogLevel minLevel = LogLevel.debug}) : _minLevel = minLevel;
 
-  /// Ensure the log file exists and write a session start marker.
+  /// Enable or disable file-backed logging.
+  /// When enabled, writes a session start marker and captures all log entries.
+  /// When disabled, no file writes occur.
+  static void enableFileLogging(bool enabled) {
+    _fileLoggingEnabled = enabled;
+    if (enabled) {
+      unawaited(_writeSessionMarker());
+    }
+  }
+
+  /// Write a session start marker to the file.
+  static Future<void> _writeSessionMarker() async {
+    try {
+      await _ensureFile();
+      final marker =
+          '===== Session started ${DateTime.now().toIso8601String()} =====\n';
+      await _logFile!.writeAsString(marker, mode: FileMode.append);
+    } catch (_) {}
+  }
+
+  /// Ensure the log file exists (lazy init).
   static Future<void> _ensureFile() async {
-    if (_fileReady) return;
-    _fileReady = true;
+    if (_logFile != null) return;
     final dir = await pp.getApplicationDocumentsDirectory();
     _logFile = File('${dir.path}/debug.log');
-    final marker =
-        '===== Session started ${DateTime.now().toIso8601String()} =====\n';
-    await _logFile!.writeAsString(marker, mode: FileMode.append);
   }
 
   /// Returns a snapshot of the in-memory buffer.
@@ -89,9 +105,9 @@ final class Log {
       _buffer.removeAt(0);
     }
 
-    // Fire-and-forget: write to file for full session history.
-    // This runs after the synchronous path so the UI is never blocked.
-    _writeToFile(entry);
+    if (_fileLoggingEnabled) {
+      _writeToFile(entry);
+    }
   }
 
   static Future<void> _writeToFile(LogEntry entry) async {
