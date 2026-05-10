@@ -101,5 +101,18 @@
   "iconLegendFiles": "Dosyalar",
   "iconLegendLinks": "Linkler",
   "iconLegendImages": "Görseller",
-  "iconLegendOther": "Diğer"
+  "iconLegendOther": "Diğer",
+  "insecureWarningTitle": "Güvensiz Bağlantı",
+  "insecureWarningHttp": "{providerName} sağlayıcısı {url} adresinde güvensiz bir HTTP bağlantısı kullanıyor. Dosyalarınız ve kimlik doğrulama verileriniz düz metin olarak gönderilecek.",
+  "insecureWarningHttps": "{providerName} sağlayıcısı {url} adresinde geçersiz veya kendi imzalı bir sertifikaya sahip. Bağlantı güvenli olmayabilir.",
+  "viewCertificate": "Sertifikayı Görüntüle",
+  "certificateDialogTitle": "Sunucu Sertifikası",
+  "certSubject": "Konu",
+  "certIssuer": "Yayıncı",
+  "certValidFrom": "Geçerlilik başlangıcı",
+  "certValidUntil": "Geçerlilik sonu",
+  "certFingerprint": "Parmak izi",
+  "proceedAnyway": "Yine de devam et",
+  "dontShowAgain": "Bu sağlayıcı için tekrar gösterme",
+  "viewDebugLog": "Hata ayıklama günlüğünü görüntüle"
 }

@@ -101,5 +101,18 @@
   "iconLegendFiles": "File",
   "iconLegendLinks": "Link",
   "iconLegendImages": "Immagini",
-  "iconLegendOther": "Altro"
+  "iconLegendOther": "Altro",
+  "insecureWarningTitle": "Connessione non sicura",
+  "insecureWarningHttp": "Il provider {providerName} su {url} usa una connessione HTTP non sicura. I tuoi file e dati di autenticazione verranno inviati in chiaro.",
+  "insecureWarningHttps": "Il provider {providerName} su {url} ha un certificato non valido o autofirmato. La connessione potrebbe non essere sicura.",
+  "viewCertificate": "Vedi Certificato",
+  "certificateDialogTitle": "Certificato del Server",
+  "certSubject": "Soggetto",
+  "certIssuer": "Emittente",
+  "certValidFrom": "Valido dal",
+  "certValidUntil": "Valido fino al",
+  "certFingerprint": "Impronta digitale",
+  "proceedAnyway": "Procedi comunque",
+  "dontShowAgain": "Non mostrare più per questo provider",
+  "viewDebugLog": "Visualizza log di debug"
 }

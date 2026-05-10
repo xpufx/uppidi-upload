@@ -166,42 +166,6 @@ abstract class AppLocalizations {
   /// **'Insecure connection mode bypasses certificate validation. Only enable this for trusted self-hosted servers.'**
   String get selfSignedCertWarning;
 
-  /// No description provided for @insecureWarningTitle.
-  String get insecureWarningTitle;
-
-  /// No description provided for @insecureWarningHttp.
-  String insecureWarningHttp(String providerName, String url);
-
-  /// No description provided for @insecureWarningHttps.
-  String insecureWarningHttps(String providerName, String url);
-
-  /// No description provided for @viewCertificate.
-  String get viewCertificate;
-
-  /// No description provided for @certificateDialogTitle.
-  String get certificateDialogTitle;
-
-  /// No description provided for @certSubject.
-  String get certSubject;
-
-  /// No description provided for @certIssuer.
-  String get certIssuer;
-
-  /// No description provided for @certValidFrom.
-  String get certValidFrom;
-
-  /// No description provided for @certValidUntil.
-  String get certValidUntil;
-
-  /// No description provided for @certFingerprint.
-  String get certFingerprint;
-
-  /// No description provided for @proceedAnyway.
-  String get proceedAnyway;
-
-  /// No description provided for @dontShowAgain.
-  String get dontShowAgain;
-
   /// No description provided for @upload.
   ///
   /// In en, this message translates to:
@@ -586,12 +550,6 @@ abstract class AppLocalizations {
   /// **'Logs full HTTP request/response details to the console for troubleshooting. Only enable when needed.'**
   String get debugLoggingDescription;
 
-  /// No description provided for @viewDebugLog.
-  ///
-  /// In en, this message translates to:
-  /// **'View debug log'**
-  String get viewDebugLog;
-
   /// No description provided for @qualityOriginal.
   ///
   /// In en, this message translates to:
@@ -759,6 +717,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Other'**
   String get iconLegendOther;
+
+  /// No description provided for @insecureWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Insecure Connection'**
+  String get insecureWarningTitle;
+
+  /// No description provided for @insecureWarningHttp.
+  ///
+  /// In en, this message translates to:
+  /// **'The provider {providerName} at {url} uses an insecure HTTP connection. Your files and authentication data will be sent in plain text.'**
+  String insecureWarningHttp(Object providerName, Object url);
+
+  /// No description provided for @insecureWarningHttps.
+  ///
+  /// In en, this message translates to:
+  /// **'The provider {providerName} at {url} has a self-signed or invalid certificate. The connection may not be secure.'**
+  String insecureWarningHttps(Object providerName, Object url);
+
+  /// No description provided for @viewCertificate.
+  ///
+  /// In en, this message translates to:
+  /// **'View Certificate'**
+  String get viewCertificate;
+
+  /// No description provided for @certificateDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Server Certificate'**
+  String get certificateDialogTitle;
+
+  /// No description provided for @certSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject'**
+  String get certSubject;
+
+  /// No description provided for @certIssuer.
+  ///
+  /// In en, this message translates to:
+  /// **'Issuer'**
+  String get certIssuer;
+
+  /// No description provided for @certValidFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid from'**
+  String get certValidFrom;
+
+  /// No description provided for @certValidUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid until'**
+  String get certValidUntil;
+
+  /// No description provided for @certFingerprint.
+  ///
+  /// In en, this message translates to:
+  /// **'Fingerprint'**
+  String get certFingerprint;
+
+  /// No description provided for @proceedAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Proceed Anyway'**
+  String get proceedAnyway;
+
+  /// No description provided for @dontShowAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t show again for this provider'**
+  String get dontShowAgain;
+
+  /// No description provided for @viewDebugLog.
+  ///
+  /// In en, this message translates to:
+  /// **'View debug log'**
+  String get viewDebugLog;
 }
 
 class _AppLocalizationsDelegate

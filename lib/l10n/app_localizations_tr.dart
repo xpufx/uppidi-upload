@@ -48,46 +48,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Güvensiz bağlantı modu sertifika doğrulamasını atlar. Bu seçeneği yalnızca güvenilen kendi barındırılan sunucular için etkinleştirin.';
 
   @override
-  String get insecureWarningTitle => 'Güvenli Olmayan Bağlantı';
-
-  @override
-  String insecureWarningHttp(String providerName, String url) =>
-      '$providerName ($url) düz HTTP kullanıyor. '
-      'Dosyanız şifrelenmeden yüklenecek ve aynı ağdaki kişiler tarafından ele geçirilebilir.';
-
-  @override
-  String insecureWarningHttps(String providerName, String url) =>
-      '$providerName ($url) için sertifika doğrulaması devre dışı. '
-      'Bağlantı şifrelenmiş olsa da sunucu kimliği doğrulanmadı.';
-
-  @override
-  String get viewCertificate => 'Sertifikayı Göster';
-
-  @override
-  String get certificateDialogTitle => 'Sunucu Sertifikası';
-
-  @override
-  String get certSubject => 'Konu:';
-
-  @override
-  String get certIssuer => 'Yayıncı:';
-
-  @override
-  String get certValidFrom => 'Geçerlilik başlangıcı:';
-
-  @override
-  String get certValidUntil => 'Geçerlilik sonu:';
-
-  @override
-  String get certFingerprint => 'SHA-1 parmak izi:';
-
-  @override
-  String get proceedAnyway => 'Yine de devam et';
-
-  @override
-  String get dontShowAgain => 'Devam et ve bir daha uyarma';
-
-  @override
   String get upload => 'Yükle';
 
   @override
@@ -292,9 +252,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Sorun giderme için tüm HTTP istek/yanıt detaylarını konsola kaydeder. Yalnızca gerektiğinde etkinleştirin.';
 
   @override
-  String get viewDebugLog => 'Hata ayıklama günlüğünü görüntüle';
-
-  @override
   String get qualityOriginal => 'Orijinal';
 
   @override
@@ -385,4 +342,47 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get iconLegendOther => 'Diğer';
+
+  @override
+  String get insecureWarningTitle => 'Güvensiz Bağlantı';
+
+  @override
+  String insecureWarningHttp(Object providerName, Object url) {
+    return '$providerName sağlayıcısı $url adresinde güvensiz bir HTTP bağlantısı kullanıyor. Dosyalarınız ve kimlik doğrulama verileriniz düz metin olarak gönderilecek.';
+  }
+
+  @override
+  String insecureWarningHttps(Object providerName, Object url) {
+    return '$providerName sağlayıcısı $url adresinde geçersiz veya kendi imzalı bir sertifikaya sahip. Bağlantı güvenli olmayabilir.';
+  }
+
+  @override
+  String get viewCertificate => 'Sertifikayı Görüntüle';
+
+  @override
+  String get certificateDialogTitle => 'Sunucu Sertifikası';
+
+  @override
+  String get certSubject => 'Konu';
+
+  @override
+  String get certIssuer => 'Yayıncı';
+
+  @override
+  String get certValidFrom => 'Geçerlilik başlangıcı';
+
+  @override
+  String get certValidUntil => 'Geçerlilik sonu';
+
+  @override
+  String get certFingerprint => 'Parmak izi';
+
+  @override
+  String get proceedAnyway => 'Yine de devam et';
+
+  @override
+  String get dontShowAgain => 'Bu sağlayıcı için tekrar gösterme';
+
+  @override
+  String get viewDebugLog => 'Hata ayıklama günlüğünü görüntüle';
 }

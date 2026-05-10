@@ -101,5 +101,18 @@
   "iconLegendFiles": "Files",
   "iconLegendLinks": "Links",
   "iconLegendImages": "Images",
-  "iconLegendOther": "Other"
+  "iconLegendOther": "Other",
+  "insecureWarningTitle": "Insecure Connection",
+  "insecureWarningHttp": "The provider {providerName} at {url} uses an insecure HTTP connection. Your files and authentication data will be sent in plain text.",
+  "insecureWarningHttps": "The provider {providerName} at {url} has a self-signed or invalid certificate. The connection may not be secure.",
+  "viewCertificate": "View Certificate",
+  "certificateDialogTitle": "Server Certificate",
+  "certSubject": "Subject",
+  "certIssuer": "Issuer",
+  "certValidFrom": "Valid from",
+  "certValidUntil": "Valid until",
+  "certFingerprint": "Fingerprint",
+  "proceedAnyway": "Proceed Anyway",
+  "dontShowAgain": "Don't show again for this provider",
+  "viewDebugLog": "View debug log"
 }
