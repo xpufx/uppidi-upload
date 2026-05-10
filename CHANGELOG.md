@@ -1,5 +1,14 @@
 # Changelog
 
+- feat: insecure connection warning, debug log viewer, and session-persistent logging
+- Switch icon background to white/black for light/dark theme
+- Fix adaptive icon: solid background + centered 66px foreground
+- Bump in-app logo sizes
+- Remove stale nav layout strings from ARB source files
+- Fix Android app icon, bigger logo, compact info buttons
+- Compact System Info / Changelog / License buttons on one line
+- Update app icon and logo, increase logo sizes
+- docs: auto-update changelog
 - Fix nav overflow on Android landscape: always use bottom nav on mobile, remove layout setting
 - docs: auto-update changelog
 - Explicitly declare assets/favicons/ in pubspec.yaml
@@ -21,12 +30,3 @@
 - feat: add image crop tool with draggable/resizable overlay
 - docs: auto-update changelog
 - Remove redundant 'Quality:' label from image quality selector
-- docs: auto-update changelog
-- Remove provider config card, icon legend, and redundant title from upload screen
-- docs: auto-update changelog
-- Remove compact UI variant
-- docs: auto-update changelog
-- docs: auto-update changelog
-- feat: add swappable shell navigation strategies
-- docs: auto-update changelog
-- fix: rename UI variant options to reflect what they do
