@@ -56,6 +56,5 @@ thoughts/
 scripts/env_check.sh
 
 /*.md
-!AGENTS.md
 !CHANGELOG.md
 !README.md
