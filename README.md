@@ -4,6 +4,8 @@
 
 A simple, cross-platform file uploader that works on your phone, tablet, desktop, or web browser. Upload images, videos, and other files to your choice of free public hosting services.
 
+> **AI (LLM) Usage Notice:** This project is being developed with extensive AI assistance. The app is tested manually only on Android and Linux.
+
 ## Supported Hosting Providers
 
 - Catbox
