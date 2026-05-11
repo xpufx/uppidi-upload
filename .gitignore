@@ -48,6 +48,13 @@ app.*.map.json
 .caddy-artifacts/
 temp/
 
+# Agent/IDE config
+opencode.json
+
+# Dev tooling (not shipped)
+thoughts/
+scripts/env_check.sh
+
 /*.md
 !AGENTS.md
 !CHANGELOG.md
