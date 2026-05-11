@@ -49,5 +49,6 @@ app.*.map.json
 temp/
 
 /*.md
-!CHANGELOG.md
 !AGENTS.md
+!CHANGELOG.md
+!README.md
