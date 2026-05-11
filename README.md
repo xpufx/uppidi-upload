@@ -1,10 +1,11 @@
-# Uppidi Upload
-
 <p align="center">
   <img src="assets/logo.png" alt="Uppidi Logo" width="200"/>
 </p>
 
-A simple, cross-platform file uploader that works on your phone, tablet, desktop, or web browser. Upload images, videos, and other files to your choice of free public hosting services.
+<h1 align="center">Uppidi Upload</h1>
+
+<p align="center">
+  A simple, cross-platform file uploader that works on your phone, tablet, desktop, or web browser. Upload images, videos, and other files to your choice of free public hosting services.
 
 ## Supported Hosting Providers
 
