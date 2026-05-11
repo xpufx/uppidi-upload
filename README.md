@@ -36,7 +36,7 @@ On mobile devices, you can upload directly from your photo gallery or choose any
 
 ## Web Browser Version
 
-Uppidi works in web browsers, but some hosting services cannot be used directly from a browser due to technical limitations (CORS restrictions). For these services, you can enable an experimental proxy in settings to work around this limitation.
+Uppidi works in web browsers, but some hosting services cannot be used directly from a browser due to technical limitations (CORS restrictions). On native platforms (Android, Linux desktop), you can configure an HTTP/HTTPS proxy in settings to route uploads through an intermediary server.
 
 ## Upload History
 
