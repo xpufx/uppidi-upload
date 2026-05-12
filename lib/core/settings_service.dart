@@ -14,6 +14,11 @@ final localeCodeProvider = FutureProvider<String>((ref) async {
   return (await svc.get(SettingsService.localeKey)) ?? 'en';
 });
 
+final navigationLayoutProvider = FutureProvider<String>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  return await svc.getNavigationLayout();
+});
+
 final disabledProviderIdsProvider = FutureProvider<Set<String>>((ref) async {
   return ref.read(settingsServiceProvider).getDisabledProviders();
 });
@@ -113,6 +118,7 @@ class SettingsService {
   static const debugLoggingKey = 'global.debug_logging';
   static const shellTypeKey = 'global.shell_type';
   static const insecureMutedKey = 'global.insecure_muted_providers';
+  static const navigationLayoutKey = 'global.nav_layout';
 
   Future<bool> isInsecureConnAllowed() async {
     final val = await get(insecureConnKey);
@@ -192,5 +198,19 @@ class SettingsService {
       );
     }
     await set(shellTypeKey, type);
+  }
+
+  Future<String> getNavigationLayout() async {
+    final val = await get(navigationLayoutKey);
+    return val ?? 'left';
+  }
+
+  Future<void> setNavigationLayout(String layout) async {
+    if (!['left', 'bottom', 'right'].contains(layout)) {
+      throw ArgumentError(
+        'Invalid navigation layout: $layout. Must be one of left, bottom, right.',
+      );
+    }
+    await set(navigationLayoutKey, layout);
   }
 }

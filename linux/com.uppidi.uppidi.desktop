@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Uppidi Upload
+Comment=A simple, cross-platform file uploader
+Exec=uppidi
+Icon=com.uppidi.uppidi
+Terminal=false
+Type=Application
+Categories=Utility;
+StartupNotify=true

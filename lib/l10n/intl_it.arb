@@ -114,5 +114,10 @@
   "certFingerprint": "Impronta digitale",
   "proceedAnyway": "Procedi comunque",
   "dontShowAgain": "Non mostrare più per questo provider",
-  "viewDebugLog": "Visualizza log di debug"
+  "viewDebugLog": "Visualizza log di debug",
+  "navigationLeft": "Sinistra",
+  "navigationBottom": "In basso",
+  "navigationRight": "Destra",
+  "navLayout": "Layout navigazione",
+  "navLayoutDescription": "Scegli la posizione della navigazione: Sinistra, In basso o Destra."
 }

@@ -795,6 +795,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View debug log'**
   String get viewDebugLog;
+
+  /// No description provided for @navigationLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Left'**
+  String get navigationLeft;
+
+  /// No description provided for @navigationBottom.
+  ///
+  /// In en, this message translates to:
+  /// **'Bottom'**
+  String get navigationBottom;
+
+  /// No description provided for @navigationRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Right'**
+  String get navigationRight;
+
+  /// No description provided for @navLayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Nav Layout'**
+  String get navLayout;
+
+  /// No description provided for @navLayoutDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose navigation position: Left, Bottom, or Right.'**
+  String get navLayoutDescription;
 }
 
 class _AppLocalizationsDelegate

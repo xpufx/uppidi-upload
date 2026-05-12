@@ -114,5 +114,10 @@
   "certFingerprint": "Fingerprint",
   "proceedAnyway": "Proceed Anyway",
   "dontShowAgain": "Don't show again for this provider",
-  "viewDebugLog": "View debug log"
+  "viewDebugLog": "View debug log",
+  "navigationLeft": "Left",
+  "navigationBottom": "Bottom",
+  "navigationRight": "Right",
+  "navLayout": "Nav Layout",
+  "navLayoutDescription": "Choose navigation position: Left, Bottom, or Right."
 }

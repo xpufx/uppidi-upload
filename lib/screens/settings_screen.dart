@@ -601,6 +601,64 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           ],
         ),
         const SizedBox(height: 16),
+        // Navigation layout selector — desktop only
+        if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) ...[
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: Text(l10n.navLayout),
+                    content: Text(l10n.navLayoutDescription),
+                    actions: [
+                      TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: Text(l10n.ok))
+                    ],
+                  ),
+                ),
+                child: Icon(Icons.info_outline,
+                    size: 16,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.5)),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: SegmentedButton<String>(
+                  segments: [
+                    ButtonSegment(
+                      value: 'left',
+                      label: Text(l10n.navigationLeft),
+                      icon: const Icon(Icons.chevron_left),
+                    ),
+                    ButtonSegment(
+                      value: 'bottom',
+                      label: Text(l10n.navigationBottom),
+                      icon: const Icon(Icons.arrow_downward),
+                    ),
+                    ButtonSegment(
+                      value: 'right',
+                      label: Text(l10n.navigationRight),
+                      icon: const Icon(Icons.chevron_right),
+                    ),
+                  ],
+                  selected: {
+                    ref.watch(navigationLayoutProvider).asData?.value ?? 'left'
+                  },
+                  onSelectionChanged: (Set<String> selected) async {
+                    final layout = selected.first;
+                    await svc.setNavigationLayout(layout);
+                    ref.invalidate(navigationLayoutProvider);
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+        ],
         const Divider(height: 32),
         Card(
           child: Padding(

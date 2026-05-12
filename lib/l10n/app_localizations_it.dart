@@ -385,4 +385,20 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get viewDebugLog => 'Visualizza log di debug';
+
+  @override
+  String get navigationLeft => 'Sinistra';
+
+  @override
+  String get navigationBottom => 'In basso';
+
+  @override
+  String get navigationRight => 'Destra';
+
+  @override
+  String get navLayout => 'Layout navigazione';
+
+  @override
+  String get navLayoutDescription =>
+      'Scegli la posizione della navigazione: Sinistra, In basso o Destra.';
 }

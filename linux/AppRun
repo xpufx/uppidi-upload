@@ -1,0 +1,4 @@
+#!/bin/bash
+# AppImage entry point — executed by the AppImage runtime.
+# $APPDIR always points to the mount point.
+exec "$APPDIR/uppidi" "$@"

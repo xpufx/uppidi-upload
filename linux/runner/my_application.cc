@@ -67,6 +67,24 @@ static void my_application_activate(GApplication* application) {
   gtk_widget_show(GTK_WIDGET(view));
   gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));
 
+  // Set the app icon for the window (taskbar, title bar, etc.).
+  // When running inside an AppImage, $APPDIR is set to the mount point.
+  // Otherwise, resolve the icon relative to the binary's directory.
+  g_autofree gchar* icon_path = NULL;
+  const gchar* appdir = g_getenv("APPDIR");
+  if (appdir != NULL) {
+    icon_path = g_build_filename(appdir, "data", "icon.png", NULL);
+  } else {
+    g_autofree gchar* exe_path = g_file_read_link("/proc/self/exe", NULL);
+    if (exe_path != NULL) {
+      g_autofree gchar* exe_dir = g_path_get_dirname(exe_path);
+      icon_path = g_build_filename(exe_dir, "data", "icon.png", NULL);
+    }
+  }
+  if (icon_path != NULL && g_file_test(icon_path, G_FILE_TEST_EXISTS)) {
+    gtk_window_set_icon_from_file(window, icon_path, NULL);
+  }
+
   // Show the window when Flutter renders.
   // Requires the view to be realized so we can start rendering.
   g_signal_connect_swapped(view, "first-frame", G_CALLBACK(first_frame_cb),

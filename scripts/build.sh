@@ -9,7 +9,7 @@ set -euo pipefail
 # Usage:
 #   bash scripts/build.sh               # show usage
 #   bash scripts/build.sh android       # build Android APK
-#   bash scripts/build.sh linux         # build Linux desktop
+#   bash scripts/build.sh linux         # build Linux desktop + AppImage
 #   bash scripts/build.sh web           # build web bundle
 #   bash scripts/build.sh all           # build all supported targets
 # ──────────────────────────────────────────────────────────────
@@ -18,7 +18,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BOLD='\033[1m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 pass() { echo -e "  ${GREEN}✔${NC} $1"; }
 warn() { echo -e "  ${YELLOW}⚠${NC} $1"; }
@@ -32,7 +32,7 @@ usage() {
 	echo ""
 	echo "Targets:"
 	echo "  android    Build Android APK (release)"
-	echo "  linux      Build Linux desktop (release)"
+	echo "  linux      Build Linux desktop (release) + AppImage"
 	echo "  web        Build web bundle (release)"
 	echo "  all        Build all supported targets"
 	echo ""
@@ -53,10 +53,48 @@ TARGET="${1:-}"
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_DIR"
 
+# ── Shared helpers ────────────────────────────────────────────
+# Extract app version from pubspec.yaml (e.g. "1.2.0+3").
+app_version() {
+	grep '^version:' pubspec.yaml | sed 's/version: *//' | tr -d ' '
+}
+
+# Short git hash from HEAD.
+git_hash() {
+	git log -1 --format='%h' 2>/dev/null || echo 'unknown'
+}
+
+# Deploy a build artifact to .caddy-artifacts/ with proper naming and latest symlink.
+# Usage: deploy_artifact <src> <platform-ext>
+#   <src>          Path to the built file.
+#   <platform-ext> e.g. "linux.tar.gz", "android-arm64-v8a.apk", "x86_64.AppImage"
+deploy_artifact() {
+	local src="$1"
+	local plat_ext="$2"
+	local ver
+	ver="$(app_version)"
+	local hash
+	hash="$(git_hash)"
+	local dest_dir="${PROJECT_DIR}/.caddy-artifacts"
+	mkdir -p "$dest_dir"
+
+	local filename="uppidi-upload-${ver}-${hash}-${plat_ext}"
+	local dest="${dest_dir}/${filename}"
+
+	cp "$src" "$dest"
+	pass "deployed: ${filename} ($(du -h "$dest" | cut -f1))"
+
+	# Update latest symlink for this platform.
+	local link="${dest_dir}/uppidi-upload-latest-${plat_ext}"
+	ln -sf "$filename" "$link"
+	pass "updated:  ${link} → ${filename}"
+}
+
 echo ""
 echo -e "${BOLD}═══ Uppidi Build ═══${NC}"
 echo "  Project: $PROJECT_DIR"
 echo "  Target:  $TARGET"
+echo "  Version: $(app_version)-$(git_hash)"
 echo ""
 
 # ── Check required: git ──────────────────────────────────────
@@ -85,7 +123,6 @@ LINUX_OK=true
 
 case "$TARGET" in
 android | all)
-	# Check Java
 	if ! command -v java &>/dev/null; then
 		fail "java not found — required for Android builds (JDK 17+)"
 		ANDROID_OK=false
@@ -94,7 +131,6 @@ android | all)
 		pass "java found: $JAVA_VER"
 	fi
 
-	# Check ANDROID_HOME
 	if [ -z "${ANDROID_HOME:-}" ]; then
 		fail "ANDROID_HOME is not set"
 		ANDROID_OK=false
@@ -106,7 +142,6 @@ android | all)
 		fi
 	fi
 
-	# Check Android SDK command-line tools
 	if [ -n "${ANDROID_HOME:-}" ] && [ ! -d "$ANDROID_HOME/cmdline-tools" ] && [ ! -d "$ANDROID_HOME/tools" ]; then
 		warn "Android SDK command-line tools not found in ANDROID_HOME"
 		warn "  Run: flutter doctor --android-licenses"
@@ -116,7 +151,6 @@ esac
 
 case "$TARGET" in
 linux | all)
-	# Check common Linux desktop dev libraries
 	for cmd in cmake clang ninja pkg-config; do
 		if ! command -v "$cmd" &>/dev/null; then
 			warn "$cmd not found — Linux desktop build may fail"
@@ -169,6 +203,7 @@ build_android() {
 	if [ -f "$APK" ]; then
 		pass "Android APK: $APK"
 		ls -lh "$APK"
+		deploy_artifact "$APK" "android-arm64-v8a.apk"
 	else
 		fail "Android APK not found at $APK"
 	fi
@@ -178,12 +213,26 @@ build_linux() {
 	echo -e "${BOLD}Building Linux desktop (release)...${NC}"
 	flutter build linux --release
 	echo ""
-	LINUX_BUNDLE="build/linux/x64/release/bundle"
-	if [ -d "$LINUX_BUNDLE" ]; then
-		pass "Linux bundle: $LINUX_BUNDLE"
-		ls -lh "$LINUX_BUNDLE"
+	BUNDLE="build/linux/x64/release/bundle"
+	if [ ! -d "$BUNDLE" ]; then
+		fail "Linux bundle not found at $BUNDLE"
+		return
+	fi
+	pass "Linux bundle: $BUNDLE"
+
+	# Package as tar.gz
+	TARFILE="${PROJECT_DIR}/build/uppidi-upload-$(app_version)-$(git_hash)-linux.tar.gz"
+	mkdir -p "$(dirname "$TARFILE")"
+	tar -czf "$TARFILE" -C "$(dirname "$BUNDLE")" "$(basename "$BUNDLE")"
+	ls -lh "$TARFILE"
+	deploy_artifact "$TARFILE" "linux.tar.gz"
+
+	# Build AppImage
+	echo ""
+	if [ -f "${PROJECT_DIR}/scripts/build-appimage.sh" ]; then
+		bash "${PROJECT_DIR}/scripts/build-appimage.sh" --no-flutter-build
 	else
-		fail "Linux bundle not found at $LINUX_BUNDLE"
+		warn "scripts/build-appimage.sh not found — skipping AppImage"
 	fi
 }
 

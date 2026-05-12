@@ -124,3 +124,18 @@ if(NOT CMAKE_BUILD_TYPE MATCHES "Debug")
   install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
     COMPONENT Runtime)
 endif()
+
+# Install the app icon into the bundle's data directory so the binary can load
+# it at runtime via gtk_window_set_icon_from_file().
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/runner/icon.png"
+  DESTINATION "${INSTALL_BUNDLE_DATA_DIR}" COMPONENT Runtime)
+
+# Install the .desktop file and icon into a share/ hierarchy within the bundle.
+# Users can copy these to their XDG directories for desktop integration:
+#   cp -r share/applications   ~/.local/share/
+#   cp -r share/icons          ~/.local/share/
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/com.uppidi.uppidi.desktop"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/share/applications" COMPONENT Runtime)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/runner/icon.png"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps"
+  RENAME "com.uppidi.uppidi.png" COMPONENT Runtime)

@@ -385,4 +385,20 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get viewDebugLog => 'Hata ayıklama günlüğünü görüntüle';
+
+  @override
+  String get navigationLeft => 'Sol';
+
+  @override
+  String get navigationBottom => 'Alt';
+
+  @override
+  String get navigationRight => 'Sağ';
+
+  @override
+  String get navLayout => 'Navigasyon Düzeni';
+
+  @override
+  String get navLayoutDescription =>
+      'Navigasyon konumunu seçin: Sol, Alt veya Sağ.';
 }

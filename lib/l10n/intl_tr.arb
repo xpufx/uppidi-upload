@@ -114,5 +114,10 @@
   "certFingerprint": "Parmak izi",
   "proceedAnyway": "Yine de devam et",
   "dontShowAgain": "Bu sağlayıcı için tekrar gösterme",
-  "viewDebugLog": "Hata ayıklama günlüğünü görüntüle"
+  "viewDebugLog": "Hata ayıklama günlüğünü görüntüle",
+  "navigationLeft": "Sol",
+  "navigationBottom": "Alt",
+  "navigationRight": "Sağ",
+  "navLayout": "Navigasyon Düzeni",
+  "navLayoutDescription": "Navigasyon konumunu seçin: Sol, Alt veya Sağ."
 }
