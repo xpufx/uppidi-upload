@@ -17,6 +17,9 @@ A simple, cross-platform file uploader that works on your phone, tablet, desktop
 ## Supported Hosting Providers
 
 - Catbox
+- FileDitch
+- Frisk (1 day expiry)
+- Litterbox (temporary/expiring files)
 - Uguu.se
 - Tmpfile.link
 - FreeImage.host

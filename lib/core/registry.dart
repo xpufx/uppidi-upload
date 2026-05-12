@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'interfaces/uploader.dart';
 import 'settings_service.dart';
 import '../providers/catbox_provider.dart';
+import '../providers/fileditch_provider.dart';
 import '../providers/freeimage_provider.dart';
+import '../providers/frisk_provider.dart';
 import '../providers/httpbin_provider.dart';
 import '../providers/litterbox_provider.dart';
 import '../providers/tempsh_provider.dart';
@@ -20,6 +22,8 @@ final enabledProvidersProvider = Provider<List<BaseUploader>>((ref) {
 class ProviderRegistry {
   static final List<BaseUploader> all = [
     HttpBinProvider(),
+    FileDitchProvider(),
+    FriskProvider(),
     UguuProvider(name: 'uguu.se', url: 'https://uguu.se'),
     TmpFileLinkProvider(),
     CatboxProvider(),
