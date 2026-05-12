@@ -173,90 +173,87 @@ class _VersionCheckWidget extends ConsumerWidget {
                 VersionCheckState.updateAvailable => Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (cdnUrl.isNotEmpty)
-                        GestureDetector(
-                          onTap: () async {
-                            final isMobile = Platform.isAndroid;
-                            final url = isMobile
-                                ? '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk'
-                                : '$cdnUrl/uppidi-upload-latest-linux.tar.gz';
-                            final label = isMobile ? 'APK' : 'Linux';
+                      GestureDetector(
+                        onTap: () async {
+                          final url = notifier.downloadUrl ??
+                              (Platform.isAndroid
+                                  ? '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk'
+                                  : '$cdnUrl/uppidi-upload-latest-linux.tar.gz');
+                          if (url.isEmpty) return;
+                          final isMobile = Platform.isAndroid;
+                          final label = isMobile ? 'APK' : 'Linux';
 
-                            var received = 0, total = 0, speed = 0;
-                            void Function(void Function())? update;
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (_) => StatefulBuilder(
-                                builder: (ctx, setState) {
-                                  update = setState;
-                                  final totalStr = total > 0
-                                      ? '${(total / 1048576).toStringAsFixed(1)} MB'
-                                      : '?';
-                                  final speedStr = speed > 0
-                                      ? '${(speed / 1048576).toStringAsFixed(1)} MB/s'
-                                      : '';
-                                  final pct =
-                                      total > 0 ? received / total : null;
-                                  return AlertDialog(
-                                    title: Text('Downloading $label'),
-                                    content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        if (pct != null)
-                                          LinearProgressIndicator(value: pct)
-                                        else
-                                          const LinearProgressIndicator(),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                            '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
-                                            style:
-                                                const TextStyle(fontSize: 12)),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                            try {
-                              if (isMobile) {
-                                await downloadAndInstallApk(url,
-                                    onProgress: (r, t, s) {
-                                  received = r;
-                                  total = t;
-                                  speed = s;
-                                  update?.call(() {});
-                                });
-                              } else {
-                                final path = await downloadFile(url,
-                                    onProgress: (r, t, s) {
-                                  received = r;
-                                  total = t;
-                                  speed = s;
-                                  update?.call(() {});
-                                });
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text('Downloaded to: $path')),
-                                  );
-                                }
+                          var received = 0, total = 0, speed = 0;
+                          void Function(void Function())? update;
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (_) => StatefulBuilder(
+                              builder: (ctx, setState) {
+                                update = setState;
+                                final totalStr = total > 0
+                                    ? '${(total / 1048576).toStringAsFixed(1)} MB'
+                                    : '?';
+                                final speedStr = speed > 0
+                                    ? '${(speed / 1048576).toStringAsFixed(1)} MB/s'
+                                    : '';
+                                final pct = total > 0 ? received / total : null;
+                                return AlertDialog(
+                                  title: Text('Downloading $label'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (pct != null)
+                                        LinearProgressIndicator(value: pct)
+                                      else
+                                        const LinearProgressIndicator(),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                          '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
+                                          style: const TextStyle(fontSize: 12)),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                          try {
+                            if (isMobile) {
+                              await downloadAndInstallApk(url,
+                                  onProgress: (r, t, s) {
+                                received = r;
+                                total = t;
+                                speed = s;
+                                update?.call(() {});
+                              });
+                            } else {
+                              final path = await downloadFile(url,
+                                  onProgress: (r, t, s) {
+                                received = r;
+                                total = t;
+                                speed = s;
+                                update?.call(() {});
+                              });
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text('Downloaded to: $path')),
+                                );
                               }
-                              if (context.mounted)
-                                Navigator.of(context, rootNavigator: true)
-                                    .pop();
-                            } catch (e) {
-                              if (context.mounted)
-                                Navigator.of(context, rootNavigator: true)
-                                    .pop();
                             }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 4),
-                            child: Icon(Icons.download,
-                                size: 24, color: Colors.orange.shade600),
-                          ),
+                            if (context.mounted)
+                              Navigator.of(context, rootNavigator: true).pop();
+                          } catch (e) {
+                            if (context.mounted)
+                              Navigator.of(context, rootNavigator: true).pop();
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 4),
+                          child: Icon(Icons.download,
+                              size: 24, color: Colors.orange.shade600),
                         ),
+                      ),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
@@ -691,7 +688,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                                       .bodySmall
                                       ?.copyWith(color: Colors.grey)),
                               const SizedBox(width: 4),
-                              if (cdnUrl.isNotEmpty) _VersionCheckWidget(),
+                              _VersionCheckWidget(),
                             ],
                           ),
                         ],
@@ -700,143 +697,26 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                if (cdnUrl.isNotEmpty) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (cdnUrl.isNotEmpty) ...[
                       IconButton(
                         icon: const Icon(Icons.android, size: 20),
                         tooltip: 'Download Android APK',
-                        onPressed: () async {
-                          var received = 0;
-                          var total = 0;
-                          var speed = 0;
-                          void Function(void Function())? update;
-
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (_) => StatefulBuilder(
-                              builder: (ctx, setState) {
-                                update = setState;
-                                final totalStr = total > 0
-                                    ? '${(total / 1048576).toStringAsFixed(1)} MB'
-                                    : '?';
-                                final speedStr = speed > 0
-                                    ? '${(speed / 1048576).toStringAsFixed(1)} MB/s'
-                                    : '';
-                                final pct = total > 0 ? received / total : null;
-                                final theme = Theme.of(ctx);
-                                return AlertDialog(
-                                  title: Text('Downloading Latest APK',
-                                      style: TextStyle(
-                                          color: theme.colorScheme.onSurface)),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (pct != null)
-                                        LinearProgressIndicator(value: pct)
-                                      else
-                                        const LinearProgressIndicator(),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                          '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: theme
-                                                .colorScheme.onSurfaceVariant,
-                                          )),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                          try {
-                            final path = await downloadFile(
-                              '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk',
-                              onProgress: (r, t, s) {
-                                received = r;
-                                total = t;
-                                speed = s;
-                                update?.call(() {});
-                              },
-                            );
-                            if (context.mounted) {
-                              Navigator.of(context, rootNavigator: true).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Downloaded to: $path')),
-                              );
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              Navigator.of(context, rootNavigator: true).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Download failed: $e')),
-                              );
-                            }
-                          }
-                        },
+                        onPressed: () => _downloadAndInstall(
+                            context,
+                            '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk',
+                            'APK'),
                       ),
                       const SizedBox(width: 8),
                       IconButton(
                         icon: const Icon(Icons.desktop_windows, size: 20),
                         tooltip: 'Download Linux',
-                        onPressed: () async {
-                          var received = 0, total = 0, speed = 0;
-                          void Function(void Function())? update;
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (_) => StatefulBuilder(
-                              builder: (ctx, setState) {
-                                update = setState;
-                                final totalStr = total > 0
-                                    ? '${(total / 1048576).toStringAsFixed(1)} MB'
-                                    : '?';
-                                final speedStr = speed > 0
-                                    ? '${(speed / 1048576).toStringAsFixed(1)} MB/s'
-                                    : '';
-                                final pct = total > 0 ? received / total : null;
-                                return AlertDialog(
-                                  title: const Text('Downloading Linux'),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (pct != null)
-                                        LinearProgressIndicator(value: pct)
-                                      else
-                                        const LinearProgressIndicator(),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                          '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
-                                          style: const TextStyle(fontSize: 12)),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                          try {
-                            final path = await downloadFile(
-                                '$cdnUrl/uppidi-upload-latest-linux.tar.gz',
-                                onProgress: (r, t, s) {
-                              received = r;
-                              total = t;
-                              speed = s;
-                              update?.call(() {});
-                            });
-                            if (context.mounted) {
-                              Navigator.of(context, rootNavigator: true).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Downloaded to: $path')),
-                              );
-                            }
-                          } catch (e) {
-                            if (context.mounted)
-                              Navigator.of(context, rootNavigator: true).pop();
-                          }
-                        },
+                        onPressed: () => _downloadAndInstall(
+                            context,
+                            '$cdnUrl/uppidi-upload-latest-linux.tar.gz',
+                            'Linux'),
                       ),
                       const SizedBox(width: 8),
                       IconButton(
@@ -845,9 +725,18 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                         onPressed: () => launchUrl(Uri.parse(cdnUrl),
                             mode: LaunchMode.externalApplication),
                       ),
+                    ] else ...[
+                      IconButton(
+                        icon: const Icon(Icons.code, size: 20),
+                        tooltip: 'View releases on GitHub',
+                        onPressed: () => launchUrl(
+                            Uri.parse(
+                                'https://github.com/$githubRepo/releases'),
+                            mode: LaunchMode.externalApplication),
+                      ),
                     ],
-                  ),
-                ],
+                  ],
+                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -1026,5 +915,78 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         ],
       ),
     );
+  }
+
+  /// Shows a download progress dialog and downloads [url], installing it
+  /// on Android if applicable.
+  Future<void> _downloadAndInstall(
+      BuildContext context, String url, String label) async {
+    var received = 0, total = 0, speed = 0;
+    void Function(void Function())? update;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => StatefulBuilder(
+        builder: (ctx, setState) {
+          update = setState;
+          final totalStr =
+              total > 0 ? '${(total / 1048576).toStringAsFixed(1)} MB' : '?';
+          final speedStr =
+              speed > 0 ? '${(speed / 1048576).toStringAsFixed(1)} MB/s' : '';
+          final pct = total > 0 ? received / total : null;
+          return AlertDialog(
+            title: Text('Downloading $label'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (pct != null)
+                  LinearProgressIndicator(value: pct)
+                else
+                  const LinearProgressIndicator(),
+                const SizedBox(height: 8),
+                Text(
+                  '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    try {
+      if (Platform.isAndroid && label == 'APK') {
+        await downloadAndInstallApk(url, onProgress: (r, t, s) {
+          received = r;
+          total = t;
+          speed = s;
+          update?.call(() {});
+        });
+      } else {
+        final path = await downloadFile(url, onProgress: (r, t, s) {
+          received = r;
+          total = t;
+          speed = s;
+          update?.call(() {});
+        });
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Downloaded to: $path')),
+          );
+        }
+      }
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Download failed: $e')),
+        );
+      }
+    }
   }
 }
