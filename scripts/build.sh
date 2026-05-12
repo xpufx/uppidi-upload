@@ -208,8 +208,8 @@ echo ""
 
 # ── Build ────────────────────────────────────────────────────
 build_android() {
-	echo -e "${BOLD}Building Android APK (release)...${NC}"
-	flutter build apk --release
+	echo -e "${BOLD}Building Android APK (release, arm64-v8a)...${NC}"
+	flutter build apk --release --target-platform android-arm64
 	echo ""
 	APK="build/app/outputs/flutter-apk/app-release.apk"
 	if [ -f "$APK" ]; then
