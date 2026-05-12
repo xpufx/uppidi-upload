@@ -6,6 +6,14 @@ A simple, cross-platform file uploader that works on your phone, tablet, desktop
 
 > **AI (LLM) Usage Notice:** This project is being developed with extensive AI assistance. The app is tested manually only on Android and Linux.
 
+## Screenshots
+
+| Light | Dark |
+|---|---|
+| ![Main screen (light)](docs/screenshots/main-screen-light.jpg) | ![Main screen (dark)](docs/screenshots/main-screen-dark.jpg) |
+| ![Upload screen (light)](docs/screenshots/upload-screen-light.jpg) | ![Upload screen (dark)](docs/screenshots/upload-screen-dark.jpg) |
+| ![Settings screen (light)](docs/screenshots/settings-screen-light.jpg) | ![Settings screen (dark)](docs/screenshots/settings-screen-dark.jpg) |
+
 ## Supported Hosting Providers
 
 - Catbox
