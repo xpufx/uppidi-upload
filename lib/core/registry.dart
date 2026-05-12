@@ -5,13 +5,16 @@ import 'settings_service.dart';
 import '../providers/catbox_provider.dart';
 import '../providers/freeimage_provider.dart';
 import '../providers/httpbin_provider.dart';
+import '../providers/litterbox_provider.dart';
 import '../providers/tempsh_provider.dart';
 import '../providers/tmpfilelink_provider.dart';
 import '../providers/uguu_provider.dart';
 
 final enabledProvidersProvider = Provider<List<BaseUploader>>((ref) {
   final disabled = ref.watch(disabledProviderIdsProvider).asData?.value ?? {};
-  return ProviderRegistry.all.where((p) => !disabled.contains(p.providerId)).toList();
+  return ProviderRegistry.all
+      .where((p) => !disabled.contains(p.providerId))
+      .toList();
 });
 
 class ProviderRegistry {
@@ -25,5 +28,6 @@ class ProviderRegistry {
       url: 'https://freeimage.host',
     ),
     TempShProvider(),
+    LitterboxProvider(),
   ];
 }
