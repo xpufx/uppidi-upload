@@ -1,0 +1,53 @@
+name: Build Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Override version (e.g. 1.2.0+5). Blank = from pubspec.yaml'
+        required: false
+        type: string
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Override version (optional)
+        if: inputs.version != ''
+        shell: powershell
+        run: |
+          $yaml = Get-Content pubspec.yaml -Raw
+          $yaml = $yaml -replace '^version: .+', "version: $env:OVERRIDE"
+          Set-Content pubspec.yaml $yaml
+        env:
+          OVERRIDE: ${{ inputs.version }}
+
+      - name: Build Windows
+        run: flutter build windows --release
+
+      - name: Package
+        shell: powershell
+        run: |
+          $ver = (Select-String '^version: (.+)' pubspec.yaml).Matches[0].Groups[1].Value.Trim()
+          $hash = $env:GITHUB_SHA.Substring(0, 7)
+          $zipName = "uppidi-upload-${ver}-${hash}-windows.zip"
+          Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath $zipName
+          echo "ZIP_NAME=$zipName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: uppidi-windows
+          path: ${{ env.ZIP_NAME }}
