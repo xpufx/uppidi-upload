@@ -95,6 +95,18 @@ echo -e "${BOLD}═══ Uppidi Build ═══${NC}"
 echo "  Project: $PROJECT_DIR"
 echo "  Target:  $TARGET"
 echo "  Version: $(app_version)-$(git_hash)"
+
+# ── Reminder: update CHANGELOG.md ─────────────────────────────
+LAST_TAG=$(git tag -l 'v*' --sort=-version:refname 2>/dev/null | head -1)
+if [ -n "$LAST_TAG" ]; then
+	# If CHANGELOG.md wasn't modified since the last tag, remind the user.
+	CL_MOD_TIME=$(git log -1 --format='%ct' "$LAST_TAG" -- CHANGELOG.md 2>/dev/null || echo 0)
+	TAG_TIME=$(git log -1 --format='%ct' "$LAST_TAG" 2>/dev/null || echo 0)
+	if [ "$CL_MOD_TIME" -le "$TAG_TIME" ]; then
+		warn "CHANGELOG.md hasn't been updated since $LAST_TAG"
+		warn "  Edit CHANGELOG.md to document changes for this release."
+	fi
+fi
 echo ""
 
 # ── Check required: git ──────────────────────────────────────
