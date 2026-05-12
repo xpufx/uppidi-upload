@@ -42,6 +42,10 @@ On mobile devices, you can upload directly from your photo gallery or choose any
 5. Tap upload and wait for it to finish.
 6. Copy the link from the app to share your file.
 
+### Building from Source
+
+See [BUILDING.md](BUILDING.md) for instructions on building Uppidi from source for Android, Linux, and web.
+
 ## Web Browser Version
 
 Uppidi works in web browsers, but some hosting services cannot be used directly from a browser due to technical limitations (CORS restrictions). On native platforms (Android, Linux desktop), you can configure an HTTP/HTTPS proxy in settings to route uploads through an intermediary server.
