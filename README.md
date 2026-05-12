@@ -2,7 +2,7 @@
 
 ![Uppidi Logo](assets/logo.png)
 
-A simple, cross-platform file uploader that works on your phone, tablet, desktop, or web browser. Upload images, videos, and other files to your choice of free public hosting services. Easily share media with a URL on any platform such as IRC.
+A simple, cross-platform file uploader that works on your phone, tablet, desktop, or web browser. Upload images, videos, and other files to your choice of free public hosting services. You can conveniently share the media URL on any platform including IRC.
 
 > **AI (LLM) Usage Notice:** This project is being developed with extensive AI assistance. The app is tested manually only on Android and Linux.
 
