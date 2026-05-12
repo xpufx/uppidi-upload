@@ -46,6 +46,8 @@ On mobile devices, you can upload directly from your photo gallery or choose any
 
 See [BUILDING.md](BUILDING.md) for instructions on building Uppidi from source for Android, Linux, and web.
 
+> Pre-built binary packages are coming soon.
+
 ## Web Browser Version
 
 Uppidi works in web browsers, but some hosting services cannot be used directly from a browser due to technical limitations (CORS restrictions). On native platforms (Android, Linux desktop), you can configure an HTTP/HTTPS proxy in settings to route uploads through an intermediary server.
