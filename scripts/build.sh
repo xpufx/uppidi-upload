@@ -208,16 +208,20 @@ echo ""
 
 # ── Build ────────────────────────────────────────────────────
 build_android() {
-	echo -e "${BOLD}Building Android APK (release, arm64-v8a)...${NC}"
-	flutter build apk --release --target-platform android-arm64
+	echo -e "${BOLD}Building Android APKs (release, split-per-abi)...${NC}"
+	flutter build apk --release --split-per-abi
 	echo ""
-	APK="build/app/outputs/flutter-apk/app-release.apk"
-	if [ -f "$APK" ]; then
-		pass "Android APK: $APK"
-		ls -lh "$APK"
-		deploy_artifact "$APK" "android-arm64-v8a.apk"
-	else
-		fail "Android APK not found at $APK"
+	APK_DIR="build/app/outputs/flutter-apk"
+	COUNT=0
+	for apk in "$APK_DIR"/app-*-release.apk; do
+		[ -f "$apk" ] || continue
+		# Extract ABI from filename: app-arm64-v8a-release.apk → arm64-v8a
+		abi=$(basename "$apk" | sed 's/^app-//; s/-release\.apk$//')
+		deploy_artifact "$apk" "android-${abi}.apk"
+		COUNT=$((COUNT + 1))
+	done
+	if [ "$COUNT" -eq 0 ]; then
+		fail "No APKs found in $APK_DIR"
 	fi
 }
 
@@ -284,6 +288,23 @@ all)
 	exit 1
 	;;
 esac
+
+# ── Print download URLs ───────────────────────────────────────
+# Detect Caddy server IP (serves .caddy-artifacts on port 80)
+CADDY_IP=$(ip -4 addr show 2>/dev/null | grep -oP 'inet \K[0-9.]+' | grep -v '127.0.0.1' | head -1)
+if [ -n "$CADDY_IP" ]; then
+	BASE_URL="http://$CADDY_IP"
+else
+	BASE_URL="http://$(hostname)"
+fi
+
+echo ""
+echo -e "${BOLD}Download URLs:${NC}"
+for f in "$PROJECT_DIR"/.caddy-artifacts/uppidi-upload-"$(app_version)"-*.{apk,AppImage,tar.gz}; do
+	[ -f "$f" ] || continue
+	name=$(basename "$f")
+	echo "  $BASE_URL/$name"
+done
 
 echo ""
 echo -e "${GREEN}${BOLD}Done.${NC}"
