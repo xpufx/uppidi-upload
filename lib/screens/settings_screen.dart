@@ -147,137 +147,132 @@ class _VersionCheckWidget extends ConsumerWidget {
       ageText = seconds < 60 ? '${seconds}s ago' : '${seconds ~/ 60}m ago';
     }
 
-    return SizedBox(
-      width: 120,
-      height: 32,
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: GestureDetector(
-          onTap: state == VersionCheckState.checking
-              ? null
-              : () => ref.read(versionCheckProvider.notifier).check(),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              switch (state) {
-                VersionCheckState.idle =>
-                  const Icon(Icons.refresh, size: 14, color: Colors.grey),
-                VersionCheckState.checking => const SizedBox(
-                    width: 14,
-                    height: 14,
-                    child: CircularProgressIndicator(strokeWidth: 1.5),
-                  ),
-                VersionCheckState.upToDate =>
-                  const Icon(Icons.check_circle, size: 14, color: Colors.green),
-                VersionCheckState.updateAvailable => Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          final url = notifier.downloadUrl ??
-                              (Platform.isAndroid
-                                  ? '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk'
-                                  : '$cdnUrl/uppidi-upload-latest-linux.tar.gz');
-                          if (url.isEmpty) return;
-                          final isMobile = Platform.isAndroid;
-                          final label = isMobile ? 'APK' : 'Linux';
+    return GestureDetector(
+      onTap: state == VersionCheckState.checking
+          ? null
+          : () => ref.read(versionCheckProvider.notifier).check(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          switch (state) {
+            VersionCheckState.idle =>
+              const Icon(Icons.refresh, size: 14, color: Colors.grey),
+            VersionCheckState.checking => const SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(strokeWidth: 1.5),
+              ),
+            VersionCheckState.upToDate =>
+              const Icon(Icons.check_circle, size: 14, color: Colors.green),
+            VersionCheckState.updateAvailable => Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      final url = notifier.downloadUrl ??
+                          (Platform.isAndroid
+                              ? '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk'
+                              : '$cdnUrl/uppidi-upload-latest-linux.tar.gz');
+                      if (url.isEmpty) return;
+                      final isMobile = Platform.isAndroid;
+                      final label = isMobile ? 'APK' : 'Linux';
 
-                          var received = 0, total = 0, speed = 0;
-                          void Function(void Function())? update;
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (_) => StatefulBuilder(
-                              builder: (ctx, setState) {
-                                update = setState;
-                                final totalStr = total > 0
-                                    ? '${(total / 1048576).toStringAsFixed(1)} MB'
-                                    : '?';
-                                final speedStr = speed > 0
-                                    ? '${(speed / 1048576).toStringAsFixed(1)} MB/s'
-                                    : '';
-                                final pct = total > 0 ? received / total : null;
-                                return AlertDialog(
-                                  title: Text('Downloading $label'),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (pct != null)
-                                        LinearProgressIndicator(value: pct)
-                                      else
-                                        const LinearProgressIndicator(),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                          '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
-                                          style: const TextStyle(fontSize: 12)),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                          try {
-                            if (isMobile) {
-                              await downloadAndInstallApk(url,
-                                  onProgress: (r, t, s) {
-                                received = r;
-                                total = t;
-                                speed = s;
-                                update?.call(() {});
-                              });
-                            } else {
-                              final path = await downloadFile(url,
-                                  onProgress: (r, t, s) {
-                                received = r;
-                                total = t;
-                                speed = s;
-                                update?.call(() {});
-                              });
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text('Downloaded to: $path')),
-                                );
-                              }
-                            }
-                            if (context.mounted)
-                              Navigator.of(context, rootNavigator: true).pop();
-                          } catch (e) {
-                            if (context.mounted)
-                              Navigator.of(context, rootNavigator: true).pop();
+                      var received = 0, total = 0, speed = 0;
+                      void Function(void Function())? update;
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) => StatefulBuilder(
+                          builder: (ctx, setState) {
+                            update = setState;
+                            final totalStr = total > 0
+                                ? '${(total / 1048576).toStringAsFixed(1)} MB'
+                                : '?';
+                            final speedStr = speed > 0
+                                ? '${(speed / 1048576).toStringAsFixed(1)} MB/s'
+                                : '';
+                            final pct = total > 0 ? received / total : null;
+                            return AlertDialog(
+                              title: Text('Downloading $label'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (pct != null)
+                                    LinearProgressIndicator(value: pct)
+                                  else
+                                    const LinearProgressIndicator(),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                      '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
+                                      style: const TextStyle(fontSize: 12)),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                      try {
+                        if (isMobile) {
+                          await downloadAndInstallApk(url,
+                              onProgress: (r, t, s) {
+                            received = r;
+                            total = t;
+                            speed = s;
+                            update?.call(() {});
+                          });
+                        } else {
+                          final path =
+                              await downloadFile(url, onProgress: (r, t, s) {
+                            received = r;
+                            total = t;
+                            speed = s;
+                            update?.call(() {});
+                          });
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Downloaded to: $path')),
+                            );
                           }
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 4),
-                          child: Icon(Icons.download,
-                              size: 24, color: Colors.orange.shade600),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.shade100,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          notifier.latestHash ?? '',
-                          style: const TextStyle(
-                              fontSize: 10,
-                              color: Colors.orange,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
+                        }
+                        if (context.mounted)
+                          Navigator.of(context, rootNavigator: true).pop();
+                      } catch (e) {
+                        if (context.mounted)
+                          Navigator.of(context, rootNavigator: true).pop();
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: Icon(Icons.download,
+                          size: 24, color: Colors.orange.shade600),
+                    ),
                   ),
-              },
-              if (ageText != null)
-                Text(ageText,
-                    style: TextStyle(fontSize: 9, color: Colors.grey.shade500)),
-            ],
-          ),
-        ),
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade100,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        notifier.latestHash ?? '',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.orange,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+          },
+          if (ageText != null)
+            Text(ageText,
+                style: TextStyle(fontSize: 9, color: Colors.grey.shade500)),
+        ],
       ),
     );
   }
