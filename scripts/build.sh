@@ -212,7 +212,7 @@ echo ""
 # ── Build ────────────────────────────────────────────────────
 build_android() {
 	echo -e "${BOLD}Building Android APKs (release, split-per-abi)...${NC}"
-	flutter build apk --release --split-per-abi
+	flutter build apk --release --split-per-abi --dart-define=GIT_HASH="$(git_hash)"
 	echo ""
 	APK_DIR="build/app/outputs/flutter-apk"
 	COUNT=0
@@ -230,7 +230,7 @@ build_android() {
 
 build_linux() {
 	echo -e "${BOLD}Building Linux desktop (release)...${NC}"
-	flutter build linux --release
+	flutter build linux --release --dart-define=GIT_HASH="$(git_hash)"
 	echo ""
 	BUNDLE="build/linux/x64/release/bundle"
 	if [ ! -d "$BUNDLE" ]; then
@@ -270,7 +270,7 @@ build_web() {
 
 build_windows() {
 	echo -e "${BOLD}Building Windows desktop (release)...${NC}"
-	if ! flutter build windows --release 2>&1; then
+	if ! flutter build windows --release --dart-define=GIT_HASH="$(git_hash)" 2>&1; then
 		warn "Windows build failed."
 
 		# Check if there's a MSVC environment issue.
