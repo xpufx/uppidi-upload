@@ -16,6 +16,9 @@ DOMAINS[tmpfilelink]="tmpfile.link"
 DOMAINS[freeimage_freeimage_host]="freeimage.host"
 DOMAINS[uguu_uguu_se]="uguu.se"
 DOMAINS[tempsh]="temp.sh"
+DOMAINS[frisk]="frisk.page"
+DOMAINS[litterbox]="litterbox.catbox.moe"
+DOMAINS[fileditch]="new.fileditch.com"
 
 echo "==> Downloading provider favicons..."
 

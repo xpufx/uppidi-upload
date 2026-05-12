@@ -147,6 +147,7 @@ class UploadNotifier extends Notifier<UploadState> {
     if (q == 0) {
       // Restore to pre-quality bytes (preserving crop)
       _lastFileBytes = _lastUncompressedBytes;
+      _lastFilePath = null; // resized bytes no longer match original file
       state = UploadFileSelected(
         fileName: prev.fileName,
         fileSizeBytes: _lastUncompressedBytes!.length,
@@ -173,6 +174,7 @@ class UploadNotifier extends Notifier<UploadState> {
         // Skip if not meaningfully smaller
         if (outBytes.length < (_lastUncompressedBytes!.length * 0.9)) {
           _lastFileBytes = outBytes;
+          _lastFilePath = null; // resized bytes no longer match original file
           state = UploadFileSelected(
             fileName: prev.fileName.replaceAll(RegExp(r'\.\w+$'), '') + '.jpg',
             fileSizeBytes: outBytes.length,

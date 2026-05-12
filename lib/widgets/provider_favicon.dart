@@ -22,6 +22,9 @@ class ProviderFavicon extends StatelessWidget {
     if (id.contains('uguu')) return Icons.burst_mode_outlined;
     if (id.contains('freeimage')) return Icons.image_outlined;
     if (id.contains('temp') || id.contains('tempsh')) return Icons.cloud_upload;
+    if (id.contains('litterbox')) return Icons.timer_outlined;
+    if (id.contains('fileditch')) return Icons.cloud_upload;
+    if (id.contains('frisk')) return Icons.shield_outlined;
     return Icons.cloud_upload;
   }
 
