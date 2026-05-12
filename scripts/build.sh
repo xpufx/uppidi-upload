@@ -10,6 +10,7 @@ set -euo pipefail
 #   bash scripts/build.sh               # show usage
 #   bash scripts/build.sh android       # build Android APK
 #   bash scripts/build.sh linux         # build Linux desktop + AppImage
+#   bash scripts/build.sh windows       # build Windows desktop
 #   bash scripts/build.sh web           # build web bundle
 #   bash scripts/build.sh all           # build all supported targets
 # ──────────────────────────────────────────────────────────────
@@ -33,6 +34,7 @@ usage() {
 	echo "Targets:"
 	echo "  android    Build Android APK (release)"
 	echo "  linux      Build Linux desktop (release) + AppImage"
+	echo "  windows    Build Windows desktop (release)"
 	echo "  web        Build web bundle (release)"
 	echo "  all        Build all supported targets"
 	echo ""
@@ -40,6 +42,7 @@ usage() {
 	echo "  - Flutter SDK >= 3.16.0 (flutter must be on PATH)"
 	echo "  - Android build: JDK 17+, Android SDK, ANDROID_HOME set"
 	echo "  - Linux build:   gtk3-dev, cmake, clang, ninja-build, pkg-config"
+	echo "  - Windows build: MinGW-w64 or Visual Studio (MSVC toolchain)"
 	echo "  - Web build:     none beyond Flutter"
 	echo ""
 }
@@ -265,12 +268,49 @@ build_web() {
 	fi
 }
 
+build_windows() {
+	echo -e "${BOLD}Building Windows desktop (release)...${NC}"
+	if ! flutter build windows --release 2>&1; then
+		warn "Windows build failed."
+
+		# Check if there's a MSVC environment issue.
+		if command -v cl.exe &>/dev/null; then
+			fail "cl.exe found but Flutter build still failed — check Flutter doctor."
+		elif [ -n "${VCINSTALLDIR:-}" ] || [ -n "${VSCMD_ARG_TGT_ARCH:-}" ]; then
+			fail "MSVC environment detected but Flutter build failed — see output above."
+		else
+			warn "No MSVC environment detected."
+			warn "  On Windows, run from a 'Visual Studio Developer Command Prompt'"
+			warn "  or use: vcvarsall.bat x64 && bash scripts/build.sh windows"
+			warn "  Cross-build from Linux is not supported by Flutter."
+		fi
+		return 1
+	fi
+	echo ""
+	BUNDLE="build/windows/x64/runner/Release"
+	if [ ! -d "$BUNDLE" ]; then
+		fail "Windows build not found at $BUNDLE"
+		return 1
+	fi
+	pass "Windows build: $BUNDLE"
+
+	# Package as zip
+	ZIPFILE="${PROJECT_DIR}/build/uppidi-upload-$(app_version)-$(git_hash)-windows.zip"
+	mkdir -p "$(dirname "$ZIPFILE")"
+	(cd "$(dirname "$BUNDLE")" && zip -qr "$ZIPFILE" "$(basename "$BUNDLE")")
+	ls -lh "$ZIPFILE"
+	deploy_artifact "$ZIPFILE" "windows.zip"
+}
+
 case "$TARGET" in
 android)
 	build_android
 	;;
 linux)
 	build_linux
+	;;
+windows)
+	build_windows
 	;;
 web)
 	build_web
@@ -279,6 +319,8 @@ all)
 	build_web
 	echo ""
 	build_linux
+	echo ""
+	build_windows
 	echo ""
 	build_android
 	;;
@@ -300,7 +342,7 @@ fi
 
 echo ""
 echo -e "${BOLD}Download URLs:${NC}"
-for f in "$PROJECT_DIR"/.caddy-artifacts/uppidi-upload-"$(app_version)"-*.{apk,AppImage,tar.gz}; do
+for f in "$PROJECT_DIR"/.caddy-artifacts/uppidi-upload-"$(app_version)"-*.{apk,AppImage,tar.gz,zip}; do
 	[ -f "$f" ] || continue
 	name=$(basename "$f")
 	echo "  $BASE_URL/$name"
