@@ -1,32 +1,32 @@
 # Changelog
 
-- fix: add missing l10n strings for insecure warning and debug log viewer to ARB files
-- docs: auto-update changelog
-- feat: insecure connection warning, debug log viewer, and session-persistent logging
-- Switch icon background to white/black for light/dark theme
-- Fix adaptive icon: solid background + centered 66px foreground
-- Bump in-app logo sizes
-- Remove stale nav layout strings from ARB source files
-- Fix Android app icon, bigger logo, compact info buttons
-- Compact System Info / Changelog / License buttons on one line
-- Update app icon and logo, increase logo sizes
-- docs: auto-update changelog
-- Fix nav overflow on Android landscape: always use bottom nav on mobile, remove layout setting
-- docs: auto-update changelog
-- Explicitly declare assets/favicons/ in pubspec.yaml
-- docs: auto-update changelog
-- Remove favicon re-download from release build
-- docs: auto-update changelog
-- Add clear/dismiss button after upload completes or fails
-- docs: auto-update changelog
-- Rewrite crop overlay as full-screen dialog with l10n support
-- docs: auto-update changelog
-- Remove redundant provider name from info card (visible in dropdown)
-- docs: auto-update changelog
-- Add provider favicons to dropdown, metadata card, and history
-- Fix upload progress to track actual processed size
-- Store small image thumbnail in upload history
-- Remove redundant title from provider details card
-- docs: auto-update changelog
-- chore: bump version to 1.1.0+1
-- feat: add image crop tool with draggable/resizable overlay
+- Fix expiry info text overflowing its container on provider info card
+- Remove broken template variables from share dialog; persist custom message
+- Fix image resize not being applied on upload; add favicons for new providers
+- feat: add FileDitch and Frisk file hosting providers
+- feat: add Litterbox (temporary file hosting) provider
+- fix: pass GIT_HASH as --dart-define in build script
+- fix: version check widget overflow on mobile
+- ci: add Windows build workflow (GitHub Actions)
+- feat: add windows build target
+- chore: print download URLs at end of build script
+- fix: build Android APK for arm64-v8a only (was producing fat APK)
+- chore: add CHANGELOG.md reminder to build.sh
+- chore: bump to v1.2.0+4, wire up GitHub Releases for update checks
+- feat: use GitHub Releases for version check when CDN URL is not set
+- feat: nav layout preference (left/right/bottom), Linux AppImage build, build script improvements
+- docs: rephrase IRC mention in README tagline
+- docs: add IRC share mention to README tagline
+- docs: update upload-screen-dark screenshot, add note about pre-built binaries coming soon
+- docs: link BUILDING.md from README Getting Started section
+- docs: add screenshots section to README with light/dark comparison table
+- docs: add BUILDING.md and build script for end users
+- docs: fix proxy section - general HTTP proxy, native-only, not CORS-specific
+- docs: add AI usage notice to README
+- chore: stop tracking AGENTS.md
+- docs: switch README to pure markdown, remove inline HTML
+- chore: gitignore for agent config, thoughts, and dev scripts
+- chore: clean up gitignore exceptions for root .md files
+- docs: center title below logo in README
+- docs: add app logo to README
+- fix: gate file logging behind debug toggle, fix download dialog tint
