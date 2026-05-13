@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: rewrite build_and_serve.sh to use --split-per-abi and clean stale symlinks
+- docs: auto-update changelog
 - fix: add AppImage build to build_and_serve.sh
 - chore: bump to v1.2.0+5
 - docs: auto-update changelog
@@ -28,5 +30,3 @@
 - docs: add AI usage notice to README
 - chore: stop tracking AGENTS.md
 - docs: switch README to pure markdown, remove inline HTML
-- chore: gitignore for agent config, thoughts, and dev scripts
-- chore: clean up gitignore exceptions for root .md files
