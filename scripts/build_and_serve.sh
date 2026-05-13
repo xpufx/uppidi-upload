@@ -46,31 +46,39 @@ GIT_HASH=$(git rev-parse --short HEAD)
 ARTIFACTS_DIR="/home/xpufx/code/uppidi/.caddy-artifacts"
 mkdir -p "$ARTIFACTS_DIR"
 
+# ── Stale symlink cleanup ──────────────────────────────────
+# Remove dangling symlinks left by other build methods (e.g. build.sh).
+find "$ARTIFACTS_DIR" -xtype l -delete 2>/dev/null
+echo "   ✅ Stale symlinks cleaned"
+
 # ── Provider favicons (from repo, no re-download needed) ────
 # Favicons are tracked in git under assets/favicons/.
 # To refresh them, run: bash scripts/download_favicons.sh
 echo "==> Using provider favicons from repo (assets/favicons/)..."
 ls assets/favicons/*.png 2>/dev/null || echo "   (none found)"
 
-# ── Android APK ────────────────────────────────────────────
-echo "==> Building Android APK (arm64) @ ${GIT_HASH}..."
-flutter build apk --release --target-platform android-arm64 --dart-define=GIT_HASH=$GIT_HASH --dart-define=CDN_URL=http://10.20.30.24
+# ── Android APK (split-per-abi) ───────────────────────────
+echo "==> Building Android APKs @ ${GIT_HASH}..."
+flutter build apk --release --split-per-abi --dart-define=GIT_HASH=$GIT_HASH --dart-define=CDN_URL=http://10.20.30.24
 
-echo "==> Copying APK to ${ARTIFACTS_DIR}..."
+echo "==> Deploying APKs..."
 APK_DIR="build/app/outputs/flutter-apk"
-SRC="${APK_DIR}/app-release.apk"
-DST="uppidi-upload-${VERSION}-${GIT_HASH}-android-arm64-v8a.apk"
-cp "$SRC" "${ARTIFACTS_DIR}/${DST}"
-echo "    ${DST}"
-
-echo "==> Updating latest symlink..."
-ln -sf "${DST}" "${ARTIFACTS_DIR}/uppidi-upload-latest-android-arm64-v8a.apk"
+for apk in "$APK_DIR"/app-*-release.apk; do
+	[ -f "$apk" ] || continue
+	abi=$(basename "$apk" | sed 's/^app-//; s/-release\.apk$//')
+	dst="uppidi-upload-${VERSION}-${GIT_HASH}-android-${abi}.apk"
+	cp "$apk" "${ARTIFACTS_DIR}/${dst}"
+	ln -sf "$dst" "${ARTIFACTS_DIR}/uppidi-upload-latest-android-${abi}.apk"
+	echo "    ${dst}"
+done
 
 echo "==> Writing version file..."
 echo "$GIT_HASH" >"${ARTIFACTS_DIR}/latest.txt"
 
-echo "==> Cleaning old APKs (keep latest 5)..."
-ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-android-*.apk 2>/dev/null | tail -n +6 | xargs -r rm -f
+echo "==> Cleaning old APKs (keep latest 5 per ABI)..."
+for abi in arm64-v8a armeabi-v7a x86_64; do
+	ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-android-${abi}.apk 2>/dev/null | tail -n +6 | xargs -r rm -f
+done
 
 # ── Linux ──────────────────────────────────────────────────
 LINUX_NAME="uppidi-upload-${VERSION}-${GIT_HASH}-linux.tar.gz"
@@ -95,7 +103,7 @@ fi
 
 echo ""
 echo "==> Done"
-echo "    ${DST}"
+echo "    uppidi-upload-${VERSION}-${GIT_HASH}-android-{arm64-v8a,armeabi-v7a,x86_64}.apk"
 echo "    ${LINUX_NAME}"
 
 # ── Feature test checklist ───────────────────────────────────
