@@ -119,6 +119,7 @@ class SettingsService {
   static const shellTypeKey = 'global.shell_type';
   static const insecureMutedKey = 'global.insecure_muted_providers';
   static const navigationLayoutKey = 'global.nav_layout';
+  static const shareMessageKey = 'global.share_message';
 
   Future<bool> isInsecureConnAllowed() async {
     final val = await get(insecureConnKey);

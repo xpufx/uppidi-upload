@@ -520,18 +520,6 @@ abstract class AppLocalizations {
   /// **'Include message'**
   String get includeMessage;
 
-  /// No description provided for @templateVars.
-  ///
-  /// In en, this message translates to:
-  /// **'Template Variables'**
-  String get templateVars;
-
-  /// No description provided for @templateExamples.
-  ///
-  /// In en, this message translates to:
-  /// **'Examples:'**
-  String get templateExamples;
-
   /// No description provided for @customizeMessage.
   ///
   /// In en, this message translates to:

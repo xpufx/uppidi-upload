@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../core/share_template.dart';
+import '../core/settings_service.dart';
 import '../l10n/app_localizations.dart';
 
 class ShareMessageDialog extends ConsumerStatefulWidget {
@@ -24,64 +24,36 @@ class ShareMessageDialog extends ConsumerStatefulWidget {
 class _ShareMessageDialogState extends ConsumerState<ShareMessageDialog> {
   bool _includeMessage = false;
   final TextEditingController _controller = TextEditingController();
-  final String _template = 'Shared via %appname: %url';
 
   @override
   void initState() {
     super.initState();
-    _controller.text = ShareTemplate.expand(
-      _template,
-      url: widget.url,
-      provider: widget.providerName,
-      date: DateTime.now(),
-      filename: widget.fileName,
-    );
+    _loadSavedMessage();
+  }
+
+  Future<void> _loadSavedMessage() async {
+    final svc = ref.read(settingsServiceProvider);
+    final saved = await svc.get(SettingsService.shareMessageKey);
+    if (mounted) {
+      setState(() {
+        _controller.text = saved ?? '';
+      });
+    }
+  }
+
+  Future<void> _saveMessage(String text) async {
+    final svc = ref.read(settingsServiceProvider);
+    if (text.trim().isEmpty) {
+      await svc.remove(SettingsService.shareMessageKey);
+    } else {
+      await svc.set(SettingsService.shareMessageKey, text);
+    }
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  void handleShowTemplateInfo() {
-    final l10n = AppLocalizations.of(context);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.templateVars),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ...ShareTemplate.variables.entries.map((e) => Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: RichText(
-                  text: TextSpan(
-                    style: DefaultTextStyle.of(ctx).style,
-                    children: [
-                      TextSpan(text: e.key, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(text: ' — ${e.value}'),
-                    ],
-                  ),
-                ),
-              )),
-              const SizedBox(height: 12),
-              Text(l10n.templateExamples, style: const TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
-              ...ShareTemplate.examples.map((ex) => Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(ex, style: const TextStyle(fontStyle: FontStyle.italic)),
-              )),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok)),
-        ],
-      ),
-    );
   }
 
   @override
@@ -94,7 +66,8 @@ class _ShareMessageDialogState extends ConsumerState<ShareMessageDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.url, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          Text(widget.url,
+              style: const TextStyle(fontSize: 12, color: Colors.grey)),
           const SizedBox(height: 16),
           SwitchListTile(
             title: Text(l10n.includeMessage),
@@ -105,18 +78,7 @@ class _ShareMessageDialogState extends ConsumerState<ShareMessageDialog> {
           ),
           if (_includeMessage) ...[
             const SizedBox(height: 8),
-            Row(
-              children: [
-                Text(l10n.customizeMessage, style: const TextStyle(fontSize: 12)),
-                IconButton(
-                  icon: const Icon(Icons.info_outline, size: 16),
-                  onPressed: handleShowTemplateInfo,
-                  tooltip: l10n.templateVars,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-              ],
-            ),
+            Text(l10n.customizeMessage, style: const TextStyle(fontSize: 12)),
             const SizedBox(height: 4),
             TextField(
               controller: _controller,
@@ -125,6 +87,7 @@ class _ShareMessageDialogState extends ConsumerState<ShareMessageDialog> {
                 border: OutlineInputBorder(),
                 isDense: true,
               ),
+              onChanged: _saveMessage,
             ),
           ],
         ],
@@ -134,15 +97,12 @@ class _ShareMessageDialogState extends ConsumerState<ShareMessageDialog> {
           onPressed: () => Navigator.pop(context, false),
           child: Text(l10n.cancel),
         ),
-          FilledButton.icon(
+        FilledButton.icon(
           onPressed: () {
-            final customMsg = _includeMessage ? ShareTemplate.expand(_controller.text,
-              url: widget.url,
-              provider: widget.providerName,
-              date: DateTime.now(),
-              filename: widget.fileName,
-            ) : null;
-            final text = customMsg ?? widget.url;
+            final custom = _controller.text.trim();
+            final text = _includeMessage && custom.isNotEmpty
+                ? '$custom\n${widget.url}'
+                : widget.url;
             SharePlus.instance.share(ShareParams(text: text));
             Navigator.pop(context, true);
           },

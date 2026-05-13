@@ -236,12 +236,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get includeMessage => 'Mesaj ekle';
 
   @override
-  String get templateVars => 'Şablon Değişkenleri';
-
-  @override
-  String get templateExamples => 'Örnekler:';
-
-  @override
   String get customizeMessage => 'Özelleştir:';
 
   @override

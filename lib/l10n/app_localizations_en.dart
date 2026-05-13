@@ -234,12 +234,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get includeMessage => 'Include message';
 
   @override
-  String get templateVars => 'Template Variables';
-
-  @override
-  String get templateExamples => 'Examples:';
-
-  @override
   String get customizeMessage => 'Customize:';
 
   @override
