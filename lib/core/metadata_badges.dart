@@ -40,11 +40,14 @@ Widget _buildBadge(String? label, {IconData? icon}) {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null)
-            Icon(icon, size: 14, color: Colors.blue),
+          if (icon != null) Icon(icon, size: 14, color: Colors.blue),
           if (label != null && label.isNotEmpty) ...[
             const SizedBox(width: 2),
-            Text(label, style: const TextStyle(fontSize: 10, color: Colors.blue)),
+            Flexible(
+              child: Text(label,
+                  style: const TextStyle(fontSize: 10, color: Colors.blue),
+                  overflow: TextOverflow.ellipsis),
+            ),
           ],
         ],
       ),

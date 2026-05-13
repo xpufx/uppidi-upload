@@ -343,9 +343,11 @@ class _ProviderInfo extends StatelessWidget {
                   Icon(Icons.timer_outlined,
                       size: 14, color: Colors.grey.shade600),
                   const SizedBox(width: 6),
-                  Text(
-                    l10n.expiryInfo(meta.expiryInfo!),
-                    style: Theme.of(context).textTheme.bodySmall,
+                  Expanded(
+                    child: Text(
+                      l10n.expiryInfo(meta.expiryInfo!),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ),
                 ],
               ),
