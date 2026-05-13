@@ -1,33 +1,32 @@
 # Changelog
 
-## v1.2.0+5
-
-### New Providers
-- Litterbox — temporary/expiring file hosting
-- FileDitch — file hosting service
-- Frisk — file hosting with 1-day expiry
-- Favicon assets for all new providers
-
-### New Features
-- Custom share message — write your own message instead of broken `%url` template variables; message is persisted across sessions and always prepended above the URL
-- Windows desktop build target
-- GitHub Actions CI workflow for Windows builds
-- Build script prints download URLs at the end
-
-### Bug Fixes
-- Image resize now actually applies before upload (was streaming original file from disk instead of resized bytes)
-- Expiry info text no longer overflows its container on the provider info card
-- Badge text now uses ellipsis overflow instead of clipping
-- Version check widget no longer overflows on narrow screens
-- GIT_HASH is now correctly passed as `--dart-define` in build script
-- Build Android APK for arm64-v8a only (was producing fat APK with all architectures)
-
-### Infrastructure
-- Windows build workflow (GitHub Actions)
-- Build script improvements: URL printing, changelog reminder
-
-## v1.2.0+4
-
-- use GitHub Releases for version check when CDN URL is not set
-- nav layout preference (left/right/bottom), Linux AppImage build, build script improvements
-- various documentation updates and screenshots
+- fix: add AppImage build to build_and_serve.sh
+- chore: bump to v1.2.0+5
+- docs: auto-update changelog
+- Fix expiry info text overflowing its container on provider info card
+- Remove broken template variables from share dialog; persist custom message
+- Fix image resize not being applied on upload; add favicons for new providers
+- feat: add FileDitch and Frisk file hosting providers
+- feat: add Litterbox (temporary file hosting) provider
+- fix: pass GIT_HASH as --dart-define in build script
+- fix: version check widget overflow on mobile
+- ci: add Windows build workflow (GitHub Actions)
+- feat: add windows build target
+- chore: print download URLs at end of build script
+- fix: build Android APK for arm64-v8a only (was producing fat APK)
+- chore: add CHANGELOG.md reminder to build.sh
+- chore: bump to v1.2.0+4, wire up GitHub Releases for update checks
+- feat: use GitHub Releases for version check when CDN URL is not set
+- feat: nav layout preference (left/right/bottom), Linux AppImage build, build script improvements
+- docs: rephrase IRC mention in README tagline
+- docs: add IRC share mention to README tagline
+- docs: update upload-screen-dark screenshot, add note about pre-built binaries coming soon
+- docs: link BUILDING.md from README Getting Started section
+- docs: add screenshots section to README with light/dark comparison table
+- docs: add BUILDING.md and build script for end users
+- docs: fix proxy section - general HTTP proxy, native-only, not CORS-specific
+- docs: add AI usage notice to README
+- chore: stop tracking AGENTS.md
+- docs: switch README to pure markdown, remove inline HTML
+- chore: gitignore for agent config, thoughts, and dev scripts
+- chore: clean up gitignore exceptions for root .md files
