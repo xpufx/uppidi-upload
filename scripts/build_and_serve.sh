@@ -87,6 +87,12 @@ ln -sf "${LINUX_NAME}" "${ARTIFACTS_DIR}/uppidi-upload-latest-linux.tar.gz"
 echo "==> Cleaning old Linux builds (keep latest 5)..."
 ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-linux.tar.gz 2>/dev/null | tail -n +6 | xargs -r rm -f
 
+# ── AppImage ─────────────────────────────────────────────────
+if [ -f "$(dirname "$0")/build-appimage.sh" ]; then
+	echo "==> Building AppImage..."
+	bash "$(dirname "$0")/build-appimage.sh" --no-flutter-build
+fi
+
 echo ""
 echo "==> Done"
 echo "    ${DST}"
