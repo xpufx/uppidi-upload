@@ -1,6 +1,7 @@
 # Changelog
 
 - docs: auto-update changelog
+- docs: auto-update changelog
 - fix: rewrite build_and_serve.sh to use --split-per-abi and clean stale symlinks
 - docs: auto-update changelog
 - fix: add AppImage build to build_and_serve.sh
@@ -29,4 +30,3 @@
 - docs: add BUILDING.md and build script for end users
 - docs: fix proxy section - general HTTP proxy, native-only, not CORS-specific
 - docs: add AI usage notice to README
-- chore: stop tracking AGENTS.md
