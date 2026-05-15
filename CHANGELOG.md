@@ -8,6 +8,7 @@
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
+- docs: auto-update changelog
 - fix: rewrite build_and_serve.sh to use --split-per-abi and clean stale symlinks
 - docs: auto-update changelog
 - fix: add AppImage build to build_and_serve.sh
@@ -29,4 +30,3 @@
 - feat: use GitHub Releases for version check when CDN URL is not set
 - feat: nav layout preference (left/right/bottom), Linux AppImage build, build script improvements
 - docs: rephrase IRC mention in README tagline
-- docs: add IRC share mention to README tagline
