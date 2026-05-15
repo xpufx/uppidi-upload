@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.uppidi.uppidi</id>
+  <name>Uppidi Upload</name>
+  <summary>Cross-platform file uploader for multiple hosting services</summary>
+  <description>
+    <p>Upload images, videos, and other files to your choice of free public hosting services. Supports Catbox, FileDitch, Frisk, Uguu, Litterbox, TmpFile.link, FreeImage.host, Temp.sh, and more.</p>
+  </description>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <url type="homepage">https://github.com/xpufx/uppidi-upload</url>
+  <url type="bugtracker">https://github.com/xpufx/uppidi-upload/issues</url>
+  <launchable type="desktop-id">com.uppidi.uppidi.desktop</launchable>
+  <developer id="io.github.xpufx">
+    <name>xpufx</name>
+  </developer>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/xpufx/uppidi-upload/main/docs/screenshots/upload-screen-light.jpg</image>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="1.2.0+6" date="2026-05-15"/>
+  </releases>
+  <content_rating type="oars-1.1"/>
+</component>
