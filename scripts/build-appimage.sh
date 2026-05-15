@@ -79,14 +79,17 @@ else
 		APPIMAGETOOL="$DOWNLOAD"
 	elif command -v unsquashfs &>/dev/null; then
 		warn "appimagetool extraction via runtime failed, trying unsquashfs..."
+		rm -rf squashfs-root
 		unsquashfs -q -d squashfs-root "$DOWNLOAD" 2>/dev/null
 		if [ -f squashfs-root/usr/bin/appimagetool ]; then
-			mv squashfs-root/usr/bin/appimagetool "$DOWNLOAD"
-			rm -rf squashfs-root
-			APPIMAGETOOL="$DOWNLOAD"
+			# Keep the binary in-place so relative path to lib/appimagekit/ works
+			chmod +x squashfs-root/usr/bin/appimagetool
+			APPIMAGETOOL="$(realpath squashfs-root/usr/bin/appimagetool)"
+			rm -f "$DOWNLOAD"
 		else
 			APPIMAGETOOL="$DOWNLOAD"
 		fi
+		rm -f "$DOWNLOAD"
 	else
 		APPIMAGETOOL="$DOWNLOAD"
 	fi
