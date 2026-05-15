@@ -1,0 +1,153 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Override version (e.g. 1.2.0+6). Blank = from pubspec.yaml'
+        required: false
+        type: string
+      dev:
+        description: 'Dev build (DEV_PROVIDERS enabled)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      hash: ${{ steps.resolve.outputs.hash }}
+      dev_define: ${{ steps.resolve.outputs.dev_define }}
+      suffix: ${{ steps.resolve.outputs.suffix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: resolve
+        shell: bash
+        run: |
+          ver="${{ inputs.version }}"
+          if [ -z "$ver" ]; then
+            ver=$(grep '^version:' pubspec.yaml | sed 's/version: *//')
+          fi
+          hash=$(git rev-parse --short HEAD)
+          dev="${{ inputs.dev == true && 'true' || 'false' }}"
+          if [ "$dev" = "true" ]; then
+            echo "dev_define=--dart-define=DEV_PROVIDERS=true" >> "$GITHUB_OUTPUT"
+            echo "suffix=-dev" >> "$GITHUB_OUTPUT"
+          else
+            echo "dev_define=" >> "$GITHUB_OUTPUT"
+            echo "suffix=" >> "$GITHUB_OUTPUT"
+          fi
+          echo "version=$ver" >> "$GITHUB_OUTPUT"
+          echo "hash=$hash" >> "$GITHUB_OUTPUT"
+
+  android:
+    needs: version
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        abi: [arm64-v8a, armeabi-v7a, x86_64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: |
+          flutter build apk --release --split-per-abi \
+            --dart-define=GIT_HASH=${{ needs.version.outputs.hash }} \
+            ${{ needs.version.outputs.dev_define }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-android-${{ matrix.abi }}${{ needs.version.outputs.suffix }}
+          path: build/app/outputs/flutter-apk/app-${{ matrix.abi }}-release.apk
+
+  linux:
+    needs: version
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev file
+      - run: flutter pub get
+      - run: |
+          flutter build linux --release \
+            --dart-define=GIT_HASH=${{ needs.version.outputs.hash }} \
+            ${{ needs.version.outputs.dev_define }}
+      - name: Package tarball
+        run: |
+          tar -czf \
+            uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-linux.tar.gz \
+            -C build/linux/x64/release/bundle .
+      - name: Upload tarball
+        uses: actions/upload-artifact@v4
+        with:
+          name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-linux${{ needs.version.outputs.suffix }}
+          path: uppidi-upload-*.tar.gz
+      - name: Build AppImage
+        if: ${{ inputs.dev != true }}
+        run: |
+          bash scripts/build-appimage.sh --no-flutter-build \
+            --hash=${{ needs.version.outputs.hash }}
+      - name: Upload AppImage
+        if: ${{ inputs.dev != true }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-x86_64.AppImage
+          path: uppidi-upload-*.AppImage
+
+  windows:
+    needs: version
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build windows --release --dart-define=GIT_HASH=${{ needs.version.outputs.hash }}
+      - name: Package
+        shell: powershell
+        run: |
+          $zipName = "uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-windows.zip"
+          Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath $zipName
+          echo "ZIP_NAME=$zipName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: uppidi-windows
+          path: ${{ env.ZIP_NAME }}
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [version, android, linux, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+      - name: Upload to release
+        run: |
+          gh release upload ${{ github.ref_name }} \
+            $(find . -name 'uppidi-upload-*' -type f) \
+            --clobber
+        env:
+          GH_TOKEN: ${{ github.GITHUB_TOKEN }}
