@@ -47,6 +47,8 @@ app.*.map.json
 # Build artifacts
 .caddy-artifacts/
 temp/
+*.tar.gz
+*.AppImage
 
 # Agent/IDE config
 opencode.json
