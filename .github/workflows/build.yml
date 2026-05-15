@@ -83,7 +83,7 @@ jobs:
           cache: true
       - run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev file
+          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev file wget appstream
       - run: flutter pub get
       - run: |
           flutter build linux --release \
