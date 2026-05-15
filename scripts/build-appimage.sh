@@ -20,9 +20,13 @@ warn() { echo -e "  ${YELLOW}⚠${NC} $1"; }
 fail() { echo -e "  ${RED}✘${NC} $1"; }
 
 SKIP_FLUTTER=false
-if [ "${1:-}" = "--no-flutter-build" ]; then
-	SKIP_FLUTTER=true
-fi
+OVERRIDE_HASH=""
+for arg in "$@"; do
+	case "$arg" in
+	--no-flutter-build) SKIP_FLUTTER=true ;;
+	--hash=*) OVERRIDE_HASH="${arg#--hash=}" ;;
+	esac
+done
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 TOOLS_DIR="${PROJECT_DIR}/tools"
@@ -33,7 +37,11 @@ app_version() {
 	grep '^version:' "${PROJECT_DIR}/pubspec.yaml" | sed 's/version: *//' | tr -d ' '
 }
 git_hash() {
-	cd "$PROJECT_DIR" && git log -1 --format='%h' 2>/dev/null || echo 'unknown'
+	if [ -n "$OVERRIDE_HASH" ]; then
+		echo "$OVERRIDE_HASH"
+	else
+		cd "$PROJECT_DIR" && git log -1 --format='%h' 2>/dev/null || echo 'unknown'
+	fi
 }
 
 VER="$(app_version)"
@@ -69,6 +77,16 @@ else
 		mv squashfs-root/usr/bin/appimagetool "$DOWNLOAD"
 		rm -rf squashfs-root
 		APPIMAGETOOL="$DOWNLOAD"
+	elif command -v unsquashfs &>/dev/null; then
+		warn "appimagetool extraction via runtime failed, trying unsquashfs..."
+		unsquashfs -q -d squashfs-root "$DOWNLOAD" 2>/dev/null
+		if [ -f squashfs-root/usr/bin/appimagetool ]; then
+			mv squashfs-root/usr/bin/appimagetool "$DOWNLOAD"
+			rm -rf squashfs-root
+			APPIMAGETOOL="$DOWNLOAD"
+		else
+			APPIMAGETOOL="$DOWNLOAD"
+		fi
 	else
 		APPIMAGETOOL="$DOWNLOAD"
 	fi
@@ -122,6 +140,16 @@ pass ".DirIcon symlink created"
 
 ln -sf "data/icon.png" "$APPDIR/com.uppidi.uppidi.png"
 pass "root icon symlink created"
+
+# Add AppStream metainfo
+mkdir -p "$APPDIR/usr/share/metainfo"
+cp "${PROJECT_DIR}/linux/com.uppidi.uppidi.appdata.xml" "$APPDIR/usr/share/metainfo/"
+pass "AppStream metainfo added"
+
+# Install desktop file in standard path for AppStream validation
+mkdir -p "$APPDIR/usr/share/applications"
+cp "${PROJECT_DIR}/linux/com.uppidi.uppidi.desktop" "$APPDIR/usr/share/applications/"
+pass "desktop file installed in standard path"
 
 echo ""
 echo "AppDir structure:"

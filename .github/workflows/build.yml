@@ -104,9 +104,6 @@ jobs:
         env:
           APPIMAGE_EXTRACT_AND_RUN: 1
         run: |
-          # appimagetool looks for its bundled mksquashfs here — symlink to system one
-          mkdir -p lib/appimagekit
-          ln -sf "$(which mksquashfs)" lib/appimagekit/mksquashfs
           bash scripts/build-appimage.sh --no-flutter-build \
             --hash=${{ needs.version.outputs.hash }}
       - name: Upload AppImage
