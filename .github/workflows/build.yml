@@ -155,4 +155,4 @@ jobs:
             --generate-notes \
             $(find . -name 'uppidi-upload-*' -type f)
         env:
-          GH_TOKEN: ${{ github.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
