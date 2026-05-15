@@ -144,12 +144,15 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - name: Download all artifacts
         uses: actions/download-artifact@v8
-      - name: Upload to release
+      - name: Create release and upload artifacts
         run: |
-          gh release upload ${{ github.ref_name }} \
-            $(find . -name 'uppidi-upload-*' -type f) \
-            --clobber
+          gh release create ${{ github.ref_name }} \
+            --draft \
+            --generate-notes \
+            $(find . -name 'uppidi-upload-*' -type f)
         env:
           GH_TOKEN: ${{ github.GITHUB_TOKEN }}
