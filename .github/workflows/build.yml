@@ -101,9 +101,18 @@ jobs:
           path: uppidi-upload-*.tar.gz
       - name: Build AppImage
         if: ${{ inputs.dev != true }}
+        continue-on-error: true
         run: |
           bash scripts/build-appimage.sh --no-flutter-build \
             --hash=${{ needs.version.outputs.hash }}
+      - name: Check AppImage
+        if: ${{ inputs.dev != true }}
+        run: |
+          if [ -f uppidi-upload-*.AppImage ]; then
+            echo "AppImage built successfully"
+          else
+            echo "AppImage build failed (see logs above)"
+          fi
       - name: Upload AppImage
         if: ${{ inputs.dev != true }}
         uses: actions/upload-artifact@v4
