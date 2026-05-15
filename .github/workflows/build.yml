@@ -150,6 +150,8 @@ jobs:
         uses: actions/download-artifact@v8
       - name: Create release and upload artifacts
         run: |
+          # Remove stale artifacts from workspace root that predate this build
+          rm -f uppidi-upload-*.tar.gz uppidi-upload-*.AppImage
           gh release create ${{ github.ref_name }} \
             --draft \
             --generate-notes \
