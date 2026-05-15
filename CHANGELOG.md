@@ -16,6 +16,7 @@
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
+- docs: auto-update changelog
 - fix: rewrite build_and_serve.sh to use --split-per-abi and clean stale symlinks
 - docs: auto-update changelog
 - fix: add AppImage build to build_and_serve.sh
@@ -29,4 +30,3 @@
 - fix: pass GIT_HASH as --dart-define in build script
 - fix: version check widget overflow on mobile
 - ci: add Windows build workflow (GitHub Actions)
-- feat: add windows build target
