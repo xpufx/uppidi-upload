@@ -52,54 +52,18 @@ echo -e "${BOLD}═══ Uppidi AppImage Build ═══${NC}"
 echo "  Version: ${VER}-${HASH}"
 echo ""
 
-# ── Step 0: Ensure appimagetool ─────────────────────────────────
-echo -e "${BOLD}Preparing appimagetool...${NC}"
-APPIMAGETOOL=""
-if command -v appimagetool &>/dev/null; then
-	APPIMAGETOOL="$(command -v appimagetool)"
-	pass "appimagetool found on PATH"
-elif [ -f "${TOOLS_DIR}/appimagetool" ]; then
-	APPIMAGETOOL="$(realpath "${TOOLS_DIR}/appimagetool")"
-	pass "appimagetool found in tools/"
-elif [ -x /usr/lib/x86_64-linux-gnu/appimagetool/appimagetool ]; then
-	APPIMAGETOOL="/usr/lib/x86_64-linux-gnu/appimagetool/appimagetool"
-	pass "appimagetool found (system)"
+# ── Step 0: Ensure AppImage runtime ─────────────────────────────
+echo -e "${BOLD}Preparing AppImage runtime...${NC}"
+RUNTIME="${TOOLS_DIR}/appimageruntime"
+if [ -f "$RUNTIME" ]; then
+	pass "AppImage runtime found in tools/"
 else
-	warn "appimagetool not found — attempting download..."
+	warn "runtime not found — downloading..."
 	mkdir -p "$TOOLS_DIR"
-	DOWNLOAD="${TOOLS_DIR}/appimagetool.AppImage"
-	wget -q -O "$DOWNLOAD" \
-		"https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
-	chmod +x "$DOWNLOAD"
-
-	cd "$TOOLS_DIR"
-	if "$DOWNLOAD" --appimage-extract 2>/dev/null; then
-		mv squashfs-root/usr/bin/appimagetool "$DOWNLOAD"
-		rm -rf squashfs-root
-		APPIMAGETOOL="$DOWNLOAD"
-	elif command -v unsquashfs &>/dev/null; then
-		warn "appimagetool extraction via runtime failed, trying unsquashfs..."
-		rm -rf squashfs-root
-		unsquashfs -q -d squashfs-root "$DOWNLOAD" 2>/dev/null
-		if [ -f squashfs-root/usr/bin/appimagetool ]; then
-			# Keep the binary in-place so relative path to lib/appimagekit/ works
-			chmod +x squashfs-root/usr/bin/appimagetool
-			APPIMAGETOOL="$(realpath squashfs-root/usr/bin/appimagetool)"
-			rm -f "$DOWNLOAD"
-		else
-			APPIMAGETOOL="$DOWNLOAD"
-		fi
-		rm -f "$DOWNLOAD"
-	else
-		APPIMAGETOOL="$DOWNLOAD"
-	fi
-	cd "$PROJECT_DIR"
-	pass "appimagetool prepared"
-fi
-
-if file "$APPIMAGETOOL" 2>/dev/null | grep -q "AppImage"; then
-	export APPIMAGE_EXTRACT_AND_RUN=1
-	warn "appimagetool is itself an AppImage — using APPIMAGE_EXTRACT_AND_RUN=1"
+	wget -q -O "$RUNTIME" \
+		"https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-x86_64"
+	chmod +x "$RUNTIME"
+	pass "runtime downloaded (static ELF, not an AppImage)"
 fi
 
 # ── Step 1: Build Flutter Linux release (optional) ─────────────
@@ -158,21 +122,23 @@ echo ""
 echo "AppDir structure:"
 find "$APPDIR" -maxdepth 2 -not -path '*/flutter_assets/*' -not -path '*/share/icons/hicolor/*' | sort | sed "s|$APPDIR|  AppDir|"
 
-# ── Step 3: Build the AppImage ─────────────────────────────────
+# ── Step 3: Build the AppImage (mksquashfs + runtime) ──────────
 echo ""
 echo -e "${BOLD}Step 3: Building AppImage...${NC}"
 
 OUTPUT="${PROJECT_DIR}/uppidi-upload-${VER}-${HASH}-x86_64.AppImage"
 
-"$APPIMAGETOOL" "$APPDIR" "$OUTPUT" 2>&1
+# Create SquashFS filesystem
+mksquashfs "$APPDIR" "$OUTPUT" -noappend -comp gzip -quiet
 
-echo ""
+# Prepend the AppImage runtime
+cat "$RUNTIME" >>"$OUTPUT"
+chmod +x "$OUTPUT"
+
 if [ ! -f "$OUTPUT" ]; then
-	fail "AppImage not created — check errors above"
+	fail "AppImage not created"
 	exit 1
 fi
-
-chmod +x "$OUTPUT"
 pass "AppImage built: $(ls -lh "$OUTPUT" | awk '{print $5}')"
 echo "  $OUTPUT"
 
