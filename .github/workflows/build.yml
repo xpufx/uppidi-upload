@@ -105,14 +105,12 @@ jobs:
         run: |
           bash scripts/build-appimage.sh --no-flutter-build \
             --hash=${{ needs.version.outputs.hash }}
-      - name: Check AppImage
-        if: ${{ inputs.dev != true }}
-        run: |
-          if compgen -G "uppidi-upload-*.AppImage" > /dev/null; then
-            echo "AppImage built successfully"
-          else
-            echo "AppImage build failed (see logs above)"
-          fi
+      - name: Upload AppImage
+        if: ${{ inputs.dev != true && hashFiles('uppidi-upload-*.AppImage') != '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-x86_64.AppImage${{ needs.version.outputs.suffix }}
+          path: uppidi-upload-*.AppImage
 
   windows:
     needs: version
