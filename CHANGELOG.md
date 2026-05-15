@@ -12,6 +12,7 @@
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
+- docs: auto-update changelog
 - fix: rewrite build_and_serve.sh to use --split-per-abi and clean stale symlinks
 - docs: auto-update changelog
 - fix: add AppImage build to build_and_serve.sh
@@ -29,4 +30,3 @@
 - chore: print download URLs at end of build script
 - fix: build Android APK for arm64-v8a only (was producing fat APK)
 - chore: add CHANGELOG.md reminder to build.sh
-- chore: bump to v1.2.0+4, wire up GitHub Releases for update checks
