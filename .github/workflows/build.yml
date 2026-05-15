@@ -66,11 +66,15 @@ jobs:
           flutter build apk --release --split-per-abi \
             --dart-define=GIT_HASH=${{ needs.version.outputs.hash }} \
             ${{ needs.version.outputs.dev_define }}
+      - name: Rename APK for upload
+        run: |
+          cp build/app/outputs/flutter-apk/app-${{ matrix.abi }}-release.apk \
+            uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-android-${{ matrix.abi }}${{ needs.version.outputs.suffix }}.apk
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
           name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-android-${{ matrix.abi }}${{ needs.version.outputs.suffix }}
-          path: build/app/outputs/flutter-apk/app-${{ matrix.abi }}-release.apk
+          path: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-android-${{ matrix.abi }}${{ needs.version.outputs.suffix }}.apk
 
   linux:
     needs: version
@@ -98,7 +102,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-linux${{ needs.version.outputs.suffix }}
-          path: uppidi-upload-*.tar.gz
+          path: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-linux.tar.gz
       - name: Build AppImage
         if: ${{ inputs.dev != true }}
         env:
@@ -111,7 +115,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-x86_64.AppImage${{ needs.version.outputs.suffix }}
-          path: uppidi-upload-*.AppImage
+          path: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-x86_64.AppImage
 
   windows:
     needs: version
@@ -134,7 +138,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-windows${{ needs.version.outputs.suffix }}
-          path: uppidi-upload-*-windows.zip
+          path: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-windows.zip
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -150,11 +154,9 @@ jobs:
         uses: actions/download-artifact@v8
       - name: Create release and upload artifacts
         run: |
-          # Remove stale artifacts from workspace root that predate this build
-          rm -f uppidi-upload-*.tar.gz uppidi-upload-*.AppImage
           gh release create ${{ github.ref_name }} \
             --draft \
             --generate-notes \
-            $(find . -name 'uppidi-upload-*' -type f)
+            $(find . -type f -name 'uppidi-upload-*.*')
         env:
           GH_TOKEN: ${{ github.token }}
