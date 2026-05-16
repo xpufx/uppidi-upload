@@ -1,32 +1,32 @@
 # Changelog
 
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- fix: rewrite build_and_serve.sh to use --split-per-abi and clean stale symlinks
-- docs: auto-update changelog
-- fix: add AppImage build to build_and_serve.sh
-- chore: bump to v1.2.0+5
-- docs: auto-update changelog
-- Fix expiry info text overflowing its container on provider info card
-- Remove broken template variables from share dialog; persist custom message
-- Fix image resize not being applied on upload; add favicons for new providers
-- feat: add FileDitch and Frisk file hosting providers
-- feat: add Litterbox (temporary file hosting) provider
-- fix: pass GIT_HASH as --dart-define in build script
-- fix: version check widget overflow on mobile
-- ci: add Windows build workflow (GitHub Actions)
+- bump version to 1.2.0+9
+- fix: use tar instead of Compress-Archive for Windows zip to preserve directory structure
+- ci: sync version.dart from pubspec.yaml before each build
+- release v1.2.0+8
+- revert Windows zip to Compress-Archive
+- fix: normalize backslashes to forward slashes in zip entries
+- fix: use .NET ZipArchive for forward-slash paths in Windows zip
+- fix: AppImage runtime must precede squashfs
+- fix: HTTP client leaks, history save ordering, resetCrop MIME, log file size, CDN URL gating, remove web support
+- docs: add git discipline rules to AGENTS.md
+- track AGENTS.md, add CI docs
+- ci: fix all artifact uploads to use exact paths, not globs
+- remove tracked build artifacts from git
+- gitignore: exclude build artifacts in repo root
+- ci: clean stale artifacts before release upload
+- ci: fix GH_TOKEN env var name
+- release v1.2.0+7
+- ci: create release with auto-generated notes on tag push
+- fix: build AppImage via mksquashfs + runtime (no FUSE needed)
+- add AppStream metainfo file
+- fix: keep extracted appimagetool binary in-place so lib/appimagekit/ resolves
+- ci: fall back to unsquashfs for appimagetool extraction
+- ci: symlink system mksquashfs for appimagetool
+- ci: fix windows artifact naming
+- ci: install squashfs-tools for AppImage build
+- ci: add AppImage upload step
+- ci: bump actions to latest versions, add appstream dep
+- ci: make AppImage step non-fatal for debugging
+- ci: add appstream dep for AppImage validation
+- ci: build matrix for all platforms (Android, Linux, Windows)
