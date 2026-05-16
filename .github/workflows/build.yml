@@ -132,14 +132,7 @@ jobs:
         shell: powershell
         run: |
           $zipName = "uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-windows.zip"
-          Add-Type -Assembly "System.IO.Compression.FileSystem"
-          $sourceDir = "build\windows\x64\runner\Release"
-          $zip = [System.IO.Compression.ZipFile]::Open("$pwd\$zipName", [System.IO.Compression.ZipArchiveMode]::Create)
-          Get-ChildItem $sourceDir -Recurse | ForEach-Object {
-            $entryName = $_.FullName.Substring((Get-Item $sourceDir).FullName.Length + 1).Replace('\', '/')
-            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $_.FullName, $entryName) | Out-Null
-          }
-          $zip.Dispose()
+          Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath $zipName
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
