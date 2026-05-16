@@ -139,10 +139,10 @@ jobs:
           sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${{ needs.version.outputs.version }}';/" lib/core/version.dart
       - run: flutter build windows --release --dart-define=GIT_HASH=${{ needs.version.outputs.hash }}
       - name: Package
-        shell: powershell
+        shell: bash
         run: |
-          $zipName = "uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-windows.zip"
-          Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath $zipName
+          archive="uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-windows.zip"
+          tar -a -c -f "$archive" -C build/windows/x64/runner/Release .
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
