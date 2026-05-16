@@ -12,6 +12,7 @@ class UploadRecord {
   final int? statusCode;
   final DateTime completedAt;
   final Uint8List? thumbnailBytes;
+  final String? expiry;
 
   UploadRecord({
     required this.fileName,
@@ -23,6 +24,7 @@ class UploadRecord {
     this.statusCode,
     required this.completedAt,
     this.thumbnailBytes,
+    this.expiry,
   });
 }
 
@@ -32,7 +34,7 @@ class UploadRecordAdapter extends TypeAdapter<UploadRecord> {
 
   @override
   UploadRecord read(BinaryReader reader) {
-    final record = UploadRecord(
+    var record = UploadRecord(
       fileName: reader.readString(),
       url: reader.readBool() ? reader.readString() : null,
       providerId: reader.readString(),
@@ -47,7 +49,7 @@ class UploadRecordAdapter extends TypeAdapter<UploadRecord> {
     try {
       final thumbList = reader.readByteList();
       if (thumbList != null && thumbList.isNotEmpty) {
-        return UploadRecord(
+        record = UploadRecord(
           fileName: record.fileName,
           url: record.url,
           providerId: record.providerId,
@@ -61,6 +63,25 @@ class UploadRecordAdapter extends TypeAdapter<UploadRecord> {
       }
     } catch (_) {
       // Old record without thumbnail data — return as-is
+    }
+    // Backward compat: old records won't have expiry
+    try {
+      if (reader.readBool()) {
+        record = UploadRecord(
+          fileName: record.fileName,
+          url: record.url,
+          providerId: record.providerId,
+          providerName: record.providerName,
+          success: record.success,
+          errorMessage: record.errorMessage,
+          statusCode: record.statusCode,
+          completedAt: record.completedAt,
+          thumbnailBytes: record.thumbnailBytes,
+          expiry: reader.readString(),
+        );
+      }
+    } catch (_) {
+      // Old record without expiry — return as-is
     }
     return record;
   }
@@ -78,7 +99,10 @@ class UploadRecordAdapter extends TypeAdapter<UploadRecord> {
     writer.writeBool(obj.statusCode != null);
     if (obj.statusCode != null) writer.writeInt(obj.statusCode!);
     writer.writeInt(obj.completedAt.millisecondsSinceEpoch);
-    // thumbnailBytes appended at end for backward compat
+    // thumbnailBytes appended here for backward compat
     writer.writeByteList(obj.thumbnailBytes ?? []);
+    // expiry appended last for backward compat
+    writer.writeBool(obj.expiry != null);
+    if (obj.expiry != null) writer.writeString(obj.expiry!);
   }
 }

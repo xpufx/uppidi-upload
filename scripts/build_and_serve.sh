@@ -7,6 +7,25 @@ export PATH="$HOME/.flutter/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_
 
 cd /home/xpufx/code/uppidi
 
+# ── Parse args ─────────────────────────────────────────────────
+DEV=false
+for arg in "$@"; do
+	case "$arg" in
+	--dev) DEV=true ;;
+	esac
+done
+
+if [ "$DEV" = true ]; then
+	BUILD_TYPE="release"
+	DEV_DEFINE="--dart-define=DEV_PROVIDERS=true"
+	CDN_DEFINE="--dart-define=CDN_URL=http://10.20.30.24"
+else
+	BUILD_TYPE="release"
+	DEV_DEFINE=""
+	CDN_DEFINE=""
+fi
+BUILD_MODE="--$BUILD_TYPE"
+
 # ── Version sync ──────────────────────────────────────────────
 VERSION=$(grep 'version:' pubspec.yaml | head -1 | awk '{print $2}')
 VERSION_FILE="lib/core/version.dart"
@@ -32,6 +51,10 @@ if [ -n "$HARDCODED" ]; then
 fi
 echo "   ✅ No hardcoded strings found"
 
+# ── Capture git hash BEFORE changelog commit ─────────────────
+# This ensures artifact filenames match the tag/release commit.
+GIT_HASH=$(git rev-parse --short HEAD)
+
 # ── Auto-generate changelog ──────────────────────────────────
 echo "==> Updating CHANGELOG.md..."
 echo "# Changelog" >CHANGELOG.md
@@ -41,8 +64,6 @@ git log --oneline --format="- %s" | head -30 >>CHANGELOG.md
 git add CHANGELOG.md 2>/dev/null
 git commit -m "docs: auto-update changelog" --no-verify 2>/dev/null || true
 echo "   ✅ Changelog updated"
-
-GIT_HASH=$(git rev-parse --short HEAD)
 ARTIFACTS_DIR="/home/xpufx/code/uppidi/.caddy-artifacts"
 mkdir -p "$ARTIFACTS_DIR"
 
@@ -58,14 +79,14 @@ echo "==> Using provider favicons from repo (assets/favicons/)..."
 ls assets/favicons/*.png 2>/dev/null || echo "   (none found)"
 
 # ── Android APK (split-per-abi) ───────────────────────────
-echo "==> Building Android APKs @ ${GIT_HASH}..."
-flutter build apk --release --split-per-abi --dart-define=GIT_HASH=$GIT_HASH --dart-define=CDN_URL=http://10.20.30.24
+echo "==> Building Android APKs @ ${GIT_HASH} (${BUILD_TYPE})..."
+flutter build apk $BUILD_MODE --split-per-abi --dart-define=GIT_HASH=$GIT_HASH $CDN_DEFINE $DEV_DEFINE
 
 echo "==> Deploying APKs..."
 APK_DIR="build/app/outputs/flutter-apk"
-for apk in "$APK_DIR"/app-*-release.apk; do
+for apk in "$APK_DIR"/app-*-${BUILD_TYPE}.apk; do
 	[ -f "$apk" ] || continue
-	abi=$(basename "$apk" | sed 's/^app-//; s/-release\.apk$//')
+	abi=$(basename "$apk" | sed "s/^app-//; s/-${BUILD_TYPE}\.apk$//")
 	dst="uppidi-upload-${VERSION}-${GIT_HASH}-android-${abi}.apk"
 	cp "$apk" "${ARTIFACTS_DIR}/${dst}"
 	ln -sf "$dst" "${ARTIFACTS_DIR}/uppidi-upload-latest-android-${abi}.apk"
@@ -83,11 +104,11 @@ done
 # ── Linux ──────────────────────────────────────────────────
 LINUX_NAME="uppidi-upload-${VERSION}-${GIT_HASH}-linux.tar.gz"
 
-echo "==> Building Linux release @ ${GIT_HASH}..."
-flutter build linux --release --dart-define=GIT_HASH=$GIT_HASH --dart-define=CDN_URL=http://10.20.30.24
+echo "==> Building Linux release @ ${GIT_HASH} (${BUILD_TYPE})..."
+flutter build linux $BUILD_MODE --dart-define=GIT_HASH=$GIT_HASH $CDN_DEFINE $DEV_DEFINE
 
 echo "==> Packaging Linux release..."
-tar -czf "${ARTIFACTS_DIR}/${LINUX_NAME}" -C build/linux/x64/release/bundle .
+tar -czf "${ARTIFACTS_DIR}/${LINUX_NAME}" -C "build/linux/x64/${BUILD_TYPE}/bundle" .
 
 echo "==> Updating latest symlink..."
 ln -sf "${LINUX_NAME}" "${ARTIFACTS_DIR}/uppidi-upload-latest-linux.tar.gz"
@@ -96,15 +117,31 @@ echo "==> Cleaning old Linux builds (keep latest 5)..."
 ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-linux.tar.gz 2>/dev/null | tail -n +6 | xargs -r rm -f
 
 # ── AppImage ─────────────────────────────────────────────────
-if [ -f "$(dirname "$0")/build-appimage.sh" ]; then
+if [ "$DEV" = false ] && [ -f "$(dirname "$0")/build-appimage.sh" ]; then
 	echo "==> Building AppImage..."
-	bash "$(dirname "$0")/build-appimage.sh" --no-flutter-build
+	bash "$(dirname "$0")/build-appimage.sh" \
+		--no-flutter-build \
+		"--hash=${GIT_HASH}"
 fi
 
 echo ""
-echo "==> Done"
+echo "==> Done (${BUILD_TYPE})"
 echo "    uppidi-upload-${VERSION}-${GIT_HASH}-android-{arm64-v8a,armeabi-v7a,x86_64}.apk"
 echo "    ${LINUX_NAME}"
+
+# ── Tag release (only once per version) ──────────────────────────
+if [ "$DEV" = false ]; then
+	TAG="v${VERSION}"
+	if git rev-parse "$TAG" &>/dev/null; then
+		echo "==> Tag ${TAG} already exists — skipping"
+	else
+		echo "==> Tagging ${TAG} at ${GIT_HASH}..."
+		git tag "$TAG" "$GIT_HASH"
+		echo "   ✅ Tagged ${TAG} → ${GIT_HASH}"
+		echo ""
+		echo "   Push with: git push origin ${TAG}"
+	fi
+fi
 
 # ── Feature test checklist ───────────────────────────────────
 echo ""

@@ -7,18 +7,23 @@ import '../core/models/upload_result.dart';
 class UguuProvider extends BaseHttpProvider {
   final String _name;
   final String _url;
+  final String _endpoint;
   final ProviderMetadata _metadata;
 
   UguuProvider({
     String name = 'uguu.se',
     String url = 'https://uguu.se',
+    String endpoint = '/upload',
     ProviderMetadata? metadata,
   })  : _name = name,
         _url = url,
-        _metadata = metadata ?? const ProviderMetadata(
-          maxFileSizeBytes: 256 * 1024 * 1024,
-          supportsDirectLink: true,
-        );
+        _endpoint = endpoint,
+        _metadata = metadata ??
+            const ProviderMetadata(
+              maxFileSizeBytes: 128 * 1024 * 1024,
+              supportsDirectLink: true,
+              expiryInfo: '3 hours',
+            );
 
   @override
   ProviderMetadata get metadata => _metadata;
@@ -45,7 +50,7 @@ class UguuProvider extends BaseHttpProvider {
   String get baseUrl => _url;
 
   @override
-  String get uploadEndpoint => '/upload';
+  String get uploadEndpoint => _endpoint;
 
   @override
   String get fileFormFieldName => 'files[]';

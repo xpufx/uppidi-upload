@@ -15,6 +15,7 @@ import '../core/format.dart';
 import '../core/insecure_upload_warning.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/metadata_badges.dart';
+import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
 import '../core/share_message_dialog.dart';
 import '../core/version.dart';
@@ -480,9 +481,35 @@ class _FileSelectedButtons extends ConsumerWidget {
     final mimeType = state is UploadFileSelected ? state.mimeType : null;
     final quality = state is UploadFileSelected ? state.quality : 0;
     final showQuality = mimeType?.startsWith('image/') == true;
+
+    // Expiry picker — shown when the selected provider supports it
+    final provider = state.providers.asMap()[state.selectedProviderIndex];
+    final meta = provider?.metadata;
+    final hasConfigurableExpiry =
+        meta?.capabilities.contains(ProviderCapability.configurableExpiry) ==
+            true;
+    final expiryOptions = meta?.expiryOptions ?? [];
+    final currentExpiry =
+        state is UploadFileSelected ? state.selectedExpiry : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (hasConfigurableExpiry && expiryOptions.isNotEmpty) ...[
+          SegmentedButton<String>(
+            segments: expiryOptions
+                .map((opt) => ButtonSegment(
+                    value: opt, label: Text(_expiryDisplayLabel(opt))))
+                .toList(),
+            selected: {currentExpiry ?? expiryOptions.first},
+            onSelectionChanged: (v) => notifier.setExpiry(v.first),
+            style: ButtonStyle(
+              visualDensity: VisualDensity.compact,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
         if (showQuality) ...[
           SegmentedButton<int>(
             segments: const [
@@ -522,6 +549,16 @@ class _FileSelectedButtons extends ConsumerWidget {
       ],
     );
   }
+}
+
+/// Converts an API expiry value to a friendly display label.
+String _expiryDisplayLabel(String value) {
+  return switch (value) {
+    '1h' => '1 hour',
+    '24h' => '24 hours',
+    '72h' => '3 days',
+    _ => value,
+  };
 }
 
 class _FilePreview extends StatefulWidget {
@@ -1019,6 +1056,7 @@ class _ResultBannerState extends State<_ResultBanner> {
     buffer.writeln('=== RESPONSE ===');
     buffer.writeln('URL: ${widget.url ?? "none"}');
     buffer.writeln('Success: ${result?.success ?? false}');
+    buffer.writeln('Expiry: ${result?.expiry ?? "none"}');
 
     // Build info
     buffer.writeln('=== BUILD ===');
@@ -1150,6 +1188,63 @@ class _ResultBannerState extends State<_ResultBanner> {
                     );
                   },
                   tooltip: l10n.shareUrl,
+                ),
+              ],
+            ),
+          ],
+          // Expiry row — shown when the provider has configurable expiry
+          if (widget.lastResult?.expiry != null) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(Icons.schedule, size: 16, color: Colors.orange.shade600),
+                const SizedBox(width: 6),
+                Text(
+                  l10n.selectedExpiry(widget.lastResult!.expiry!),
+                  style: TextStyle(fontSize: 13, color: Colors.orange.shade600),
+                ),
+              ],
+            ),
+          ],
+          // Delete URL row — shown when provider returned a delete URL
+          if (widget.lastResult?.deleteUrl != null) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(Icons.delete_outline,
+                    size: 16, color: Colors.red.shade400),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: SelectableText(
+                    widget.lastResult!.deleteUrl!,
+                    style: TextStyle(
+                      color: Colors.red.shade400,
+                      fontSize: 13,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.open_in_new, size: 18),
+                  onPressed: () async {
+                    final uri = Uri.tryParse(widget.lastResult!.deleteUrl!);
+                    if (uri != null) {
+                      await launchUrl(uri,
+                          mode: LaunchMode.externalApplication);
+                    }
+                  },
+                  tooltip: l10n.openDeleteUrl,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.copy, size: 18),
+                  onPressed: () {
+                    Clipboard.setData(
+                        ClipboardData(text: widget.lastResult!.deleteUrl!));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.deleteUrlCopied)),
+                    );
+                  },
+                  tooltip: l10n.copyDeleteUrl,
                 ),
               ],
             ),

@@ -71,7 +71,7 @@ Future<bool> _showHttpWarning(
       showViewCert: false,
     ),
   );
-  return _handleResult(result, provider.providerId);
+  return _handleResult(result, provider.providerId, svc);
 }
 
 // ---------------------------------------------------------------------------
@@ -99,7 +99,7 @@ Future<bool> _showHttpsWarning(
           : null,
     ),
   );
-  return _handleResult(result, provider.providerId);
+  return _handleResult(result, provider.providerId, svc);
 }
 
 String _getBaseUrl(BaseUploader provider) {
@@ -111,11 +111,11 @@ String _getBaseUrl(BaseUploader provider) {
 // Result handling
 // ---------------------------------------------------------------------------
 
-Future<bool> _handleResult(_WarningResult? result, String providerId) async {
+Future<bool> _handleResult(
+    _WarningResult? result, String providerId, SettingsService svc) async {
   if (result == null) return false; // dismissed / back
 
   if (result.mute) {
-    final svc = SettingsService();
     await svc.muteInsecureWarning(providerId);
   }
 
@@ -159,13 +159,16 @@ Future<_CertInfo?> _fetchCertificate(String baseUrl) async {
         return true; // allow to read the response
       };
 
-    // Connect to the root (cheapest round-trip we can make)
-    final request = await client.getUrl(
-      uri.replace(path: '/', queryParameters: null, fragment: null),
-    );
-    final response = await request.close();
-    await response.drain<List<int>>();
-    client.close(force: true);
+    try {
+      // Connect to the root (cheapest round-trip we can make)
+      final request = await client.getUrl(
+        uri.replace(path: '/', queryParameters: null, fragment: null),
+      );
+      final response = await request.close();
+      await response.drain<List<int>>();
+    } finally {
+      client.close(force: true);
+    }
 
     if (captured == null) return null; // valid cert, callback not called
 

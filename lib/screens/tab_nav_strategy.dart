@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/app_logo.dart';
+import '../core/registry.dart';
 import '../core/settings_service.dart' show navigationLayoutProvider;
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
@@ -211,12 +212,39 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
   }
 
   Widget _buildBody() {
-    return switch (_selected) {
+    final screen = switch (_selected) {
       _NavTab.upload => const _ScreenLookup(screen: AppScreen.upload),
       _NavTab.history => const _ScreenLookup(screen: AppScreen.history),
       _NavTab.providers => const _ScreenLookup(screen: AppScreen.providers),
       _NavTab.settings => const _ScreenLookup(screen: AppScreen.settings),
     };
+
+    if (!devProviders) return screen;
+
+    return Stack(
+      children: [
+        screen,
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: Container(
+            color: Colors.orange.shade700,
+            padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+            child: const Text(
+              'DEV BUILD',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 

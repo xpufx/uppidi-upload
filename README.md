@@ -32,7 +32,9 @@ Uppidi runs on:
 
 - Android phones and tablets
 - iPhones and iPads (coming soon)
-- Linux desktops (Windows and MacOS coming soon)
+- Linux desktops
+- Windows
+- macOS (coming soon)
 - Web browsers
 
 On mobile devices, you can upload directly from your photo gallery or choose any file from your device. On desktop and web, you can select files from your computer. You can also share files directly to Uppidi from other apps.
@@ -41,15 +43,15 @@ On mobile devices, you can upload directly from your photo gallery or choose any
 
 1. Download and install Uppidi on your device.
 2. Open Uppidi and select which hosting service you want to use.
-4. Select a file to upload from your device.
-5. Tap upload and wait for it to finish.
-6. Copy the link from the app to share your file.
+3. Select a file to upload from your device.
+4. Tap upload and wait for it to finish.
+5. Copy the link from the app to share your file.
 
 ### Building from Source
 
 See [BUILDING.md](BUILDING.md) for instructions on building Uppidi from source for Android, Linux, and web.
 
-> Pre-built binary packages are coming soon.
+> Pre-built binaries are available from [GitHub Releases](https://github.com/xpufx/uppidi-upload/releases).
 
 ## Web Browser Version
 

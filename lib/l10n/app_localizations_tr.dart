@@ -236,6 +236,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get includeMessage => 'Mesaj ekle';
 
   @override
+  String get templateVars => 'Şablon Değişkenleri';
+
+  @override
+  String get templateExamples => 'Örnekler:';
+
+  @override
   String get customizeMessage => 'Özelleştir:';
 
   @override
@@ -395,4 +401,21 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get navLayoutDescription =>
       'Navigasyon konumunu seçin: Sol, Alt veya Sağ.';
+
+  @override
+  String selectedExpiry(Object expiry) {
+    return 'Süresi doluyor: $expiry';
+  }
+
+  @override
+  String get deleteUrl => 'Silme URL\'si';
+
+  @override
+  String get openDeleteUrl => 'Silme URL\'sini aç';
+
+  @override
+  String get deleteUrlCopied => 'Silme URL\'si panoya kopyalandı';
+
+  @override
+  String get copyDeleteUrl => 'Silme URL\'sini kopyala';
 }

@@ -1,9 +1,17 @@
 import 'package:dio/dio.dart';
 
 import '../core/interfaces/base_http_provider.dart';
+import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
 
 class TmpFileLinkProvider extends BaseHttpProvider {
+  @override
+  ProviderMetadata get metadata => const ProviderMetadata(
+        maxFileSizeBytes: 100 * 1024 * 1024,
+        expiryInfo: '7 days',
+        supportsDirectLink: true,
+      );
+
   @override
   String get providerId => 'tmpfilelink';
 

@@ -29,24 +29,26 @@ final providerHealthProvider =
   if (cdnUrl.isEmpty) return {};
   try {
     final client = HttpClient();
-    final request = await client.getUrl(Uri.parse('$cdnUrl/providers.json'));
-    final response = await request.close();
-    if (response.statusCode == 200) {
-      final body = await response.transform(utf8.decoder).join();
-      final json = jsonDecode(body) as Map<String, dynamic>;
-      client.close();
-      return json.map((k, v) {
-        final info = v as Map<String, dynamic>;
-        return MapEntry(
-            k,
-            ProviderHealthInfo(
-              disabled: info['disabled'] as bool? ?? false,
-              since: info['since'] as String?,
-              reason: info['reason'] as String?,
-            ));
-      });
+    try {
+      final request = await client.getUrl(Uri.parse('$cdnUrl/providers.json'));
+      final response = await request.close();
+      if (response.statusCode == 200) {
+        final body = await response.transform(utf8.decoder).join();
+        final json = jsonDecode(body) as Map<String, dynamic>;
+        return json.map((k, v) {
+          final info = v as Map<String, dynamic>;
+          return MapEntry(
+              k,
+              ProviderHealthInfo(
+                disabled: info['disabled'] as bool? ?? false,
+                since: info['since'] as String?,
+                reason: info['reason'] as String?,
+              ));
+        });
+      }
+    } finally {
+      client.close(force: true);
     }
-    client.close();
   } catch (_) {}
   return {};
 });

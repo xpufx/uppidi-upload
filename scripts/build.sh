@@ -3,7 +3,7 @@ set -euo pipefail
 
 # ──────────────────────────────────────────────────────────────
 # Uppidi build script
-#   Builds the app for Android, Linux, and/or web.
+#   Builds the app for Android, Linux, and/or Windows.
 #   Checks prerequisites before building.
 #
 # Usage:
@@ -11,7 +11,6 @@ set -euo pipefail
 #   bash scripts/build.sh android       # build Android APK
 #   bash scripts/build.sh linux         # build Linux desktop + AppImage
 #   bash scripts/build.sh windows       # build Windows desktop
-#   bash scripts/build.sh web           # build web bundle
 #   bash scripts/build.sh all           # build all supported targets
 # ──────────────────────────────────────────────────────────────
 
@@ -35,7 +34,6 @@ usage() {
 	echo "  android    Build Android APK (release)"
 	echo "  linux      Build Linux desktop (release) + AppImage"
 	echo "  windows    Build Windows desktop (release)"
-	echo "  web        Build web bundle (release)"
 	echo "  all        Build all supported targets"
 	echo ""
 	echo "Prerequisites:"
@@ -255,19 +253,6 @@ build_linux() {
 	fi
 }
 
-build_web() {
-	echo -e "${BOLD}Building web (release)...${NC}"
-	flutter build web --release
-	echo ""
-	WEB_DIR="build/web"
-	if [ -d "$WEB_DIR" ]; then
-		pass "Web bundle: $WEB_DIR"
-		ls -lh "$WEB_DIR/index.html"
-	else
-		fail "Web bundle not found at $WEB_DIR"
-	fi
-}
-
 build_windows() {
 	echo -e "${BOLD}Building Windows desktop (release)...${NC}"
 	if ! flutter build windows --release --dart-define=GIT_HASH="$(git_hash)" 2>&1; then
@@ -312,12 +297,7 @@ linux)
 windows)
 	build_windows
 	;;
-web)
-	build_web
-	;;
 all)
-	build_web
-	echo ""
 	build_linux
 	echo ""
 	build_windows

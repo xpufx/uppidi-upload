@@ -8,8 +8,10 @@ class LitterboxProvider extends BaseHttpProvider {
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
         maxFileSizeBytes: 1024 * 1024 * 1024,
-        expiryInfo: '1h / 24h / 72h',
+        expiryInfo: '1h / 12h / 24h / 72h',
         supportsDirectLink: true,
+        capabilities: {ProviderCapability.configurableExpiry},
+        expiryOptions: ['1h', '12h', '24h', '72h'],
       );
 
   @override
@@ -42,8 +44,15 @@ class LitterboxProvider extends BaseHttpProvider {
   @override
   Map<String, String> get additionalFormFields => const {
         'reqtype': 'fileupload',
-        'time': '24h',
       };
+
+  @override
+  Map<String, dynamic> buildFormFields(Map<String, String> config) {
+    return {
+      'reqtype': 'fileupload',
+      'time': config['_expiry'] ?? '24h',
+    };
+  }
 
   @override
   UploadResult parseResponse(Response response) {

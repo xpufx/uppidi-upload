@@ -2,9 +2,9 @@
 
 ## 1. What is Uppidi Upload?
 
-Uppidi Upload is a cross-platform file upload application that lets you upload images, videos, documents, and other files to multiple free and self-hosted hosting services. The app uses a modular "provider" system where each hosting service (such as Catbox, Immich, and others) connects to the app through a standardized plugin interface.
+Uppidi Upload is a cross-platform file upload application that lets you upload images, videos, documents, and other files to multiple free hosting services. The app uses a modular "provider" system where each hosting service (such as Catbox, FileDitch, and others) connects to the app through a standardized plugin interface.
 
-**Supported Platforms:** Android, iOS, Windows, macOS, Linux, and Web.
+**Supported Platforms:** Android, Linux, Windows, and Web.
 
 **Key Features:**
 - Streaming uploads that handle large files without consuming excessive memory
@@ -202,10 +202,10 @@ Set a **Default Share Provider** to automatically use a specific provider when s
 
 ### Network Settings
 - **Proxy URL**: Enter a proxy URL (useful for CORS bypass on web browsers). Changes are saved automatically after a short delay.
-- **Enable Insecure Connections**: Toggle this option to allow self-signed certificates (useful for self-hosted providers like Immich). A security warning will appear when enabling this option.
+- **Enable Insecure Connections**: Toggle this option to allow self-signed certificates. A security warning will appear when enabling this option.
 
 ### Provider Configuration
-For providers that require setup (such as Immich, which needs a server URL and API key), enter the required details in the provider's configuration card. Changes are saved automatically as you type.
+For providers that require setup, enter the required details in the provider's configuration card. Changes are saved automatically as you type.
 
 ### About Card (Version & Updates)
 The About card in Settings displays:

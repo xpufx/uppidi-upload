@@ -119,5 +119,10 @@
   "navigationBottom": "In basso",
   "navigationRight": "Destra",
   "navLayout": "Layout navigazione",
-  "navLayoutDescription": "Scegli la posizione della navigazione: Sinistra, In basso o Destra."
+  "navLayoutDescription": "Scegli la posizione della navigazione: Sinistra, In basso o Destra.",
+  "selectedExpiry": "Scade tra: {expiry}",
+  "deleteUrl": "URL di eliminazione",
+  "openDeleteUrl": "Apri URL di eliminazione",
+  "deleteUrlCopied": "URL di eliminazione copiato",
+  "copyDeleteUrl": "Copia URL di eliminazione"
 }

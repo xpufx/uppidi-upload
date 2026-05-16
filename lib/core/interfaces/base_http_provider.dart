@@ -48,6 +48,16 @@ abstract class BaseHttpProvider implements BaseUploader {
     return dio;
   }
 
+  /// Builds the form fields for the upload request.
+  ///
+  /// Defaults to [additionalFormFields]. Override to inject values from
+  /// [config] (e.g. user-selected expiry). The config map has already had
+  /// internal keys (e.g. `_proxy_url`) stripped — it contains only
+  /// provider-specific and feature-specific keys like `_expiry`.
+  Map<String, dynamic> buildFormFields(Map<String, String> config) {
+    return Map<String, dynamic>.from(additionalFormFields);
+  }
+
   @override
   Future<UploadResult> upload(
     FileUploadRequest request, {
@@ -64,7 +74,7 @@ abstract class BaseHttpProvider implements BaseUploader {
       final dio = await createHttpClient(cleanConfig,
           allowInsecureConn: allowInsecure, proxyUrl: proxyUrl);
 
-      final fields = Map<String, dynamic>.from(additionalFormFields);
+      final fields = buildFormFields(cleanConfig);
       fields[fileFormFieldName] = _buildStreamFile(request);
 
       // Opt-in debug logging: log request details if enabled
@@ -74,7 +84,8 @@ abstract class BaseHttpProvider implements BaseUploader {
         _log.info('=== DEBUG UPLOAD REQUEST ===');
         _log.info('Provider: $providerId');
         _log.info('URL: $baseUrl$uploadEndpoint');
-        _log.info('File: ${request.fileName} (${request.sizeInBytes} bytes, ${request.mimeType})');
+        _log.info(
+            'File: ${request.fileName} (${request.sizeInBytes} bytes, ${request.mimeType})');
         _log.info('Form fields: $fields');
         _log.info('Additional form fields: $additionalFormFields');
         _log.info('Proxy: $proxyUrl');

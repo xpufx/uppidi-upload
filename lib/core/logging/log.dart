@@ -62,11 +62,34 @@ final class Log {
     } catch (_) {}
   }
 
+  /// Max file size before truncation (1 MB).
+  static const int _maxFileSize = 1024 * 1024;
+
   /// Ensure the log file exists (lazy init).
   static Future<void> _ensureFile() async {
     if (_logFile != null) return;
     final dir = await pp.getApplicationDocumentsDirectory();
     _logFile = File('${dir.path}/debug.log');
+    _truncateIfNeeded();
+  }
+
+  /// Truncate the file to roughly the last [_maxFileSize] bytes.
+  static Future<void> _truncateIfNeeded() async {
+    try {
+      if (_logFile == null) return;
+      final exists = await _logFile!.exists();
+      if (!exists) return;
+      final len = await _logFile!.length();
+      if (len <= _maxFileSize) return;
+      // Keep the last 3/4 of max size from the end
+      final keep = _maxFileSize * 3 ~/ 4;
+      final raf = await _logFile!.open(mode: FileMode.read);
+      await raf.setPosition(len - keep);
+      final tail = await raf.read(keep);
+      await raf.close();
+      await _logFile!.writeAsString('=== truncated ===\n');
+      await _logFile!.writeAsBytes(tail, mode: FileMode.append);
+    } catch (_) {}
   }
 
   /// Returns a snapshot of the in-memory buffer.
@@ -76,6 +99,9 @@ final class Log {
   static Future<String> get fullLog async {
     if (_logFile == null) return _buffer.map((e) => e.formatted).join('\n');
     if (!await _logFile!.exists()) return '';
+    if (await _logFile!.length() > _maxFileSize * 2) {
+      await _truncateIfNeeded();
+    }
     return _logFile!.readAsString();
   }
 

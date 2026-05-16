@@ -119,5 +119,10 @@
   "navigationBottom": "Alt",
   "navigationRight": "Sağ",
   "navLayout": "Navigasyon Düzeni",
-  "navLayoutDescription": "Navigasyon konumunu seçin: Sol, Alt veya Sağ."
+  "navLayoutDescription": "Navigasyon konumunu seçin: Sol, Alt veya Sağ.",
+  "selectedExpiry": "Süresi doluyor: {expiry}",
+  "deleteUrl": "Silme URL'si",
+  "openDeleteUrl": "Silme URL'sini aç",
+  "deleteUrlCopied": "Silme URL'si panoya kopyalandı",
+  "copyDeleteUrl": "Silme URL'sini kopyala"
 }

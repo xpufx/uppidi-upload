@@ -188,6 +188,11 @@ class _HistoryTile extends StatelessWidget {
                 Text(r.url!,
                     style: const TextStyle(fontSize: 12),
                     overflow: TextOverflow.ellipsis),
+              if (r.expiry != null)
+                Text(
+                  l10n.selectedExpiry(r.expiry!),
+                  style: const TextStyle(fontSize: 11, color: Colors.orange),
+                ),
               Text(
                   formatTime(
                     r.completedAt,

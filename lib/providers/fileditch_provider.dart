@@ -9,7 +9,7 @@ import '../core/models/upload_result.dart';
 class FileDitchProvider extends BaseHttpProvider {
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
-        maxFileSizeBytes: 25 * 1024 * 1024 * 1024, // 25 GB
+        maxFileSizeBytes: 100 * 1024 * 1024 * 1024, // 100 GB
         expiryInfo: 'Indefinite (inactive >30d may delete)',
         supportsDirectLink: true,
       );

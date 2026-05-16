@@ -1,3 +1,19 @@
+/// Capabilities a provider can support.
+/// The UI reads these to dynamically show relevant controls.
+enum ProviderCapability {
+  /// Provider returns a delete URL/token after upload that lets the user
+  /// remove the file before it expires naturally.
+  deleteUrl,
+
+  /// Provider allows the user to choose how long the file stays up.
+  /// When set, the upload screen shows an expiry picker before uploading.
+  configurableExpiry,
+
+  /// Provider needs an API key, access token, or other credentials
+  /// configured in settings before it can be used.
+  requiresAuth,
+}
+
 class ProviderMetadata {
   final int? maxFileSizeBytes;
   final String? expiryInfo;
@@ -5,6 +21,11 @@ class ProviderMetadata {
   final Set<String>? blockedMimeTypes;
   final bool supportsDirectLink;
   final bool requiresAccount;
+  final Set<ProviderCapability> capabilities;
+
+  /// Available expiry durations for providers with [configurableExpiry].
+  /// Each string is the API value (e.g. `'24h'`).
+  final List<String>? expiryOptions;
 
   const ProviderMetadata({
     this.maxFileSizeBytes,
@@ -13,6 +34,8 @@ class ProviderMetadata {
     this.blockedMimeTypes,
     this.supportsDirectLink = true,
     this.requiresAccount = false,
+    this.capabilities = const {},
+    this.expiryOptions,
   });
 
   bool allowsMimeType(String mimeType) {
@@ -34,7 +57,9 @@ class ProviderMetadata {
     if (allowedMimeTypes == null || allowedMimeTypes!.isEmpty) return '';
     final allImages = allowedMimeTypes!.every((t) => t.startsWith('image/'));
     if (allImages && allowedMimeTypes!.isNotEmpty) return 'Images only';
-    return allowedMimeTypes!.map((m) => m.split('/').last.toUpperCase()).join(', ');
+    return allowedMimeTypes!
+        .map((m) => m.split('/').last.toUpperCase())
+        .join(', ');
   }
 
   String get fileSizeLabel {

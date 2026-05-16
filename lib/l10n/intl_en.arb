@@ -119,5 +119,10 @@
   "navigationBottom": "Bottom",
   "navigationRight": "Right",
   "navLayout": "Nav Layout",
-  "navLayoutDescription": "Choose navigation position: Left, Bottom, or Right."
+  "navLayoutDescription": "Choose navigation position: Left, Bottom, or Right.",
+  "selectedExpiry": "Expires in: {expiry}",
+  "deleteUrl": "Delete URL",
+  "openDeleteUrl": "Open delete URL",
+  "deleteUrlCopied": "Delete URL copied to clipboard",
+  "copyDeleteUrl": "Copy delete URL"
 }

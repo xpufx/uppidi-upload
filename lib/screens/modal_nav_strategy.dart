@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/app_logo.dart';
+import '../core/registry.dart';
 import '../l10n/app_localizations.dart';
 import 'modal_utils.dart';
 import 'shell_strategy.dart';
@@ -51,7 +52,31 @@ class _ModalDashboard extends StatelessWidget {
           ),
         ],
       ),
-      body: const _ScreenLookup(screen: AppScreen.upload),
+      body: Stack(
+        children: [
+          const _ScreenLookup(screen: AppScreen.upload),
+          if (devProviders)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                color: Colors.orange.shade700,
+                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                child: const Text(
+                  'DEV BUILD',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

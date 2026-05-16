@@ -10,6 +10,7 @@ import '../core/history_service.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/models/upload_record.dart';
 import '../core/logging/log.dart';
+import '../core/models/provider_metadata.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
 import '../core/platform/file_source.dart';
@@ -44,6 +45,7 @@ final class UploadFileSelected extends UploadState {
   final String? mimeType;
   final Uint8List? fileBytes;
   final int quality;
+  final String? selectedExpiry;
 
   const UploadFileSelected({
     required this.fileName,
@@ -51,6 +53,7 @@ final class UploadFileSelected extends UploadState {
     this.mimeType,
     this.fileBytes,
     this.quality = 0,
+    this.selectedExpiry,
     super.results,
     super.selectedProviderIndex,
     super.providers,
@@ -114,6 +117,7 @@ class UploadNotifier extends Notifier<UploadState> {
       : _injectedProviders = providers;
 
   int _selectedQuality = 0; // 0=original, 1=medium (50%), 2=low (25%)
+  String _selectedExpiry = '24h'; // default for configurableExpiry providers
   Uint8List? _originalFileBytes; // saved for crop reset
   Uint8List?
       _lastUncompressedBytes; // bytes after crop, before quality compression
@@ -124,6 +128,24 @@ class UploadNotifier extends Notifier<UploadState> {
   int _lastSampleBytes = 0;
 
   int get quality => _selectedQuality;
+
+  void setExpiry(String expiry) {
+    _selectedExpiry = expiry;
+    if (state is UploadFileSelected) {
+      final prev = state as UploadFileSelected;
+      state = UploadFileSelected(
+        fileName: prev.fileName,
+        fileSizeBytes: prev.fileSizeBytes,
+        mimeType: prev.mimeType,
+        fileBytes: prev.fileBytes,
+        quality: prev.quality,
+        selectedExpiry: expiry,
+        results: prev.results,
+        selectedProviderIndex: prev.selectedProviderIndex,
+        providers: prev.providers,
+      );
+    }
+  }
 
   void setQuality(int q) {
     _selectedQuality = q;
@@ -137,6 +159,7 @@ class UploadNotifier extends Notifier<UploadState> {
         mimeType: prev.mimeType,
         fileBytes: prev.fileBytes,
         quality: q,
+        selectedExpiry: prev.selectedExpiry,
         results: prev.results,
         selectedProviderIndex: prev.selectedProviderIndex,
         providers: prev.providers,
@@ -154,6 +177,7 @@ class UploadNotifier extends Notifier<UploadState> {
         mimeType: 'image/jpeg',
         fileBytes: _lastUncompressedBytes,
         quality: 0,
+        selectedExpiry: prev.selectedExpiry,
         results: prev.results,
         selectedProviderIndex: prev.selectedProviderIndex,
         providers: prev.providers,
@@ -181,6 +205,7 @@ class UploadNotifier extends Notifier<UploadState> {
             mimeType: 'image/jpeg',
             fileBytes: outBytes,
             quality: q,
+            selectedExpiry: prev.selectedExpiry,
             results: prev.results,
             selectedProviderIndex: prev.selectedProviderIndex,
             providers: prev.providers,
@@ -198,6 +223,7 @@ class UploadNotifier extends Notifier<UploadState> {
       mimeType: prev.mimeType,
       fileBytes: prev.fileBytes,
       quality: q,
+      selectedExpiry: prev.selectedExpiry,
       results: prev.results,
       selectedProviderIndex: prev.selectedProviderIndex,
       providers: prev.providers,
@@ -221,6 +247,7 @@ class UploadNotifier extends Notifier<UploadState> {
           mimeType: prev.mimeType,
           fileBytes: prev.fileBytes,
           quality: prev.quality,
+          selectedExpiry: prev.selectedExpiry,
           results: prev.results,
           selectedProviderIndex: index,
           providers: prev.providers,
@@ -236,6 +263,7 @@ class UploadNotifier extends Notifier<UploadState> {
           fileSizeBytes: prev.fileSizeBytes,
           mimeType: prev.mimeType,
           fileBytes: prev.fileBytes,
+          selectedExpiry: _selectedExpiry,
           results: prev.results,
           selectedProviderIndex: index,
           providers: prev.providers,
@@ -283,6 +311,7 @@ class UploadNotifier extends Notifier<UploadState> {
         mimeType: request.mimeType,
         fileBytes: previewBytes,
         quality: _selectedQuality,
+        selectedExpiry: _selectedExpiry,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -355,6 +384,7 @@ class UploadNotifier extends Notifier<UploadState> {
         mimeType: mimeType,
         fileBytes: previewBytes,
         quality: _selectedQuality,
+        selectedExpiry: _selectedExpiry,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -473,6 +503,10 @@ class UploadNotifier extends Notifier<UploadState> {
         config['_proxy_url'] = proxyUrl;
       }
 
+      // Pass user-selected expiry (providers with configurableExpiry
+      // capability will pick it up via buildFormFields).
+      config['_expiry'] = _selectedExpiry;
+
       final result = await provider.upload(
         request,
         onProgress: (sent, total) {
@@ -507,23 +541,36 @@ class UploadNotifier extends Notifier<UploadState> {
         config: config,
       );
 
+      // Stamp expiry on the result so the UI and history can display it.
+      // Configurable-expiry providers use the user's selection; others use
+      // their fixed expiryInfo from metadata (e.g. Uguu '3 hours').
+      final meta = provider.metadata;
+      final expiryValue =
+          meta.capabilities.contains(ProviderCapability.configurableExpiry)
+              ? _selectedExpiry
+              : meta.expiryInfo;
+      final resultWithExpiry =
+          expiryValue != null ? result.copyWith(expiry: expiryValue) : result;
+
       _log.info(
-        'Result: success=${result.success}, url=${result.url}, error=${result.errorMessage}',
+        'Result: success=${resultWithExpiry.success}, url=${resultWithExpiry.url}, '
+        'error=${resultWithExpiry.errorMessage}',
       );
 
+      _saveToHistory(resultWithExpiry, provider, request.fileName,
+          currentFileBytes, currentMimeType);
       state = UploadCompleted(
-        lastResult: result,
-        errorMessage: result.success ? null : result.errorMessage,
+        lastResult: resultWithExpiry,
+        errorMessage:
+            resultWithExpiry.success ? null : resultWithExpiry.errorMessage,
         fileName: currentFileName,
         fileSizeBytes: currentFileSize,
         mimeType: currentMimeType,
         fileBytes: currentFileBytes,
-        results: [result, ...state.results],
+        results: [resultWithExpiry, ...state.results],
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
-      _saveToHistory(result, provider, request.fileName, currentFileBytes,
-          currentMimeType);
     } catch (e) {
       if (cancelToken.isCancelled) {
         state = UploadIdle(
@@ -539,6 +586,8 @@ class UploadNotifier extends Notifier<UploadState> {
           ? _mapDioException(e)
           : '${e.runtimeType}: ${e.toString().split('\n').first}';
       final failResult = UploadResult(success: false, errorMessage: errorMsg);
+      _saveToHistory(failResult, provider, request.fileName, currentFileBytes,
+          currentMimeType);
       state = UploadCompleted(
         lastResult: failResult,
         errorMessage: errorMsg,
@@ -550,9 +599,11 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
-      _saveToHistory(failResult, provider, request.fileName, currentFileBytes,
-          currentMimeType);
     }
+    // Free byte buffers — no longer needed after upload and history save
+    _lastFileBytes = null;
+    _originalFileBytes = null;
+    _lastUncompressedBytes = null;
   }
 
   Future<void> _saveToHistory(
@@ -576,6 +627,7 @@ class UploadNotifier extends Notifier<UploadState> {
           statusCode: result.statusCode,
           completedAt: result.completedAt,
           thumbnailBytes: thumb,
+          expiry: result.expiry,
         ),
       );
       ref.invalidate(uploadHistoryProvider);
@@ -612,6 +664,7 @@ class UploadNotifier extends Notifier<UploadState> {
         mimeType: 'image/jpeg',
         fileBytes: croppedBytes,
         quality: prev.quality,
+        selectedExpiry: prev.selectedExpiry,
         results: prev.results,
         selectedProviderIndex: prev.selectedProviderIndex,
         providers: prev.providers,
@@ -630,9 +683,10 @@ class UploadNotifier extends Notifier<UploadState> {
       state = UploadFileSelected(
         fileName: prev.fileName.replaceAll('.jpg', '_original'),
         fileSizeBytes: _originalFileBytes!.length,
-        mimeType: 'image/png',
+        mimeType: prev.mimeType,
         fileBytes: _originalFileBytes,
         quality: prev.quality,
+        selectedExpiry: prev.selectedExpiry,
         results: prev.results,
         selectedProviderIndex: prev.selectedProviderIndex,
         providers: prev.providers,

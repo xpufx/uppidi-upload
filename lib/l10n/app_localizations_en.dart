@@ -234,6 +234,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get includeMessage => 'Include message';
 
   @override
+  String get templateVars => 'Template Variables';
+
+  @override
+  String get templateExamples => 'Examples:';
+
+  @override
   String get customizeMessage => 'Customize:';
 
   @override
@@ -393,4 +399,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get navLayoutDescription =>
       'Choose navigation position: Left, Bottom, or Right.';
+
+  @override
+  String selectedExpiry(Object expiry) {
+    return 'Expires in: $expiry';
+  }
+
+  @override
+  String get deleteUrl => 'Delete URL';
+
+  @override
+  String get openDeleteUrl => 'Open delete URL';
+
+  @override
+  String get deleteUrlCopied => 'Delete URL copied to clipboard';
+
+  @override
+  String get copyDeleteUrl => 'Copy delete URL';
 }

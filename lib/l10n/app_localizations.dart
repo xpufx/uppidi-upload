@@ -520,6 +520,18 @@ abstract class AppLocalizations {
   /// **'Include message'**
   String get includeMessage;
 
+  /// No description provided for @templateVars.
+  ///
+  /// In en, this message translates to:
+  /// **'Template Variables'**
+  String get templateVars;
+
+  /// No description provided for @templateExamples.
+  ///
+  /// In en, this message translates to:
+  /// **'Examples:'**
+  String get templateExamples;
+
   /// No description provided for @customizeMessage.
   ///
   /// In en, this message translates to:
@@ -813,6 +825,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose navigation position: Left, Bottom, or Right.'**
   String get navLayoutDescription;
+
+  /// No description provided for @selectedExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires in: {expiry}'**
+  String selectedExpiry(Object expiry);
+
+  /// No description provided for @deleteUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete URL'**
+  String get deleteUrl;
+
+  /// No description provided for @openDeleteUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Open delete URL'**
+  String get openDeleteUrl;
+
+  /// No description provided for @deleteUrlCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete URL copied to clipboard'**
+  String get deleteUrlCopied;
+
+  /// No description provided for @copyDeleteUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy delete URL'**
+  String get copyDeleteUrl;
 }
 
 class _AppLocalizationsDelegate

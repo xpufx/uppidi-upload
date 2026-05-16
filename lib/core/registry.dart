@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'interfaces/uploader.dart';
+import 'models/provider_metadata.dart';
 import 'settings_service.dart';
 import '../providers/catbox_provider.dart';
 import '../providers/fileditch_provider.dart';
@@ -11,6 +12,8 @@ import '../providers/litterbox_provider.dart';
 import '../providers/tempsh_provider.dart';
 import '../providers/tmpfilelink_provider.dart';
 import '../providers/uguu_provider.dart';
+
+const bool devProviders = bool.fromEnvironment('DEV_PROVIDERS');
 
 final enabledProvidersProvider = Provider<List<BaseUploader>>((ref) {
   final disabled = ref.watch(disabledProviderIdsProvider).asData?.value ?? {};
@@ -33,5 +36,16 @@ class ProviderRegistry {
     ),
     TempShProvider(),
     LitterboxProvider(),
+    if (devProviders)
+      UguuProvider(
+        name: 'Uguu (milan)',
+        url: 'https://uguu.milan.xpufx.com',
+        endpoint: '/upload.php',
+        metadata: const ProviderMetadata(
+          maxFileSizeBytes: 128 * 1024 * 1024,
+          supportsDirectLink: true,
+          expiryInfo: '8 hours',
+        ),
+      ),
   ];
 }
