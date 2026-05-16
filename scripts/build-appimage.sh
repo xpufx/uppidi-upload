@@ -127,12 +127,14 @@ echo ""
 echo -e "${BOLD}Step 3: Building AppImage...${NC}"
 
 OUTPUT="${PROJECT_DIR}/uppidi-upload-${VER}-${HASH}-x86_64.AppImage"
+SFS="${PROJECT_DIR}/.tmp.squashfs"
 
-# Create SquashFS filesystem
-mksquashfs "$APPDIR" "$OUTPUT" -noappend -comp gzip -quiet
+# Create SquashFS filesystem (write to temp, then prepend runtime)
+mksquashfs "$APPDIR" "$SFS" -noappend -comp gzip -quiet
 
-# Prepend the AppImage runtime
-cat "$RUNTIME" >>"$OUTPUT"
+# Build final AppImage: runtime then squashfs
+cat "$RUNTIME" "$SFS" >"$OUTPUT"
+rm -f "$SFS"
 chmod +x "$OUTPUT"
 
 if [ ! -f "$OUTPUT" ]; then
