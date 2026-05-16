@@ -62,6 +62,9 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      - name: Sync version
+        run: |
+          sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${{ needs.version.outputs.version }}';/" lib/core/version.dart
       - run: |
           flutter build apk --release --split-per-abi \
             --dart-define=GIT_HASH=${{ needs.version.outputs.hash }} \
@@ -89,6 +92,9 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev file wget appstream squashfs-tools libfuse2
       - run: flutter pub get
+      - name: Sync version
+        run: |
+          sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${{ needs.version.outputs.version }}';/" lib/core/version.dart
       - run: |
           flutter build linux --release \
             --dart-define=GIT_HASH=${{ needs.version.outputs.hash }} \
@@ -127,6 +133,10 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      - name: Sync version
+        shell: bash
+        run: |
+          sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${{ needs.version.outputs.version }}';/" lib/core/version.dart
       - run: flutter build windows --release --dart-define=GIT_HASH=${{ needs.version.outputs.hash }}
       - name: Package
         shell: powershell
