@@ -2,7 +2,7 @@ app-id: com.uppidi.uppidi
 runtime: org.freedesktop.Platform
 runtime-version: '24.08'
 sdk: org.freedesktop.Sdk
-command: uppidi
+command: /app/uppidi
 
 finish-args:
   - --socket=x11
@@ -16,7 +16,8 @@ modules:
   - name: uppidi
     buildsystem: simple
     build-commands:
-      - cp -r . /app/
+      - cp -a . /app/
+      - chmod 755 /app/uppidi
 
     sources:
       - type: dir
