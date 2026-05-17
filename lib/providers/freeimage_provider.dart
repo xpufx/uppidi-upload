@@ -14,14 +14,23 @@ class FreeImageHostProvider extends BaseHttpProvider {
     String url = 'https://freeimage.host',
   })  : _name = name,
         _url = url,
+        // FreeImage.host's documented demo key for anonymous/unsplash-style
+        // access. This is a public, read-only key published by the service
+        // itself — it is not a secret credential.
         _apiKey = '6d207e02198a847aa98d0a2a901485a5';
 
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
-    maxFileSizeBytes: 64 * 1024 * 1024,
-    allowedMimeTypes: {'image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/bmp'},
-    supportsDirectLink: true,
-  );
+        maxFileSizeBytes: 64 * 1024 * 1024,
+        allowedMimeTypes: {
+          'image/png',
+          'image/jpeg',
+          'image/gif',
+          'image/webp',
+          'image/bmp'
+        },
+        supportsDirectLink: true,
+      );
 
   @override
   String get providerId => 'freeimage_${_name.replaceAll('.', '_')}';
@@ -55,7 +64,8 @@ class FreeImageHostProvider extends BaseHttpProvider {
   @override
   UploadResult parseResponse(Response response) {
     final body = response.data.toString();
-    if (body.trimLeft().startsWith('<!DOCTYPE') || body.trimLeft().startsWith('<html')) {
+    if (body.trimLeft().startsWith('<!DOCTYPE') ||
+        body.trimLeft().startsWith('<html')) {
       return UploadResult(
         success: false,
         errorMessage: 'genericError',
@@ -68,9 +78,7 @@ class FreeImageHostProvider extends BaseHttpProvider {
       final image = data['image'] as Map<String, dynamic>?;
 
       if (image != null) {
-        final url = (image['display_url'] ??
-                image['url'] ??
-                '') as String;
+        final url = (image['display_url'] ?? image['url'] ?? '') as String;
 
         if (url.isNotEmpty) {
           return UploadResult(
@@ -86,7 +94,8 @@ class FreeImageHostProvider extends BaseHttpProvider {
     return UploadResult(
       success: false,
       errorMessage: 'genericError',
-      rawError: raw.length > 5000 ? '${raw.substring(0, 5000)}\n[truncated]' : raw,
+      rawError:
+          raw.length > 5000 ? '${raw.substring(0, 5000)}\n[truncated]' : raw,
       statusCode: response.statusCode,
     );
   }

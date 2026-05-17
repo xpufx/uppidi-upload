@@ -71,8 +71,9 @@ class _ImageCropOverlayState extends State<ImageCropOverlay> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final cancelLabel = l10n?.cancel ?? 'Cancel';
-    final applyLabel = l10n?.apply ?? 'Apply';
+    // AppLocalizations.of() never returns null, so ?. is unnecessary.
+    final cancelLabel = l10n.cancel;
+    final applyLabel = l10n.apply;
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -87,7 +88,7 @@ class _ImageCropOverlayState extends State<ImageCropOverlay> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Crop',
+          applyLabel,
           style: const TextStyle(color: Colors.white),
         ),
         actions: [

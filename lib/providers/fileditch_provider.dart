@@ -56,7 +56,9 @@ class FileDitchProvider extends BaseHttpProvider {
       if (body is String) {
         json = jsonDecode(body) as Map<String, dynamic>;
       } else if (body is Map) {
-        json = body.cast<String, dynamic>();
+        // Use Map.from to avoid .cast<>() which throws if any value is
+        // non-String (e.g. nested objects, numbers).
+        json = Map<String, dynamic>.from(body);
       } else {
         return UploadResult(
             success: false,

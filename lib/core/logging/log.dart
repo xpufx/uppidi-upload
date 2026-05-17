@@ -152,9 +152,15 @@ final class Log {
 
   void warn(String message, {Object? error, StackTrace? stackTrace}) {
     _log(LogLevel.warn, message, error: error);
+    // stackTrace intentionally unused here; _log writes structured entries
+    // to the in-memory buffer and file. If full traceback is needed, callers
+    // should include it in the message string.
   }
 
   void error(String message, {Object? error, StackTrace? stackTrace}) {
     _log(LogLevel.error, message, error: error);
+    // stackTrace intentionally unused here; _log writes structured entries
+    // to the in-memory buffer and file. If full traceback is needed, callers
+    // should include it in the message string.
   }
 }

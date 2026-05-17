@@ -59,10 +59,15 @@ class UguuProvider extends BaseHttpProvider {
   UploadResult parseResponse(Response response) {
     if (response.statusCode == 200 && response.data is Map) {
       final data = response.data as Map<String, dynamic>;
-      final files = data['files'] as List<dynamic>?;
+      // Guard against unexpected types: 'files' might be missing or non-List.
+      final filesRaw = data['files'];
+      final files = (filesRaw is List) ? filesRaw : null;
 
       if (files != null && files.isNotEmpty) {
-        final fileData = files[0] as Map<String, dynamic>?;
+        // Guard against non-Map elements in the files array.
+        final first = files[0];
+        final fileData =
+            (first is Map) ? Map<String, dynamic>.from(first) : null;
         final url = fileData?['url'] as String?;
 
         if (url != null && url.isNotEmpty) {

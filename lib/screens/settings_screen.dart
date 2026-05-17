@@ -140,6 +140,10 @@ class _VersionCheckWidget extends ConsumerWidget {
     final notifier = ref.read(versionCheckProvider.notifier);
     final lastChecked = notifier.lastChecked;
 
+    // Watch the age ticker so this widget rebuilds every second to update
+    // the "Xs ago" text — avoids the old `state = state` no-op hack.
+    ref.watch(versionCheckAgeTicker);
+
     // Age text only for upToDate (checkmark state)
     String? ageText;
     if (lastChecked != null && state == VersionCheckState.upToDate) {

@@ -130,7 +130,10 @@ class VersionCheckNotifier extends Notifier<VersionCheckState> {
       if (state == VersionCheckState.upToDate ||
           state == VersionCheckState.updateAvailable) {
         _tick++;
-        state = state;
+        // Update the age ticker so UI watching it can refresh "Xs ago" text.
+        // Avoids the hack of `state = state` which caused unnecessary rebuilds
+        // of every widget watching the main versionCheckProvider.
+        ref.read(versionCheckAgeTicker.notifier).set(_tick);
       } else {
         _ticker?.cancel();
       }
@@ -147,3 +150,16 @@ final versionCheckProvider =
     NotifierProvider<VersionCheckNotifier, VersionCheckState>(
   VersionCheckNotifier.new,
 );
+
+/// Separate ticker for age display; updated every second by the version check
+/// notifier. Watched by UI that shows "Xs ago" text. Keeps the main
+/// [versionCheckProvider] clean from no-op self-assignment hacks.
+class AgeTickNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void set(int value) => state = value;
+}
+
+final versionCheckAgeTicker =
+    NotifierProvider<AgeTickNotifier, int>(AgeTickNotifier.new);
