@@ -279,7 +279,7 @@ class UploadNotifier extends Notifier<UploadState> {
   Future<void> pickAndUpload() async {
     if (state is UploadInProgress) return;
 
-    final pickResult = await FilePicker.platform.pickFiles();
+    final pickResult = await FilePicker.pickFiles();
     if (pickResult == null || pickResult.files.isEmpty) return;
 
     final file = pickResult.files.first;

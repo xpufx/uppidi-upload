@@ -227,7 +227,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get chooseFile => 'Dosya Seç';
 
   @override
-  String get deleteThisRecord => 'Bu kayıtı sil?';
+  String get deleteThisRecord => 'Bu kaydı sil?';
 
   @override
   String get shareLink => 'Bağlantıyı Paylaş';
@@ -316,7 +316,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String expiryInfo(Object info) {
-    return 'Dosyaların süresi: $info';
+    return 'Süre: $info';
   }
 
   @override
@@ -404,7 +404,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String selectedExpiry(Object expiry) {
-    return 'Süresi doluyor: $expiry';
+    return 'Kalan süre: $expiry';
   }
 
   @override
