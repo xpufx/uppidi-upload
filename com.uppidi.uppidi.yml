@@ -1,0 +1,23 @@
+app-id: com.uppidi.uppidi
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+command: uppidi
+
+finish-args:
+  - --socket=x11
+  - --socket=wayland
+  - --share=network
+  - --share=ipc
+  - --device=dri
+  - --filesystem=host
+
+modules:
+  - name: uppidi
+    buildsystem: simple
+    build-commands:
+      - cp -r . /app/
+
+    sources:
+      - type: dir
+        path: flatpak-src

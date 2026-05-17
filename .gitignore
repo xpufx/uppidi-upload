@@ -51,6 +51,7 @@ temp/
 *.AppImage
 lib/gen/
 tools/appimageruntime
+flatpak-src/
 
 # Agent/IDE config
 opencode.json
