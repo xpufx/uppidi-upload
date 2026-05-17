@@ -137,11 +137,14 @@ jobs:
         shell: bash
         run: |
           sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${{ needs.version.outputs.version }}';/" lib/core/version.dart
-      - run: flutter build windows --release --dart-define=GIT_HASH=${{ needs.version.outputs.hash }}
+      - run: |
+          flutter build windows --release \
+            --dart-define=GIT_HASH=${{ needs.version.outputs.hash }} \
+            ${{ needs.version.outputs.dev_define }}
       - name: Package
         shell: bash
         run: |
-          archive="uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-windows.zip"
+          archive="uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-windows${{ needs.version.outputs.suffix }}.zip"
           tar -a -c -f "$archive" -C build/windows/x64/runner/Release .
       - name: Upload artifact
         uses: actions/upload-artifact@v7
