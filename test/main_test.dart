@@ -57,14 +57,9 @@ class MockNavUploadNotifier extends UploadNotifier {
 }
 
 void main() {
-  late AppLocalizations l10n;
-
-  setUpAll(() async {
-    l10n = await AppLocalizations.delegate.load(const Locale('en'));
-  });
-
   group('Navigation UI Tests', () {
-    testWidgets('Bottom navigation bar shows all 4 tabs', (WidgetTester tester) async {
+    testWidgets('Bottom navigation bar shows all 4 tabs',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -112,7 +107,8 @@ void main() {
       expect(find.byIcon(Icons.settings), findsOneWidget);
     });
 
-    testWidgets('NavigationRail shows all 4 destinations on wide screen', (WidgetTester tester) async {
+    testWidgets('NavigationRail shows all 4 destinations on wide screen',
+        (WidgetTester tester) async {
       await tester.binding.setSurfaceSize(const Size(800, 600));
 
       await tester.pumpWidget(
@@ -171,7 +167,8 @@ void main() {
       await tester.binding.setSurfaceSize(null);
     });
 
-    testWidgets('BottomNavigationBar switches to narrow layout', (WidgetTester tester) async {
+    testWidgets('BottomNavigationBar switches to narrow layout',
+        (WidgetTester tester) async {
       await tester.binding.setSurfaceSize(const Size(400, 800));
 
       await tester.pumpWidget(

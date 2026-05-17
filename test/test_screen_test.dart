@@ -1,20 +1,15 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 
 import 'package:uppidi_upload/screens/test_screen.dart';
-import 'package:uppidi_upload/screens/upload_screen.dart';
-import 'package:uppidi_upload/providers/upload_provider.dart';
 import 'package:uppidi_upload/core/interfaces/uploader.dart';
 import 'package:uppidi_upload/core/models/provider_metadata.dart';
 import 'package:uppidi_upload/core/models/upload_result.dart';
 import 'package:uppidi_upload/core/models/upload_request.dart';
 import 'package:uppidi_upload/core/registry.dart';
 import 'package:uppidi_upload/l10n/app_localizations.dart';
-import 'package:uppidi_upload/core/version_check_provider.dart';
 import 'package:uppidi_upload/core/settings_service.dart';
 
 /// Mock uploader for testing

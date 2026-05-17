@@ -200,7 +200,7 @@ class UploadNotifier extends Notifier<UploadState> {
           _lastFileBytes = outBytes;
           _lastFilePath = null; // resized bytes no longer match original file
           state = UploadFileSelected(
-            fileName: prev.fileName.replaceAll(RegExp(r'\.\w+$'), '') + '.jpg',
+            fileName: '${prev.fileName.replaceAll(RegExp(r'\.\w+$'), '')}.jpg',
             fileSizeBytes: outBytes.length,
             mimeType: 'image/jpeg',
             fileBytes: outBytes,
@@ -657,7 +657,7 @@ class UploadNotifier extends Notifier<UploadState> {
     if (state is UploadFileSelected) {
       final prev = state as UploadFileSelected;
       final croppedName =
-          prev.fileName.replaceAll(RegExp(r'\.\w+$'), '') + '.jpg';
+          '${prev.fileName.replaceAll(RegExp(r'\.\w+$'), '')}.jpg';
       state = UploadFileSelected(
         fileName: croppedName,
         fileSizeBytes: croppedBytes.length,
@@ -733,8 +733,9 @@ extension UploadInProgressX on UploadInProgress {
 
 String _formatSpeed(double bytesPerSec) {
   if (bytesPerSec < 1024) return '${bytesPerSec.toStringAsFixed(0)} B/s';
-  if (bytesPerSec < 1024 * 1024)
+  if (bytesPerSec < 1024 * 1024) {
     return '${(bytesPerSec / 1024).toStringAsFixed(1)} KB/s';
+  }
   return '${(bytesPerSec / (1024 * 1024)).toStringAsFixed(1)} MB/s';
 }
 

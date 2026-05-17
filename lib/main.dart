@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'core/app_logo.dart';
 import 'core/models/upload_record.dart';
 import 'core/settings_service.dart';
 import 'core/share_handler.dart';

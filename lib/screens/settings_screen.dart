@@ -239,11 +239,13 @@ class _VersionCheckWidget extends ConsumerWidget {
                             );
                           }
                         }
-                        if (context.mounted)
+                        if (context.mounted) {
                           Navigator.of(context, rootNavigator: true).pop();
+                        }
                       } catch (e) {
-                        if (context.mounted)
+                        if (context.mounted) {
                           Navigator.of(context, rootNavigator: true).pop();
+                        }
                       }
                     },
                     child: Padding(

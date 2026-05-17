@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 
 import 'package:uppidi_upload/core/interfaces/base_http_provider.dart';
-import 'package:uppidi_upload/core/interfaces/uploader.dart';
 import 'package:uppidi_upload/core/models/provider_metadata.dart';
 import 'package:uppidi_upload/core/models/upload_request.dart';
 import 'package:uppidi_upload/core/models/upload_result.dart';
@@ -93,7 +92,6 @@ void main() {
 
     test('does nothing when proxy URL is not parseable', () {
       final dio = Dio();
-      final originalAdapter = dio.httpClientAdapter;
       configureProxy(dio, 'not-a-valid-url');
       // not-a-valid-url: Uri.tryParse succeeds (it thinks "not-a-valid-url" is a path)
       // but host is empty, so the function returns early
@@ -126,10 +124,7 @@ void main() {
 
     test('does not replace default adapter when no options given', () async {
       final dio = await provider.createHttpClient({'api_key': 'secret'});
-      // default adapter is the original one
-      final newDio = Dio(BaseOptions(baseUrl: 'https://test.example.com'));
-      // both are IOHttpClientAdapter but created at different times
-      // we just verify it's not null — meaning no explicit proxy/insecure was applied
+      // Verify it's not null — meaning no explicit proxy/insecure was applied
       expect(dio.httpClientAdapter, isNotNull);
     });
 

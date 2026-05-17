@@ -48,7 +48,7 @@ class UploadRecordAdapter extends TypeAdapter<UploadRecord> {
     // Backward compat: old records won't have thumbnailBytes
     try {
       final thumbList = reader.readByteList();
-      if (thumbList != null && thumbList.isNotEmpty) {
+      if (thumbList.isNotEmpty) {
         record = UploadRecord(
           fileName: record.fileName,
           url: record.url,

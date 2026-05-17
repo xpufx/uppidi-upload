@@ -211,9 +211,10 @@ class _HistoryTile extends StatelessWidget {
                     icon: const Icon(Icons.open_in_new, size: 18),
                     onPressed: () async {
                       final uri = Uri.tryParse(r.url!);
-                      if (uri != null)
+                      if (uri != null) {
                         await launchUrl(uri,
                             mode: LaunchMode.externalApplication);
+                      }
                     },
                     tooltip: l10n.openInBrowser),
               IconButton(

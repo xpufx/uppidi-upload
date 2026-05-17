@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -17,7 +16,6 @@ import 'package:uppidi_upload/core/models/provider_metadata.dart';
 import 'package:uppidi_upload/core/models/upload_result.dart';
 import 'package:uppidi_upload/core/models/upload_request.dart';
 import 'package:uppidi_upload/l10n/app_localizations.dart';
-import 'package:uppidi_upload/core/version_check_provider.dart';
 import 'package:uppidi_upload/core/settings_service.dart';
 import 'package:uppidi_upload/widgets/image_crop_overlay.dart';
 
@@ -990,7 +988,7 @@ void main() {
 
   group('Crop Tool Tests', () {
     /// Generate valid PNG bytes for testing image decode.
-    Uint8List _validPngBytes() {
+    Uint8List validPngBytes() {
       final image = img.Image(width: 100, height: 100);
       for (int y = 0; y < 100; y++) {
         for (int x = 0; x < 100; x++) {
@@ -1007,7 +1005,7 @@ void main() {
           fileName: 'test.png',
           fileSizeBytes: 67,
           mimeType: 'image/png',
-          fileBytes: _validPngBytes(),
+          fileBytes: validPngBytes(),
           quality: 0,
           providers: [imageUploader],
           selectedProviderIndex: 0,
@@ -1070,7 +1068,7 @@ void main() {
 
     testWidgets('ImageCropOverlay shows Apply and Cancel buttons',
         (tester) async {
-      final bytes = _validPngBytes();
+      final bytes = validPngBytes();
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -1093,7 +1091,7 @@ void main() {
 
     testWidgets('ImageCropOverlay Cancel button closes the dialog',
         (tester) async {
-      final bytes = _validPngBytes();
+      final bytes = validPngBytes();
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,

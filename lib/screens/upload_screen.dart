@@ -7,8 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'dart:typed_data';
-
 import 'package:image/image.dart' as img;
 
 import '../core/format.dart';
@@ -21,7 +19,6 @@ import '../core/share_message_dialog.dart';
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
-import '../screens/settings_screen.dart';
 import '../widgets/image_crop_overlay.dart';
 import '../widgets/provider_favicon.dart';
 

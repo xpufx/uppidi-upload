@@ -21,8 +21,7 @@ Future<bool> checkInsecureWarning(
   // Only HTTP-based providers have a URL we can inspect
   if (provider is! BaseHttpProvider) return true;
 
-  final httpProvider = provider as BaseHttpProvider;
-  final baseUrl = httpProvider.baseUrl;
+  final baseUrl = provider.baseUrl;
   final uri = Uri.tryParse(baseUrl);
   if (uri == null) return true;
 
@@ -95,7 +94,7 @@ Future<bool> _showHttpsWarning(
       body: l10n.insecureWarningHttps(provider.providerName, baseUrl),
       showViewCert: certInfo != null,
       onViewCert: certInfo != null
-          ? () => _showCertificateDialog(ctx, certInfo!, l10n)
+          ? () => _showCertificateDialog(ctx, certInfo, l10n)
           : null,
     ),
   );
@@ -172,6 +171,8 @@ Future<_CertInfo?> _fetchCertificate(String baseUrl) async {
 
     if (captured == null) return null; // valid cert, callback not called
 
+    // captured is assigned inside a closure (badCertificateCallback) so
+    // Dart cannot promote it to non-null despite the null check above.
     return _CertInfo(
       subject: captured!.subject,
       issuer: captured!.issuer,

@@ -20,7 +20,7 @@ void main() {
       );
 
       // Launch the dialog
-      final future = ImageCropOverlay.show(
+      ImageCropOverlay.show(
         context: tester.element(find.byType(SizedBox)),
         imageBytes: _testImageBytes(100, 100),
         imageWidth: 100,
@@ -58,7 +58,6 @@ void main() {
 
     testWidgets('Apply button closes dialog with a valid crop rect',
         (tester) async {
-      Rect? result;
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -78,14 +77,17 @@ void main() {
       await tester.tap(find.text('Apply'));
       await tester.pumpAndSettle();
 
-      result = await future;
+      final result = await future;
       expect(result, isNotNull);
-      expect(result!.left, greaterThanOrEqualTo(0));
-      expect(result!.top, greaterThanOrEqualTo(0));
-      expect(result!.right, lessThanOrEqualTo(100));
-      expect(result!.bottom, lessThanOrEqualTo(100));
-      expect(result!.width, greaterThan(0));
-      expect(result!.height, greaterThan(0));
+      // Unwrap result into a non-nullable local to avoid repeated ! operators.
+      // ignore: this is safe because we just asserted it's not null above.
+      final r = result!;
+      expect(r.left, greaterThanOrEqualTo(0));
+      expect(r.top, greaterThanOrEqualTo(0));
+      expect(r.right, lessThanOrEqualTo(100));
+      expect(r.bottom, lessThanOrEqualTo(100));
+      expect(r.width, greaterThan(0));
+      expect(r.height, greaterThan(0));
     });
 
     testWidgets('drag gesture on the dialog does not crash', (tester) async {
