@@ -15,6 +15,7 @@ import '../core/interfaces/uploader.dart';
 import '../core/metadata_badges.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
+import '../core/provider_config_sheet.dart';
 import '../core/share_message_dialog.dart';
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
@@ -61,6 +62,7 @@ class UploadScreen extends ConsumerWidget {
             ],
             if (provider != null) ...[
               const SizedBox(height: 8),
+              _ProviderConfigStatus(provider: provider),
             ],
             if (webUnsupported) const _WebWarning(),
             switch (uploadState) {
@@ -455,6 +457,19 @@ class _UploadButton extends ConsumerWidget {
         final state = ref.read(uploadProvider);
         if (state is! UploadFileSelected) return;
         final provider = state.providers[state.selectedProviderIndex];
+
+        // Check if provider requires auth config
+        if (provider.metadata.capabilities
+            .contains(ProviderCapability.requiresAuth)) {
+          final configured = await isProviderConfigured(ref, provider);
+          if (!configured) {
+            if (context.mounted) {
+              showProviderConfigDialog(context, ref, provider);
+            }
+            return;
+          }
+        }
+
         final proceed = await checkInsecureWarning(context, provider, ref);
         if (!proceed) return;
         notifier.uploadSelected();
@@ -582,8 +597,9 @@ class _FilePreview extends StatefulWidget {
 }
 
 class _FilePreviewState extends State<_FilePreview> {
-  late final AppLocalizations _l10n;
   bool _hasCropped = false;
+
+  AppLocalizations get _l10n => AppLocalizations.of(context);
 
   bool get _isImage {
     final mime = widget.mimeType ?? '';
@@ -862,6 +878,13 @@ class _ProgressSectionState extends State<_ProgressSection>
   @override
   void initState() {
     super.initState();
+    _animCtrl = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _anim = Tween<double>(begin: 0, end: widget.progress ?? 0).animate(
+      CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic),
+    );
   }
 
   @override
@@ -1288,6 +1311,70 @@ class _ResultBannerState extends State<_ResultBanner> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Shows a warning banner when the selected provider requires auth
+/// configuration but hasn't been set up yet.
+class _ProviderConfigStatus extends ConsumerWidget {
+  final BaseUploader provider;
+
+  const _ProviderConfigStatus({required this.provider});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Only show for providers that require auth
+    if (!provider.metadata.capabilities
+        .contains(ProviderCapability.requiresAuth)) {
+      return const SizedBox.shrink();
+    }
+
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    return FutureBuilder<bool>(
+      future: isProviderConfigured(ref, provider),
+      builder: (context, snapshot) {
+        final configured = snapshot.data ?? false;
+        if (configured) return const SizedBox.shrink();
+
+        return Card(
+          color: Colors.orange.shade50,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.orange.shade200),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Icon(Icons.warning_amber,
+                    size: 20, color: Colors.orange.shade700),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l10n.providerConfigNotConfigured(provider.providerName),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: Colors.orange.shade900,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                FilledButton.tonalIcon(
+                  onPressed: () =>
+                      showProviderConfigDialog(context, ref, provider),
+                  icon: const Icon(Icons.settings, size: 16),
+                  label: Text(l10n.providerConfigure),
+                  style: FilledButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -356,9 +356,9 @@ void main() {
       // Quality selector should be shown for image files
       expect(find.byType(SegmentedButton<int>), findsOneWidget);
       // Check for quality options
-      expect(find.text('Original'), findsOneWidget);
-      expect(find.text('Medium'), findsOneWidget);
-      expect(find.text('Low'), findsOneWidget);
+      expect(find.text(l10n.qualityOriginal), findsOneWidget);
+      expect(find.text(l10n.qualityMedium), findsOneWidget);
+      expect(find.text(l10n.qualityLow), findsOneWidget);
     });
 
     testWidgets('Quality selector NOT shown for non-image files',
@@ -721,7 +721,7 @@ void main() {
       expect((notifier.state as UploadFileSelected).quality, 0);
 
       // Find and tap the "Medium" quality option (quality value 1)
-      final mediumOption = find.text('Medium');
+      final mediumOption = find.text(l10n.qualityMedium);
       expect(mediumOption, findsOneWidget);
       // Scroll to the Medium option (might be off-screen due to new UI elements)
       await tester.ensureVisible(mediumOption);

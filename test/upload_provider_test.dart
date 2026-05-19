@@ -355,7 +355,7 @@ void main() {
       expect(notifier.state, isA<UploadCompleted>());
       final state = notifier.state as UploadCompleted;
       expect(state.isSuccess, isFalse);
-      expect(state.errorMessage, 'No upload providers configured');
+      expect(state.errorMessage, 'noProvidersConfigured');
       emptyContainer.dispose();
     });
 
@@ -366,7 +366,7 @@ void main() {
       expect(notifier.state, isA<UploadCompleted>());
       final state = notifier.state as UploadCompleted;
       expect(state.isSuccess, isFalse);
-      expect(state.errorMessage, 'Failed to read selected file');
+      expect(state.errorMessage, 'failedToReadFile');
     });
 
     test('Upload failure → error with retry possible', () async {
