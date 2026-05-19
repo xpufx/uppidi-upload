@@ -26,13 +26,16 @@ Future<bool> checkInsecureWarning(
   if (uri == null) return true;
 
   final svc = ref.read(settingsServiceProvider);
+  // Capture all context-dependent values before any await so we never use
+  // BuildContext across an async gap.
+  final l10n = AppLocalizations.of(context);
 
   // For plain HTTP — always warn (no encryption at all)
   if (uri.scheme == 'http') {
     final muted = await svc.isInsecureWarningMuted(provider.providerId);
     if (muted) return true;
 
-    final l10n = AppLocalizations.of(context);
+    if (!context.mounted) return false;
     return _showHttpWarning(context, provider, svc, l10n);
   }
 
@@ -44,7 +47,7 @@ Future<bool> checkInsecureWarning(
     final muted = await svc.isInsecureWarningMuted(provider.providerId);
     if (muted) return true;
 
-    final l10n = AppLocalizations.of(context);
+    if (!context.mounted) return false;
     return _showHttpsWarning(context, provider, svc, l10n);
   }
 
@@ -87,6 +90,7 @@ Future<bool> _showHttpsWarning(
   // Try to fetch the server certificate in the background
   final certInfo = await _fetchCertificate(baseUrl);
 
+  if (!context.mounted) return false;
   final result = await showDialog<_WarningResult>(
     context: context,
     builder: (ctx) => _InsecureWarningDialog(

@@ -470,6 +470,7 @@ class _UploadButton extends ConsumerWidget {
           }
         }
 
+        if (!context.mounted) return;
         final proceed = await checkInsecureWarning(context, provider, ref);
         if (!proceed) return;
         notifier.uploadSelected();
