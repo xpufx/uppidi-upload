@@ -1,5 +1,6 @@
 # Changelog
 
+- docs: auto-update changelog
 - refactor: simplify error-message resolution
 - feat: localize remaining hardcoded UI strings across 5 source files
 - chore: resolve all flutter analyze warnings and infos
@@ -29,4 +30,3 @@
 - release v1.2.0+7
 - ci: create release with auto-generated notes on tag push
 - fix: build AppImage via mksquashfs + runtime (no FUSE needed)
-- add AppStream metainfo file
