@@ -185,7 +185,15 @@
   "save": "Konservi",
   "telegramErrorBotBlocked": "La roboto estis blokita de la uzanto. Malbloku la roboton unue.",
   "telegramErrorChatNotFound": "Babilejo ne trovita. Bonvolu kontroli vian Babilejan ID.",
-  "telegramErrorInvalidToken": "Nevalida robota ĵetono. Kontrolu vian Bot-Ĵetonon de BotFather.",
+  "telegramErrorBotBlocked": "La roboto estis blokita de la uzanto. Malbloku la roboton unue.",
   "telegramErrorNoRights": "Roboto ne rajtas sendi mesaĝojn en ĉi tiu babilejo.",
-  "telegramSentToChat": "Sendita al Telegram-babilejo"
+  "telegramErrorInvalidToken": "Nevalida robota ĵetono. Kontrolu vian Bot-Ĵetonon de BotFather.",
+  "telegramSentToChat": "Sendita al Telegram-babilejo",
+
+  "expiryPersistent": "Daŭra (ĝis la robotsimbolo estas revokita)",
+  "expiryIndefinite30d": "Nedifinita (neaktiva >30d povas esti forigita)",
+  "expiryOneDayExtendable": "~1 tago (etendebla post re-alŝuto)",
+  "expiryOptions1h12h24h72h": "1h / 12h / 24h / 72h",
+  "expiry3Hours": "3 horoj",
+  "expiry7Days": "7 tagoj"
 }

@@ -573,51 +573,65 @@ class AppLocalizationsTlh extends AppLocalizations {
   }
 
   @override
-  String get providerConfigDescription =>
-      'Enter the credentials required by this provider.';
+  String get providerConfigDescription => 'ngeDna\'vaD pat yIchenmoH.';
 
   @override
   String get providerConfigSecretHint =>
-      'This value is stored locally and never shared.';
+      'Dochvam \'ay\'Daq yIqel. latlhvaD yIbejQo\'.';
 
   @override
-  String get providerConfigRequired => 'This field is required';
+  String get providerConfigRequired => 'QochDaq Doch yIqel';
 
   @override
   String providerConfigSaved(Object provider) {
-    return '$provider configuration saved!';
+    return '$provider pat chenmoHlu\'!';
   }
 
   @override
-  String get providerConfigSectionConfigured => 'Configured';
+  String get providerConfigSectionConfigured => 'chenmoHlu\'';
 
   @override
   String providerConfigNotConfigured(Object provider) {
-    return '$provider — not configured';
+    return '$provider — pat ghobe\'';
   }
 
   @override
-  String get providerConfigure => 'Configure';
+  String get providerConfigure => 'chenmoH';
 
   @override
-  String get save => 'Save';
+  String get save => 'yIqel';
 
   @override
-  String get telegramErrorChatNotFound =>
-      'Chat not found. Please check your Chat ID.';
+  String get telegramErrorChatNotFound => 'chat ghobe\'. Chat ID yIghoS.';
 
   @override
-  String get telegramErrorBotBlocked =>
-      'Bot was blocked by the user. Unblock the bot first.';
+  String get telegramErrorBotBlocked => 'bot loD qIp. bot yIqIt Ha\'.';
 
   @override
-  String get telegramErrorNoRights =>
-      'Bot lacks rights to send messages in this chat.';
+  String get telegramErrorNoRights => 'bot chatDaq mIw chaw\'be\'.';
 
   @override
   String get telegramErrorInvalidToken =>
-      'Invalid bot token. Check your Bot Token from BotFather.';
+      'bot token Qagh. BotFatherDaq Bot Token yIghoS.';
 
   @override
-  String get telegramSentToChat => 'Sent to Telegram chat';
+  String get telegramSentToChat => 'Telegram chatDaq nge\'';
+
+  @override
+  String get expiryPersistent => 'bot token QItpu\'ba\' rur';
+
+  @override
+  String get expiryIndefinite30d => 'poH QItbe\' (30h jaj QItlaH)';
+
+  @override
+  String get expiryOneDayExtendable => '~1 jaj (qa\'Ha\'ra\'laH)';
+
+  @override
+  String get expiryOptions1h12h24h72h => '1h / 12h / 24h / 72h';
+
+  @override
+  String get expiry3Hours => '3 rep';
+
+  @override
+  String get expiry7Days => '7 jaj';
 }

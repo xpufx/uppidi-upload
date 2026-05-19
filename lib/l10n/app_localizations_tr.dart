@@ -584,50 +584,70 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get providerConfigDescription =>
-      'Enter the credentials required by this provider.';
+      'Bu sağlayıcının gerektirdiği kimlik bilgilerini girin.';
 
   @override
   String get providerConfigSecretHint =>
-      'This value is stored locally and never shared.';
+      'Bu değer yerel olarak saklanır ve asla paylaşılmaz.';
 
   @override
-  String get providerConfigRequired => 'This field is required';
+  String get providerConfigRequired => 'Bu alan zorunludur';
 
   @override
   String providerConfigSaved(Object provider) {
-    return '$provider configuration saved!';
+    return '$provider yapılandırması kaydedildi!';
   }
 
   @override
-  String get providerConfigSectionConfigured => 'Configured';
+  String get providerConfigSectionConfigured => 'Yapılandırıldı';
 
   @override
   String providerConfigNotConfigured(Object provider) {
-    return '$provider — not configured';
+    return '$provider — yapılandırılmamış';
   }
 
   @override
-  String get providerConfigure => 'Configure';
+  String get providerConfigure => 'Yapılandır';
 
   @override
-  String get save => 'Save';
+  String get save => 'Kaydet';
 
   @override
   String get telegramErrorChatNotFound =>
-      'Chat not found. Please check your Chat ID.';
+      'Chat bulunamadı. Chat ID\'nizi kontrol edin.';
 
   @override
   String get telegramErrorBotBlocked =>
-      'Bot was blocked by the user. Unblock the bot first.';
+      'Bot kullanıcı tarafından engellendi. Önce botun engelini kaldırın.';
 
   @override
   String get telegramErrorNoRights =>
-      'Bot lacks rights to send messages in this chat.';
+      'Botun bu sohbette mesaj gönderme izni yok.';
 
   @override
   String get telegramErrorInvalidToken =>
-      'Invalid bot token. Check your Bot Token from BotFather.';
+      'Geçersiz bot tokeni. BotFather\'dan Bot Token\'inizi kontrol edin.';
 
   @override
-  String get telegramSentToChat => 'Sent to Telegram chat';
+  String get telegramSentToChat => 'Telegram sohbetine gönderildi';
+
+  @override
+  String get expiryPersistent => 'Kalıcı (bot tokeni iptal edilene kadar)';
+
+  @override
+  String get expiryIndefinite30d =>
+      'Süresiz (30 gün hareketsiz kalırsa silinebilir)';
+
+  @override
+  String get expiryOneDayExtendable =>
+      '~1 gün (yeniden yüklemeyle uzatılabilir)';
+
+  @override
+  String get expiryOptions1h12h24h72h => '1s / 12s / 24s / 72s';
+
+  @override
+  String get expiry3Hours => '3 saat';
+
+  @override
+  String get expiry7Days => '7 gün';
 }

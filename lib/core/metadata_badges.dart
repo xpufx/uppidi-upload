@@ -1,5 +1,22 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import 'models/provider_metadata.dart';
+
+/// Resolves a provider expiry info string to a localized value.
+/// Providers store raw English keys like "expiry3Hours" in their metadata;
+/// this maps them to the user's language.
+String resolveExpiry(AppLocalizations l10n, String raw) {
+  return switch (raw) {
+    'Persistent (until bot token is revoked)' => l10n.expiryPersistent,
+    'Indefinite (inactive >30d may delete)' => l10n.expiryIndefinite30d,
+    '~1 day (extendable on re-upload)' => l10n.expiryOneDayExtendable,
+    '1h / 12h / 24h / 72h' => l10n.expiryOptions1h12h24h72h,
+    '3 hours' => l10n.expiry3Hours,
+    '3 days' => l10n.expiry3Days,
+    '7 days' => l10n.expiry7Days,
+    _ => raw, // unknown string — show as-is
+  };
+}
 
 IconData mimeIcon(ProviderMetadata meta) {
   final types = meta.allowedMimeTypes;
@@ -21,6 +38,9 @@ Widget metadataBadges(ProviderMetadata meta) {
     chips.add(_buildBadge(null, icon: mimeIcon(meta)));
   }
   if (meta.expiryInfo != null && meta.expiryInfo!.isNotEmpty) {
+    // Expiry info is stored as raw keys; resolve via l10n at display time.
+    // Badge has no l10n access — show raw value (the resolved version
+    // appears in _ProviderInfo via resolveExpiry + l10n.expiryInfo).
     chips.add(_buildBadge(meta.expiryInfo!, icon: Icons.calendar_today));
   }
 

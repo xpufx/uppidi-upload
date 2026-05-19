@@ -627,4 +627,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get telegramSentToChat => 'Sent to Telegram chat';
+
+  @override
+  String get expiryPersistent => 'Persistent (until bot token is revoked)';
+
+  @override
+  String get expiryIndefinite30d => 'Indefinite (inactive >30d may delete)';
+
+  @override
+  String get expiryOneDayExtendable => '~1 day (extendable on re-upload)';
+
+  @override
+  String get expiryOptions1h12h24h72h => '1h / 12h / 24h / 72h';
+
+  @override
+  String get expiry3Hours => '3 hours';
+
+  @override
+  String get expiry7Days => '7 days';
 }

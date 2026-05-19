@@ -185,7 +185,15 @@
   "save": "Kaydet",
   "telegramErrorBotBlocked": "Bot kullanıcı tarafından engellendi. Önce botun engelini kaldırın.",
   "telegramErrorChatNotFound": "Chat bulunamadı. Chat ID'nizi kontrol edin.",
-  "telegramErrorInvalidToken": "Geçersiz bot tokeni. BotFather'dan Bot Token'inizi kontrol edin.",
+  "telegramErrorBotBlocked": "Bot kullanıcı tarafından engellendi. Önce botun engelini kaldırın.",
   "telegramErrorNoRights": "Botun bu sohbette mesaj gönderme izni yok.",
-  "telegramSentToChat": "Telegram sohbetine gönderildi"
+  "telegramErrorInvalidToken": "Geçersiz bot tokeni. BotFather'dan Bot Token'inizi kontrol edin.",
+  "telegramSentToChat": "Telegram sohbetine gönderildi",
+
+  "expiryPersistent": "Kalıcı (bot tokeni iptal edilene kadar)",
+  "expiryIndefinite30d": "Süresiz (30 gün hareketsiz kalırsa silinebilir)",
+  "expiryOneDayExtendable": "~1 gün (yeniden yüklemeyle uzatılabilir)",
+  "expiryOptions1h12h24h72h": "1s / 12s / 24s / 72s",
+  "expiry3Hours": "3 saat",
+  "expiry7Days": "7 gün"
 }

@@ -582,50 +582,69 @@ class AppLocalizationsEo extends AppLocalizations {
 
   @override
   String get providerConfigDescription =>
-      'Enter the credentials required by this provider.';
+      'Enigu la necesajn akreditaĵojn por ĉi tiu provizanto.';
 
   @override
   String get providerConfigSecretHint =>
-      'This value is stored locally and never shared.';
+      'Ĉi tiu valoro estas stokita loke kaj neniam dividita.';
 
   @override
-  String get providerConfigRequired => 'This field is required';
+  String get providerConfigRequired => 'Ĉi tiu kampo estas deviga';
 
   @override
   String providerConfigSaved(Object provider) {
-    return '$provider configuration saved!';
+    return 'Agordo de $provider konservita!';
   }
 
   @override
-  String get providerConfigSectionConfigured => 'Configured';
+  String get providerConfigSectionConfigured => 'Agordita';
 
   @override
   String providerConfigNotConfigured(Object provider) {
-    return '$provider — not configured';
+    return '$provider — ne agordita';
   }
 
   @override
-  String get providerConfigure => 'Configure';
+  String get providerConfigure => 'Agordi';
 
   @override
-  String get save => 'Save';
+  String get save => 'Konservi';
 
   @override
   String get telegramErrorChatNotFound =>
-      'Chat not found. Please check your Chat ID.';
+      'Babilejo ne trovita. Bonvolu kontroli vian Babilejan ID.';
 
   @override
   String get telegramErrorBotBlocked =>
-      'Bot was blocked by the user. Unblock the bot first.';
+      'La roboto estis blokita de la uzanto. Malbloku la roboton unue.';
 
   @override
   String get telegramErrorNoRights =>
-      'Bot lacks rights to send messages in this chat.';
+      'Roboto ne rajtas sendi mesaĝojn en ĉi tiu babilejo.';
 
   @override
   String get telegramErrorInvalidToken =>
-      'Invalid bot token. Check your Bot Token from BotFather.';
+      'Nevalida robota ĵetono. Kontrolu vian Bot-Ĵetonon de BotFather.';
 
   @override
-  String get telegramSentToChat => 'Sent to Telegram chat';
+  String get telegramSentToChat => 'Sendita al Telegram-babilejo';
+
+  @override
+  String get expiryPersistent => 'Daŭra (ĝis la robotsimbolo estas revokita)';
+
+  @override
+  String get expiryIndefinite30d =>
+      'Nedifinita (neaktiva >30d povas esti forigita)';
+
+  @override
+  String get expiryOneDayExtendable => '~1 tago (etendebla post re-alŝuto)';
+
+  @override
+  String get expiryOptions1h12h24h72h => '1h / 12h / 24h / 72h';
+
+  @override
+  String get expiry3Hours => '3 horoj';
+
+  @override
+  String get expiry7Days => '7 tagoj';
 }

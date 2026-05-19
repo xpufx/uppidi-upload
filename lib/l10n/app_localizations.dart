@@ -1201,6 +1201,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sent to Telegram chat'**
   String get telegramSentToChat;
+
+  /// No description provided for @expiryPersistent.
+  ///
+  /// In en, this message translates to:
+  /// **'Persistent (until bot token is revoked)'**
+  String get expiryPersistent;
+
+  /// No description provided for @expiryIndefinite30d.
+  ///
+  /// In en, this message translates to:
+  /// **'Indefinite (inactive >30d may delete)'**
+  String get expiryIndefinite30d;
+
+  /// No description provided for @expiryOneDayExtendable.
+  ///
+  /// In en, this message translates to:
+  /// **'~1 day (extendable on re-upload)'**
+  String get expiryOneDayExtendable;
+
+  /// No description provided for @expiryOptions1h12h24h72h.
+  ///
+  /// In en, this message translates to:
+  /// **'1h / 12h / 24h / 72h'**
+  String get expiryOptions1h12h24h72h;
+
+  /// No description provided for @expiry3Hours.
+  ///
+  /// In en, this message translates to:
+  /// **'3 hours'**
+  String get expiry3Hours;
+
+  /// No description provided for @expiry7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days'**
+  String get expiry7Days;
 }
 
 class _AppLocalizationsDelegate

@@ -345,7 +345,7 @@ class _ProviderInfo extends StatelessWidget {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      l10n.expiryInfo(meta.expiryInfo!),
+                      l10n.expiryInfo(resolveExpiry(l10n, meta.expiryInfo!)),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),

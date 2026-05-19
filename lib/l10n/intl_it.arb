@@ -185,7 +185,15 @@
   "save": "Salva",
   "telegramErrorBotBlocked": "Il bot è stato bloccato dall'utente. Sblocca prima il bot.",
   "telegramErrorChatNotFound": "Chat non trovata. Controlla il tuo Chat ID.",
-  "telegramErrorInvalidToken": "Token bot non valido. Controlla il tuo Bot Token da BotFather.",
+  "telegramErrorBotBlocked": "Il bot è stato bloccato dall'utente. Sblocca prima il bot.",
   "telegramErrorNoRights": "Il bot non ha i permessi per inviare messaggi in questa chat.",
-  "telegramSentToChat": "Inviato alla chat Telegram"
+  "telegramErrorInvalidToken": "Token bot non valido. Controlla il tuo Bot Token da BotFather.",
+  "telegramSentToChat": "Inviato alla chat Telegram",
+
+  "expiryPersistent": "Persistente (fino alla revoca del token del bot)",
+  "expiryIndefinite30d": "Indefinito (inattivo >30gg può essere eliminato)",
+  "expiryOneDayExtendable": "~1 giorno (estensibile al re-upload)",
+  "expiryOptions1h12h24h72h": "1h / 12h / 24h / 72h",
+  "expiry3Hours": "3 ore",
+  "expiry7Days": "7 giorni"
 }

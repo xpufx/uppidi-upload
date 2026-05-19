@@ -583,50 +583,70 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get providerConfigDescription =>
-      'Enter the credentials required by this provider.';
+      'Inserisci le credenziali richieste da questo provider.';
 
   @override
   String get providerConfigSecretHint =>
-      'This value is stored locally and never shared.';
+      'Questo valore è memorizzato localmente e mai condiviso.';
 
   @override
-  String get providerConfigRequired => 'This field is required';
+  String get providerConfigRequired => 'Questo campo è obbligatorio';
 
   @override
   String providerConfigSaved(Object provider) {
-    return '$provider configuration saved!';
+    return 'Configurazione di $provider salvata!';
   }
 
   @override
-  String get providerConfigSectionConfigured => 'Configured';
+  String get providerConfigSectionConfigured => 'Configurato';
 
   @override
   String providerConfigNotConfigured(Object provider) {
-    return '$provider — not configured';
+    return '$provider — non configurato';
   }
 
   @override
-  String get providerConfigure => 'Configure';
+  String get providerConfigure => 'Configura';
 
   @override
-  String get save => 'Save';
+  String get save => 'Salva';
 
   @override
   String get telegramErrorChatNotFound =>
-      'Chat not found. Please check your Chat ID.';
+      'Chat non trovata. Controlla il tuo Chat ID.';
 
   @override
   String get telegramErrorBotBlocked =>
-      'Bot was blocked by the user. Unblock the bot first.';
+      'Il bot è stato bloccato dall\'utente. Sblocca prima il bot.';
 
   @override
   String get telegramErrorNoRights =>
-      'Bot lacks rights to send messages in this chat.';
+      'Il bot non ha i permessi per inviare messaggi in questa chat.';
 
   @override
   String get telegramErrorInvalidToken =>
-      'Invalid bot token. Check your Bot Token from BotFather.';
+      'Token bot non valido. Controlla il tuo Bot Token da BotFather.';
 
   @override
-  String get telegramSentToChat => 'Sent to Telegram chat';
+  String get telegramSentToChat => 'Inviato alla chat Telegram';
+
+  @override
+  String get expiryPersistent =>
+      'Persistente (fino alla revoca del token del bot)';
+
+  @override
+  String get expiryIndefinite30d =>
+      'Indefinito (inattivo >30gg può essere eliminato)';
+
+  @override
+  String get expiryOneDayExtendable => '~1 giorno (estensibile al re-upload)';
+
+  @override
+  String get expiryOptions1h12h24h72h => '1h / 12h / 24h / 72h';
+
+  @override
+  String get expiry3Hours => '3 ore';
+
+  @override
+  String get expiry7Days => '7 giorni';
 }

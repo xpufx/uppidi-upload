@@ -186,7 +186,15 @@
   "save": "yIqel",
   "telegramErrorBotBlocked": "bot loD qIp. bot yIqIt Ha'.",
   "telegramErrorChatNotFound": "chat ghobe'. Chat ID yIghoS.",
-  "telegramErrorInvalidToken": "bot token Qagh. BotFatherDaq Bot Token yIghoS.",
+  "telegramErrorBotBlocked": "bot loD qIp. bot yIqIt Ha'.",
   "telegramErrorNoRights": "bot chatDaq mIw chaw'be'.",
-  "telegramSentToChat": "Telegram chatDaq nge'"
+  "telegramErrorInvalidToken": "bot token Qagh. BotFatherDaq Bot Token yIghoS.",
+  "telegramSentToChat": "Telegram chatDaq nge'",
+
+  "expiryPersistent": "bot token QItpu'ba' rur",
+  "expiryIndefinite30d": "poH QItbe' (30h jaj QItlaH)",
+  "expiryOneDayExtendable": "~1 jaj (qa'Ha'ra'laH)",
+  "expiryOptions1h12h24h72h": "1h / 12h / 24h / 72h",
+  "expiry3Hours": "3 rep",
+  "expiry7Days": "7 jaj"
 }
