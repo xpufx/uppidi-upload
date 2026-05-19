@@ -2,6 +2,7 @@
 
 - docs: auto-update changelog
 - docs: auto-update changelog
+- docs: auto-update changelog
 - fix: Telegram override of createHttpClient bypassed validateStatus fix
 - docs: auto-update changelog
 - fix: let parseResponse handle all HTTP status codes
@@ -28,5 +29,4 @@
 - docs: auto-update changelog
 - fix: update download picks wrong APK architecture
 - fix: add shell: bash to Windows build step to fix --dart-define parsing in PowerShell
-- docs: auto-update changelog
 - docs: auto-update changelog
