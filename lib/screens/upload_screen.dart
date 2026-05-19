@@ -1016,11 +1016,11 @@ class _ResultBanner extends StatefulWidget {
 }
 
 class _ResultBannerState extends State<_ResultBanner> {
-  /// Resolves an error message string. If it's a known ARB key (all-lowercase
-  /// with no spaces), returns the localized value. Otherwise passes it through.
-  String _err(BuildContext context, String? msg) {
+  /// Resolves an error message. Simple keys are looked up via [l10n];
+  /// anything else (English strings with runtime data) passes through.
+  String _errorText(AppLocalizations l10n) {
+    final msg = widget.errorMessage;
     if (msg == null) return '';
-    final l10n = AppLocalizations.of(context);
     return switch (msg) {
       'genericError' => l10n.genericError,
       'errorSessionExpired' => l10n.errorSessionExpired,
@@ -1030,14 +1030,7 @@ class _ResultBannerState extends State<_ResultBanner> {
       'noProvidersConfigured' => l10n.noProvidersConfigured,
       'connectionTimedOut' => l10n.connectionTimedOut,
       'uploadCancelled' => l10n.uploadCancelled,
-      // Keys with embedded content: "key:content" — show the content as-is
-      _ when msg.startsWith('connectionFailedMsg:') =>
-        l10n.connectionFailedMsg(msg.substring(19)),
-      _ when msg.startsWith('serverErrorMsg:') =>
-        l10n.serverErrorMsg(msg.substring(14)),
-      _ when msg.startsWith('uploadFailedMsg:') =>
-        l10n.uploadFailedMsg(msg.substring(14)),
-      _ => msg,
+      _ => msg, // English string with runtime data — pass through
     };
   }
 
@@ -1143,7 +1136,7 @@ class _ResultBannerState extends State<_ResultBanner> {
             Row(
               children: [
                 Expanded(
-                  child: Text(_err(context, widget.errorMessage),
+                  child: Text(_errorText(l10n),
                       style:
                           TextStyle(color: Colors.red.shade700, fontSize: 13)),
                 ),

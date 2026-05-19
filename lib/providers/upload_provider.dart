@@ -739,9 +739,10 @@ String _formatSpeed(double bytesPerSec) {
   return '${(bytesPerSec / (1024 * 1024)).toStringAsFixed(1)} MB/s';
 }
 
-/// Maps DioException to a localization key. The UI resolves these via
-/// AppLocalizations. Non-key content (status codes, messages) is embedded
-/// and passed through.
+/// Maps DioException to an error message string.
+/// If the value is a simple camelCase key, the UI resolves it via l10n.
+/// If it contains runtime data (status codes, server messages), it's a
+/// ready-to-display English string that passes through as-is.
 String _mapDioException(DioException e) {
   return switch (e.type) {
     DioExceptionType.cancel => 'uploadCancelled',
@@ -750,10 +751,10 @@ String _mapDioException(DioException e) {
     DioExceptionType.receiveTimeout =>
       'connectionTimedOut',
     DioExceptionType.connectionError =>
-      'connectionFailedMsg:${e.message ?? "server unreachable"}',
+      'Connection failed: ${e.message ?? "server unreachable"}',
     DioExceptionType.badResponse =>
-      'serverErrorMsg:${e.response?.statusCode ?? "unknown"}',
-    _ => 'uploadFailedMsg:${e.message ?? e.type.name}',
+      'Server error: ${e.response?.statusCode ?? "unknown"}',
+    _ => 'Upload failed: ${e.message ?? e.type.name}',
   };
 }
 
