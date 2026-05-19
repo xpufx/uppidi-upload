@@ -137,7 +137,8 @@ jobs:
         shell: bash
         run: |
           sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${{ needs.version.outputs.version }}';/" lib/core/version.dart
-      - run: |
+      - shell: bash
+        run: |
           flutter build windows --release \
             --dart-define=GIT_HASH=${{ needs.version.outputs.hash }} \
             ${{ needs.version.outputs.dev_define }}
