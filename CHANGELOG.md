@@ -1,5 +1,10 @@
 # Changelog
 
+- fix: resolve all use_build_context_synchronously lints
+- chore: commit Telegram provider, config sheet, and version bump to v1.2.0+10
+- fix: resolve upload page crash (late _l10n, _isImage, _anim) and test regressions
+- fix: wire eo/tlh to language dropdown and add Telegram favicon
+- docs: auto-update changelog
 - docs: auto-update changelog
 - fix: update download picks wrong APK architecture
 - fix: add shell: bash to Windows build step to fix --dart-define parsing in PowerShell
@@ -25,8 +30,3 @@
 - fix: AppImage runtime must precede squashfs
 - fix: HTTP client leaks, history save ordering, resetCrop MIME, log file size, CDN URL gating, remove web support
 - docs: add git discipline rules to AGENTS.md
-- track AGENTS.md, add CI docs
-- ci: fix all artifact uploads to use exact paths, not globs
-- remove tracked build artifacts from git
-- gitignore: exclude build artifacts in repo root
-- ci: clean stale artifacts before release upload
