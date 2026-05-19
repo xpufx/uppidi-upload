@@ -1,5 +1,11 @@
 # Changelog
 
+- fix: proper locale handling for tlh and eo (custom delegate)
+- fix: remove eo/tlh from language dropdown (break Material locale)
+- feat: two-step auth test in provider config dialog
+- feat: add Test Auth button to provider config dialog
+- feat: store provider credentials in encrypted storage
+- docs: auto-update changelog
 - fix: resolve all use_build_context_synchronously lints
 - chore: commit Telegram provider, config sheet, and version bump to v1.2.0+10
 - fix: resolve upload page crash (late _l10n, _isImage, _anim) and test regressions
@@ -24,9 +30,3 @@
 - fix: use tar instead of Compress-Archive for Windows zip to preserve directory structure
 - ci: sync version.dart from pubspec.yaml before each build
 - release v1.2.0+8
-- revert Windows zip to Compress-Archive
-- fix: normalize backslashes to forward slashes in zip entries
-- fix: use .NET ZipArchive for forward-slash paths in Windows zip
-- fix: AppImage runtime must precede squashfs
-- fix: HTTP client leaks, history save ordering, resetCrop MIME, log file size, CDN URL gating, remove web support
-- docs: add git discipline rules to AGENTS.md
