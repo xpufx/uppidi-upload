@@ -10,6 +10,7 @@ import '../providers/frisk_provider.dart';
 import '../providers/httpbin_provider.dart';
 import '../providers/litterbox_provider.dart';
 import '../providers/tempsh_provider.dart';
+import '../providers/telegram_provider.dart';
 import '../providers/tmpfilelink_provider.dart';
 import '../providers/uguu_provider.dart';
 
@@ -36,6 +37,7 @@ class ProviderRegistry {
     ),
     TempShProvider(),
     LitterboxProvider(),
+    TelegramProvider(),
     if (devProviders)
       UguuProvider(
         name: 'Uguu (milan)',

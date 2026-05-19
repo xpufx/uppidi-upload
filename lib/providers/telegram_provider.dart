@@ -1,0 +1,215 @@
+import 'package:dio/dio.dart';
+
+import '../core/interfaces/base_http_provider.dart';
+import '../core/models/provider_metadata.dart';
+import '../core/models/upload_result.dart';
+import '../core/platform/insecure_adapter.dart';
+
+/// Telegram Bot API provider.
+///
+/// Uploads files to a configured Telegram chat via a bot.
+/// Requires `bot_token` and `chat_id` to be configured in provider settings.
+///
+/// The bot token is obtained from [BotFather](https://t.me/BotFather).
+/// The chat ID can be obtained by messaging the bot and checking
+/// `https://api.telegram.org/bot<token>/getUpdates`.
+class TelegramProvider extends BaseHttpProvider {
+  @override
+  ProviderMetadata get metadata => const ProviderMetadata(
+        maxFileSizeBytes: 50 * 1024 * 1024, // 50 MB
+        expiryInfo: 'Persistent (until bot token is revoked)',
+        supportsDirectLink: false,
+        capabilities: {ProviderCapability.requiresAuth},
+      );
+
+  @override
+  String get providerId => 'telegram';
+
+  @override
+  String get providerName => 'Telegram';
+
+  /// baseUrl is overridden dynamically in [createHttpClient] to include the
+  /// bot token, so this getter is never actually read by the parent's
+  /// [createHttpClient] implementation.
+  @override
+  String get baseUrl => 'https://api.telegram.org';
+
+  @override
+  String get uploadEndpoint => '/sendDocument';
+
+  @override
+  String get fileFormFieldName => 'document';
+
+  @override
+  bool get supportsWeb => false;
+
+  @override
+  List<String> get requiredConfigKeys => ['bot_token', 'chat_id'];
+
+  @override
+  Map<String, String> get configLabels => const {
+        'bot_token': 'Bot Token',
+        'chat_id': 'Chat ID',
+      };
+
+  @override
+  String? get proxyUrl => null;
+
+  @override
+  Map<String, String> get additionalFormFields => const {};
+
+  @override
+  Future<Dio> createHttpClient(
+    Map<String, String> config, {
+    bool allowInsecureConn = false,
+    String? proxyUrl,
+  }) async {
+    final token = config['bot_token'] ?? '';
+    final apiBase = token.isNotEmpty
+        ? 'https://api.telegram.org/bot$token'
+        : 'https://api.telegram.org';
+
+    final dio = Dio(BaseOptions(
+      baseUrl: apiBase,
+      connectTimeout: const Duration(seconds: 60),
+      receiveTimeout: const Duration(seconds: 120),
+    ));
+
+    if (allowInsecureConn) {
+      configureInsecureConn(dio);
+    }
+
+    if (proxyUrl != null && proxyUrl.isNotEmpty) {
+      configureProxy(dio, proxyUrl);
+    }
+
+    return dio;
+  }
+
+  @override
+  Map<String, dynamic> buildFormFields(Map<String, String> config) {
+    return {
+      'chat_id': config['chat_id'] ?? '',
+    };
+  }
+
+  @override
+  UploadResult parseResponse(Response response) {
+    try {
+      if (response.data is! Map) {
+        return UploadResult(
+          success: false,
+          errorMessage: 'genericError',
+          rawError: 'Unexpected response type: ${response.data.runtimeType}',
+          statusCode: response.statusCode,
+        );
+      }
+
+      final data = response.data as Map<String, dynamic>;
+
+      if (data['ok'] != true) {
+        final errorCode = data['error_code'];
+        final description = (data['description'] as String?) ?? 'Unknown error';
+
+        return UploadResult(
+          success: false,
+          errorMessage: _mapTelegramError(errorCode, description),
+          rawError: 'Telegram API error $errorCode: $description',
+          statusCode: errorCode is int ? errorCode : response.statusCode,
+        );
+      }
+
+      // Extract message_id and chat_id from the result
+      final result = data['result'] as Map<String, dynamic>?;
+      if (result == null) {
+        return UploadResult(
+          success: false,
+          errorMessage: 'genericError',
+          rawError: 'Missing "result" in Telegram response',
+          statusCode: response.statusCode,
+        );
+      }
+
+      final messageId = result['message_id'];
+      final chat = result['chat'] as Map<String, dynamic>?;
+      final chatId = chat?['id'];
+
+      if (messageId == null || chatId == null) {
+        return UploadResult(
+          success: false,
+          errorMessage: 'genericError',
+          rawError: 'Missing message_id or chat_id in Telegram response',
+          statusCode: response.statusCode,
+        );
+      }
+
+      // Build a t.me link
+      final link = _buildTelegramLink(chatId.toString(), messageId.toString());
+
+      return UploadResult(
+        success: true,
+        url: link,
+        statusCode: response.statusCode,
+      );
+    } catch (e) {
+      return UploadResult(
+        success: false,
+        errorMessage: 'genericError',
+        rawError: 'Failed to parse Telegram response: $e',
+        statusCode: response.statusCode,
+      );
+    }
+  }
+
+  /// Maps a Telegram API error code and description to a user-friendly
+  /// error message key (resolved via l10n), or a plain English string
+  /// with runtime data.
+  String _mapTelegramError(Object? errorCode, String description) {
+    final descLower = description.toLowerCase();
+
+    if (descLower.contains('chat not found')) {
+      return 'telegramErrorChatNotFound';
+    }
+    if (descLower.contains('bot was blocked')) {
+      return 'telegramErrorBotBlocked';
+    }
+    if (descLower.contains('not enough rights') ||
+        descLower.contains('rights')) {
+      return 'telegramErrorNoRights';
+    }
+    if (descLower.contains('file is too big') ||
+        descLower.contains('too large')) {
+      return 'errorFileTooLarge';
+    }
+    if (descLower.contains('invalid token') ||
+        descLower.contains('unauthorized')) {
+      return 'telegramErrorInvalidToken';
+    }
+
+    // Generic fallback with the description
+    return 'Telegram: $description';
+  }
+
+  /// Builds a t.me/c/ link from a chat ID and message ID.
+  ///
+  /// - Supergroups have chat IDs like `-1001234567890` → link is
+  ///   `https://t.me/c/1234567890/{message_id}`
+  /// - Other groups have negative IDs → `https://t.me/c/{abs_id}/{message_id}`
+  /// - Private chats have positive IDs → deep link via tg://
+  String _buildTelegramLink(String chatId, String messageId) {
+    var stripped = chatId;
+
+    // Supergroup IDs start with -100
+    if (stripped.startsWith('-100')) {
+      stripped = stripped.substring(4);
+    } else if (stripped.startsWith('-')) {
+      // Other negative IDs (private groups)
+      stripped = stripped.substring(1);
+    } else {
+      // Positive IDs are private chats — use tg:// deep link
+      return 'tg://openmessage?chat_id=$chatId&message_id=$messageId';
+    }
+
+    return 'https://t.me/c/$stripped/$messageId';
+  }
+}

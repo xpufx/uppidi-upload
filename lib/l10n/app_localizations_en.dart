@@ -578,4 +578,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String versionPrefix(Object version) {
     return 'v$version';
   }
+
+  @override
+  String get providerConfigDescription =>
+      'Enter the credentials required by this provider.';
+
+  @override
+  String get providerConfigSecretHint =>
+      'This value is stored locally and never shared.';
+
+  @override
+  String get providerConfigRequired => 'This field is required';
+
+  @override
+  String providerConfigSaved(Object provider) {
+    return '$provider configuration saved!';
+  }
+
+  @override
+  String get providerConfigSectionConfigured => 'Configured';
+
+  @override
+  String providerConfigNotConfigured(Object provider) {
+    return '$provider — not configured';
+  }
+
+  @override
+  String get providerConfigure => 'Configure';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get telegramErrorChatNotFound =>
+      'Chat not found. Please check your Chat ID.';
+
+  @override
+  String get telegramErrorBotBlocked =>
+      'Bot was blocked by the user. Unblock the bot first.';
+
+  @override
+  String get telegramErrorNoRights =>
+      'Bot lacks rights to send messages in this chat.';
+
+  @override
+  String get telegramErrorInvalidToken =>
+      'Invalid bot token. Check your Bot Token from BotFather.';
+
+  @override
+  String get telegramSentToChat => 'Sent to Telegram chat';
 }

@@ -1123,6 +1123,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'v{version}'**
   String versionPrefix(Object version);
+
+  /// No description provided for @providerConfigDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the credentials required by this provider.'**
+  String get providerConfigDescription;
+
+  /// No description provided for @providerConfigSecretHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This value is stored locally and never shared.'**
+  String get providerConfigSecretHint;
+
+  /// No description provided for @providerConfigRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get providerConfigRequired;
+
+  /// No description provided for @providerConfigSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{provider} configuration saved!'**
+  String providerConfigSaved(Object provider);
+
+  /// No description provided for @providerConfigSectionConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Configured'**
+  String get providerConfigSectionConfigured;
+
+  /// No description provided for @providerConfigNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'{provider} — not configured'**
+  String providerConfigNotConfigured(Object provider);
+
+  /// No description provided for @providerConfigure.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure'**
+  String get providerConfigure;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @telegramErrorChatNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat not found. Please check your Chat ID.'**
+  String get telegramErrorChatNotFound;
+
+  /// No description provided for @telegramErrorBotBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Bot was blocked by the user. Unblock the bot first.'**
+  String get telegramErrorBotBlocked;
+
+  /// No description provided for @telegramErrorNoRights.
+  ///
+  /// In en, this message translates to:
+  /// **'Bot lacks rights to send messages in this chat.'**
+  String get telegramErrorNoRights;
+
+  /// No description provided for @telegramErrorInvalidToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid bot token. Check your Bot Token from BotFather.'**
+  String get telegramErrorInvalidToken;
+
+  /// No description provided for @telegramSentToChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to Telegram chat'**
+  String get telegramSentToChat;
 }
 
 class _AppLocalizationsDelegate

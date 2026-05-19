@@ -173,5 +173,20 @@
   "debugLogCopied": "{label} — copied to clipboard",
 
   "devBuild": "DEV BUILD",
-  "versionPrefix": "v{version}"
+  "versionPrefix": "v{version}",
+
+  "providerConfigDescription": "Enter the credentials required by this provider.",
+  "providerConfigSecretHint": "This value is stored locally and never shared.",
+  "providerConfigRequired": "This field is required",
+  "providerConfigSaved": "{provider} configuration saved!",
+  "providerConfigSectionConfigured": "Configured",
+  "providerConfigNotConfigured": "{provider} — not configured",
+  "providerConfigure": "Configure",
+  "save": "Save",
+
+  "telegramErrorChatNotFound": "Chat not found. Please check your Chat ID.",
+  "telegramErrorBotBlocked": "Bot was blocked by the user. Unblock the bot first.",
+  "telegramErrorNoRights": "Bot lacks rights to send messages in this chat.",
+  "telegramErrorInvalidToken": "Invalid bot token. Check your Bot Token from BotFather.",
+  "telegramSentToChat": "Sent to Telegram chat"
 }
