@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image/image.dart' as img;
 
 import '../core/history_service.dart';
@@ -16,6 +17,11 @@ import '../core/models/upload_result.dart';
 import '../core/platform/file_source.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
+
+const _secure = FlutterSecureStorage();
+
+String _secureKey(String providerId, String key) =>
+    'provider_config_${providerId}_$key';
 
 final _log = Log('UploadNotifier');
 
@@ -492,6 +498,18 @@ class UploadNotifier extends Notifier<UploadState> {
         provider.providerId,
         provider.requiredConfigKeys,
       );
+      // Provider credentials moved to FlutterSecureStorage.
+      // Merge them into the config so the upload has access to tokens.
+      for (final key in provider.requiredConfigKeys) {
+        if (!config.containsKey(key) || config[key]!.isEmpty) {
+          final secure = await _secure.read(
+            key: _secureKey(provider.providerId, key),
+          );
+          if (secure != null && secure.isNotEmpty) {
+            config[key] = secure;
+          }
+        }
+      }
 
       final allowInsecure = await settingsService.isInsecureConnAllowed();
       if (allowInsecure) {

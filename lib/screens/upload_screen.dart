@@ -1319,15 +1319,23 @@ class _ResultBannerState extends State<_ResultBanner> {
 
 /// Shows a warning banner when the selected provider requires auth
 /// configuration but hasn't been set up yet.
-class _ProviderConfigStatus extends ConsumerWidget {
+class _ProviderConfigStatus extends ConsumerStatefulWidget {
   final BaseUploader provider;
 
   const _ProviderConfigStatus({required this.provider});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ProviderConfigStatus> createState() =>
+      _ProviderConfigStatusState();
+}
+
+class _ProviderConfigStatusState extends ConsumerState<_ProviderConfigStatus> {
+  int _configVersion = 0;
+
+  @override
+  Widget build(BuildContext context) {
     // Only show for providers that require auth
-    if (!provider.metadata.capabilities
+    if (!widget.provider.metadata.capabilities
         .contains(ProviderCapability.requiresAuth)) {
       return const SizedBox.shrink();
     }
@@ -1335,8 +1343,10 @@ class _ProviderConfigStatus extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
+    // Re-run the future when configVersion increments (after save).
     return FutureBuilder<bool>(
-      future: isProviderConfigured(ref, provider),
+      key: ValueKey('config_${widget.provider.providerId}_$_configVersion'),
+      future: isProviderConfigured(ref, widget.provider),
       builder: (context, snapshot) {
         final configured = snapshot.data ?? false;
         if (configured) return const SizedBox.shrink();
@@ -1356,7 +1366,8 @@ class _ProviderConfigStatus extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    l10n.providerConfigNotConfigured(provider.providerName),
+                    l10n.providerConfigNotConfigured(
+                        widget.provider.providerName),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: Colors.orange.shade900,
                     ),
@@ -1364,8 +1375,13 @@ class _ProviderConfigStatus extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 FilledButton.tonalIcon(
-                  onPressed: () =>
-                      showProviderConfigDialog(context, ref, provider),
+                  onPressed: () async {
+                    final saved = await showProviderConfigDialog(
+                        context, ref, widget.provider);
+                    if (saved && mounted) {
+                      setState(() => _configVersion++);
+                    }
+                  },
                   icon: const Icon(Icons.settings, size: 16),
                   label: Text(l10n.providerConfigure),
                   style: FilledButton.styleFrom(
