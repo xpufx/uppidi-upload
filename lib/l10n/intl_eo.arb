@@ -195,5 +195,9 @@
   "expiryOneDayExtendable": "~1 tago (etendebla post re-alŝuto)",
   "expiryOptions1h12h24h72h": "1h / 12h / 24h / 72h",
   "expiry3Hours": "3 horoj",
-  "expiry7Days": "7 tagoj"
+  "expiry7Days": "7 tagoj",
+
+  "mimeTypesImagesOnly": "Nur bildoj",
+  "configLabelBotToken": "Bot-Ĵetono",
+  "configLabelChatId": "Babileja ID"
 }

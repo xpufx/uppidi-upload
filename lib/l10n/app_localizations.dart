@@ -1237,6 +1237,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'7 days'**
   String get expiry7Days;
+
+  /// No description provided for @mimeTypesImagesOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Images only'**
+  String get mimeTypesImagesOnly;
+
+  /// No description provided for @configLabelBotToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Bot Token'**
+  String get configLabelBotToken;
+
+  /// No description provided for @configLabelChatId.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat ID'**
+  String get configLabelChatId;
 }
 
 class _AppLocalizationsDelegate

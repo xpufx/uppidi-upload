@@ -195,5 +195,9 @@
   "expiryOneDayExtendable": "~1 gün (yeniden yüklemeyle uzatılabilir)",
   "expiryOptions1h12h24h72h": "1s / 12s / 24s / 72s",
   "expiry3Hours": "3 saat",
-  "expiry7Days": "7 gün"
+  "expiry7Days": "7 gün",
+
+  "mimeTypesImagesOnly": "Yalnızca görseller",
+  "configLabelBotToken": "Bot Tokeni",
+  "configLabelChatId": "Sohbet ID'si"
 }

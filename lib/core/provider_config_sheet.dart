@@ -20,6 +20,15 @@ class _TestStep {
   const _TestStep(this.label, this.ok, this.detail);
 }
 
+/// Resolves a config field label to a localized string.
+String _resolveCfgLabel(AppLocalizations l10n, String raw) {
+  return switch (raw) {
+    'Bot Token' => l10n.configLabelBotToken,
+    'Chat ID' => l10n.configLabelChatId,
+    _ => raw,
+  };
+}
+
 /// Shows a configuration dialog/sheet for a provider that requires
 /// authentication credentials (e.g. bot tokens, API keys).
 ///
@@ -217,7 +226,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
               ),
               const SizedBox(height: 16),
               ...widget.provider.requiredConfigKeys.map((key) {
-                final label = labels[key] ?? key;
+                final label = _resolveCfgLabel(l10n, labels[key] ?? key);
                 final isSecret = key.toLowerCase().contains('token') ||
                     key.toLowerCase().contains('key') ||
                     key.toLowerCase().contains('secret');

@@ -195,5 +195,9 @@
   "expiryOneDayExtendable": "~1 giorno (estensibile al re-upload)",
   "expiryOptions1h12h24h72h": "1h / 12h / 24h / 72h",
   "expiry3Hours": "3 ore",
-  "expiry7Days": "7 giorni"
+  "expiry7Days": "7 giorni",
+
+  "mimeTypesImagesOnly": "Solo immagini",
+  "configLabelBotToken": "Token del Bot",
+  "configLabelChatId": "ID Chat"
 }

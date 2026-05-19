@@ -634,4 +634,13 @@ class AppLocalizationsTlh extends AppLocalizations {
 
   @override
   String get expiry7Days => '7 jaj';
+
+  @override
+  String get mimeTypesImagesOnly => 'qabmey neH';
+
+  @override
+  String get configLabelBotToken => 'bot token';
+
+  @override
+  String get configLabelChatId => 'chat ID';
 }

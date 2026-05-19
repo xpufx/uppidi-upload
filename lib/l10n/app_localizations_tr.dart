@@ -650,4 +650,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get expiry7Days => '7 gün';
+
+  @override
+  String get mimeTypesImagesOnly => 'Yalnızca görseller';
+
+  @override
+  String get configLabelBotToken => 'Bot Tokeni';
+
+  @override
+  String get configLabelChatId => 'Sohbet ID\'si';
 }

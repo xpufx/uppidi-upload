@@ -645,4 +645,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get expiry7Days => '7 days';
+
+  @override
+  String get mimeTypesImagesOnly => 'Images only';
+
+  @override
+  String get configLabelBotToken => 'Bot Token';
+
+  @override
+  String get configLabelChatId => 'Chat ID';
 }

@@ -196,5 +196,9 @@
   "expiryOneDayExtendable": "~1 jaj (qa'Ha'ra'laH)",
   "expiryOptions1h12h24h72h": "1h / 12h / 24h / 72h",
   "expiry3Hours": "3 rep",
-  "expiry7Days": "7 jaj"
+  "expiry7Days": "7 jaj",
+
+  "mimeTypesImagesOnly": "qabmey neH",
+  "configLabelBotToken": "bot token",
+  "configLabelChatId": "chat ID"
 }

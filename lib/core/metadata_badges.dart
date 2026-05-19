@@ -14,7 +14,16 @@ String resolveExpiry(AppLocalizations l10n, String raw) {
     '3 hours' => l10n.expiry3Hours,
     '3 days' => l10n.expiry3Days,
     '7 days' => l10n.expiry7Days,
-    _ => raw, // unknown string — show as-is
+    _ => raw,
+  };
+}
+
+/// Resolves a provider mime-type label to a localized value.
+/// Dynamic labels like "PNG, JPG" pass through; known labels localize.
+String resolveMimeLabel(AppLocalizations l10n, String raw) {
+  return switch (raw) {
+    'Images only' => l10n.mimeTypesImagesOnly,
+    _ => raw,
   };
 }
 

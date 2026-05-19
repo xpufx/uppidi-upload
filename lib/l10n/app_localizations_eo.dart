@@ -647,4 +647,13 @@ class AppLocalizationsEo extends AppLocalizations {
 
   @override
   String get expiry7Days => '7 tagoj';
+
+  @override
+  String get mimeTypesImagesOnly => 'Nur bildoj';
+
+  @override
+  String get configLabelBotToken => 'Bot-Ĵetono';
+
+  @override
+  String get configLabelChatId => 'Babileja ID';
 }

@@ -329,7 +329,8 @@ class _ProviderInfo extends StatelessWidget {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      l10n.acceptedFiles(meta.mimeTypeLabel),
+                      l10n.acceptedFiles(
+                          resolveMimeLabel(l10n, meta.mimeTypeLabel)),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
