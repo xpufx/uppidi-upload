@@ -1,5 +1,8 @@
 # Changelog
 
+- feat: localize provider metadata (expiry info, descriptions)
+- chore: add missing translations for all locales
+- docs: auto-update changelog
 - fix: proper locale handling for tlh and eo (custom delegate)
 - fix: remove eo/tlh from language dropdown (break Material locale)
 - feat: two-step auth test in provider config dialog
@@ -27,6 +30,3 @@
 - update deps: file_picker 8→12, share_plus 12→13; fix turkish translations
 - docs: auto-update changelog
 - bump version to 1.2.0+9
-- fix: use tar instead of Compress-Archive for Windows zip to preserve directory structure
-- ci: sync version.dart from pubspec.yaml before each build
-- release v1.2.0+8
