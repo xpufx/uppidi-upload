@@ -5,6 +5,7 @@
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
+- docs: auto-update changelog
 - fix: Telegram override of createHttpClient bypassed validateStatus fix
 - docs: auto-update changelog
 - fix: let parseResponse handle all HTTP status codes
@@ -29,4 +30,3 @@
 - fix: wire eo/tlh to language dropdown and add Telegram favicon
 - docs: auto-update changelog
 - docs: auto-update changelog
-- fix: update download picks wrong APK architecture
