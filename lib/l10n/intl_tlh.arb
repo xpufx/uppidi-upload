@@ -174,5 +174,19 @@
   "debugLogCopied": "{label} — rur ghe'tor",
 
   "devBuild": "DEV BUILD",
-  "versionPrefix": "v{version}"
+  "versionPrefix": "v{version}",
+
+  "providerConfigDescription": "ngeDna'vaD pat yIchenmoH.",
+  "providerConfigNotConfigured": "{provider} — pat ghobe'",
+  "providerConfigRequired": "QochDaq Doch yIqel",
+  "providerConfigSaved": "{provider} pat chenmoHlu'!",
+  "providerConfigSecretHint": "Dochvam 'ay'Daq yIqel. latlhvaD yIbejQo'.",
+  "providerConfigSectionConfigured": "chenmoHlu'",
+  "providerConfigure": "chenmoH",
+  "save": "yIqel",
+  "telegramErrorBotBlocked": "bot loD qIp. bot yIqIt Ha'.",
+  "telegramErrorChatNotFound": "chat ghobe'. Chat ID yIghoS.",
+  "telegramErrorInvalidToken": "bot token Qagh. BotFatherDaq Bot Token yIghoS.",
+  "telegramErrorNoRights": "bot chatDaq mIw chaw'be'.",
+  "telegramSentToChat": "Telegram chatDaq nge'"
 }

@@ -173,5 +173,19 @@
   "debugLogCopied": "{label} — kopiis al tondujo",
 
   "devBuild": "TESTA VERSIO",
-  "versionPrefix": "v{version}"
+  "versionPrefix": "v{version}",
+
+  "providerConfigDescription": "Enigu la necesajn akreditaĵojn por ĉi tiu provizanto.",
+  "providerConfigNotConfigured": "{provider} — ne agordita",
+  "providerConfigRequired": "Ĉi tiu kampo estas deviga",
+  "providerConfigSaved": "Agordo de {provider} konservita!",
+  "providerConfigSecretHint": "Ĉi tiu valoro estas stokita loke kaj neniam dividita.",
+  "providerConfigSectionConfigured": "Agordita",
+  "providerConfigure": "Agordi",
+  "save": "Konservi",
+  "telegramErrorBotBlocked": "La roboto estis blokita de la uzanto. Malbloku la roboton unue.",
+  "telegramErrorChatNotFound": "Babilejo ne trovita. Bonvolu kontroli vian Babilejan ID.",
+  "telegramErrorInvalidToken": "Nevalida robota ĵetono. Kontrolu vian Bot-Ĵetonon de BotFather.",
+  "telegramErrorNoRights": "Roboto ne rajtas sendi mesaĝojn en ĉi tiu babilejo.",
+  "telegramSentToChat": "Sendita al Telegram-babilejo"
 }

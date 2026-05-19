@@ -173,5 +173,19 @@
   "debugLogCopied": "{label} — panoya kopyalandı",
 
   "devBuild": "GELİŞTİRME YAPISI",
-  "versionPrefix": "v{version}"
+  "versionPrefix": "v{version}",
+
+  "providerConfigDescription": "Bu sağlayıcının gerektirdiği kimlik bilgilerini girin.",
+  "providerConfigNotConfigured": "{provider} — yapılandırılmamış",
+  "providerConfigRequired": "Bu alan zorunludur",
+  "providerConfigSaved": "{provider} yapılandırması kaydedildi!",
+  "providerConfigSecretHint": "Bu değer yerel olarak saklanır ve asla paylaşılmaz.",
+  "providerConfigSectionConfigured": "Yapılandırıldı",
+  "providerConfigure": "Yapılandır",
+  "save": "Kaydet",
+  "telegramErrorBotBlocked": "Bot kullanıcı tarafından engellendi. Önce botun engelini kaldırın.",
+  "telegramErrorChatNotFound": "Chat bulunamadı. Chat ID'nizi kontrol edin.",
+  "telegramErrorInvalidToken": "Geçersiz bot tokeni. BotFather'dan Bot Token'inizi kontrol edin.",
+  "telegramErrorNoRights": "Botun bu sohbette mesaj gönderme izni yok.",
+  "telegramSentToChat": "Telegram sohbetine gönderildi"
 }
