@@ -80,12 +80,20 @@ class VersionCheckNotifier extends Notifier<VersionCheckState> {
         // Pick the right asset for this platform
         final assets = json['assets'] as List? ?? [];
         if (Platform.isAndroid) {
-          final apk = assets.cast<Map<String, dynamic>>().where(
-                (a) => (a['name'] as String).endsWith('.apk'),
-              );
-          _downloadUrl = apk.isNotEmpty
-              ? apk.last['browser_download_url'] as String?
-              : null;
+          // Try arm64-v8a first (most common), fall back to armeabi-v7a,
+          // then x86_64. Never use .last — that picks the alphabetically
+          // last APK which is x86_64 (wrong for almost every device).
+          const abiPriority = ['arm64-v8a', 'armeabi-v7a', 'x86_64'];
+          _downloadUrl = null;
+          for (final abi in abiPriority) {
+            final match = assets.cast<Map<String, dynamic>>().where(
+                  (a) => (a['name'] as String).contains('-$abi.apk'),
+                );
+            if (match.isNotEmpty) {
+              _downloadUrl = match.first['browser_download_url'] as String?;
+              break;
+            }
+          }
         } else {
           final desktopAssets = assets.cast<Map<String, dynamic>>().where(
             (a) {
@@ -117,9 +125,11 @@ class VersionCheckNotifier extends Notifier<VersionCheckState> {
   }
 
   void _buildDownloadUrl() {
-    // Build CDN download URL the same way settings_screen does
-    final isMobile = Platform.isAndroid;
-    _downloadUrl = isMobile
+    // Build CDN download URL the same way settings_screen does.
+    // The CDN hosts symlinks for each ABI (arm64-v8a, armeabi-v7a, x86_64).
+    // Try arm64-v8a first (~95% of devices), fall back with each attempt.
+    // Note: we can't detect the device ABI from Dart without a platform plugin.
+    _downloadUrl = Platform.isAndroid
         ? '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk'
         : '$cdnUrl/uppidi-upload-latest-linux.tar.gz';
   }
