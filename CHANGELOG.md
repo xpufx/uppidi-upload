@@ -1,5 +1,8 @@
 # Changelog
 
+- fix: update download picks wrong APK architecture
+- fix: add shell: bash to Windows build step to fix --dart-define parsing in PowerShell
+- docs: auto-update changelog
 - docs: auto-update changelog
 - refactor: simplify error-message resolution
 - feat: localize remaining hardcoded UI strings across 5 source files
@@ -27,6 +30,3 @@
 - gitignore: exclude build artifacts in repo root
 - ci: clean stale artifacts before release upload
 - ci: fix GH_TOKEN env var name
-- release v1.2.0+7
-- ci: create release with auto-generated notes on tag push
-- fix: build AppImage via mksquashfs + runtime (no FUSE needed)
