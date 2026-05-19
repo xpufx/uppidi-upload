@@ -13,6 +13,13 @@ final _secure = FlutterSecureStorage();
 String _configKey(String providerId, String key) =>
     'provider_config_${providerId}_$key';
 
+class _TestStep {
+  final String label;
+  final bool ok;
+  final String detail;
+  const _TestStep(this.label, this.ok, this.detail);
+}
+
 /// Shows a configuration dialog/sheet for a provider that requires
 /// authentication credentials (e.g. bot tokens, API keys).
 ///
@@ -44,8 +51,9 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   late Map<String, TextEditingController> _controllers;
   bool _isSaving = false;
   bool _isTesting = false;
-  bool? _testSuccess;
-  String _testMessage = '';
+
+  /// Each test step: (label, ok?, detail).
+  final List<_TestStep> _testSteps = [];
 
   @override
   void initState() {
@@ -68,11 +76,13 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
     }
   }
 
+  /// Runs a multi-step auth test. For Telegram: step 1 = bot token (getMe),
+  /// step 2 = chat access (getChat). For other providers: simple connectivity.
   Future<void> _testAuth() async {
+    final steps = <_TestStep>[];
     setState(() {
       _isTesting = true;
-      _testSuccess = null;
-      _testMessage = '';
+      _testSteps.clear();
     });
 
     try {
@@ -83,73 +93,84 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
         if (value.isNotEmpty) config[key] = value;
       }
 
-      // Telegram-specific test: call getMe with the bot token
-      if (provider.providerId == 'telegram') {
-        final token = config['bot_token'] ?? '';
-        if (token.isEmpty) {
-          setState(() {
-            _testSuccess = false;
-            _testMessage = 'Bot token is required';
-          });
-          return;
-        }
-        final client = HttpClient();
-        try {
-          final request = await client.getUrl(
+      final client = HttpClient();
+      try {
+        if (provider.providerId == 'telegram') {
+          // ── Step 1: validate bot_token via getMe ──
+          final token = config['bot_token'] ?? '';
+          var meRequest = await client.getUrl(
             Uri.parse('https://api.telegram.org/bot$token/getMe'),
           );
-          final response = await request.close();
-          final body = await response.transform(utf8.decoder).join();
-          final json = jsonDecode(body) as Map<String, dynamic>;
+          var meResponse = await meRequest.close();
+          var meBody = await meResponse.transform(utf8.decoder).join();
+          var meJson = jsonDecode(meBody) as Map<String, dynamic>;
 
-          if (response.statusCode == 200 && json['ok'] == true) {
-            final botName = json['result']?['username'] ?? 'unknown';
-            setState(() {
-              _testSuccess = true;
-              _testMessage = 'Connected as @$botName';
-            });
+          if (meResponse.statusCode == 200 && meJson['ok'] == true) {
+            final botName = meJson['result']?['username'] ?? 'unknown';
+            steps.add(_TestStep('Bot token', true, 'Connected as @$botName'));
           } else {
-            final desc = json['description'] ?? 'Unknown error';
+            steps.add(_TestStep(
+                'Bot token', false, meJson['description'] ?? 'Invalid'));
             setState(() {
-              _testSuccess = false;
-              _testMessage = '$desc';
+              _testSteps
+                ..clear()
+                ..addAll(steps);
             });
+            return; // no point checking chat if token fails
           }
-        } finally {
-          client.close();
+
+          // ── Step 2: verify chat_id via getChat ──
+          final chatId = config['chat_id'] ?? '';
+          if (chatId.isEmpty) {
+            steps.add(const _TestStep('Chat ID', false, 'Not provided'));
+          } else {
+            var chatRequest = await client.getUrl(Uri.parse(
+                'https://api.telegram.org/bot$token/getChat?chat_id=$chatId'));
+            var chatResponse = await chatRequest.close();
+            var chatBody = await chatResponse.transform(utf8.decoder).join();
+            var chatJson = jsonDecode(chatBody) as Map<String, dynamic>;
+
+            if (chatResponse.statusCode == 200 && chatJson['ok'] == true) {
+              final title = chatJson['result']?['title'] ??
+                  chatJson['result']?['first_name'] ??
+                  'found';
+              steps.add(_TestStep('Chat ID', true, 'Chat "$title" accessible'));
+            } else {
+              steps.add(_TestStep(
+                  'Chat ID', false, chatJson['description'] ?? 'Not found'));
+            }
+          }
+        } else {
+          // Generic: try a simple HEAD/GET to the provider's base URL
+          final dio = await provider.createHttpClient(config);
+          try {
+            await dio.head('/');
+            steps.add(const _TestStep('Connectivity', true, 'Reachable'));
+          } catch (_) {
+            try {
+              await dio.get('/');
+              steps.add(const _TestStep('Connectivity', true, 'Reachable'));
+            } catch (e2) {
+              steps.add(_TestStep('Connectivity', false, '$e2'));
+            }
+          } finally {
+            dio.close();
+          }
         }
-      } else if (provider.providerId == 'freeimage_host') {
-        // FreeImage.host: try a simple upload test with a minimal payload
-        setState(() {
-          _testSuccess = true;
-          _testMessage = 'API key accepted (endpoint reachable)';
-        });
-      } else {
-        // Generic: try a simple HEAD to the provider's base URL
-        final dio = await provider.createHttpClient(config);
-        try {
-          await dio.head('/');
-          setState(() {
-            _testSuccess = true;
-            _testMessage = 'Provider reachable';
-          });
-        } catch (_) {
-          await dio.get('/');
-          setState(() {
-            _testSuccess = true;
-            _testMessage = 'Provider reachable';
-          });
-        } finally {
-          dio.close();
-        }
+      } finally {
+        client.close();
       }
     } catch (e) {
-      setState(() {
-        _testSuccess = false;
-        _testMessage = e.toString();
-      });
+      steps.add(_TestStep('Error', false, e.toString()));
     } finally {
-      if (mounted) setState(() => _isTesting = false);
+      if (mounted) {
+        setState(() {
+          _testSteps
+            ..clear()
+            ..addAll(steps);
+          _isTesting = false;
+        });
+      }
     }
   }
 
@@ -222,45 +243,34 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                   ),
                 );
               }),
-              if (_testMessage.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: _testSuccess == true
-                        ? Colors.green.shade50
-                        : Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: _testSuccess == true
-                          ? Colors.green.shade200
-                          : Colors.red.shade200,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        _testSuccess == true ? Icons.check_circle : Icons.error,
-                        size: 18,
-                        color: _testSuccess == true ? Colors.green : Colors.red,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _testMessage,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: _testSuccess == true
-                                ? Colors.green.shade800
-                                : Colors.red.shade800,
-                          ),
+              ..._testSteps.map((step) => Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Row(
+                      children: [
+                        Icon(
+                          step.ok ? Icons.check_circle : Icons.error,
+                          size: 16,
+                          color: step.ok ? Colors.green : Colors.red,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                        const SizedBox(width: 6),
+                        Text('${step.label}: ',
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: step.ok
+                                    ? Colors.green.shade800
+                                    : Colors.red.shade800)),
+                        Expanded(
+                          child: Text(step.detail,
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: step.ok
+                                      ? Colors.green.shade700
+                                      : Colors.red.shade700)),
+                        ),
+                      ],
+                    ),
+                  )),
             ],
           ),
         ),
