@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: let parseResponse handle all HTTP status codes
+- docs: auto-update changelog
 - docs: auto-update changelog
 - fix: Telegram upload config not loading from secure storage
 - docs: auto-update changelog
@@ -28,5 +30,3 @@
 - feat: localize remaining hardcoded UI strings across 5 source files
 - chore: resolve all flutter analyze warnings and infos
 - fix: resolve dead code, logic errors, resource leaks, and cruft
-- fix: add dev_define and suffix to Windows build
-- fix: use absolute path for flatpak command and preserve executable permissions
