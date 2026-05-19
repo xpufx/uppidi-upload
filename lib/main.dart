@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -16,6 +17,26 @@ import 'screens/shell_strategy.dart';
 import 'screens/tab_nav_strategy.dart';
 import 'screens/test_screen.dart';
 import 'screens/upload_screen.dart';
+
+/// A custom delegate that loads AppLocalizations for the user's chosen
+/// language regardless of what locale Flutter resolves for Material.
+/// This lets us use locales like 'tlh' or 'eo' that Flutter's Material
+/// library doesn't support — our strings work, Material falls back to English.
+class _UserLangDelegate extends LocalizationsDelegate<AppLocalizations> {
+  final String languageCode;
+
+  const _UserLangDelegate(this.languageCode);
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<AppLocalizations> load(Locale locale) =>
+      AppLocalizations.delegate.load(Locale(languageCode));
+
+  @override
+  bool shouldReload(_UserLangDelegate old) => old.languageCode != languageCode;
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,14 +78,21 @@ class _UppidiAppState extends ConsumerState<UppidiApp> {
 
   @override
   Widget build(BuildContext context) {
-    final localeCode = ref.watch(localeCodeProvider).asData?.value;
+    final localeCode = ref.watch(localeCodeProvider).asData?.value ?? 'en';
     final seed = ref.watch(seedColorProvider);
     final themeMode = ref.watch(themeModeProvider);
     final shellType = ref.watch(shellTypeProvider).asData?.value ?? 'tabs';
 
+    // Our custom delegate always loads the user's language for app strings.
+    // Material delegates resolve independently (English for unsupported
+    // locales like tlh/eo, the user's locale for en/it/tr).
+    final userDelegate = _UserLangDelegate(localeCode);
+
     return MaterialApp(
       title: 'Uppidi Upload',
-      locale: localeCode != null ? Locale(localeCode) : null,
+      locale: localeCode == 'tlh' || localeCode == 'eo'
+          ? const Locale('en')
+          : Locale(localeCode),
       themeMode: themeMode,
       theme: ThemeData(
         colorScheme:
@@ -76,8 +104,16 @@ class _UppidiAppState extends ConsumerState<UppidiApp> {
             ColorScheme.fromSeed(seedColor: seed, brightness: Brightness.dark),
         useMaterial3: true,
       ),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: [
+        userDelegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('it'),
+        Locale('tr'),
+      ],
       home: switch (shellType) {
         'modals' => const ModalNavStrategy(),
         _ => const TabNavStrategy(),
