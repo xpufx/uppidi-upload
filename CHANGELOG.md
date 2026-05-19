@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: Telegram override of createHttpClient bypassed validateStatus fix
+- docs: auto-update changelog
 - fix: let parseResponse handle all HTTP status codes
 - docs: auto-update changelog
 - docs: auto-update changelog
@@ -28,5 +30,3 @@
 - docs: auto-update changelog
 - refactor: simplify error-message resolution
 - feat: localize remaining hardcoded UI strings across 5 source files
-- chore: resolve all flutter analyze warnings and infos
-- fix: resolve dead code, logic errors, resource leaks, and cruft
