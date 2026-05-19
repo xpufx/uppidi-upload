@@ -1,5 +1,15 @@
 # Changelog
 
+- refactor: simplify error-message resolution
+- feat: localize remaining hardcoded UI strings across 5 source files
+- chore: resolve all flutter analyze warnings and infos
+- fix: resolve dead code, logic errors, resource leaks, and cruft
+- fix: add dev_define and suffix to Windows build
+- fix: use absolute path for flatpak command and preserve executable permissions
+- fix: use --user flatpak mode for CI runner
+- feat: add Flatpak build to CI
+- update deps: file_picker 8→12, share_plus 12→13; fix turkish translations
+- docs: auto-update changelog
 - bump version to 1.2.0+9
 - fix: use tar instead of Compress-Archive for Windows zip to preserve directory structure
 - ci: sync version.dart from pubspec.yaml before each build
@@ -20,13 +30,3 @@
 - ci: create release with auto-generated notes on tag push
 - fix: build AppImage via mksquashfs + runtime (no FUSE needed)
 - add AppStream metainfo file
-- fix: keep extracted appimagetool binary in-place so lib/appimagekit/ resolves
-- ci: fall back to unsquashfs for appimagetool extraction
-- ci: symlink system mksquashfs for appimagetool
-- ci: fix windows artifact naming
-- ci: install squashfs-tools for AppImage build
-- ci: add AppImage upload step
-- ci: bump actions to latest versions, add appstream dep
-- ci: make AppImage step non-fatal for debugging
-- ci: add appstream dep for AppImage validation
-- ci: build matrix for all platforms (Android, Linux, Windows)
