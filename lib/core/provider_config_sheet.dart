@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../l10n/app_localizations.dart';
 import 'interfaces/uploader.dart';
-import 'settings_service.dart';
+
+final _secure = FlutterSecureStorage();
+
+String _configKey(String providerId, String key) =>
+    'provider_config_${providerId}_$key';
 
 /// Shows a configuration dialog/sheet for a provider that requires
 /// authentication credentials (e.g. bot tokens, API keys).
@@ -47,10 +52,9 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   }
 
   Future<void> _loadConfig() async {
-    final svc = ref.read(settingsServiceProvider);
     for (final key in widget.provider.requiredConfigKeys) {
-      final value = await svc.get(
-        svc.providerKey(widget.provider.providerId, key),
+      final value = await _secure.read(
+        key: _configKey(widget.provider.providerId, key),
       );
       if (mounted && _controllers[key] != null) {
         _controllers[key]!.text = value ?? '';
@@ -144,18 +148,14 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
 
                   setState(() => _isSaving = true);
                   try {
-                    final svc = ref.read(settingsServiceProvider);
+                    final store = _secure;
                     for (final key in widget.provider.requiredConfigKeys) {
                       final value = _controllers[key]?.text.trim() ?? '';
+                      final skey = _configKey(widget.provider.providerId, key);
                       if (value.isNotEmpty) {
-                        await svc.set(
-                          svc.providerKey(widget.provider.providerId, key),
-                          value,
-                        );
+                        await store.write(key: skey, value: value);
                       } else {
-                        await svc.remove(
-                          svc.providerKey(widget.provider.providerId, key),
-                        );
+                        await store.delete(key: skey);
                       }
                     }
                     if (context.mounted) {
@@ -189,9 +189,10 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
 
 /// Checks whether a provider's required config keys have all been set.
 Future<bool> isProviderConfigured(WidgetRef ref, BaseUploader provider) async {
-  final svc = ref.read(settingsServiceProvider);
   for (final key in provider.requiredConfigKeys) {
-    final value = await svc.get(svc.providerKey(provider.providerId, key));
+    final value = await _secure.read(
+      key: _configKey(provider.providerId, key),
+    );
     if (value == null || value.trim().isEmpty) {
       return false;
     }
