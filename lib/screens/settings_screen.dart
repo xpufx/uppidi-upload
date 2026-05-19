@@ -451,12 +451,14 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               },
               items: const [
                 DropdownMenuItem(value: 'en', child: Text('English')),
-                DropdownMenuItem(value: 'eo', child: Text('Esperanto')),
                 DropdownMenuItem(value: 'it', child: Text('Italiano')),
-                DropdownMenuItem(
-                    value: 'tlh', child: Text('Klingon (tlhIngan)')),
                 DropdownMenuItem(value: 'tr', child: Text('Türkçe')),
               ],
+              // eo (Esperanto) and tlh (Klingon) exist as ARB files but
+              // cannot be used as Material locales — Flutter's Material
+              // library has no translations for them, producing a blank
+              // gray UI. They remain available for future use once a
+              // custom delegate is implemented.
             ),
           ],
         ),
