@@ -474,6 +474,7 @@ class _FileSelectedButtons extends ConsumerWidget {
   const _FileSelectedButtons({required this.notifier});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(uploadProvider);
     final mimeType = state is UploadFileSelected ? state.mimeType : null;
     final quality = state is UploadFileSelected ? state.quality : 0;
@@ -496,7 +497,7 @@ class _FileSelectedButtons extends ConsumerWidget {
           SegmentedButton<String>(
             segments: expiryOptions
                 .map((opt) => ButtonSegment(
-                    value: opt, label: Text(_expiryDisplayLabel(opt))))
+                    value: opt, label: Text(_expiryDisplayLabel(opt, l10n))))
                 .toList(),
             selected: {currentExpiry ?? expiryOptions.first},
             onSelectionChanged: (v) => notifier.setExpiry(v.first),
@@ -509,19 +510,19 @@ class _FileSelectedButtons extends ConsumerWidget {
         ],
         if (showQuality) ...[
           SegmentedButton<int>(
-            segments: const [
+            segments: [
               ButtonSegment(
                   value: 0,
-                  label: Text('Original'),
-                  icon: Icon(Icons.high_quality, size: 16)),
+                  label: Text(l10n.qualityOriginal),
+                  icon: const Icon(Icons.high_quality, size: 16)),
               ButtonSegment(
                   value: 1,
-                  label: Text('Medium'),
-                  icon: Icon(Icons.photo_size_select_large, size: 16)),
+                  label: Text(l10n.qualityMedium),
+                  icon: const Icon(Icons.photo_size_select_large, size: 16)),
               ButtonSegment(
                   value: 2,
-                  label: Text('Low'),
-                  icon: Icon(Icons.photo_size_select_small, size: 16)),
+                  label: Text(l10n.qualityLow),
+                  icon: const Icon(Icons.photo_size_select_small, size: 16)),
             ],
             selected: {quality},
             onSelectionChanged: (v) => notifier.setQuality(v.first),
@@ -538,7 +539,7 @@ class _FileSelectedButtons extends ConsumerWidget {
             const SizedBox(width: 8),
             IconButton(
               icon: const Icon(Icons.close, size: 20),
-              tooltip: 'Clear selection',
+              tooltip: l10n.clearSelection,
               onPressed: () => notifier.clearSelection(),
             ),
           ],
@@ -549,11 +550,12 @@ class _FileSelectedButtons extends ConsumerWidget {
 }
 
 /// Converts an API expiry value to a friendly display label.
-String _expiryDisplayLabel(String value) {
+/// [l10n] must be provided since this is called from widget code.
+String _expiryDisplayLabel(String value, AppLocalizations l10n) {
   return switch (value) {
-    '1h' => '1 hour',
-    '24h' => '24 hours',
-    '72h' => '3 days',
+    '1h' => l10n.expiry1Hour,
+    '24h' => l10n.expiry24Hours,
+    '72h' => l10n.expiry3Days,
     _ => value,
   };
 }
@@ -580,6 +582,7 @@ class _FilePreview extends StatefulWidget {
 }
 
 class _FilePreviewState extends State<_FilePreview> {
+  late final AppLocalizations _l10n;
   bool _hasCropped = false;
 
   bool get _isImage {
@@ -710,7 +713,7 @@ class _FilePreviewState extends State<_FilePreview> {
           right: 4,
           child: IconButton(
             icon: Icon(_hasCropped ? Icons.restore : Icons.crop),
-            tooltip: _hasCropped ? 'Reset crop' : 'Crop',
+            tooltip: _hasCropped ? _l10n.resetCrop : _l10n.apply,
             onPressed: _hasCropped
                 ? () {
                     widget.notifier.resetCrop();
@@ -774,13 +777,13 @@ class _FilePreviewState extends State<_FilePreview> {
     if (meta.allowedMimeTypes != null && widget.mimeType != null) {
       if (!meta.allowsMimeType(widget.mimeType!)) {
         warnings
-            .add(_warningRow('Provider only accepts: ${meta.mimeTypeLabel}'));
+            .add(_warningRow(_l10n.providerOnlyAccepts(meta.mimeTypeLabel)));
       }
     }
 
     if (meta.maxFileSizeBytes != null &&
         widget.fileSize > meta.maxFileSizeBytes!) {
-      warnings.add(_warningRow('File exceeds ${meta.fileSizeLabel} limit'));
+      warnings.add(_warningRow(_l10n.fileExceedsLimit(meta.fileSizeLabel)));
     }
 
     return warnings;
@@ -859,14 +862,6 @@ class _ProgressSectionState extends State<_ProgressSection>
   @override
   void initState() {
     super.initState();
-    _animCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _anim = Tween<double>(begin: 0, end: widget.progress ?? 0).animate(
-      CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic),
-    );
-    _animCtrl.forward();
   }
 
   @override
@@ -1021,6 +1016,31 @@ class _ResultBanner extends StatefulWidget {
 }
 
 class _ResultBannerState extends State<_ResultBanner> {
+  /// Resolves an error message string. If it's a known ARB key (all-lowercase
+  /// with no spaces), returns the localized value. Otherwise passes it through.
+  String _err(BuildContext context, String? msg) {
+    if (msg == null) return '';
+    final l10n = AppLocalizations.of(context);
+    return switch (msg) {
+      'genericError' => l10n.genericError,
+      'errorSessionExpired' => l10n.errorSessionExpired,
+      'errorFileTooLarge' => l10n.errorFileTooLarge,
+      'errorInvalidUploader' => l10n.errorInvalidUploader,
+      'failedToReadFile' => l10n.failedToReadFile,
+      'noProvidersConfigured' => l10n.noProvidersConfigured,
+      'connectionTimedOut' => l10n.connectionTimedOut,
+      'uploadCancelled' => l10n.uploadCancelled,
+      // Keys with embedded content: "key:content" — show the content as-is
+      _ when msg.startsWith('connectionFailedMsg:') =>
+        l10n.connectionFailedMsg(msg.substring(19)),
+      _ when msg.startsWith('serverErrorMsg:') =>
+        l10n.serverErrorMsg(msg.substring(14)),
+      _ when msg.startsWith('uploadFailedMsg:') =>
+        l10n.uploadFailedMsg(msg.substring(14)),
+      _ => msg,
+    };
+  }
+
   void _showDebugInfo(BuildContext context) {
     final buffer = StringBuffer();
     final result = widget.lastResult;
@@ -1123,7 +1143,7 @@ class _ResultBannerState extends State<_ResultBanner> {
             Row(
               children: [
                 Expanded(
-                  child: Text(widget.errorMessage!,
+                  child: Text(_err(context, widget.errorMessage),
                       style:
                           TextStyle(color: Colors.red.shade700, fontSize: 13)),
                 ),

@@ -136,6 +136,7 @@ void _showSystemInfo(BuildContext context, WidgetRef ref) {
 class _VersionCheckWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(versionCheckProvider);
     final notifier = ref.read(versionCheckProvider.notifier);
     final lastChecked = notifier.lastChecked;
@@ -180,7 +181,8 @@ class _VersionCheckWidget extends ConsumerWidget {
                               : '$cdnUrl/uppidi-upload-latest-linux.tar.gz');
                       if (url.isEmpty) return;
                       final isMobile = Platform.isAndroid;
-                      final label = isMobile ? 'APK' : 'Linux';
+                      final label =
+                          isMobile ? l10n.downloadAndroid : l10n.downloadLinux;
 
                       var received = 0, total = 0, speed = 0;
                       void Function(void Function())? update;
@@ -198,7 +200,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                                 : '';
                             final pct = total > 0 ? received / total : null;
                             return AlertDialog(
-                              title: Text('Downloading $label'),
+                              title: Text(l10n.downloadingFile(label)),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -235,7 +237,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                           });
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Downloaded to: $path')),
+                              SnackBar(content: Text(l10n.downloadedTo(path))),
                             );
                           }
                         }
@@ -674,7 +676,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Uppidi Upload v$appVersion',
+                          Text(l10n.versionLabel(appVersion),
                               style: Theme.of(context)
                                   .textTheme
                                   .titleSmall

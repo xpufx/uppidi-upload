@@ -6,7 +6,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_eo.dart';
 import 'app_localizations_it.dart';
+import 'app_localizations_tlh.dart';
 import 'app_localizations_tr.dart';
 
 // ignore_for_file: type=lint
@@ -96,7 +98,9 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('eo'),
     Locale('it'),
+    Locale('tlh'),
     Locale('tr')
   ];
 
@@ -855,6 +859,270 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copy delete URL'**
   String get copyDeleteUrl;
+
+  /// No description provided for @failedToReadFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to read selected file'**
+  String get failedToReadFile;
+
+  /// No description provided for @noProvidersConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'No upload providers configured'**
+  String get noProvidersConfigured;
+
+  /// No description provided for @connectionTimedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection timed out'**
+  String get connectionTimedOut;
+
+  /// No description provided for @connectionFailedMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection failed: {error}'**
+  String connectionFailedMsg(Object error);
+
+  /// No description provided for @serverErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Server error: {code}'**
+  String serverErrorMsg(Object code);
+
+  /// No description provided for @uploadFailedMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed: {reason}'**
+  String uploadFailedMsg(Object reason);
+
+  /// No description provided for @speedBS.
+  ///
+  /// In en, this message translates to:
+  /// **'{speed} B/s'**
+  String speedBS(Object speed);
+
+  /// No description provided for @speedKBS.
+  ///
+  /// In en, this message translates to:
+  /// **'{speed} KB/s'**
+  String speedKBS(Object speed);
+
+  /// No description provided for @speedMBS.
+  ///
+  /// In en, this message translates to:
+  /// **'{speed} MB/s'**
+  String speedMBS(Object speed);
+
+  /// No description provided for @clearSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear selection'**
+  String get clearSelection;
+
+  /// No description provided for @expiry1Hour.
+  ///
+  /// In en, this message translates to:
+  /// **'1 hour'**
+  String get expiry1Hour;
+
+  /// No description provided for @expiry24Hours.
+  ///
+  /// In en, this message translates to:
+  /// **'24 hours'**
+  String get expiry24Hours;
+
+  /// No description provided for @expiry3Days.
+  ///
+  /// In en, this message translates to:
+  /// **'3 days'**
+  String get expiry3Days;
+
+  /// No description provided for @resetCrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset crop'**
+  String get resetCrop;
+
+  /// No description provided for @debugInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug Info'**
+  String get debugInfo;
+
+  /// No description provided for @debugInfoTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug info'**
+  String get debugInfoTooltip;
+
+  /// No description provided for @copyAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy All'**
+  String get copyAll;
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
+
+  /// No description provided for @copiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get copiedToClipboard;
+
+  /// No description provided for @fileExceedsLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'File exceeds {size} limit'**
+  String fileExceedsLimit(Object size);
+
+  /// No description provided for @providerOnlyAccepts.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider only accepts: {types}'**
+  String providerOnlyAccepts(Object types);
+
+  /// No description provided for @systemInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'System Info'**
+  String get systemInfo;
+
+  /// No description provided for @info.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get info;
+
+  /// No description provided for @license.
+  ///
+  /// In en, this message translates to:
+  /// **'License'**
+  String get license;
+
+  /// No description provided for @gplNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This project is licensed under the GNU General Public License v3.0.'**
+  String get gplNotice;
+
+  /// No description provided for @gplUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'https://www.gnu.org/licenses/gpl-3.0.txt'**
+  String get gplUrl;
+
+  /// No description provided for @noLogEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'No log entries yet.'**
+  String get noLogEntries;
+
+  /// No description provided for @copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// No description provided for @versionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Uppidi Upload v{version}'**
+  String versionLabel(Object version);
+
+  /// No description provided for @shellLayoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shell Layout'**
+  String get shellLayoutTitle;
+
+  /// No description provided for @shellLayoutDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how screens are organized: \"Tabs\" uses a tab bar for navigation. \"Modals\" shows the upload screen always and opens other screens as dialogs.'**
+  String get shellLayoutDescription;
+
+  /// No description provided for @tabs.
+  ///
+  /// In en, this message translates to:
+  /// **'Tabs'**
+  String get tabs;
+
+  /// No description provided for @modals.
+  ///
+  /// In en, this message translates to:
+  /// **'Modals'**
+  String get modals;
+
+  /// No description provided for @downloadAndroid.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Android APK'**
+  String get downloadAndroid;
+
+  /// No description provided for @downloadLinux.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Linux'**
+  String get downloadLinux;
+
+  /// No description provided for @browseAllBuilds.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse all builds'**
+  String get browseAllBuilds;
+
+  /// No description provided for @viewReleases.
+  ///
+  /// In en, this message translates to:
+  /// **'View releases on GitHub'**
+  String get viewReleases;
+
+  /// No description provided for @downloadingFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading {label}'**
+  String downloadingFile(Object label);
+
+  /// No description provided for @downloadedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded to: {path}'**
+  String downloadedTo(Object path);
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed: {error}'**
+  String downloadFailed(Object error);
+
+  /// No description provided for @changelogNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Changelog not available'**
+  String get changelogNotAvailable;
+
+  /// No description provided for @debugLogCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} — copied to clipboard'**
+  String debugLogCopied(Object label);
+
+  /// No description provided for @devBuild.
+  ///
+  /// In en, this message translates to:
+  /// **'DEV BUILD'**
+  String get devBuild;
+
+  /// No description provided for @versionPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'v{version}'**
+  String versionPrefix(Object version);
 }
 
 class _AppLocalizationsDelegate
@@ -868,7 +1136,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'it', 'tr'].contains(locale.languageCode);
+      <String>['en', 'eo', 'it', 'tlh', 'tr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -879,8 +1147,12 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'eo':
+      return AppLocalizationsEo();
     case 'it':
       return AppLocalizationsIt();
+    case 'tlh':
+      return AppLocalizationsTlh();
     case 'tr':
       return AppLocalizationsTr();
   }

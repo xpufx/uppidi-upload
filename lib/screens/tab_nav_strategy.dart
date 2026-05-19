@@ -186,7 +186,7 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
           ),
           const Spacer(),
           Text(
-            'v$appVersion',
+            l10n.versionPrefix(appVersion),
             style: Theme.of(context)
                 .textTheme
                 .bodySmall

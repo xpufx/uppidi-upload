@@ -321,7 +321,7 @@ class UploadNotifier extends Notifier<UploadState> {
       final info = _extractFileInfo(state);
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
-        errorMessage: 'Failed to read selected file',
+        errorMessage: 'failedToReadFile',
         fileName: info.fileName,
         fileSizeBytes: info.fileSizeBytes,
         mimeType: info.mimeType,
@@ -394,7 +394,7 @@ class UploadNotifier extends Notifier<UploadState> {
       final info = _extractFileInfo(state);
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
-        errorMessage: 'Failed to read selected file',
+        errorMessage: 'failedToReadFile',
         fileName: info.fileName,
         fileSizeBytes: info.fileSizeBytes,
         mimeType: info.mimeType,
@@ -411,7 +411,7 @@ class UploadNotifier extends Notifier<UploadState> {
       final info = _extractFileInfo(state);
       state = UploadCompleted(
         lastResult: UploadResult(success: false),
-        errorMessage: 'No upload providers configured',
+        errorMessage: 'noProvidersConfigured',
         fileName: info.fileName ?? request.fileName,
         fileSizeBytes:
             info.fileSizeBytes > 0 ? info.fileSizeBytes : request.sizeInBytes,
@@ -739,19 +739,21 @@ String _formatSpeed(double bytesPerSec) {
   return '${(bytesPerSec / (1024 * 1024)).toStringAsFixed(1)} MB/s';
 }
 
-/// Maps DioException to a user-friendly error message
+/// Maps DioException to a localization key. The UI resolves these via
+/// AppLocalizations. Non-key content (status codes, messages) is embedded
+/// and passed through.
 String _mapDioException(DioException e) {
   return switch (e.type) {
-    DioExceptionType.cancel => 'Upload cancelled',
+    DioExceptionType.cancel => 'uploadCancelled',
     DioExceptionType.connectionTimeout ||
     DioExceptionType.sendTimeout ||
     DioExceptionType.receiveTimeout =>
-      'Connection timed out',
+      'connectionTimedOut',
     DioExceptionType.connectionError =>
-      'Connection failed: ${e.message ?? "server unreachable"}',
+      'connectionFailedMsg:${e.message ?? "server unreachable"}',
     DioExceptionType.badResponse =>
-      'Server error: ${e.response?.statusCode ?? "unknown"}',
-    _ => 'Upload failed: ${e.message ?? e.type.name}',
+      'serverErrorMsg:${e.response?.statusCode ?? "unknown"}',
+    _ => 'uploadFailedMsg:${e.message ?? e.type.name}',
   };
 }
 

@@ -418,4 +418,166 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get copyDeleteUrl => 'Copia URL di eliminazione';
+
+  @override
+  String get failedToReadFile => 'Impossibile leggere il file selezionato';
+
+  @override
+  String get noProvidersConfigured => 'Nessun servizio di upload configurato';
+
+  @override
+  String get connectionTimedOut => 'Tempo di connessione scaduto';
+
+  @override
+  String connectionFailedMsg(Object error) {
+    return 'Connessione fallita: $error';
+  }
+
+  @override
+  String serverErrorMsg(Object code) {
+    return 'Errore del server: $code';
+  }
+
+  @override
+  String uploadFailedMsg(Object reason) {
+    return 'Caricamento fallito: $reason';
+  }
+
+  @override
+  String speedBS(Object speed) {
+    return '$speed B/s';
+  }
+
+  @override
+  String speedKBS(Object speed) {
+    return '$speed KB/s';
+  }
+
+  @override
+  String speedMBS(Object speed) {
+    return '$speed MB/s';
+  }
+
+  @override
+  String get clearSelection => 'Annulla selezione';
+
+  @override
+  String get expiry1Hour => '1 ora';
+
+  @override
+  String get expiry24Hours => '24 ore';
+
+  @override
+  String get expiry3Days => '3 giorni';
+
+  @override
+  String get resetCrop => 'Ripristina ritaglio';
+
+  @override
+  String get debugInfo => 'Informazioni di Debug';
+
+  @override
+  String get debugInfoTooltip => 'Info debug';
+
+  @override
+  String get copyAll => 'Copia Tutto';
+
+  @override
+  String get share => 'Condividi';
+
+  @override
+  String get copiedToClipboard => 'Copiato negli appunti';
+
+  @override
+  String fileExceedsLimit(Object size) {
+    return 'Il file supera il limite di $size';
+  }
+
+  @override
+  String providerOnlyAccepts(Object types) {
+    return 'Il provider accetta solo: $types';
+  }
+
+  @override
+  String get systemInfo => 'Informazioni di Sistema';
+
+  @override
+  String get info => 'Informazioni';
+
+  @override
+  String get license => 'Licenza';
+
+  @override
+  String get gplNotice =>
+      'Questo progetto è concesso in licenza GNU General Public License v3.0.';
+
+  @override
+  String get gplUrl => 'https://www.gnu.org/licenses/gpl-3.0.txt';
+
+  @override
+  String get noLogEntries => 'Nessuna voce di log.';
+
+  @override
+  String get copy => 'Copia';
+
+  @override
+  String versionLabel(Object version) {
+    return 'Uppidi Upload v$version';
+  }
+
+  @override
+  String get shellLayoutTitle => 'Layout Schermata';
+
+  @override
+  String get shellLayoutDescription =>
+      'Scegli come organizzare le schermate: \"Tabs\" usa una barra delle schede per la navigazione. \"Modals\" mostra sempre la schermata di upload e apre le altre come dialoghi.';
+
+  @override
+  String get tabs => 'Schede';
+
+  @override
+  String get modals => 'Modali';
+
+  @override
+  String get downloadAndroid => 'Scarica APK Android';
+
+  @override
+  String get downloadLinux => 'Scarica Linux';
+
+  @override
+  String get browseAllBuilds => 'Sfoglia tutte le build';
+
+  @override
+  String get viewReleases => 'Vedi release su GitHub';
+
+  @override
+  String downloadingFile(Object label) {
+    return 'Download di $label';
+  }
+
+  @override
+  String downloadedTo(Object path) {
+    return 'Scaricato in: $path';
+  }
+
+  @override
+  String downloadFailed(Object error) {
+    return 'Download fallito: $error';
+  }
+
+  @override
+  String get changelogNotAvailable => 'Changelog non disponibile';
+
+  @override
+  String debugLogCopied(Object label) {
+    return '$label — copiato negli appunti';
+  }
+
+  @override
+  String get devBuild => 'BUILD DI SVILUPPO';
+
+  @override
+  String versionPrefix(Object version) {
+    return 'v$version';
+  }
 }

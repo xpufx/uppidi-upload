@@ -416,4 +416,166 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get copyDeleteUrl => 'Copy delete URL';
+
+  @override
+  String get failedToReadFile => 'Failed to read selected file';
+
+  @override
+  String get noProvidersConfigured => 'No upload providers configured';
+
+  @override
+  String get connectionTimedOut => 'Connection timed out';
+
+  @override
+  String connectionFailedMsg(Object error) {
+    return 'Connection failed: $error';
+  }
+
+  @override
+  String serverErrorMsg(Object code) {
+    return 'Server error: $code';
+  }
+
+  @override
+  String uploadFailedMsg(Object reason) {
+    return 'Upload failed: $reason';
+  }
+
+  @override
+  String speedBS(Object speed) {
+    return '$speed B/s';
+  }
+
+  @override
+  String speedKBS(Object speed) {
+    return '$speed KB/s';
+  }
+
+  @override
+  String speedMBS(Object speed) {
+    return '$speed MB/s';
+  }
+
+  @override
+  String get clearSelection => 'Clear selection';
+
+  @override
+  String get expiry1Hour => '1 hour';
+
+  @override
+  String get expiry24Hours => '24 hours';
+
+  @override
+  String get expiry3Days => '3 days';
+
+  @override
+  String get resetCrop => 'Reset crop';
+
+  @override
+  String get debugInfo => 'Debug Info';
+
+  @override
+  String get debugInfoTooltip => 'Debug info';
+
+  @override
+  String get copyAll => 'Copy All';
+
+  @override
+  String get share => 'Share';
+
+  @override
+  String get copiedToClipboard => 'Copied to clipboard';
+
+  @override
+  String fileExceedsLimit(Object size) {
+    return 'File exceeds $size limit';
+  }
+
+  @override
+  String providerOnlyAccepts(Object types) {
+    return 'Provider only accepts: $types';
+  }
+
+  @override
+  String get systemInfo => 'System Info';
+
+  @override
+  String get info => 'Info';
+
+  @override
+  String get license => 'License';
+
+  @override
+  String get gplNotice =>
+      'This project is licensed under the GNU General Public License v3.0.';
+
+  @override
+  String get gplUrl => 'https://www.gnu.org/licenses/gpl-3.0.txt';
+
+  @override
+  String get noLogEntries => 'No log entries yet.';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String versionLabel(Object version) {
+    return 'Uppidi Upload v$version';
+  }
+
+  @override
+  String get shellLayoutTitle => 'Shell Layout';
+
+  @override
+  String get shellLayoutDescription =>
+      'Choose how screens are organized: \"Tabs\" uses a tab bar for navigation. \"Modals\" shows the upload screen always and opens other screens as dialogs.';
+
+  @override
+  String get tabs => 'Tabs';
+
+  @override
+  String get modals => 'Modals';
+
+  @override
+  String get downloadAndroid => 'Download Android APK';
+
+  @override
+  String get downloadLinux => 'Download Linux';
+
+  @override
+  String get browseAllBuilds => 'Browse all builds';
+
+  @override
+  String get viewReleases => 'View releases on GitHub';
+
+  @override
+  String downloadingFile(Object label) {
+    return 'Downloading $label';
+  }
+
+  @override
+  String downloadedTo(Object path) {
+    return 'Downloaded to: $path';
+  }
+
+  @override
+  String downloadFailed(Object error) {
+    return 'Download failed: $error';
+  }
+
+  @override
+  String get changelogNotAvailable => 'Changelog not available';
+
+  @override
+  String debugLogCopied(Object label) {
+    return '$label — copied to clipboard';
+  }
+
+  @override
+  String get devBuild => 'DEV BUILD';
+
+  @override
+  String versionPrefix(Object version) {
+    return 'v$version';
+  }
 }

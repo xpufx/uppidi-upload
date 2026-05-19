@@ -418,4 +418,167 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get copyDeleteUrl => 'Silme URL\'sini kopyala';
+
+  @override
+  String get failedToReadFile => 'Seçilen dosya okunamadı';
+
+  @override
+  String get noProvidersConfigured =>
+      'Hiçbir yükleme sağlayıcısı yapılandırılmamış';
+
+  @override
+  String get connectionTimedOut => 'Bağlantı zaman aşımına uğradı';
+
+  @override
+  String connectionFailedMsg(Object error) {
+    return 'Bağlantı başarısız: $error';
+  }
+
+  @override
+  String serverErrorMsg(Object code) {
+    return 'Sunucu hatası: $code';
+  }
+
+  @override
+  String uploadFailedMsg(Object reason) {
+    return 'Yükleme başarısız: $reason';
+  }
+
+  @override
+  String speedBS(Object speed) {
+    return '$speed B/s';
+  }
+
+  @override
+  String speedKBS(Object speed) {
+    return '$speed KB/s';
+  }
+
+  @override
+  String speedMBS(Object speed) {
+    return '$speed MB/s';
+  }
+
+  @override
+  String get clearSelection => 'Seçimi temizle';
+
+  @override
+  String get expiry1Hour => '1 saat';
+
+  @override
+  String get expiry24Hours => '24 saat';
+
+  @override
+  String get expiry3Days => '3 gün';
+
+  @override
+  String get resetCrop => 'Kırpmayı sıfırla';
+
+  @override
+  String get debugInfo => 'Hata Ayıklama Bilgisi';
+
+  @override
+  String get debugInfoTooltip => 'Hata ayıklama bilgisi';
+
+  @override
+  String get copyAll => 'Tümünü Kopyala';
+
+  @override
+  String get share => 'Paylaş';
+
+  @override
+  String get copiedToClipboard => 'Panoya kopyalandı';
+
+  @override
+  String fileExceedsLimit(Object size) {
+    return 'Dosya $size sınırını aşıyor';
+  }
+
+  @override
+  String providerOnlyAccepts(Object types) {
+    return 'Sağlayıcı yalnızca şunları kabul eder: $types';
+  }
+
+  @override
+  String get systemInfo => 'Sistem Bilgisi';
+
+  @override
+  String get info => 'Bilgi';
+
+  @override
+  String get license => 'Lisans';
+
+  @override
+  String get gplNotice =>
+      'Bu proje GNU Genel Kamu Lisansı v3.0 kapsamında lisanslanmıştır.';
+
+  @override
+  String get gplUrl => 'https://www.gnu.org/licenses/gpl-3.0.txt';
+
+  @override
+  String get noLogEntries => 'Henüz günlük kaydı yok.';
+
+  @override
+  String get copy => 'Kopyala';
+
+  @override
+  String versionLabel(Object version) {
+    return 'Uppidi Upload v$version';
+  }
+
+  @override
+  String get shellLayoutTitle => 'Arayüz Düzeni';
+
+  @override
+  String get shellLayoutDescription =>
+      'Ekranların nasıl düzenleneceğini seçin: \"Sekmeler\" gezinti için bir sekme çubuğu kullanır. \"Modal\" yükleme ekranını her zaman gösterir ve diğer ekranları iletişim kutusu olarak açar.';
+
+  @override
+  String get tabs => 'Sekmeler';
+
+  @override
+  String get modals => 'Modal';
+
+  @override
+  String get downloadAndroid => 'Android APK İndir';
+
+  @override
+  String get downloadLinux => 'Linux İndir';
+
+  @override
+  String get browseAllBuilds => 'Tüm yapıları göz at';
+
+  @override
+  String get viewReleases => 'GitHub\'da sürümleri görüntüle';
+
+  @override
+  String downloadingFile(Object label) {
+    return '$label indiriliyor';
+  }
+
+  @override
+  String downloadedTo(Object path) {
+    return 'İndirildi: $path';
+  }
+
+  @override
+  String downloadFailed(Object error) {
+    return 'İndirme başarısız: $error';
+  }
+
+  @override
+  String get changelogNotAvailable => 'Değişiklik günlüğü mevcut değil';
+
+  @override
+  String debugLogCopied(Object label) {
+    return '$label — panoya kopyalandı';
+  }
+
+  @override
+  String get devBuild => 'GELİŞTİRME YAPISI';
+
+  @override
+  String versionPrefix(Object version) {
+    return 'v$version';
+  }
 }
