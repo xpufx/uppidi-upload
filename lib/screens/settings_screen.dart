@@ -9,7 +9,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../core/apk_installer.dart' show downloadAndInstallApk, downloadFile;
 import '../core/app_logo.dart';
+import '../core/interfaces/uploader.dart';
 import '../core/logging/log.dart';
+import '../core/models/provider_metadata.dart';
+import '../core/provider_config_sheet.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
 import '../core/theme_provider.dart';
@@ -27,10 +30,6 @@ final proxyUrlProvider = FutureProvider<String?>((ref) async {
   return svc.getProxyUrl();
 });
 
-final localeProvider = FutureProvider<String>((ref) async {
-  final svc = ref.read(settingsServiceProvider);
-  return (await svc.get(SettingsService.localeKey)) ?? 'en';
-});
 final _defaultShareProviderProvider = FutureProvider<String?>((ref) async {
   final svc = ref.read(settingsServiceProvider);
   return await svc.get(SettingsService.defaultShareProviderKey);
@@ -452,8 +451,11 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               },
               items: const [
                 DropdownMenuItem(value: 'en', child: Text('English')),
-                DropdownMenuItem(value: 'tr', child: Text('Türkçe')),
+                DropdownMenuItem(value: 'eo', child: Text('Esperanto')),
                 DropdownMenuItem(value: 'it', child: Text('Italiano')),
+                DropdownMenuItem(
+                    value: 'tlh', child: Text('Klingon (tlhIngan)')),
+                DropdownMenuItem(value: 'tr', child: Text('Türkçe')),
               ],
             ),
           ],
@@ -659,6 +661,8 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           ),
           const SizedBox(height: 16),
         ],
+        const SizedBox(height: 8),
+        _ProviderConfigSection(),
         const Divider(height: 32),
         Card(
           child: Padding(
@@ -991,5 +995,94 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         );
       }
     }
+  }
+}
+
+/// Section showing providers that require authentication configuration.
+class _ProviderConfigSection extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final authProviders = ProviderRegistry.all
+        .where((p) =>
+            p.metadata.capabilities.contains(ProviderCapability.requiresAuth))
+        .toList();
+
+    if (authProviders.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.providersSection,
+            style: theme.textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        ...authProviders.map((p) => _AuthProviderCard(provider: p)),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+}
+
+class _AuthProviderCard extends ConsumerWidget {
+  final BaseUploader provider;
+
+  const _AuthProviderCard({required this.provider});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    return FutureBuilder<bool>(
+      future: isProviderConfigured(ref, provider),
+      builder: (context, snapshot) {
+        final configured = snapshot.data ?? false;
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: [
+                Icon(
+                  configured ? Icons.check_circle : Icons.warning_amber,
+                  size: 20,
+                  color: configured ? Colors.green : Colors.orange,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(provider.providerName,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text(
+                        configured
+                            ? l10n.providerConfigSectionConfigured
+                            : l10n.providerConfigNotConfigured(
+                                provider.providerName),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: configured
+                              ? Colors.green.shade700
+                              : Colors.orange.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                FilledButton.tonalIcon(
+                  onPressed: () =>
+                      showProviderConfigDialog(context, ref, provider),
+                  icon: const Icon(Icons.settings, size: 18),
+                  label: Text(l10n.providerConfigure),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
