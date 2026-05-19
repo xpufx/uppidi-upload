@@ -35,6 +35,10 @@ abstract class BaseHttpProvider implements BaseUploader {
       baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
+      // Accept all HTTP status codes — let each provider's parseResponse
+      // handle errors. Dio's default throws on non-2xx, which discards
+      // the response body (and with it, the provider's error details).
+      validateStatus: (_) => true,
     ));
 
     if (allowInsecureConn) {
