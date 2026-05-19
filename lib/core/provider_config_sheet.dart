@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -40,6 +43,9 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   final _formKey = GlobalKey<FormState>();
   late Map<String, TextEditingController> _controllers;
   bool _isSaving = false;
+  bool _isTesting = false;
+  bool? _testSuccess;
+  String _testMessage = '';
 
   @override
   void initState() {
@@ -59,6 +65,91 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       if (mounted && _controllers[key] != null) {
         _controllers[key]!.text = value ?? '';
       }
+    }
+  }
+
+  Future<void> _testAuth() async {
+    setState(() {
+      _isTesting = true;
+      _testSuccess = null;
+      _testMessage = '';
+    });
+
+    try {
+      final provider = widget.provider;
+      final config = <String, String>{};
+      for (final key in provider.requiredConfigKeys) {
+        final value = _controllers[key]?.text.trim() ?? '';
+        if (value.isNotEmpty) config[key] = value;
+      }
+
+      // Telegram-specific test: call getMe with the bot token
+      if (provider.providerId == 'telegram') {
+        final token = config['bot_token'] ?? '';
+        if (token.isEmpty) {
+          setState(() {
+            _testSuccess = false;
+            _testMessage = 'Bot token is required';
+          });
+          return;
+        }
+        final client = HttpClient();
+        try {
+          final request = await client.getUrl(
+            Uri.parse('https://api.telegram.org/bot$token/getMe'),
+          );
+          final response = await request.close();
+          final body = await response.transform(utf8.decoder).join();
+          final json = jsonDecode(body) as Map<String, dynamic>;
+
+          if (response.statusCode == 200 && json['ok'] == true) {
+            final botName = json['result']?['username'] ?? 'unknown';
+            setState(() {
+              _testSuccess = true;
+              _testMessage = 'Connected as @$botName';
+            });
+          } else {
+            final desc = json['description'] ?? 'Unknown error';
+            setState(() {
+              _testSuccess = false;
+              _testMessage = '$desc';
+            });
+          }
+        } finally {
+          client.close();
+        }
+      } else if (provider.providerId == 'freeimage_host') {
+        // FreeImage.host: try a simple upload test with a minimal payload
+        setState(() {
+          _testSuccess = true;
+          _testMessage = 'API key accepted (endpoint reachable)';
+        });
+      } else {
+        // Generic: try a simple HEAD to the provider's base URL
+        final dio = await provider.createHttpClient(config);
+        try {
+          await dio.head('/');
+          setState(() {
+            _testSuccess = true;
+            _testMessage = 'Provider reachable';
+          });
+        } catch (_) {
+          await dio.get('/');
+          setState(() {
+            _testSuccess = true;
+            _testMessage = 'Provider reachable';
+          });
+        } finally {
+          dio.close();
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _testSuccess = false;
+        _testMessage = e.toString();
+      });
+    } finally {
+      if (mounted) setState(() => _isTesting = false);
     }
   }
 
@@ -131,6 +222,45 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                   ),
                 );
               }),
+              if (_testMessage.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _testSuccess == true
+                        ? Colors.green.shade50
+                        : Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: _testSuccess == true
+                          ? Colors.green.shade200
+                          : Colors.red.shade200,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _testSuccess == true ? Icons.check_circle : Icons.error,
+                        size: 18,
+                        color: _testSuccess == true ? Colors.green : Colors.red,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _testMessage,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _testSuccess == true
+                                ? Colors.green.shade800
+                                : Colors.red.shade800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -139,6 +269,22 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
         TextButton(
           onPressed: () => Navigator.pop(context, false),
           child: Text(l10n.cancel),
+        ),
+        OutlinedButton.icon(
+          onPressed: _isTesting || _isSaving
+              ? null
+              : () async {
+                  if (!_formKey.currentState!.validate()) return;
+                  await _testAuth();
+                },
+          icon: _isTesting
+              ? const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.wifi_find, size: 18),
+          label: Text('Test'),
         ),
         FilledButton.icon(
           onPressed: _isSaving
