@@ -1,5 +1,6 @@
 # Changelog
 
+- docs: auto-update changelog
 - fix: update download picks wrong APK architecture
 - fix: add shell: bash to Windows build step to fix --dart-define parsing in PowerShell
 - docs: auto-update changelog
@@ -29,4 +30,3 @@
 - remove tracked build artifacts from git
 - gitignore: exclude build artifacts in repo root
 - ci: clean stale artifacts before release upload
-- ci: fix GH_TOKEN env var name
