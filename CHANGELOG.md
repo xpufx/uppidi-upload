@@ -1,6 +1,7 @@
 # Changelog
 
 - docs: auto-update changelog
+- docs: auto-update changelog
 - fix: Telegram override of createHttpClient bypassed validateStatus fix
 - docs: auto-update changelog
 - fix: let parseResponse handle all HTTP status codes
@@ -29,4 +30,3 @@
 - fix: add shell: bash to Windows build step to fix --dart-define parsing in PowerShell
 - docs: auto-update changelog
 - docs: auto-update changelog
-- refactor: simplify error-message resolution
