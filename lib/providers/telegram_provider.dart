@@ -73,6 +73,7 @@ class TelegramProvider extends BaseHttpProvider {
       baseUrl: apiBase,
       connectTimeout: const Duration(seconds: 60),
       receiveTimeout: const Duration(seconds: 120),
+      validateStatus: (_) => true,
     ));
 
     if (allowInsecureConn) {

@@ -1055,6 +1055,10 @@ class _ResultBannerState extends State<_ResultBanner> {
       'noProvidersConfigured' => l10n.noProvidersConfigured,
       'connectionTimedOut' => l10n.connectionTimedOut,
       'uploadCancelled' => l10n.uploadCancelled,
+      'telegramErrorChatNotFound' => l10n.telegramErrorChatNotFound,
+      'telegramErrorBotBlocked' => l10n.telegramErrorBotBlocked,
+      'telegramErrorNoRights' => l10n.telegramErrorNoRights,
+      'telegramErrorInvalidToken' => l10n.telegramErrorInvalidToken,
       _ => msg, // English string with runtime data — pass through
     };
   }
