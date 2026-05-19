@@ -1,5 +1,7 @@
 # Changelog
 
+- feat: localize remaining provider metadata strings
+- docs: auto-update changelog
 - feat: localize provider metadata (expiry info, descriptions)
 - chore: add missing translations for all locales
 - docs: auto-update changelog
@@ -28,5 +30,3 @@
 - fix: use --user flatpak mode for CI runner
 - feat: add Flatpak build to CI
 - update deps: file_picker 8→12, share_plus 12→13; fix turkish translations
-- docs: auto-update changelog
-- bump version to 1.2.0+9
