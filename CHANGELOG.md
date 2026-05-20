@@ -12,6 +12,7 @@
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
+- docs: auto-update changelog
 - fix: Telegram override of createHttpClient bypassed validateStatus fix
 - docs: auto-update changelog
 - fix: let parseResponse handle all HTTP status codes
@@ -29,4 +30,3 @@
 - feat: two-step auth test in provider config dialog
 - feat: add Test Auth button to provider config dialog
 - feat: store provider credentials in encrypted storage
-- docs: auto-update changelog
