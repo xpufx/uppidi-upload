@@ -10,6 +10,7 @@
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
+- docs: auto-update changelog
 - fix: Telegram override of createHttpClient bypassed validateStatus fix
 - docs: auto-update changelog
 - fix: let parseResponse handle all HTTP status codes
@@ -29,4 +30,3 @@
 - feat: store provider credentials in encrypted storage
 - docs: auto-update changelog
 - fix: resolve all use_build_context_synchronously lints
-- chore: commit Telegram provider, config sheet, and version bump to v1.2.0+10
