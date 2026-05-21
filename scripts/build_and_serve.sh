@@ -55,7 +55,7 @@ echo "   ✅ No hardcoded strings found"
 # This ensures artifact filenames match the tag/release commit.
 GIT_HASH=$(git rev-parse --short HEAD)
 # Compact timestamp as Android versionCode: yyMMddHHmm, always increasing, git-proof.
-BUILD_NUM=$(date +%y%m%d%H%M)
+BUILD_NUM=$(date +%y%j%H%M)
 
 # ── Refresh changelog (no commit — avoids spam in git log) ──
 echo "# Changelog" >CHANGELOG.md

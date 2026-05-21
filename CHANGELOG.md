@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: cleanup glob, version code, providers.json, compact cards, tests
 - fix: cleanup glob matches symlinks, deletes just-deployed APKs
 - revert: back to split-per-abi, keep cleanup + Install Now
 - fix: universal APK instead of split-per-abi
@@ -22,7 +23,6 @@
 - rename My Providers, add provider type dropdown
 - fix: instance names in dropdown, providerName vs displayName
 - fix: Telegram multi-instance, test auth, settings reactivity, apk paths, link format
-- docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
