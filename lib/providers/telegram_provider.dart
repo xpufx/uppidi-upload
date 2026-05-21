@@ -279,22 +279,20 @@ class TelegramProvider extends BaseHttpProvider {
 
   /// Builds a t.me link from a chat ID and message ID.
   ///
-  /// - Supergroups have chat IDs like `-1001234567890` → link is
-  ///   `https://t.me/c/1234567890/{message_id}`
-  /// - Other groups have negative IDs → `https://t.me/c/{abs_id}/{message_id}`
-  /// - Private chats have positive IDs → `https://t.me/c/{chat_id}/{message_id}`
+  /// - Supergroups (`-100…`) → `https://t.me/c/…/…`  (opens in-app on Android)
+  /// - Other groups (negative ID) → `https://t.me/c/{abs_id}/{msg_id}`
+  /// - Private chats (positive ID) → `tg://openmessage?chat_id=…&message_id=…`
+  ///   (tg:// scheme is required to open the Telegram app for private chats)
   String _buildTelegramLink(String chatId, String messageId) {
-    var stripped = chatId;
-
-    // Supergroup IDs start with -100
-    if (stripped.startsWith('-100')) {
-      stripped = stripped.substring(4);
-    } else if (stripped.startsWith('-')) {
-      // Other negative IDs (private groups)
-      stripped = stripped.substring(1);
+    if (chatId.startsWith('-100')) {
+      // Supergroup
+      return 'https://t.me/c/${chatId.substring(4)}/$messageId';
     }
-    // Positive IDs (private chats) are used as-is
-
-    return 'https://t.me/c/$stripped/$messageId';
+    if (chatId.startsWith('-')) {
+      // Other group
+      return 'https://t.me/c/${chatId.substring(1)}/$messageId';
+    }
+    // Private chat — need tg:// scheme to trigger the app
+    return 'tg://openmessage?chat_id=$chatId&message_id=$messageId';
   }
 }

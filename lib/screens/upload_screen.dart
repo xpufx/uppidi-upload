@@ -44,28 +44,15 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
   }
 
   void _scrollToPreview() {
+    // Fixed scroll: content above the preview is ~180px (blurb, dropdown,
+    // provider info, spacings). No need to wait for image decode or
+    // calculate render box positions.
     if (!_scrollController.hasClients) return;
-    final ctx = _previewKey.currentContext;
-    if (ctx == null || !ctx.mounted) return;
-    final renderBox = ctx.findRenderObject() as RenderBox?;
-    if (renderBox == null || !renderBox.attached) return;
-
-    // Get the preview's position relative to the scroll viewport
-    final previewGlobal = renderBox.localToGlobal(Offset.zero);
-    final scrollBox = _scrollController.position.context.notificationContext
-        ?.findRenderObject() as RenderBox?;
-    if (scrollBox == null) return;
-    final scrollGlobal = scrollBox.localToGlobal(Offset.zero);
-    final offsetInViewport = previewGlobal.dy - scrollGlobal.dy;
-
-    // Scroll to bring preview to the top of the viewport
-    if (offsetInViewport > 10) {
-      _scrollController.animateTo(
-        _scrollController.offset + offsetInViewport,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
+    _scrollController.animateTo(
+      180,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   @override

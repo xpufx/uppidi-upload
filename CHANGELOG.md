@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: hide unconfigured providers, My Providers on test screen, last-used provider
 - l10n: myProviders, addProvider, delete, done, debug response keys
 - feat: instanceDescription curation for My Providers
 - rename My Providers, add provider type dropdown
@@ -29,4 +30,3 @@
 - docs: auto-update changelog
 - fix: Telegram upload config not loading from secure storage
 - docs: auto-update changelog
-- feat: localize remaining provider metadata strings
