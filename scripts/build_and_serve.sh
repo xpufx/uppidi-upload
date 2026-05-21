@@ -92,9 +92,9 @@ done
 echo "==> Writing version file..."
 echo "$GIT_HASH" >"${ARTIFACTS_DIR}/latest.txt"
 
-echo "==> Cleaning old APKs (keep latest 5 per ABI)..."
+echo "==> Cleaning old APKs (keep latest 1 per ABI)..."
 for abi in arm64-v8a armeabi-v7a x86_64; do
-	ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-android-${abi}.apk 2>/dev/null | tail -n +6 | xargs -r rm -f
+	ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-android-${abi}.apk 2>/dev/null | tail -n +2 | xargs -r rm -f
 done
 
 # ── Linux ──────────────────────────────────────────────────
@@ -109,8 +109,8 @@ tar -czf "${ARTIFACTS_DIR}/${LINUX_NAME}" -C "build/linux/x64/${BUILD_TYPE}/bund
 echo "==> Updating latest symlink..."
 ln -sf "${LINUX_NAME}" "${ARTIFACTS_DIR}/uppidi-upload-latest-linux.tar.gz"
 
-echo "==> Cleaning old Linux builds (keep latest 5)..."
-ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-linux.tar.gz 2>/dev/null | tail -n +6 | xargs -r rm -f
+echo "==> Cleaning old Linux builds (keep latest 1)..."
+ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-linux.tar.gz 2>/dev/null | tail -n +2 | xargs -r rm -f
 
 # ── AppImage ─────────────────────────────────────────────────
 if [ "$DEV" = false ] && [ -f "$(dirname "$0")/build-appimage.sh" ]; then
