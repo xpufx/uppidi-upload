@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: add Zulip provider with multi-instance support
 - fix: tg://openmessage for all chat types
 - fix: scroll trusted, telegram link opens app
 - feat: hide unconfigured providers, My Providers on test screen, last-used provider
@@ -28,5 +29,4 @@
 - fix: Telegram override of createHttpClient bypassed validateStatus fix
 - docs: auto-update changelog
 - fix: let parseResponse handle all HTTP status codes
-- docs: auto-update changelog
 - docs: auto-update changelog

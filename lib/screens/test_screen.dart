@@ -60,7 +60,7 @@ class TestScreen extends ConsumerWidget {
         const SizedBox(height: 16),
 
         // ── Built-in Providers ──
-        Text(l10n.navProviders,
+        Text(l10n.builtInProviders,
             style: Theme.of(context)
                 .textTheme
                 .titleMedium
@@ -216,7 +216,7 @@ class _ProviderRow extends ConsumerWidget {
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
-                                    health?.reason ?? 'Currently unavailable',
+                                    health?.reason ?? l10n.currentlyUnavailable,
                                     style: const TextStyle(
                                         fontSize: 10, color: Colors.orange)),
                               ),
@@ -240,7 +240,7 @@ class _ProviderRow extends ConsumerWidget {
                 if (showConfigure)
                   IconButton(
                     icon: const Icon(Icons.settings, size: 18),
-                    tooltip: 'Configure',
+                    tooltip: l10n.providerConfigure,
                     onPressed: () async {
                       final saved = await showProviderConfigDialog(
                           context, ref, provider);

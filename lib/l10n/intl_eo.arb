@@ -125,18 +125,15 @@
   "openDeleteUrl": "Malfermi forigan URL",
   "deleteUrlCopied": "Foriga URL kopiis al tondujo",
   "copyDeleteUrl": "Kopii forigan URL",
-
   "failedToReadFile": "Ne eblis legi la elektitan dosieron",
   "noProvidersConfigured": "Neniu alŝuta provizanto agordita",
   "connectionTimedOut": "Konekto tempis",
   "connectionFailedMsg": "Konekto malsukcesis: {error}",
   "serverErrorMsg": "Servila eraro: {code}",
   "uploadFailedMsg": "Alŝuto malsukcesis: {reason}",
-
   "speedBS": "{speed} B/s",
   "speedKBS": "{speed} KB/s",
   "speedMBS": "{speed} MB/s",
-
   "clearSelection": "Malplenigi elekton",
   "expiry1Hour": "1 horo",
   "expiry24Hours": "24 horoj",
@@ -149,7 +146,6 @@
   "copiedToClipboard": "Kopiis al tondujo",
   "fileExceedsLimit": "Dosiero superas la limon de {size}",
   "providerOnlyAccepts": "Provizanto nur akceptas: {types}",
-
   "systemInfo": "Sistema Informo",
   "info": "Informo",
   "license": "Permesilo",
@@ -171,10 +167,8 @@
   "downloadFailed": "Elŝuto malsukcesis: {error}",
   "changelogNotAvailable": "Ŝanĝoprotokolo ne havebla",
   "debugLogCopied": "{label} — kopiis al tondujo",
-
   "devBuild": "TESTA VERSIO",
   "versionPrefix": "v{version}",
-
   "providerConfigDescription": "Enigu la necesajn akreditaĵojn por ĉi tiu provizanto.",
   "providerConfigNotConfigured": "{provider} — ne agordita",
   "providerConfigRequired": "Ĉi tiu kampo estas deviga",
@@ -185,23 +179,19 @@
   "save": "Konservi",
   "telegramErrorBotBlocked": "La roboto estis blokita de la uzanto. Malbloku la roboton unue.",
   "telegramErrorChatNotFound": "Babilejo ne trovita. Bonvolu kontroli vian Babilejan ID.",
-  "telegramErrorBotBlocked": "La roboto estis blokita de la uzanto. Malbloku la roboton unue.",
   "telegramErrorNoRights": "Roboto ne rajtas sendi mesaĝojn en ĉi tiu babilejo.",
   "telegramErrorInvalidToken": "Nevalida robota ĵetono. Kontrolu vian Bot-Ĵetonon de BotFather.",
   "telegramSentToChat": "Sendita al Telegram-babilejo",
-
   "expiryPersistent": "Daŭra (ĝis la robotsimbolo estas revokita)",
   "expiryIndefinite30d": "Nedifinita (neaktiva >30d povas esti forigita)",
   "expiryOneDayExtendable": "~1 tago (etendebla post re-alŝuto)",
   "expiryOptions1h12h24h72h": "1h / 12h / 24h / 72h",
   "expiry3Hours": "3 horoj",
   "expiry7Days": "7 tagoj",
-
   "mimeTypesImagesOnly": "Nur bildoj",
   "configLabelBotToken": "Bot-Ĵetono",
   "configLabelChatId": "Babileja ID",
   "configLabelSendAsPhoto": "Sendi bildojn kiel fotoj",
-
   "myProviders": "Miaj Provizantoj",
   "addProvider": "Aldoni provizanton",
   "noInstancesConfigured": "Neniu ekzemplero agordita",
@@ -210,5 +200,19 @@
   "delete": "Forigi",
   "fillRequiredFields": "Plenigu la devigajn kampojn unue",
   "debugResponse": "Debug response",
-  "done": "Done"
+  "done": "Done",
+  "configLabelServerUrl": "Server URL",
+  "configLabelEmail": "Email",
+  "configLabelApiKey": "API Key",
+  "configLabelInstanceName": "Name",
+  "configInstanceNameHelper": "A label to identify this instance",
+  "currentlyUnavailable": "Currently unavailable",
+  "cropImage": "Crop",
+  "builtInProviders": "Built-in",
+  "testStepReachable": "Reachable",
+  "testStepNotProvided": "Not provided",
+  "testStepNotFound": "Not found",
+  "testStepInvalid": "Invalid",
+  "connectedAs": "Connected as @{username}",
+  "chatAccessible": "Chat \"{title}\" accessible"
 }

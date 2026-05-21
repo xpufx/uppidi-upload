@@ -87,9 +87,9 @@ class _ImageCropOverlayState extends State<ImageCropOverlay> {
           tooltip: cancelLabel,
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Crop',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          AppLocalizations.of(context).cropImage,
+          style: const TextStyle(color: Colors.white),
         ),
         actions: [
           TextButton.icon(

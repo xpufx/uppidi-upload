@@ -97,6 +97,9 @@ String _resolveCfgLabel(AppLocalizations l10n, String raw) {
     'Bot Token' => l10n.configLabelBotToken,
     'Chat ID' => l10n.configLabelChatId,
     'Send images as photos' => l10n.configLabelSendAsPhoto,
+    'Server URL' => l10n.configLabelServerUrl,
+    'Email' => l10n.configLabelEmail,
+    'API Key' => l10n.configLabelApiKey,
     _ => raw,
   };
 }
@@ -505,11 +508,11 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Name',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.configLabelInstanceName,
+                    border: const OutlineInputBorder(),
                     isDense: true,
-                    helperText: 'A label to identify this instance',
+                    helperText: l10n.configInstanceNameHelper,
                   ),
                 ),
               ),

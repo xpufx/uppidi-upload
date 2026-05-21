@@ -125,18 +125,15 @@
   "openDeleteUrl": "Silme URL'sini aç",
   "deleteUrlCopied": "Silme URL'si panoya kopyalandı",
   "copyDeleteUrl": "Silme URL'sini kopyala",
-
   "failedToReadFile": "Seçilen dosya okunamadı",
   "noProvidersConfigured": "Hiçbir yükleme sağlayıcısı yapılandırılmamış",
   "connectionTimedOut": "Bağlantı zaman aşımına uğradı",
   "connectionFailedMsg": "Bağlantı başarısız: {error}",
   "serverErrorMsg": "Sunucu hatası: {code}",
   "uploadFailedMsg": "Yükleme başarısız: {reason}",
-
   "speedBS": "{speed} B/s",
   "speedKBS": "{speed} KB/s",
   "speedMBS": "{speed} MB/s",
-
   "clearSelection": "Seçimi temizle",
   "expiry1Hour": "1 saat",
   "expiry24Hours": "24 saat",
@@ -149,7 +146,6 @@
   "copiedToClipboard": "Panoya kopyalandı",
   "fileExceedsLimit": "Dosya {size} sınırını aşıyor",
   "providerOnlyAccepts": "Sağlayıcı yalnızca şunları kabul eder: {types}",
-
   "systemInfo": "Sistem Bilgisi",
   "info": "Bilgi",
   "license": "Lisans",
@@ -171,10 +167,8 @@
   "downloadFailed": "İndirme başarısız: {error}",
   "changelogNotAvailable": "Değişiklik günlüğü mevcut değil",
   "debugLogCopied": "{label} — panoya kopyalandı",
-
   "devBuild": "GELİŞTİRME YAPISI",
   "versionPrefix": "v{version}",
-
   "providerConfigDescription": "Bu sağlayıcının gerektirdiği kimlik bilgilerini girin.",
   "providerConfigNotConfigured": "{provider} — yapılandırılmamış",
   "providerConfigRequired": "Bu alan zorunludur",
@@ -185,23 +179,19 @@
   "save": "Kaydet",
   "telegramErrorBotBlocked": "Bot kullanıcı tarafından engellendi. Önce botun engelini kaldırın.",
   "telegramErrorChatNotFound": "Chat bulunamadı. Chat ID'nizi kontrol edin.",
-  "telegramErrorBotBlocked": "Bot kullanıcı tarafından engellendi. Önce botun engelini kaldırın.",
   "telegramErrorNoRights": "Botun bu sohbette mesaj gönderme izni yok.",
   "telegramErrorInvalidToken": "Geçersiz bot tokeni. BotFather'dan Bot Token'inizi kontrol edin.",
   "telegramSentToChat": "Telegram sohbetine gönderildi",
-
   "expiryPersistent": "Kalıcı (bot tokeni iptal edilene kadar)",
   "expiryIndefinite30d": "Süresiz (30 gün hareketsiz kalırsa silinebilir)",
   "expiryOneDayExtendable": "~1 gün (yeniden yüklemeyle uzatılabilir)",
   "expiryOptions1h12h24h72h": "1s / 12s / 24s / 72s",
   "expiry3Hours": "3 saat",
   "expiry7Days": "7 gün",
-
   "mimeTypesImagesOnly": "Yalnızca görseller",
   "configLabelBotToken": "Bot Tokeni",
   "configLabelChatId": "Sohbet ID'si",
   "configLabelSendAsPhoto": "Görselleri fotoğraf olarak gönder",
-
   "myProviders": "Sağlayıcılarım",
   "addProvider": "Sağlayıcı ekle",
   "noInstancesConfigured": "Hiçbir örnek yapılandırılmamış",
@@ -210,5 +200,19 @@
   "delete": "Sil",
   "fillRequiredFields": "Önce gerekli alanları doldurun",
   "debugResponse": "Debug response",
-  "done": "Done"
+  "done": "Done",
+  "configLabelServerUrl": "Server URL",
+  "configLabelEmail": "Email",
+  "configLabelApiKey": "API Key",
+  "configLabelInstanceName": "Name",
+  "configInstanceNameHelper": "A label to identify this instance",
+  "currentlyUnavailable": "Currently unavailable",
+  "cropImage": "Crop",
+  "builtInProviders": "Built-in",
+  "testStepReachable": "Reachable",
+  "testStepNotProvided": "Not provided",
+  "testStepNotFound": "Not found",
+  "testStepInvalid": "Invalid",
+  "connectedAs": "Connected as @{username}",
+  "chatAccessible": "Chat \"{title}\" accessible"
 }

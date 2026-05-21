@@ -686,4 +686,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get done => 'Done';
+
+  @override
+  String get configLabelServerUrl => 'Server URL';
+
+  @override
+  String get configLabelEmail => 'Email';
+
+  @override
+  String get configLabelApiKey => 'API Key';
+
+  @override
+  String get configLabelInstanceName => 'Name';
+
+  @override
+  String get configInstanceNameHelper => 'A label to identify this instance';
+
+  @override
+  String get currentlyUnavailable => 'Currently unavailable';
+
+  @override
+  String get cropImage => 'Crop';
+
+  @override
+  String get builtInProviders => 'Built-in';
+
+  @override
+  String get testStepReachable => 'Reachable';
+
+  @override
+  String get testStepNotProvided => 'Not provided';
+
+  @override
+  String get testStepNotFound => 'Not found';
+
+  @override
+  String get testStepInvalid => 'Invalid';
+
+  @override
+  String connectedAs(Object username) {
+    return 'Connected as @$username';
+  }
+
+  @override
+  String chatAccessible(Object title) {
+    return 'Chat \"$title\" accessible';
+  }
 }

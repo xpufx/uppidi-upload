@@ -125,18 +125,15 @@
   "openDeleteUrl": "Apri URL di eliminazione",
   "deleteUrlCopied": "URL di eliminazione copiato",
   "copyDeleteUrl": "Copia URL di eliminazione",
-
   "failedToReadFile": "Impossibile leggere il file selezionato",
   "noProvidersConfigured": "Nessun servizio di upload configurato",
   "connectionTimedOut": "Tempo di connessione scaduto",
   "connectionFailedMsg": "Connessione fallita: {error}",
   "serverErrorMsg": "Errore del server: {code}",
   "uploadFailedMsg": "Caricamento fallito: {reason}",
-
   "speedBS": "{speed} B/s",
   "speedKBS": "{speed} KB/s",
   "speedMBS": "{speed} MB/s",
-
   "clearSelection": "Annulla selezione",
   "expiry1Hour": "1 ora",
   "expiry24Hours": "24 ore",
@@ -149,7 +146,6 @@
   "copiedToClipboard": "Copiato negli appunti",
   "fileExceedsLimit": "Il file supera il limite di {size}",
   "providerOnlyAccepts": "Il provider accetta solo: {types}",
-
   "systemInfo": "Informazioni di Sistema",
   "info": "Informazioni",
   "license": "Licenza",
@@ -171,10 +167,8 @@
   "downloadFailed": "Download fallito: {error}",
   "changelogNotAvailable": "Changelog non disponibile",
   "debugLogCopied": "{label} — copiato negli appunti",
-
   "devBuild": "BUILD DI SVILUPPO",
   "versionPrefix": "v{version}",
-
   "providerConfigDescription": "Inserisci le credenziali richieste da questo provider.",
   "providerConfigNotConfigured": "{provider} — non configurato",
   "providerConfigRequired": "Questo campo è obbligatorio",
@@ -185,23 +179,19 @@
   "save": "Salva",
   "telegramErrorBotBlocked": "Il bot è stato bloccato dall'utente. Sblocca prima il bot.",
   "telegramErrorChatNotFound": "Chat non trovata. Controlla il tuo Chat ID.",
-  "telegramErrorBotBlocked": "Il bot è stato bloccato dall'utente. Sblocca prima il bot.",
   "telegramErrorNoRights": "Il bot non ha i permessi per inviare messaggi in questa chat.",
   "telegramErrorInvalidToken": "Token bot non valido. Controlla il tuo Bot Token da BotFather.",
   "telegramSentToChat": "Inviato alla chat Telegram",
-
   "expiryPersistent": "Persistente (fino alla revoca del token del bot)",
   "expiryIndefinite30d": "Indefinito (inattivo >30gg può essere eliminato)",
   "expiryOneDayExtendable": "~1 giorno (estensibile al re-upload)",
   "expiryOptions1h12h24h72h": "1h / 12h / 24h / 72h",
   "expiry3Hours": "3 ore",
   "expiry7Days": "7 giorni",
-
   "mimeTypesImagesOnly": "Solo immagini",
   "configLabelBotToken": "Token del Bot",
   "configLabelChatId": "ID Chat",
   "configLabelSendAsPhoto": "Invia immagini come foto",
-
   "myProviders": "I Miei Provider",
   "addProvider": "Aggiungi provider",
   "noInstancesConfigured": "Nessuna istanza configurata",
@@ -210,5 +200,19 @@
   "delete": "Elimina",
   "fillRequiredFields": "Compila prima i campi obbligatori",
   "debugResponse": "Debug response",
-  "done": "Done"
+  "done": "Done",
+  "configLabelServerUrl": "Server URL",
+  "configLabelEmail": "Email",
+  "configLabelApiKey": "API Key",
+  "configLabelInstanceName": "Name",
+  "configInstanceNameHelper": "A label to identify this instance",
+  "currentlyUnavailable": "Currently unavailable",
+  "cropImage": "Crop",
+  "builtInProviders": "Built-in",
+  "testStepReachable": "Reachable",
+  "testStepNotProvided": "Not provided",
+  "testStepNotFound": "Not found",
+  "testStepInvalid": "Invalid",
+  "connectedAs": "Connected as @{username}",
+  "chatAccessible": "Chat \"{title}\" accessible"
 }

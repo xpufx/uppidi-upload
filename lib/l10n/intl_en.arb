@@ -210,5 +210,20 @@
   "delete": "Delete",
   "fillRequiredFields": "Fill in required fields first",
   "debugResponse": "Debug response",
-  "done": "Done"
+  "done": "Done",
+
+  "configLabelServerUrl": "Server URL",
+  "configLabelEmail": "Email",
+  "configLabelApiKey": "API Key",
+  "configLabelInstanceName": "Name",
+  "configInstanceNameHelper": "A label to identify this instance",
+  "currentlyUnavailable": "Currently unavailable",
+  "cropImage": "Crop",
+  "builtInProviders": "Built-in",
+  "testStepReachable": "Reachable",
+  "testStepNotProvided": "Not provided",
+  "testStepNotFound": "Not found",
+  "testStepInvalid": "Invalid",
+  "connectedAs": "Connected as @{username}",
+  "chatAccessible": "Chat \"{title}\" accessible"
 }

@@ -1315,6 +1315,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get done;
+
+  /// No description provided for @configLabelServerUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Server URL'**
+  String get configLabelServerUrl;
+
+  /// No description provided for @configLabelEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get configLabelEmail;
+
+  /// No description provided for @configLabelApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get configLabelApiKey;
+
+  /// No description provided for @configLabelInstanceName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get configLabelInstanceName;
+
+  /// No description provided for @configInstanceNameHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'A label to identify this instance'**
+  String get configInstanceNameHelper;
+
+  /// No description provided for @currentlyUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently unavailable'**
+  String get currentlyUnavailable;
+
+  /// No description provided for @cropImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop'**
+  String get cropImage;
+
+  /// No description provided for @builtInProviders.
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in'**
+  String get builtInProviders;
+
+  /// No description provided for @testStepReachable.
+  ///
+  /// In en, this message translates to:
+  /// **'Reachable'**
+  String get testStepReachable;
+
+  /// No description provided for @testStepNotProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'Not provided'**
+  String get testStepNotProvided;
+
+  /// No description provided for @testStepNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Not found'**
+  String get testStepNotFound;
+
+  /// No description provided for @testStepInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid'**
+  String get testStepInvalid;
+
+  /// No description provided for @connectedAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected as @{username}'**
+  String connectedAs(Object username);
+
+  /// No description provided for @chatAccessible.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat \"{title}\" accessible'**
+  String chatAccessible(Object title);
 }
 
 class _AppLocalizationsDelegate

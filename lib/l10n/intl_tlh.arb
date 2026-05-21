@@ -126,18 +126,15 @@
   "openDeleteUrl": "QIt ra'wI' yIpoQ",
   "deleteUrlCopied": "QIt ra'wI' rur ghe'tor",
   "copyDeleteUrl": "QIt ra'wI' yIrur",
-
   "failedToReadFile": "Doch laDlaHbe'",
   "noProvidersConfigured": "ngeDna' pat ghobe'",
   "connectionTimedOut": "qara'DI' poH QIt",
   "connectionFailedMsg": "Qapbe' qara'DI': {error}",
   "serverErrorMsg": "raS Qagh: {code}",
   "uploadFailedMsg": "Ha'ra' Qagh: {reason}",
-
   "speedBS": "{speed} B/s",
   "speedKBS": "{speed} KB/s",
   "speedMBS": "{speed} MB/s",
-
   "clearSelection": "ghoS QIt",
   "expiry1Hour": "1 rep",
   "expiry24Hours": "24 rep",
@@ -150,7 +147,6 @@
   "copiedToClipboard": "rur ghe'tor",
   "fileExceedsLimit": "Doch {size} law'qu'",
   "providerOnlyAccepts": "ngeDna' chaw': {types}",
-
   "systemInfo": "raS QonoS",
   "info": "QonoS",
   "license": "pat chaw'",
@@ -172,10 +168,8 @@
   "downloadFailed": "yItlhutlh Qagh: {error}",
   "changelogNotAvailable": "choH QonwI' ghobe'",
   "debugLogCopied": "{label} — rur ghe'tor",
-
   "devBuild": "DEV BUILD",
   "versionPrefix": "v{version}",
-
   "providerConfigDescription": "ngeDna'vaD pat yIchenmoH.",
   "providerConfigNotConfigured": "{provider} — pat ghobe'",
   "providerConfigRequired": "QochDaq Doch yIqel",
@@ -186,23 +180,19 @@
   "save": "yIqel",
   "telegramErrorBotBlocked": "bot loD qIp. bot yIqIt Ha'.",
   "telegramErrorChatNotFound": "chat ghobe'. Chat ID yIghoS.",
-  "telegramErrorBotBlocked": "bot loD qIp. bot yIqIt Ha'.",
   "telegramErrorNoRights": "bot chatDaq mIw chaw'be'.",
   "telegramErrorInvalidToken": "bot token Qagh. BotFatherDaq Bot Token yIghoS.",
   "telegramSentToChat": "Telegram chatDaq nge'",
-
   "expiryPersistent": "bot token QItpu'ba' rur",
   "expiryIndefinite30d": "poH QItbe' (30h jaj QItlaH)",
   "expiryOneDayExtendable": "~1 jaj (qa'Ha'ra'laH)",
   "expiryOptions1h12h24h72h": "1h / 12h / 24h / 72h",
   "expiry3Hours": "3 rep",
   "expiry7Days": "7 jaj",
-
   "mimeTypesImagesOnly": "qabmey neH",
   "configLabelBotToken": "bot token",
   "configLabelChatId": "chat ID",
   "configLabelSendAsPhoto": "qabmey FotoDaq",
-
   "myProviders": "QaHwI'meywIj",
   "addProvider": "QaHwI' lan",
   "noInstancesConfigured": "pagh rap ta'",
@@ -211,5 +201,19 @@
   "delete": "Qaw'",
   "fillRequiredFields": "Dochmey rur qaSpay'",
   "debugResponse": "Debug response",
-  "done": "Done"
+  "done": "Done",
+  "configLabelServerUrl": "Server URL",
+  "configLabelEmail": "Email",
+  "configLabelApiKey": "API Key",
+  "configLabelInstanceName": "Name",
+  "configInstanceNameHelper": "A label to identify this instance",
+  "currentlyUnavailable": "Currently unavailable",
+  "cropImage": "Crop",
+  "builtInProviders": "Built-in",
+  "testStepReachable": "Reachable",
+  "testStepNotProvided": "Not provided",
+  "testStepNotFound": "Not found",
+  "testStepInvalid": "Invalid",
+  "connectedAs": "Connected as @{username}",
+  "chatAccessible": "Chat \"{title}\" accessible"
 }
