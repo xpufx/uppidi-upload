@@ -43,6 +43,9 @@ class ProviderInstance implements BaseUploader {
   String? get proxyUrl => _base.proxyUrl;
 
   @override
+  String? get instanceDescription => _base.instanceDescription;
+
+  @override
   ProviderMetadata get metadata => _base.metadata;
 
   @override

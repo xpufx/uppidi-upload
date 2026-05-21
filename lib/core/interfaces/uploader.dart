@@ -18,6 +18,11 @@ abstract class BaseUploader {
   Map<String, String> get configLabels;
   String? get proxyUrl;
 
+  /// Optional short description shown in the "Add instance" dialog, e.g.
+  /// "Telegram Bot API — send files to any chat". Only providers with a
+  /// non-null description appear as addable instance types.
+  String? get instanceDescription => null;
+
   ProviderMetadata get metadata;
 
   Future<Dio> createHttpClient(

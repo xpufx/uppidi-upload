@@ -54,6 +54,10 @@ class TelegramProvider extends BaseHttpProvider {
   List<String> get optionalConfigKeys => ['send_as_photo'];
 
   @override
+  String? get instanceDescription =>
+      'Telegram Bot API — send files to any chat';
+
+  @override
   Map<String, String> get configLabels => const {
         'bot_token': 'Bot Token',
         'chat_id': 'Chat ID',

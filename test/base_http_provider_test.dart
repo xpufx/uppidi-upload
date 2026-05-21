@@ -45,6 +45,9 @@ class TestHttpProvider extends BaseHttpProvider {
   String? get proxyUrl => null;
 
   @override
+  String? get instanceDescription => null;
+
+  @override
   UploadResult parseResponse(Response response) {
     return UploadResult(success: response.statusCode == 200);
   }

@@ -175,12 +175,12 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
 
   Future<void> _add() async {
     // Show a dialog to pick which provider type to add an instance for
-    final authTypes = ProviderRegistry.authProviderTypes();
-    if (authTypes.isEmpty) return;
+    final types = ProviderRegistry.instanceTypes;
+    if (types.isEmpty) return;
 
     BaseUploader? chosen;
-    if (authTypes.length == 1) {
-      chosen = authTypes.first;
+    if (types.length == 1) {
+      chosen = types.first;
     } else {
       chosen = await showDialog<BaseUploader>(
         context: context,
@@ -188,10 +188,14 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
           title: const Text('Add provider'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            children: authTypes
+            children: types
                 .map((t) => ListTile(
                       dense: true,
                       title: Text(t.providerName),
+                      subtitle: t.instanceDescription != null
+                          ? Text(t.instanceDescription!,
+                              style: const TextStyle(fontSize: 12))
+                          : null,
                       onTap: () => Navigator.pop(ctx, t),
                     ))
                 .toList(),

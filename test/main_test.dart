@@ -34,6 +34,9 @@ class MockNavUploader implements BaseUploader {
   String? get proxyUrl => null;
 
   @override
+  String? get instanceDescription => null;
+
+  @override
   ProviderMetadata get metadata => ProviderMetadata();
 
   @override
