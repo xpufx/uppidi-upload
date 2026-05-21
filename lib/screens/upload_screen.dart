@@ -14,6 +14,7 @@ import '../core/insecure_upload_warning.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/metadata_badges.dart';
+import '../core/models/provider_instance.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
 import '../core/provider_config_sheet.dart';
@@ -313,7 +314,11 @@ class _ProviderDropdown extends StatelessWidget {
     final selectedProvider =
         selectedIndex < providers.length ? providers[selectedIndex] : null;
     return Tooltip(
-      message: selectedProvider?.providerName ?? '',
+      message: selectedProvider != null
+          ? (selectedProvider is ProviderInstance
+              ? selectedProvider.displayName
+              : selectedProvider.providerName)
+          : '',
       child: DropdownButton<int>(
         value: selectedIndex,
         isExpanded: true,
@@ -336,7 +341,7 @@ class _ProviderDropdown extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                     child: Text(
-                  p.providerName,
+                  p is ProviderInstance ? p.displayName : p.providerName,
                   overflow: TextOverflow.ellipsis,
                   style: online
                       ? null

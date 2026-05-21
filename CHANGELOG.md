@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: Telegram multi-instance, test auth, settings reactivity, apk paths, link format
+- docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
@@ -28,5 +30,3 @@
 - feat: localize provider metadata (expiry info, descriptions)
 - chore: add missing translations for all locales
 - docs: auto-update changelog
-- fix: proper locale handling for tlh and eo (custom delegate)
-- fix: remove eo/tlh from language dropdown (break Material locale)

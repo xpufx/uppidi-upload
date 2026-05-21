@@ -22,7 +22,10 @@ class ProviderInstance implements BaseUploader {
   String get providerId => '${_base.providerId}__$instanceId';
 
   @override
-  String get providerName => '${_base.providerName} ($instanceName)';
+  String get providerName => instanceName;
+
+  /// Display name including the base provider type, e.g. "Telegram (Work Bot)".
+  String get displayName => '${_base.providerName} ($instanceName)';
 
   @override
   bool get supportsWeb => _base.supportsWeb;
