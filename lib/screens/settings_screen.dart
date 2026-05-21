@@ -11,10 +11,7 @@ import 'package:open_filex/open_filex.dart';
 
 import '../core/apk_installer.dart' show downloadFile;
 import '../core/app_logo.dart';
-import '../core/interfaces/uploader.dart';
 import '../core/logging/log.dart';
-import '../core/models/provider_metadata.dart';
-import '../core/provider_config_sheet.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
 import '../core/theme_provider.dart';
@@ -676,7 +673,6 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           const SizedBox(height: 16),
         ],
         const SizedBox(height: 8),
-        _ProviderConfigSection(),
         const Divider(height: 32),
         Card(
           child: Padding(
@@ -1011,115 +1007,5 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         );
       }
     }
-  }
-}
-
-/// Section showing providers that require authentication configuration.
-/// Groups instances by base provider type — one card per type with instance
-/// count. Tapping "Configure" opens the instance manager dialog.
-class _ProviderConfigSection extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Watch so the card updates immediately when instances change.
-    ref.watch(enabledProvidersProvider);
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final baseIds = <String>{};
-    final authCards = <Widget>[];
-    for (final p in ProviderRegistry.all) {
-      final baseId = p.providerId.split('__').first;
-      if (baseIds.contains(baseId)) continue;
-      baseIds.add(baseId);
-      final base = ProviderRegistry.baseFor(p.providerId);
-      if (base == null) continue;
-      if (!base.metadata.capabilities.contains(ProviderCapability.requiresAuth))
-        continue;
-
-      // Count actual instances (ProviderInstance wrappers have IDs like
-      // `telegram__work`). Bare base providers are not instances.
-      final instanceCount = ProviderRegistry.all
-          .where((i) => i.providerId.startsWith('${baseId}__'))
-          .length;
-
-      authCards.add(_AuthProviderCard(
-        key: ValueKey(baseId),
-        baseProvider: base,
-        instanceCount: instanceCount,
-      ));
-    }
-
-    if (authCards.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(l10n.providersSection,
-            style: theme.textTheme.titleMedium
-                ?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        ...authCards,
-        const SizedBox(height: 16),
-      ],
-    );
-  }
-}
-
-class _AuthProviderCard extends ConsumerWidget {
-  final BaseUploader baseProvider;
-  final int instanceCount;
-
-  const _AuthProviderCard({
-    super.key,
-    required this.baseProvider,
-    required this.instanceCount,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          children: [
-            Icon(
-              instanceCount > 0 ? Icons.check_circle : Icons.warning_amber,
-              size: 20,
-              color: instanceCount > 0 ? Colors.green : Colors.orange,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(baseProvider.providerName,
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
-                  Text(
-                    instanceCount > 0
-                        ? '$instanceCount instance${instanceCount > 1 ? 's' : ''} configured'
-                        : l10n.providerConfigNotConfigured(
-                            baseProvider.providerName),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: instanceCount > 0
-                          ? Colors.green.shade700
-                          : Colors.orange.shade700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            FilledButton.tonalIcon(
-              onPressed: () =>
-                  showProviderConfigDialog(context, ref, baseProvider),
-              icon: const Icon(Icons.settings, size: 18),
-              label: Text(l10n.providerConfigure),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

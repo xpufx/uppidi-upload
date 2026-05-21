@@ -59,14 +59,18 @@ class ProviderRegistry {
   static List<BaseUploader> all = List.of(_baseTypes);
 
   /// Loads instances from secure storage and builds the provider list.
-  /// Providers without configured instances appear as a single default.
-  /// Providers WITH instances get one entry per instance.
+  /// Auth providers (requiresAuth capability) only appear when they have
+  /// at least one configured instance.  Non-auth providers always appear.
   static Future<void> init() async {
     final result = <BaseUploader>[];
     for (final base in _baseTypes) {
       final instances = await loadProviderInstances(base.providerId);
       if (instances.isEmpty) {
-        result.add(base);
+        // Only add bare base type if it doesn't need auth config
+        if (!base.metadata.capabilities
+            .contains(ProviderCapability.requiresAuth)) {
+          result.add(base);
+        }
       } else {
         for (final inst in instances) {
           result.add(ProviderInstance(base, inst.id, inst.name));

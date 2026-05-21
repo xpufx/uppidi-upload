@@ -160,6 +160,20 @@ class UploadNotifier extends Notifier<UploadState> {
   UploadState build() {
     final List<BaseUploader> enabled =
         _injectedProviders ?? ref.watch(enabledProvidersProvider);
+
+    // Restore last used provider after frame
+    Future.microtask(() async {
+      if (state is! UploadIdle) return;
+      final svc = ref.read(settingsServiceProvider);
+      final lastId = await svc.get(SettingsService.lastUsedProviderKey);
+      if (lastId != null) {
+        final idx = enabled.indexWhere((p) => p.providerId == lastId);
+        if (idx >= 0 && idx != 0) {
+          state = UploadIdle(providers: enabled, selectedProviderIndex: idx);
+        }
+      }
+    });
+
     return UploadIdle(providers: enabled);
   }
 
@@ -354,6 +368,13 @@ class UploadNotifier extends Notifier<UploadState> {
   }
 
   Future<void> _executeUpload(FileUploadRequest request) async {
+    // Save last used provider
+    if (state.selectedProviderIndex < state.providers.length) {
+      final svc = ref.read(settingsServiceProvider);
+      await svc.set(SettingsService.lastUsedProviderKey,
+          state.providers[state.selectedProviderIndex].providerId);
+    }
+
     if (state.providers.isEmpty) {
       final info = _extractFileInfo(state);
       state = UploadCompleted(

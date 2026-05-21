@@ -1,5 +1,6 @@
 # Changelog
 
+- l10n: myProviders, addProvider, delete, done, debug response keys
 - feat: instanceDescription curation for My Providers
 - rename My Providers, add provider type dropdown
 - fix: instance names in dropdown, providerName vs displayName
@@ -29,4 +30,3 @@
 - fix: Telegram upload config not loading from secure storage
 - docs: auto-update changelog
 - feat: localize remaining provider metadata strings
-- docs: auto-update changelog

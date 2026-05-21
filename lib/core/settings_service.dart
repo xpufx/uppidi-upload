@@ -121,6 +121,7 @@ class SettingsService {
   static const insecureMutedKey = 'global.insecure_muted_providers';
   static const navigationLayoutKey = 'global.nav_layout';
   static const shareMessageKey = 'global.share_message';
+  static const lastUsedProviderKey = 'global.last_used_provider';
 
   Future<bool> isInsecureConnAllowed() async {
     final val = await get(insecureConnKey);
