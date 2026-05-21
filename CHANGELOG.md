@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: scroll trusted, telegram link opens app
 - feat: hide unconfigured providers, My Providers on test screen, last-used provider
 - l10n: myProviders, addProvider, delete, done, debug response keys
 - feat: instanceDescription curation for My Providers
@@ -29,4 +30,3 @@
 - docs: auto-update changelog
 - docs: auto-update changelog
 - fix: Telegram upload config not loading from secure storage
-- docs: auto-update changelog

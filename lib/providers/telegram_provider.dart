@@ -277,22 +277,10 @@ class TelegramProvider extends BaseHttpProvider {
     return 'Telegram: $description';
   }
 
-  /// Builds a t.me link from a chat ID and message ID.
-  ///
-  /// - Supergroups (`-100…`) → `https://t.me/c/…/…`  (opens in-app on Android)
-  /// - Other groups (negative ID) → `https://t.me/c/{abs_id}/{msg_id}`
-  /// - Private chats (positive ID) → `tg://openmessage?chat_id=…&message_id=…`
-  ///   (tg:// scheme is required to open the Telegram app for private chats)
+  /// Builds a deep link from a chat ID and message ID.
+  /// Uses `tg://openmessage` for all types because that's the only URL
+  /// scheme guaranteed to open the Telegram app on Android for any chat.
   String _buildTelegramLink(String chatId, String messageId) {
-    if (chatId.startsWith('-100')) {
-      // Supergroup
-      return 'https://t.me/c/${chatId.substring(4)}/$messageId';
-    }
-    if (chatId.startsWith('-')) {
-      // Other group
-      return 'https://t.me/c/${chatId.substring(1)}/$messageId';
-    }
-    // Private chat — need tg:// scheme to trigger the app
     return 'tg://openmessage?chat_id=$chatId&message_id=$messageId';
   }
 }
