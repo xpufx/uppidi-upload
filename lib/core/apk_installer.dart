@@ -2,12 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
-/// Downloads a file from [url] to the device Downloads folder and returns
-/// the local path. Falls back to temporary directory if Downloads is not
-/// available. [onProgress] receives (downloadedBytes, totalBytes, bytesPerSec).
+/// Downloads a file from [url] to a temporary directory and returns the
+/// local path. [onProgress] receives (downloadedBytes, totalBytes, bytesPerSec).
 Future<String> downloadFile(String url,
     {void Function(int, int, int)? onProgress}) async {
-  final dir = await getDownloadsDirectory() ?? await getTemporaryDirectory();
+  final dir = await getTemporaryDirectory();
   final ext = url.endsWith('.apk') ? '.apk' : '.tar.gz';
   final filePath = '${dir.path}/uppidi-update$ext';
 

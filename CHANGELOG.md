@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: download label redundancy
 - feat: export/import config, Install Now fix, Uguu-like provider
 - fix: debug buttons on all provider test steps
 - feat: Uguu-like provider, floating buttons, collapsible sections
@@ -16,7 +17,6 @@
 - rename My Providers, add provider type dropdown
 - fix: instance names in dropdown, providerName vs displayName
 - fix: Telegram multi-instance, test auth, settings reactivity, apk paths, link format
-- docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog

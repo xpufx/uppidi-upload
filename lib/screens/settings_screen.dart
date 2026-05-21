@@ -238,6 +238,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                                             type:
                                                 'application/vnd.android.package-archive',
                                           );
+                                          if (ctx.mounted) Navigator.pop(ctx);
                                         },
                                         icon: const Icon(Icons.download_done,
                                             size: 18),
@@ -1128,6 +1129,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                           downloadedPath!,
                           type: 'application/vnd.android.package-archive',
                         );
+                        if (ctx.mounted) Navigator.pop(ctx);
                       },
                       icon: const Icon(Icons.download_done, size: 18),
                       label: const Text('Install Now'),
