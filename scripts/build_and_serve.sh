@@ -94,7 +94,8 @@ echo "$GIT_HASH" >"${ARTIFACTS_DIR}/latest.txt"
 
 echo "==> Cleaning old APKs (keep latest 1 per ABI)..."
 for abi in arm64-v8a armeabi-v7a x86_64; do
-	ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-android-${abi}.apk 2>/dev/null | tail -n +2 | xargs -r rm -f
+	# Only match versioned files (starts with a digit), not symlinks like latest-*
+	ls -t "${ARTIFACTS_DIR}"/uppidi-upload-[0-9]*-android-${abi}.apk 2>/dev/null | tail -n +2 | xargs -r rm -f
 done
 
 # ── Linux ──────────────────────────────────────────────────
@@ -110,7 +111,7 @@ echo "==> Updating latest symlink..."
 ln -sf "${LINUX_NAME}" "${ARTIFACTS_DIR}/uppidi-upload-latest-linux.tar.gz"
 
 echo "==> Cleaning old Linux builds (keep latest 1)..."
-ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-linux.tar.gz 2>/dev/null | tail -n +2 | xargs -r rm -f
+ls -t "${ARTIFACTS_DIR}"/uppidi-upload-[0-9]*-linux.tar.gz 2>/dev/null | tail -n +2 | xargs -r rm -f
 
 # ── AppImage ─────────────────────────────────────────────────
 if [ "$DEV" = false ] && [ -f "$(dirname "$0")/build-appimage.sh" ]; then
