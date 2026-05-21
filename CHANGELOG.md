@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: export/import config, Install Now fix, Uguu-like provider
 - fix: debug buttons on all provider test steps
 - feat: Uguu-like provider, floating buttons, collapsible sections
 - fix: keep modal after download, Install Now button
@@ -15,7 +16,6 @@
 - rename My Providers, add provider type dropdown
 - fix: instance names in dropdown, providerName vs displayName
 - fix: Telegram multi-instance, test auth, settings reactivity, apk paths, link format
-- docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog

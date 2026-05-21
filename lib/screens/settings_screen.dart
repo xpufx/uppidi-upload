@@ -177,8 +177,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                               : '$cdnUrl/uppidi-upload-latest-linux.tar.gz');
                       if (url.isEmpty) return;
                       final isMobile = Platform.isAndroid;
-                      final label =
-                          isMobile ? l10n.downloadAndroid : l10n.downloadLinux;
+                      final label = isMobile ? 'Android APK' : 'Linux';
 
                       var received = 0, total = 0, speed = 0;
                       void Function(void Function())? update;
