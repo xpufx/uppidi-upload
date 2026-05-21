@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/interfaces/uploader.dart';
 import '../core/connectivity.dart';
+import '../core/interfaces/uploader.dart';
 import '../core/metadata_badges.dart';
 import '../core/models/provider_instance.dart';
+import '../core/models/provider_metadata.dart';
 import '../core/provider_config_sheet.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
@@ -20,7 +21,14 @@ class TestScreen extends ConsumerWidget {
     final health = ref.watch(providerHealthProvider).asData?.value ?? {};
 
     // Split into built-in (non-instance) and custom instances
-    final builtIn = allProviders.where((p) => p is! ProviderInstance).toList();
+    // Built-in = non-auth providers (no config needed, always available).
+    // Auth providers like Zulip/Telegram are only available as configured
+    // instances in "My Providers" — they never appear as built-in.
+    final builtIn = allProviders
+        .where((p) =>
+            p is! ProviderInstance &&
+            !p.metadata.capabilities.contains(ProviderCapability.requiresAuth))
+        .toList();
     final myProviders = allProviders.whereType<ProviderInstance>().toList();
 
     return ListView(

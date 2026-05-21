@@ -15,6 +15,7 @@ import '../providers/tempsh_provider.dart';
 import '../providers/telegram_provider.dart';
 import '../providers/tmpfilelink_provider.dart';
 import '../providers/uguu_provider.dart';
+import '../providers/zulip_provider.dart';
 
 const bool devProviders = bool.fromEnvironment('DEV_PROVIDERS');
 
@@ -40,6 +41,7 @@ final List<BaseUploader> _baseTypes = [
   TempShProvider(),
   LitterboxProvider(),
   TelegramProvider(),
+  ZulipProvider(),
   if (devProviders)
     UguuProvider(
       name: 'Uguu (milan)',

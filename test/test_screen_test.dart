@@ -79,7 +79,7 @@ void main() {
   });
 
   group('TestScreen Provider List Tests', () {
-    testWidgets('Shows all 6 providers listed', (WidgetTester tester) async {
+    testWidgets('Shows built-in providers', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -99,18 +99,21 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Each provider name must be findable. Scroll to each one individually
-      // since the list is rendered as lazy slivers.
+      // Built-in providers (non-auth) should be visible
       for (final provider in ProviderRegistry.all) {
+        if (provider.metadata.capabilities
+            .contains(ProviderCapability.requiresAuth)) continue;
         try {
           await tester.ensureVisible(find.text(provider.providerName));
         } catch (_) {
-          // scrollUntilVisible will fail if the item is already visible
-          // or the list is very short — just pump to be safe
           await tester.pump();
         }
         expect(find.text(provider.providerName), findsWidgets);
       }
+
+      // My Providers section shows "No instances configured" since
+      // we haven't set up any auth provider instances.
+      expect(find.text(l10n.noInstancesConfigured), findsOneWidget);
     });
   });
 
@@ -263,8 +266,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Each provider should have a play icon. Scroll to each name to account
-      // for lazy sliver rendering.
+      // for lazy sliver rendering. Skip auth providers (not shown without
+      // configured instances).
       for (final provider in ProviderRegistry.all) {
+        if (provider.metadata.capabilities
+            .contains(ProviderCapability.requiresAuth)) continue;
         await tester.ensureVisible(find.text(provider.providerName));
         await tester.pump();
         expect(find.byIcon(Icons.play_arrow), findsWidgets);

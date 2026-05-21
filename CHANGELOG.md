@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: tg://openmessage for all chat types
 - fix: scroll trusted, telegram link opens app
 - feat: hide unconfigured providers, My Providers on test screen, last-used provider
 - l10n: myProviders, addProvider, delete, done, debug response keys
@@ -29,4 +30,3 @@
 - fix: let parseResponse handle all HTTP status codes
 - docs: auto-update changelog
 - docs: auto-update changelog
-- fix: Telegram upload config not loading from secure storage

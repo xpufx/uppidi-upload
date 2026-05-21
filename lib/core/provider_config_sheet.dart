@@ -384,7 +384,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       final client = HttpClient();
       try {
         if (provider.providerId.split('__').first == 'telegram') {
-          // ── Step 1: validate bot_token via getMe ──
+          // ── Telegram test steps ──
           final token = config['bot_token'] ?? '';
           var meRequest = await client.getUrl(
             Uri.parse('https://api.telegram.org/bot$token/getMe'),
