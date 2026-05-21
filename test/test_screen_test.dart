@@ -107,6 +107,10 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      // Expand Built-in section (collapsed by default)
+      await tester.tap(find.text(l10n.builtInProviders));
+      await tester.pumpAndSettle();
+
       // Built-in providers (non-auth) should be visible
       for (final provider in ProviderRegistry.all) {
         if (provider.metadata.capabilities
@@ -215,6 +219,10 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      // Expand Built-in section to see the provider
+      await tester.tap(find.text(l10n.builtInProviders));
+      await tester.pumpAndSettle();
+
       // Warning icon should be visible
       expect(find.byIcon(Icons.warning_amber), findsWidgets);
 
@@ -246,6 +254,10 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      // Expand Built-in section to see provider toggles
+      await tester.tap(find.text(l10n.builtInProviders));
+      await tester.pumpAndSettle();
+
       // Find all switches
       final switches = tester.widgetList<Switch>(find.byType(Switch));
       expect(switches, isNotEmpty);
@@ -273,6 +285,10 @@ void main() {
         ),
       );
 
+      await tester.pumpAndSettle();
+
+      // Expand Built-in section to see providers
+      await tester.tap(find.text(l10n.builtInProviders));
       await tester.pumpAndSettle();
 
       // Each provider should have a play icon. Scroll to each name to account

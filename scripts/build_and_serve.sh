@@ -54,6 +54,8 @@ echo "   ✅ No hardcoded strings found"
 # ── Capture git hash BEFORE changelog commit ─────────────────
 # This ensures artifact filenames match the tag/release commit.
 GIT_HASH=$(git rev-parse --short HEAD)
+# Compact timestamp as Android versionCode: yyMMddHHmm, always increasing, git-proof.
+BUILD_NUM=$(date +%y%m%d%H%M)
 
 # ── Refresh changelog (no commit — avoids spam in git log) ──
 echo "# Changelog" >CHANGELOG.md
@@ -76,7 +78,9 @@ ls assets/favicons/*.png 2>/dev/null || echo "   (none found)"
 
 # ── Android APK (split-per-abi) ───────────────────────────
 echo "==> Building Android APKs @ ${GIT_HASH} (${BUILD_TYPE})..."
-flutter build apk $BUILD_MODE --split-per-abi --dart-define=GIT_HASH=$GIT_HASH $CDN_DEFINE $DEV_DEFINE
+flutter build apk $BUILD_MODE --split-per-abi \
+	--build-number=$BUILD_NUM --build-name=$VERSION \
+	--dart-define=GIT_HASH=$GIT_HASH $CDN_DEFINE $DEV_DEFINE
 
 echo "==> Deploying APKs..."
 APK_DIR="build/app/outputs/flutter-apk"

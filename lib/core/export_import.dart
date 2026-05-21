@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'provider_config_sheet.dart';
 import 'settings_service.dart';
 
 const _secure = FlutterSecureStorage();
@@ -35,16 +35,20 @@ Future<String?> exportConfig() async {
   }
 
   final json = const JsonEncoder.withIndent('  ').convert(data);
+  final jsonBytes = utf8.encode(json);
 
-  // Pick save location
+  // Pick save location and write file (bytes parameter required on Android/iOS)
   final outputFile = await FilePicker.saveFile(
     dialogTitle: 'Export config',
     fileName: 'uppidi-export.json',
     type: FileType.custom,
     allowedExtensions: ['json'],
+    bytes: Uint8List.fromList(jsonBytes),
   );
   if (outputFile == null) return null;
 
+  // On desktop the picker returns the path but doesn't write — do it here.
+  // On mobile the picker already wrote the bytes, so this is a no-op overwrite.
   await File(outputFile).writeAsString(json);
   return outputFile;
 }

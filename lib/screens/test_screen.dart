@@ -18,6 +18,48 @@ class TestScreen extends ConsumerStatefulWidget {
 }
 
 class _TestScreenState extends ConsumerState<TestScreen> {
+  bool _builtinExpanded = false;
+  bool _myProvidersExpanded = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPrefs();
+  }
+
+  Future<void> _loadPrefs() async {
+    try {
+      final svc = ref.read(settingsServiceProvider);
+      final builtin = await svc.get(SettingsService.sectionBuiltinCollapsed);
+      final myprov = await svc.get(SettingsService.sectionMyProvidersCollapsed);
+      if (mounted)
+        setState(() {
+          _builtinExpanded = builtin != 'true';
+          _myProvidersExpanded = myprov != 'true';
+        });
+    } catch (_) {}
+  }
+
+  Future<void> _toggleBuiltin() async {
+    final newVal = !_builtinExpanded;
+    setState(() => _builtinExpanded = newVal);
+    try {
+      final svc = ref.read(settingsServiceProvider);
+      await svc.set(
+          SettingsService.sectionBuiltinCollapsed, newVal ? 'false' : 'true');
+    } catch (_) {}
+  }
+
+  Future<void> _toggleMyProviders() async {
+    final newVal = !_myProvidersExpanded;
+    setState(() => _myProvidersExpanded = newVal);
+    try {
+      final svc = ref.read(settingsServiceProvider);
+      await svc.set(SettingsService.sectionMyProvidersCollapsed,
+          newVal ? 'false' : 'true');
+    } catch (_) {}
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -64,62 +106,86 @@ class _TestScreenState extends ConsumerState<TestScreen> {
         ),
         const SizedBox(height: 16),
 
-        // ── Built-in Providers ──
-        Text(l10n.builtInProviders,
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        if (builtIn.isEmpty)
-          Center(child: Text(l10n.noProvidersAvailable))
-        else
-          ...builtIn.map((p) => _ProviderRow(
-                provider: p,
-                isEnabled: enabled.any((e) => e.providerId == p.providerId),
-                health: health[p.providerId],
-              )),
-        const SizedBox(height: 24),
-
-        // ── My Providers (custom instances) ──
-        Row(
-          children: [
-            Expanded(
-              child: Text(l10n.myProviders,
+        // ── Built-in Providers (collapsible) ──
+        InkWell(
+          onTap: _toggleBuiltin,
+          child: Row(
+            children: [
+              Icon(
+                _builtinExpanded ? Icons.expand_less : Icons.expand_more,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(l10n.builtInProviders,
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
                       ?.copyWith(fontWeight: FontWeight.bold)),
-            ),
-            TextButton.icon(
-              onPressed: () async {
-                final types = ProviderRegistry.instanceTypes;
-                if (types.isEmpty) return;
-                final saved =
-                    await showProviderConfigDialog(context, ref, types.first);
-                if (saved == true) {
-                  ref.invalidate(enabledProvidersProvider);
-                }
-              },
-              icon: const Icon(Icons.settings, size: 16),
-              label: Text(l10n.providerConfigure),
-            ),
-          ],
+            ],
+          ),
         ),
-        const SizedBox(height: 8),
-        if (myProviders.isEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(l10n.noInstancesConfigured,
-                style: Theme.of(context).textTheme.bodySmall),
-          )
-        else
-          ...myProviders.map((p) => _ProviderRow(
-                provider: p,
-                isEnabled: enabled.any((e) => e.providerId == p.providerId),
-                health: health[p.providerId],
-                showConfigure: true,
-              )),
+        if (_builtinExpanded) ...[
+          const SizedBox(height: 8),
+          if (builtIn.isEmpty)
+            Center(child: Text(l10n.noProvidersAvailable))
+          else
+            ...builtIn.map((p) => _ProviderRow(
+                  provider: p,
+                  isEnabled: enabled.any((e) => e.providerId == p.providerId),
+                  health: health[p.providerId],
+                )),
+        ],
+        const SizedBox(height: 24),
+
+        // ── My Providers (collapsible) ──
+        InkWell(
+          onTap: _toggleMyProviders,
+          child: Row(
+            children: [
+              Icon(
+                _myProvidersExpanded ? Icons.expand_less : Icons.expand_more,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(l10n.myProviders,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold)),
+              ),
+              TextButton.icon(
+                onPressed: () async {
+                  final types = ProviderRegistry.instanceTypes;
+                  if (types.isEmpty) return;
+                  final saved =
+                      await showProviderConfigDialog(context, ref, types.first);
+                  if (saved == true) {
+                    ref.invalidate(enabledProvidersProvider);
+                  }
+                },
+                icon: const Icon(Icons.settings, size: 16),
+                label: Text(l10n.providerConfigure),
+              ),
+            ],
+          ),
+        ),
+        if (_myProvidersExpanded) ...[
+          const SizedBox(height: 8),
+          if (myProviders.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(l10n.noInstancesConfigured,
+                  style: Theme.of(context).textTheme.bodySmall),
+            )
+          else
+            ...myProviders.map((p) => _ProviderRow(
+                  provider: p,
+                  isEnabled: enabled.any((e) => e.providerId == p.providerId),
+                  health: health[p.providerId],
+                  showConfigure: true,
+                )),
+        ],
       ],
     );
   }
@@ -177,112 +243,115 @@ class _ProviderRow extends ConsumerWidget {
     final result = testState?.maybeWhen(data: (r) => r, orElse: () => null);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 4),
       child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Row(
           children: [
-            Row(
-              children: [
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: isLoading
-                      ? const CircularProgressIndicator(strokeWidth: 2)
-                      : Icon(
-                          result == null
-                              ? Icons.help_outline
-                              : result.online
-                                  ? Icons.check_circle
-                                  : Icons.error,
-                          color: result == null
-                              ? Colors.grey
-                              : result.online
-                                  ? Colors.green
-                                  : Colors.red,
-                          size: 20,
-                        ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: isLoading
+                  ? const CircularProgressIndicator(strokeWidth: 2)
+                  : Icon(
+                      result == null
+                          ? Icons.help_outline
+                          : result.online
+                              ? Icons.check_circle
+                              : Icons.error,
+                      color: result == null
+                          ? Colors.grey
+                          : result.online
+                              ? Colors.green
+                              : Colors.red,
+                      size: 18,
+                    ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
                     children: [
-                      Text(provider.providerName,
-                          style: const TextStyle(fontWeight: FontWeight.w600)),
-                      if (health?.disabled == true)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 2),
-                          child: Row(
-                            children: [
-                              Icon(Icons.warning_amber,
-                                  size: 12, color: Colors.orange),
-                              const SizedBox(width: 4),
-                              Expanded(
-                                child: Text(
-                                    health?.reason ?? l10n.currentlyUnavailable,
-                                    style: const TextStyle(
-                                        fontSize: 10, color: Colors.orange)),
-                              ),
-                            ],
-                          ),
-                        ),
-                      metadataBadges(provider.metadata),
+                      Flexible(
+                        child: Text(provider.providerName,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 13)),
+                      ),
+                      if (result != null) ...[
+                        const SizedBox(width: 6),
+                        result.online
+                            ? Text('${result.latencyMs}ms',
+                                style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.green.shade700,
+                                    fontWeight: FontWeight.w500))
+                            : Text(result.error ?? '',
+                                style: const TextStyle(
+                                    fontSize: 11, color: Colors.red)),
+                      ],
                     ],
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.play_arrow, size: 20),
-                  tooltip: l10n.testProvider,
-                  onPressed: isLoading
-                      ? null
-                      : () {
-                          _setLoading(ref, provider.providerId);
-                          _runTest(ref, provider, l10n.connectionFailed);
-                        },
-                ),
-                if (showConfigure)
-                  IconButton(
-                    icon: const Icon(Icons.settings, size: 18),
-                    tooltip: l10n.providerConfigure,
-                    onPressed: () async {
-                      final saved = await showProviderConfigDialog(
-                          context, ref, provider);
-                      if (saved) ref.invalidate(enabledProvidersProvider);
-                    },
-                  ),
-                Switch(
-                  value: isEnabled,
-                  onChanged: (v) async {
-                    final svc = ref.read(settingsServiceProvider);
-                    final current = await svc.getDisabledProviders();
-                    if (v) {
-                      current.remove(provider.providerId);
-                    } else {
-                      current.add(provider.providerId);
-                    }
-                    await svc.setDisabledProviders(current);
-                    ref.invalidate(disabledProviderIdsProvider);
-                  },
-                ),
-              ],
-            ),
-            if (result != null) ...[
-              const SizedBox(height: 4),
-              Padding(
-                padding: const EdgeInsets.only(left: 36),
-                child: result.online
-                    ? Text('${result.latencyMs}ms',
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.green.shade700,
-                            fontWeight: FontWeight.w500))
-                    : Text(result.error ?? l10n.connectionFailed,
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.red)),
+                  if (health?.disabled == true)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 1),
+                      child: Row(
+                        children: [
+                          Icon(Icons.warning_amber,
+                              size: 10, color: Colors.orange),
+                          const SizedBox(width: 3),
+                          Flexible(
+                            child: Text(
+                                health?.reason ?? l10n.currentlyUnavailable,
+                                style: const TextStyle(
+                                    fontSize: 9, color: Colors.orange)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  metadataBadges(provider.metadata),
+                ],
               ),
-            ],
+            ),
+            IconButton(
+              icon: const Icon(Icons.play_arrow, size: 18),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              tooltip: l10n.testProvider,
+              onPressed: isLoading
+                  ? null
+                  : () {
+                      _setLoading(ref, provider.providerId);
+                      _runTest(ref, provider, l10n.connectionFailed);
+                    },
+            ),
+            if (showConfigure)
+              IconButton(
+                icon: const Icon(Icons.settings, size: 18),
+                tooltip: l10n.providerConfigure,
+                onPressed: () async {
+                  final saved =
+                      await showProviderConfigDialog(context, ref, provider);
+                  if (saved) ref.invalidate(enabledProvidersProvider);
+                },
+              ),
+            Switch(
+              value: isEnabled,
+              onChanged: (v) async {
+                final svc = ref.read(settingsServiceProvider);
+                final current = await svc.getDisabledProviders();
+                if (v) {
+                  current.remove(provider.providerId);
+                } else {
+                  current.add(provider.providerId);
+                }
+                await svc.setDisabledProviders(current);
+                ref.invalidate(disabledProviderIdsProvider);
+              },
+            ),
           ],
         ),
       ),
