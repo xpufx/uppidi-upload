@@ -96,4 +96,11 @@ class ProviderRegistry {
   /// True when [provider] is a base type (not an instance wrapper).
   static bool isBaseType(BaseUploader provider) =>
       provider is! ProviderInstance;
+
+  /// Returns all base provider types that support instances (i.e. those
+  /// that require authentication config). Used by the "Add" dialog.
+  static List<BaseUploader> authProviderTypes() => _baseTypes
+      .where((b) =>
+          b.metadata.capabilities.contains(ProviderCapability.requiresAuth))
+      .toList();
 }

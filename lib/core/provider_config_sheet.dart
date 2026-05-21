@@ -174,17 +174,47 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
   }
 
   Future<void> _add() async {
+    // Show a dialog to pick which provider type to add an instance for
+    final authTypes = ProviderRegistry.authProviderTypes();
+    if (authTypes.isEmpty) return;
+
+    BaseUploader? chosen;
+    if (authTypes.length == 1) {
+      chosen = authTypes.first;
+    } else {
+      chosen = await showDialog<BaseUploader>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Add provider'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: authTypes
+                .map((t) => ListTile(
+                      dense: true,
+                      title: Text(t.providerName),
+                      onTap: () => Navigator.pop(ctx, t),
+                    ))
+                .toList(),
+          ),
+        ),
+      );
+    }
+    if (chosen == null) return;
+
+    final baseId = chosen.providerId;
+    final instances = await loadProviderInstances(baseId);
     final newId = DateTime.now().millisecondsSinceEpoch.toString();
     final instance = ProviderInstanceMeta(
-        id: newId,
-        name: '${widget.baseProvider.providerName} ${_instances.length + 1}');
-    final wrapped =
-        ProviderInstance(widget.baseProvider, instance.id, instance.name);
+        id: newId, name: '${chosen.providerName} ${instances.length + 1}');
+    final wrapped = ProviderInstance(chosen, instance.id, instance.name);
     final saved = await showDialog<bool>(
       context: context,
       builder: (_) => _ProviderConfigDialog(provider: wrapped),
     );
-    if (saved == true) _reload();
+    if (saved == true) {
+      await ProviderRegistry.refresh(ref);
+      _reload();
+    }
   }
 
   Future<void> _delete(ProviderInstanceMeta instance) async {
@@ -214,7 +244,7 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      title: Text('${widget.baseProvider.providerName} Instances'),
+      title: const Text('My Providers'),
       content: SizedBox(
         width: double.maxFinite,
         child: _loading

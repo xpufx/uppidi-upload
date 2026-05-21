@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: instance names in dropdown, providerName vs displayName
 - fix: Telegram multi-instance, test auth, settings reactivity, apk paths, link format
 - docs: auto-update changelog
 - docs: auto-update changelog
@@ -29,4 +30,3 @@
 - docs: auto-update changelog
 - feat: localize provider metadata (expiry info, descriptions)
 - chore: add missing translations for all locales
-- docs: auto-update changelog
