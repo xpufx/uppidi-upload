@@ -11,6 +11,7 @@ import 'package:open_filex/open_filex.dart';
 
 import '../core/apk_installer.dart' show downloadFile;
 import '../core/app_logo.dart';
+import '../core/export_import.dart';
 import '../core/logging/log.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
@@ -874,6 +875,118 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                       ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Export / Import',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall
+                        ?.copyWith(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                Text(
+                  'Export your provider credentials and app settings to a JSON file for backup or transfer. '
+                  'Import merges all data — existing settings and provider config will be replaced.',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('Export config'),
+                            content: const Text(
+                              'This file will contain API keys, tokens, passwords, and app settings. '
+                              'Keep it safe — anyone with this file can access your accounts.',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx, false),
+                                child: const Text('Cancel'),
+                              ),
+                              FilledButton(
+                                onPressed: () => Navigator.pop(ctx, true),
+                                child: const Text('Export'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm != true) return;
+                        try {
+                          final path = await exportConfig();
+                          if (path != null && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Exported to: $path')),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Export failed: $e')),
+                            );
+                          }
+                        }
+                      },
+                      icon: const Icon(Icons.upload, size: 16),
+                      label: const Text('Export'),
+                    ),
+                    const SizedBox(width: 12),
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('Import config'),
+                            content: const Text(
+                              'This will replace ALL current provider credentials '
+                              'and app settings. This cannot be undone. Continue?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx, false),
+                                child: const Text('Cancel'),
+                              ),
+                              FilledButton(
+                                onPressed: () => Navigator.pop(ctx, true),
+                                child: const Text('Import'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm != true) return;
+                        try {
+                          final msg = await importConfig();
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(msg)),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Import failed: $e')),
+                            );
+                          }
+                        }
+                      },
+                      icon: const Icon(Icons.download, size: 16),
+                      label: const Text('Import'),
                     ),
                   ],
                 ),
