@@ -184,6 +184,7 @@ class _VersionCheckWidget extends ConsumerWidget {
 
                       var received = 0, total = 0, speed = 0;
                       void Function(void Function())? update;
+                      String? _dlPath;
                       showDialog(
                         context: context,
                         barrierDismissible: false,
@@ -197,48 +198,72 @@ class _VersionCheckWidget extends ConsumerWidget {
                                 ? '${(speed / 1048576).toStringAsFixed(1)} MB/s'
                                 : '';
                             final pct = total > 0 ? received / total : null;
+                            final complete = _dlPath != null;
                             return AlertDialog(
-                              title: Text(l10n.downloadingFile(label)),
+                              title: Text(complete
+                                  ? 'Download complete'
+                                  : l10n.downloadingFile(label)),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (pct != null)
-                                    LinearProgressIndicator(value: pct)
-                                  else
-                                    const LinearProgressIndicator(),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                      '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
-                                      style: const TextStyle(fontSize: 12)),
-                                ],
+                                children: complete
+                                    ? [
+                                        const Icon(Icons.check_circle,
+                                            size: 48, color: Colors.green),
+                                        const SizedBox(height: 8),
+                                        const Text('APK downloaded'),
+                                        const SizedBox(height: 4),
+                                        SelectableText(_dlPath!,
+                                            style:
+                                                const TextStyle(fontSize: 11)),
+                                      ]
+                                    : [
+                                        if (pct != null)
+                                          LinearProgressIndicator(value: pct)
+                                        else
+                                          const LinearProgressIndicator(),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                            '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
+                                            style:
+                                                const TextStyle(fontSize: 12)),
+                                      ],
                               ),
+                              actions: complete
+                                  ? [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(ctx),
+                                        child: const Text('Done'),
+                                      ),
+                                      FilledButton.icon(
+                                        onPressed: () async {
+                                          await OpenFilex.open(
+                                            _dlPath!,
+                                            type:
+                                                'application/vnd.android.package-archive',
+                                          );
+                                        },
+                                        icon: const Icon(Icons.download_done,
+                                            size: 18),
+                                        label: const Text('Install Now'),
+                                      ),
+                                    ]
+                                  : null,
                             );
                           },
                         ),
                       );
                       try {
+                        String? downloadedPath;
                         if (isMobile) {
-                          final path =
+                          downloadedPath =
                               await downloadFile(url, onProgress: (r, t, s) {
                             received = r;
                             total = t;
                             speed = s;
                             update?.call(() {});
                           });
-                          // Attempt to open package installer
-                          try {
-                            await OpenFilex.open(
-                              path,
-                              type: 'application/vnd.android.package-archive',
-                            );
-                          } catch (_) {}
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Downloaded to: $path')),
-                            );
-                          }
                         } else {
-                          final path =
+                          downloadedPath =
                               await downloadFile(url, onProgress: (r, t, s) {
                             received = r;
                             total = t;
@@ -247,12 +272,15 @@ class _VersionCheckWidget extends ConsumerWidget {
                           });
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(l10n.downloadedTo(path))),
+                              SnackBar(
+                                  content:
+                                      Text(l10n.downloadedTo(downloadedPath))),
                             );
                           }
                         }
-                        if (context.mounted) {
-                          Navigator.of(context, rootNavigator: true).pop();
+                        if (downloadedPath != null && context.mounted) {
+                          _dlPath = downloadedPath;
+                          update?.call(() {});
                         }
                       } catch (e) {
                         if (context.mounted) {
@@ -939,6 +967,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
   Future<void> _downloadAndInstall(
       BuildContext context, String url, String label) async {
     var received = 0, total = 0, speed = 0;
+    String? downloadedPath;
     void Function(void Function())? update;
 
     showDialog(
@@ -952,22 +981,50 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           final speedStr =
               speed > 0 ? '${(speed / 1048576).toStringAsFixed(1)} MB/s' : '';
           final pct = total > 0 ? received / total : null;
+          final complete = downloadedPath != null;
           return AlertDialog(
-            title: Text('Downloading $label'),
+            title: Text(complete ? 'Download complete' : 'Downloading $label'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (pct != null)
-                  LinearProgressIndicator(value: pct)
-                else
-                  const LinearProgressIndicator(),
-                const SizedBox(height: 8),
-                Text(
-                  '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
-                  style: const TextStyle(fontSize: 12),
-                ),
+                if (!complete) ...[
+                  if (pct != null)
+                    LinearProgressIndicator(value: pct)
+                  else
+                    const LinearProgressIndicator(),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ] else ...[
+                  const Icon(Icons.check_circle, size: 48, color: Colors.green),
+                  const SizedBox(height: 8),
+                  const Text('APK downloaded'),
+                  const SizedBox(height: 4),
+                  SelectableText(downloadedPath!,
+                      style: const TextStyle(fontSize: 11)),
+                ],
               ],
             ),
+            actions: complete
+                ? [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Done'),
+                    ),
+                    FilledButton.icon(
+                      onPressed: () async {
+                        await OpenFilex.open(
+                          downloadedPath!,
+                          type: 'application/vnd.android.package-archive',
+                        );
+                      },
+                      icon: const Icon(Icons.download_done, size: 18),
+                      label: const Text('Install Now'),
+                    ),
+                  ]
+                : null,
           );
         },
       ),
@@ -980,25 +1037,8 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         speed = s;
         update?.call(() {});
       });
-
-      if (Platform.isAndroid && label == 'APK') {
-        // Attempt to open the package installer
-        try {
-          await OpenFilex.open(
-            path,
-            type: 'application/vnd.android.package-archive',
-          );
-        } catch (_) {
-          // Installer didn't open — file is still accessible manually
-        }
-      }
-
-      if (context.mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Downloaded to: $path')),
-        );
-      }
+      downloadedPath = path;
+      update?.call(() {});
     } catch (e) {
       if (context.mounted) {
         Navigator.of(context, rootNavigator: true).pop();
