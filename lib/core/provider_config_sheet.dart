@@ -310,6 +310,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   late Map<String, TextEditingController> _controllers;
   final Map<String, bool> _checkboxValues = {};
   final TextEditingController _nameController = TextEditingController();
+  final ScrollController _contentScrollController = ScrollController();
   bool _isSaving = false;
   bool _isTesting = false;
 
@@ -364,7 +365,18 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       c.dispose();
     }
     _nameController.dispose();
+    _contentScrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollToTestSteps() {
+    if (_contentScrollController.hasClients) {
+      _contentScrollController.animateTo(
+        _contentScrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   /// Runs a multi-step auth test. For Telegram: step 1 = bot token (getMe),
@@ -409,6 +421,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                 ..clear()
                 ..addAll(steps);
             });
+            _scrollToTestSteps();
             return; // no point checking chat if token fails
           }
 
@@ -465,7 +478,54 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
             ..addAll(steps);
           _isTesting = false;
         });
+        _scrollToTestSteps();
       }
+    }
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isSaving = true);
+    try {
+      final store = _secure;
+      for (final key in widget.provider.requiredConfigKeys) {
+        final value = _controllers[key]?.text.trim() ?? '';
+        final skey = _configKey(widget.provider.providerId, key);
+        if (value.isNotEmpty) {
+          await store.write(key: skey, value: value);
+        } else {
+          await store.delete(key: skey);
+        }
+      }
+      for (final key in widget.provider.optionalConfigKeys) {
+        final skey = _configKey(widget.provider.providerId, key);
+        await store.write(
+            key: skey, value: (_checkboxValues[key] ?? false).toString());
+      }
+      // Save instance metadata
+      final (baseId, instanceId) = _splitInstanceId(widget.provider.providerId);
+      final instances = await loadProviderInstances(baseId);
+      final name = _nameController.text.trim();
+      final existing = instances.indexWhere((i) => i.id == instanceId);
+      if (existing >= 0) {
+        instances[existing] = ProviderInstanceMeta(id: instanceId, name: name);
+      } else {
+        instances.add(ProviderInstanceMeta(id: instanceId, name: name));
+      }
+      await saveProviderInstances(baseId, instances);
+      if (context.mounted) {
+        final loc = AppLocalizations.of(context);
+        Navigator.pop(context, true);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              loc.providerConfigSaved(widget.provider.providerName),
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -492,6 +552,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
+          controller: _contentScrollController,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -521,11 +582,22 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                 final isSecret = key.toLowerCase().contains('token') ||
                     key.toLowerCase().contains('key') ||
                     key.toLowerCase().contains('secret');
+                final keys = widget.provider.requiredConfigKeys;
+                final isLast = keys.lastOrNull == key;
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: TextFormField(
                     controller: _controllers[key],
+                    textInputAction:
+                        isLast ? TextInputAction.done : TextInputAction.next,
+                    onFieldSubmitted: isLast
+                        ? (_) {
+                            // Trigger save on Enter from the last field
+                            if (!_formKey.currentState!.validate()) return;
+                            _save();
+                          }
+                        : null,
                     decoration: InputDecoration(
                       labelText: label,
                       border: const OutlineInputBorder(),
@@ -658,55 +730,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
           onPressed: _isSaving
               ? null
               : () async {
-                  if (!_formKey.currentState!.validate()) return;
-
-                  setState(() => _isSaving = true);
-                  try {
-                    final store = _secure;
-                    for (final key in widget.provider.requiredConfigKeys) {
-                      final value = _controllers[key]?.text.trim() ?? '';
-                      final skey = _configKey(widget.provider.providerId, key);
-                      if (value.isNotEmpty) {
-                        await store.write(key: skey, value: value);
-                      } else {
-                        await store.delete(key: skey);
-                      }
-                    }
-                    for (final key in widget.provider.optionalConfigKeys) {
-                      final skey = _configKey(widget.provider.providerId, key);
-                      await store.write(
-                          key: skey,
-                          value: (_checkboxValues[key] ?? false).toString());
-                    }
-                    // Save instance metadata
-                    final (baseId, instanceId) =
-                        _splitInstanceId(widget.provider.providerId);
-                    final instances = await loadProviderInstances(baseId);
-                    final name = _nameController.text.trim();
-                    final existing =
-                        instances.indexWhere((i) => i.id == instanceId);
-                    if (existing >= 0) {
-                      instances[existing] =
-                          ProviderInstanceMeta(id: instanceId, name: name);
-                    } else {
-                      instances.add(
-                          ProviderInstanceMeta(id: instanceId, name: name));
-                    }
-                    await saveProviderInstances(baseId, instances);
-                    if (context.mounted) {
-                      Navigator.pop(context, true);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            l10n.providerConfigSaved(
-                                widget.provider.providerName),
-                          ),
-                        ),
-                      );
-                    }
-                  } finally {
-                    if (mounted) setState(() => _isSaving = false);
-                  }
+                  await _save();
                 },
           icon: _isSaving
               ? const SizedBox(
