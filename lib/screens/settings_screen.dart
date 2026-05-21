@@ -90,9 +90,6 @@ void _showSystemInfo(BuildContext context, WidgetRef ref) {
   buffer.writeln('Mode: ${theme.name}');
   buffer
       .writeln('Seed: 0x${seed.toARGB32().toRadixString(16).padLeft(8, '0')}');
-  buffer.writeln(
-      'Custom Logo: ${ref.read(logoPathProvider) != null ? "yes" : "no"}');
-
   final text = buffer.toString();
 
   showDialog(
@@ -184,7 +181,7 @@ class _VersionCheckWidget extends ConsumerWidget {
 
                       var received = 0, total = 0, speed = 0;
                       void Function(void Function())? update;
-                      String? _dlPath;
+                      String? dlPath;
                       showDialog(
                         context: context,
                         barrierDismissible: false,
@@ -198,7 +195,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                                 ? '${(speed / 1048576).toStringAsFixed(1)} MB/s'
                                 : '';
                             final pct = total > 0 ? received / total : null;
-                            final complete = _dlPath != null;
+                            final complete = dlPath != null;
                             return AlertDialog(
                               title: Text(complete
                                   ? 'Download complete'
@@ -212,7 +209,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                                         const SizedBox(height: 8),
                                         const Text('APK downloaded'),
                                         const SizedBox(height: 4),
-                                        SelectableText(_dlPath!,
+                                        SelectableText(dlPath,
                                             style:
                                                 const TextStyle(fontSize: 11)),
                                       ]
@@ -237,7 +234,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                                       FilledButton.icon(
                                         onPressed: () async {
                                           await OpenFilex.open(
-                                            _dlPath!,
+                                            dlPath!,
                                             type:
                                                 'application/vnd.android.package-archive',
                                           );
@@ -278,8 +275,8 @@ class _VersionCheckWidget extends ConsumerWidget {
                             );
                           }
                         }
-                        if (downloadedPath != null && context.mounted) {
-                          _dlPath = downloadedPath;
+                        if (context.mounted) {
+                          dlPath = downloadedPath;
                           update?.call(() {});
                         }
                       } catch (e) {
@@ -1002,7 +999,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                   const SizedBox(height: 8),
                   const Text('APK downloaded'),
                   const SizedBox(height: 4),
-                  SelectableText(downloadedPath!,
+                  SelectableText(downloadedPath,
                       style: const TextStyle(fontSize: 11)),
                 ],
               ],

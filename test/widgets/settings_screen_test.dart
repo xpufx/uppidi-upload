@@ -62,9 +62,6 @@ class MockSettingsService implements SettingsService {
   Future<Color> getSeedColor() async => const Color(0xFF6750A4);
 
   @override
-  Future<String?> getLogoPath() async => null;
-
-  @override
   Future<Set<String>> getDisabledProviders() async => {};
 
   @override

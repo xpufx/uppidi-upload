@@ -11,14 +11,12 @@ import 'package:image/image.dart' as img;
 
 import '../core/format.dart';
 import '../core/insecure_upload_warning.dart';
-import '../core/interfaces/base_http_provider.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/metadata_badges.dart';
 import '../core/models/provider_instance.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
 import '../core/provider_config_sheet.dart';
-import '../core/settings_service.dart';
 import '../core/share_message_dialog.dart';
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
@@ -44,12 +42,15 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
   }
 
   void _scrollToPreview() {
-    // Fixed scroll: content above the preview is ~180px (blurb, dropdown,
-    // provider info, spacings). No need to wait for image decode or
-    // calculate render box positions.
-    if (!_scrollController.hasClients) return;
-    _scrollController.animateTo(
-      180,
+    // Scroll to the preview widget dynamically, so it works regardless of
+    // how much content is above it (description, dropdown, provider info).
+    // Uses a small top alignment to keep the preview slightly below the
+    // top edge of the viewport.
+    final ctx = _previewKey.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.1,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
@@ -67,10 +68,8 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
           (next is UploadCompleted && next.fileName != null);
 
       if (nowHasFile && !prevHasFile) {
-        // Scroll after the current frame AND the next one. The first frame
-        // has Image.memory at 0 height (not decoded yet). The second frame
-        // has the actual image size after decoding. We scroll on the second
-        // to get an accurate measurement.
+        // Wait two frames for Image.memory to decode, then scroll to the
+        // preview so the user sees it without manual scrolling.
         WidgetsBinding.instance.addPostFrameCallback((_) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _scrollToPreview();

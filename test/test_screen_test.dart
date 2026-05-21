@@ -110,7 +110,9 @@ void main() {
       // Built-in providers (non-auth) should be visible
       for (final provider in ProviderRegistry.all) {
         if (provider.metadata.capabilities
-            .contains(ProviderCapability.requiresAuth)) continue;
+            .contains(ProviderCapability.requiresAuth)) {
+          continue;
+        }
         try {
           await tester.ensureVisible(find.text(provider.providerName));
         } catch (_) {
@@ -278,7 +280,9 @@ void main() {
       // configured instances).
       for (final provider in ProviderRegistry.all) {
         if (provider.metadata.capabilities
-            .contains(ProviderCapability.requiresAuth)) continue;
+            .contains(ProviderCapability.requiresAuth)) {
+          continue;
+        }
         await tester.ensureVisible(find.text(provider.providerName));
         await tester.pump();
         expect(find.byIcon(Icons.play_arrow), findsWidgets);

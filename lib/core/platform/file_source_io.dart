@@ -15,7 +15,8 @@ Future<FileUploadRequest> createUploadRequest(PlatformFile file) async {
 
   return FileUploadRequest(
     fileName: file.name,
-    mimeType: file.extension != null ? mimeTypeFromExtension(file.extension!) : null,
+    mimeType:
+        file.extension != null ? mimeTypeFromExtension(file.extension!) : null,
     sizeInBytes: size,
     dataStream: stream,
   );

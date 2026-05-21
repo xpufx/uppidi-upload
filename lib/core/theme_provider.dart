@@ -63,35 +63,3 @@ class SeedColorNotifier extends Notifier<Color> {
     state = color;
   }
 }
-
-/// Custom logo path (null = use asset default).
-///
-/// Same flash-on-startup trade-off as [themeModeProvider].
-final logoPathProvider =
-    NotifierProvider<LogoPathNotifier, String?>(LogoPathNotifier.new);
-
-class LogoPathNotifier extends Notifier<String?> {
-  @override
-  String? build() {
-    _load();
-    return null;
-  }
-
-  Future<void> _load() async {
-    final path = await ref.read(settingsServiceProvider).getLogoPath();
-    state = path;
-  }
-
-  Future<void> setPath(String? path) async {
-    if (path == null) {
-      await ref
-          .read(settingsServiceProvider)
-          .remove(SettingsService.logoPathKey);
-    } else {
-      await ref
-          .read(settingsServiceProvider)
-          .set(SettingsService.logoPathKey, path);
-    }
-    state = path;
-  }
-}

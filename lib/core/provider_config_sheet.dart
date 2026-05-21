@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -162,11 +163,12 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
 
   Future<void> _reload() async {
     final list = await loadProviderInstances(widget.providerId);
-    if (mounted)
+    if (mounted) {
       setState(() {
         _instances = list;
         _loading = false;
       });
+    }
   }
 
   Future<void> _edit(ProviderInstanceMeta instance) async {
@@ -214,6 +216,7 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
         id: newId, name: '${chosen.providerName} ${instances.length + 1}');
     final wrapped = ProviderInstance(chosen, instance.id, instance.name);
     final saved = await showDialog<bool>(
+      // ignore: use_build_context_synchronously
       context: context,
       builder: (_) => _ProviderConfigDialog(provider: wrapped),
     );
@@ -456,15 +459,23 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
         } else {
           // Generic: try a simple HEAD/GET to the provider's base URL
           final dio = await provider.createHttpClient(config);
+          String? rawResp;
           try {
-            await dio.head('/');
-            steps.add(const _TestStep('Connectivity', true, 'Reachable'));
+            final resp = await dio.head('/');
+            rawResp = resp.data?.toString();
+            steps.add(_TestStep('Connectivity', true, 'Reachable',
+                rawResponse: rawResp));
           } catch (_) {
             try {
-              await dio.get('/');
-              steps.add(const _TestStep('Connectivity', true, 'Reachable'));
+              final resp = await dio.get('/');
+              rawResp = resp.data?.toString();
+              steps.add(_TestStep('Connectivity', true, 'Reachable',
+                  rawResponse: rawResp));
             } catch (e2) {
-              steps.add(_TestStep('Connectivity', false, '$e2'));
+              rawResp =
+                  e2 is DioException ? e2.response?.data?.toString() : null;
+              steps.add(_TestStep('Connectivity', false, '$e2',
+                  rawResponse: rawResp));
             }
           } finally {
             dio.close();
@@ -528,8 +539,11 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       }
       await saveProviderInstances(baseId, instances);
       if (context.mounted) {
+        // ignore: use_build_context_synchronously
         final loc = AppLocalizations.of(context);
+        // ignore: use_build_context_synchronously
         Navigator.pop(context, true);
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -623,8 +637,9 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                                   : TextInputAction.next,
                               onFieldSubmitted: isLast
                                   ? (_) {
-                                      if (!_formKey.currentState!.validate())
+                                      if (!_formKey.currentState!.validate()) {
                                         return;
+                                      }
                                       _save();
                                     }
                                   : null,

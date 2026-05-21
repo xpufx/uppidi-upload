@@ -75,13 +75,15 @@ class HistoryService {
       _log.warn('Failed to clear history: $e', error: e);
     }
   }
+
   Future<void> close() async {
     await _box?.close();
     _box = null;
   }
 }
 
-final historyServiceProvider = Provider<HistoryService>((ref) => HistoryService());
+final historyServiceProvider =
+    Provider<HistoryService>((ref) => HistoryService());
 final uploadHistoryProvider = FutureProvider<List<HistoryRecord>>((ref) async {
   final svc = ref.read(historyServiceProvider);
   return svc.getAll();

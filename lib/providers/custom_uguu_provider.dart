@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 
 import '../core/interfaces/base_http_provider.dart';
 import '../core/models/provider_metadata.dart';
-import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
 import '../core/platform/insecure_adapter.dart';
 

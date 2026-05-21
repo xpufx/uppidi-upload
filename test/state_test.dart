@@ -37,7 +37,8 @@ void main() {
         providers: [],
       );
 
-      final updated = state.copyWithProgress(0.7, state.sentBytes, state.totalBytes, state.speedLabel);
+      final updated = state.copyWithProgress(
+          0.7, state.sentBytes, state.totalBytes, state.speedLabel);
       expect(updated.progress, 0.7);
       expect(updated.cancelToken, same(token));
       expect(updated.results.length, 1);

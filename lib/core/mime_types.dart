@@ -31,6 +31,7 @@ const mimeLookup = <String, String>{
 };
 
 String? mimeTypeFromExtension(String ext) {
-  final clean = ext.startsWith('.') ? ext.substring(1).toLowerCase() : ext.toLowerCase();
+  final clean =
+      ext.startsWith('.') ? ext.substring(1).toLowerCase() : ext.toLowerCase();
   return mimeLookup[clean] ?? 'application/octet-stream';
 }

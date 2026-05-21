@@ -3,4 +3,4 @@ const String gitHash =
 const String cdnUrl = String.fromEnvironment('CDN_URL', defaultValue: '');
 const String githubRepo =
     String.fromEnvironment('GITHUB_REPO', defaultValue: 'xpufx/uppidi-upload');
-const String appVersion = '1.2.0+10';
+const String appVersion = '1.3.0';

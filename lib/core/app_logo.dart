@@ -1,33 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'theme_provider.dart';
-
-class AppLogo extends ConsumerWidget {
+class AppLogo extends StatelessWidget {
   final double size;
   const AppLogo({super.key, required this.size});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final logoPath = ref.watch(logoPathProvider);
-    if (logoPath != null && logoPath.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Image.file(
-          File(logoPath),
-          width: size,
-          height: size,
-          fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => _assetLogo(context),
-        ),
-      );
-    }
-    return _assetLogo(context);
-  }
-
-  Widget _assetLogo(BuildContext context) {
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Image.asset(
       isDark ? 'assets/logo-dark.png' : 'assets/logo-light.png',

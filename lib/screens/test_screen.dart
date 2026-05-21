@@ -18,44 +18,6 @@ class TestScreen extends ConsumerStatefulWidget {
 }
 
 class _TestScreenState extends ConsumerState<TestScreen> {
-  bool _builtinExpanded = false;
-  bool _myProvidersExpanded = true;
-
-  @override
-  void initState() {
-    super.initState();
-    try {
-      _loadPrefs();
-    } catch (_) {}
-  }
-
-  Future<void> _loadPrefs() async {
-    final svc = ref.read(settingsServiceProvider);
-    final builtin = await svc.get(SettingsService.sectionBuiltinCollapsed);
-    final myprov = await svc.get(SettingsService.sectionMyProvidersCollapsed);
-    if (mounted)
-      setState(() {
-        _builtinExpanded = builtin != 'true';
-        _myProvidersExpanded = myprov != 'true';
-      });
-  }
-
-  Future<void> _toggleBuiltin() async {
-    final newVal = !_builtinExpanded;
-    setState(() => _builtinExpanded = newVal);
-    final svc = ref.read(settingsServiceProvider);
-    await svc.set(
-        SettingsService.sectionBuiltinCollapsed, newVal ? 'false' : 'true');
-  }
-
-  Future<void> _toggleMyProviders() async {
-    final newVal = !_myProvidersExpanded;
-    setState(() => _myProvidersExpanded = newVal);
-    final svc = ref.read(settingsServiceProvider);
-    await svc.set(
-        SettingsService.sectionMyProvidersCollapsed, newVal ? 'false' : 'true');
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);

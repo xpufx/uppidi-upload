@@ -24,7 +24,8 @@ class ShareHandler {
     });
   }
 
-  static Future<void> _handleSharedFiles(List<SharedMediaFile>? files, WidgetRef ref) async {
+  static Future<void> _handleSharedFiles(
+      List<SharedMediaFile>? files, WidgetRef ref) async {
     if (files == null || files.isEmpty) return;
 
     for (final file in files) {
@@ -36,16 +37,19 @@ class ShareHandler {
       final ext = filePath.contains('.') ? filePath.split('.').last : '';
       final mimeType = mimeTypeFromExtension(ext);
 
-      _log.info('Received shared file: ${filePath.split('/').last} ($mimeType)');
+      _log.info(
+          'Received shared file: ${filePath.split('/').last} ($mimeType)');
 
       final notifier = ref.read(uploadProvider.notifier);
       final svc = ref.read(settingsServiceProvider);
 
       // Switch to default share provider if configured
-      final defaultProvider = await svc.get(SettingsService.defaultShareProviderKey);
+      final defaultProvider =
+          await svc.get(SettingsService.defaultShareProviderKey);
       if (defaultProvider != null) {
         final providers = ref.read(uploadProvider).providers;
-        final idx = providers.indexWhere((p) => p.providerId == defaultProvider);
+        final idx =
+            providers.indexWhere((p) => p.providerId == defaultProvider);
         if (idx >= 0) notifier.setProvider(idx);
       }
 

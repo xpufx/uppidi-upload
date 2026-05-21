@@ -114,7 +114,6 @@ class SettingsService {
   static const defaultShareProviderKey = 'global.default_share_provider';
   static const themeModeKey = 'global.theme_mode';
   static const seedColorKey = 'global.seed_color';
-  static const logoPathKey = 'global.logo_path';
   static const disabledProvidersKey = 'global.disabled_providers';
   static const debugLoggingKey = 'global.debug_logging';
   static const shellTypeKey = 'global.shell_type';
@@ -149,8 +148,6 @@ class SettingsService {
     }
     return Colors.deepPurple;
   }
-
-  Future<String?> getLogoPath() => get(logoPathKey);
 
   Future<Set<String>> getDisabledProviders() async {
     final raw = await get(disabledProvidersKey);

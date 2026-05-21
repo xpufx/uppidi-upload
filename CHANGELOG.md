@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: Uguu-like provider, floating buttons, collapsible sections
 - fix: keep modal after download, Install Now button
 - feat: Zulip channel/topic fields, post to channel after upload
 - fix: auto-scroll test, Enter-to-submit, extract _save(), l10n
@@ -13,7 +14,6 @@
 - rename My Providers, add provider type dropdown
 - fix: instance names in dropdown, providerName vs displayName
 - fix: Telegram multi-instance, test auth, settings reactivity, apk paths, link format
-- docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog

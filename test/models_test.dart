@@ -66,8 +66,12 @@ void main() {
       final result = UploadResult(success: true, url: 'https://x.com');
       final after = DateTime.now();
 
-      expect(result.completedAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
-      expect(result.completedAt.isBefore(after.add(const Duration(seconds: 1))), true);
+      expect(
+          result.completedAt
+              .isAfter(before.subtract(const Duration(seconds: 1))),
+          true);
+      expect(result.completedAt.isBefore(after.add(const Duration(seconds: 1))),
+          true);
     });
 
     test('allows custom completedAt', () {
