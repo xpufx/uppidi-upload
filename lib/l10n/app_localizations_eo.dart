@@ -734,4 +734,10 @@ class AppLocalizationsEo extends AppLocalizations {
   String chatAccessible(Object title) {
     return 'Chat \"$title\" accessible';
   }
+
+  @override
+  String get configLabelChannel => 'Channel';
+
+  @override
+  String get configLabelTopic => 'Topic';
 }

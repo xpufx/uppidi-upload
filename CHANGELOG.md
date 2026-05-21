@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: auto-scroll test, Enter-to-submit, extract _save(), l10n
 - l10n: fix all hardcoded strings, add new ARB keys
 - feat: add Zulip provider with multi-instance support
 - fix: tg://openmessage for all chat types
@@ -29,4 +30,3 @@
 - docs: auto-update changelog
 - fix: Telegram override of createHttpClient bypassed validateStatus fix
 - docs: auto-update changelog
-- fix: let parseResponse handle all HTTP status codes

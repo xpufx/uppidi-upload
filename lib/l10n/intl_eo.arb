@@ -214,5 +214,7 @@
   "testStepNotFound": "Not found",
   "testStepInvalid": "Invalid",
   "connectedAs": "Connected as @{username}",
-  "chatAccessible": "Chat \"{title}\" accessible"
+  "chatAccessible": "Chat \"{title}\" accessible",
+  "configLabelChannel": "Channel",
+  "configLabelTopic": "Topic"
 }

@@ -100,6 +100,8 @@ String _resolveCfgLabel(AppLocalizations l10n, String raw) {
     'Server URL' => l10n.configLabelServerUrl,
     'Email' => l10n.configLabelEmail,
     'API Key' => l10n.configLabelApiKey,
+    'Channel' => l10n.configLabelChannel,
+    'Topic' => l10n.configLabelTopic,
     _ => raw,
   };
 }

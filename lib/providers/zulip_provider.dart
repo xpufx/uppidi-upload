@@ -50,7 +50,7 @@ class ZulipProvider extends BaseHttpProvider {
       ['zulip_url', 'zulip_email', 'zulip_api_key'];
 
   @override
-  List<String> get optionalConfigKeys => const [];
+  List<String> get optionalConfigKeys => ['zulip_channel', 'zulip_topic'];
 
   @override
   String? get instanceDescription =>
@@ -61,6 +61,8 @@ class ZulipProvider extends BaseHttpProvider {
         'zulip_url': 'Server URL',
         'zulip_email': 'Email',
         'zulip_api_key': 'API Key',
+        'zulip_channel': 'Channel',
+        'zulip_topic': 'Topic',
       };
 
   @override
@@ -113,9 +115,10 @@ class ZulipProvider extends BaseHttpProvider {
     CancelToken? cancelToken,
     Map<String, String> config = const {},
   }) async {
-    // Capture the server URL so parseResponse can build the full link
     _lastServerUrl =
         (config['zulip_url']?.trim() ?? '').replaceAll(RegExp(r'/$'), '');
+    final channel = (config['zulip_channel'] ?? '').trim();
+    final topic = (config['zulip_topic'] ?? '').trim();
 
     try {
       final allowInsecure = config['_allow_insecure_conn'] == 'true';
@@ -144,7 +147,36 @@ class ZulipProvider extends BaseHttpProvider {
         cancelToken: cancelToken,
       );
 
-      return parseResponse(response);
+      final result = parseResponse(response);
+      if (!result.success || channel.isEmpty) return result;
+
+      // Post the file URL to the configured channel
+      try {
+        final msgData = <String, dynamic>{
+          'type': 'stream',
+          'to': channel,
+          'content': result.url ?? '',
+        };
+        if (topic.isNotEmpty) msgData['topic'] = topic;
+
+        final msgResponse = await dio.post(
+          '/api/v1/messages',
+          data: FormData.fromMap(msgData),
+        );
+        if (msgResponse.statusCode == 200) {
+          final body = msgResponse.data is Map
+              ? (msgResponse.data as Map)['msg'] as String?
+              : null;
+          _log.info('Posted to channel: $channel (${body ?? "ok"})');
+        } else {
+          _log.warn('Failed to post to channel: ${msgResponse.statusCode}');
+        }
+      } catch (e) {
+        _log.warn('Failed to post to channel: $e');
+      }
+
+      // Upload succeeded regardless of message post outcome
+      return result;
     } catch (e, stackTrace) {
       _log.error('Upload failed: $e', error: e, stackTrace: stackTrace);
       final statusCode = e is DioException ? e.response?.statusCode : null;

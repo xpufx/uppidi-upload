@@ -1399,6 +1399,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Chat \"{title}\" accessible'**
   String chatAccessible(Object title);
+
+  /// No description provided for @configLabelChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel'**
+  String get configLabelChannel;
+
+  /// No description provided for @configLabelTopic.
+  ///
+  /// In en, this message translates to:
+  /// **'Topic'**
+  String get configLabelTopic;
 }
 
 class _AppLocalizationsDelegate
