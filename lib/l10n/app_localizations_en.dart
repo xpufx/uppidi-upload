@@ -253,10 +253,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qualityOriginal => 'Original';
 
   @override
-  String get qualityMedium => 'Medium (1920px)';
+  String get qualityMedium => 'Half size';
 
   @override
-  String get qualityLow => 'Low (800px)';
+  String get qualityLow => 'Quarter size';
 
   @override
   String get uiVariant => 'UI Variant';
@@ -654,4 +654,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get configLabelChatId => 'Chat ID';
+
+  @override
+  String get configLabelSendAsPhoto => 'Send images as photos';
 }

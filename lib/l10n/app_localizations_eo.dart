@@ -254,10 +254,10 @@ class AppLocalizationsEo extends AppLocalizations {
   String get qualityOriginal => 'Originala';
 
   @override
-  String get qualityMedium => 'Meza (1920px)';
+  String get qualityMedium => 'Duona';
 
   @override
-  String get qualityLow => 'Malalta (800px)';
+  String get qualityLow => 'Kvarona';
 
   @override
   String get uiVariant => 'UI Varianto';
@@ -656,4 +656,7 @@ class AppLocalizationsEo extends AppLocalizations {
 
   @override
   String get configLabelChatId => 'Babileja ID';
+
+  @override
+  String get configLabelSendAsPhoto => 'Sendi bildojn kiel fotoj';
 }

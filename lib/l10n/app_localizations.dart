@@ -563,13 +563,13 @@ abstract class AppLocalizations {
   /// No description provided for @qualityMedium.
   ///
   /// In en, this message translates to:
-  /// **'Medium (1920px)'**
+  /// **'Half size'**
   String get qualityMedium;
 
   /// No description provided for @qualityLow.
   ///
   /// In en, this message translates to:
-  /// **'Low (800px)'**
+  /// **'Quarter size'**
   String get qualityLow;
 
   /// No description provided for @uiVariant.
@@ -1255,6 +1255,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Chat ID'**
   String get configLabelChatId;
+
+  /// No description provided for @configLabelSendAsPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Send images as photos'**
+  String get configLabelSendAsPhoto;
 }
 
 class _AppLocalizationsDelegate

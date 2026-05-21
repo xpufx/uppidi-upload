@@ -7,7 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../core/apk_installer.dart' show downloadAndInstallApk, downloadFile;
+import 'package:open_filex/open_filex.dart';
+
+import '../core/apk_installer.dart' show downloadFile;
 import '../core/app_logo.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/logging/log.dart';
@@ -219,13 +221,25 @@ class _VersionCheckWidget extends ConsumerWidget {
                       );
                       try {
                         if (isMobile) {
-                          await downloadAndInstallApk(url,
-                              onProgress: (r, t, s) {
+                          final path =
+                              await downloadFile(url, onProgress: (r, t, s) {
                             received = r;
                             total = t;
                             speed = s;
                             update?.call(() {});
                           });
+                          // Attempt to open package installer
+                          try {
+                            await OpenFilex.open(
+                              path,
+                              type: 'application/vnd.android.package-archive',
+                            );
+                          } catch (_) {}
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Downloaded to: $path')),
+                            );
+                          }
                         } else {
                           final path =
                               await downloadFile(url, onProgress: (r, t, s) {
@@ -964,28 +978,30 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
     );
 
     try {
+      final path = await downloadFile(url, onProgress: (r, t, s) {
+        received = r;
+        total = t;
+        speed = s;
+        update?.call(() {});
+      });
+
       if (Platform.isAndroid && label == 'APK') {
-        await downloadAndInstallApk(url, onProgress: (r, t, s) {
-          received = r;
-          total = t;
-          speed = s;
-          update?.call(() {});
-        });
-      } else {
-        final path = await downloadFile(url, onProgress: (r, t, s) {
-          received = r;
-          total = t;
-          speed = s;
-          update?.call(() {});
-        });
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Downloaded to: $path')),
+        // Attempt to open the package installer
+        try {
+          await OpenFilex.open(
+            path,
+            type: 'application/vnd.android.package-archive',
           );
+        } catch (_) {
+          // Installer didn't open — file is still accessible manually
         }
       }
+
       if (context.mounted) {
         Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Downloaded to: $path')),
+        );
       }
     } catch (e) {
       if (context.mounted) {
@@ -999,17 +1015,40 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
 }
 
 /// Section showing providers that require authentication configuration.
+/// Groups instances by base provider type — one card per type with instance
+/// count. Tapping "Configure" opens the instance manager dialog.
 class _ProviderConfigSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watch so the card updates immediately when instances change.
+    ref.watch(enabledProvidersProvider);
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final authProviders = ProviderRegistry.all
-        .where((p) =>
-            p.metadata.capabilities.contains(ProviderCapability.requiresAuth))
-        .toList();
+    final baseIds = <String>{};
+    final authCards = <Widget>[];
+    for (final p in ProviderRegistry.all) {
+      final baseId = p.providerId.split('__').first;
+      if (baseIds.contains(baseId)) continue;
+      baseIds.add(baseId);
+      final base = ProviderRegistry.baseFor(p.providerId);
+      if (base == null) continue;
+      if (!base.metadata.capabilities.contains(ProviderCapability.requiresAuth))
+        continue;
 
-    if (authProviders.isEmpty) return const SizedBox.shrink();
+      // Count actual instances (ProviderInstance wrappers have IDs like
+      // `telegram__work`). Bare base providers are not instances.
+      final instanceCount = ProviderRegistry.all
+          .where((i) => i.providerId.startsWith('${baseId}__'))
+          .length;
+
+      authCards.add(_AuthProviderCard(
+        key: ValueKey(baseId),
+        baseProvider: base,
+        instanceCount: instanceCount,
+      ));
+    }
+
+    if (authCards.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1018,7 +1057,7 @@ class _ProviderConfigSection extends ConsumerWidget {
             style: theme.textTheme.titleMedium
                 ?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        ...authProviders.map((p) => _AuthProviderCard(provider: p)),
+        ...authCards,
         const SizedBox(height: 16),
       ],
     );
@@ -1026,63 +1065,61 @@ class _ProviderConfigSection extends ConsumerWidget {
 }
 
 class _AuthProviderCard extends ConsumerWidget {
-  final BaseUploader provider;
+  final BaseUploader baseProvider;
+  final int instanceCount;
 
-  const _AuthProviderCard({required this.provider});
+  const _AuthProviderCard({
+    super.key,
+    required this.baseProvider,
+    required this.instanceCount,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    return FutureBuilder<bool>(
-      future: isProviderConfigured(ref, provider),
-      builder: (context, snapshot) {
-        final configured = snapshot.data ?? false;
-
-        return Card(
-          margin: const EdgeInsets.only(bottom: 8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Row(
-              children: [
-                Icon(
-                  configured ? Icons.check_circle : Icons.warning_amber,
-                  size: 20,
-                  color: configured ? Colors.green : Colors.orange,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(provider.providerName,
-                          style: const TextStyle(fontWeight: FontWeight.w600)),
-                      Text(
-                        configured
-                            ? l10n.providerConfigSectionConfigured
-                            : l10n.providerConfigNotConfigured(
-                                provider.providerName),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: configured
-                              ? Colors.green.shade700
-                              : Colors.orange.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                FilledButton.tonalIcon(
-                  onPressed: () =>
-                      showProviderConfigDialog(context, ref, provider),
-                  icon: const Icon(Icons.settings, size: 18),
-                  label: Text(l10n.providerConfigure),
-                ),
-              ],
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          children: [
+            Icon(
+              instanceCount > 0 ? Icons.check_circle : Icons.warning_amber,
+              size: 20,
+              color: instanceCount > 0 ? Colors.green : Colors.orange,
             ),
-          ),
-        );
-      },
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(baseProvider.providerName,
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(
+                    instanceCount > 0
+                        ? '$instanceCount instance${instanceCount > 1 ? 's' : ''} configured'
+                        : l10n.providerConfigNotConfigured(
+                            baseProvider.providerName),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: instanceCount > 0
+                          ? Colors.green.shade700
+                          : Colors.orange.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            FilledButton.tonalIcon(
+              onPressed: () =>
+                  showProviderConfigDialog(context, ref, baseProvider),
+              icon: const Icon(Icons.settings, size: 18),
+              label: Text(l10n.providerConfigure),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

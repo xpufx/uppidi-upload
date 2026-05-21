@@ -69,6 +69,9 @@ class MockUploader implements BaseUploader {
   Map<String, String> get configLabels => {};
 
   @override
+  List<String> get optionalConfigKeys => const [];
+
+  @override
   String? get proxyUrl => null;
 
   @override
@@ -184,7 +187,6 @@ void main() {
                   fileSizeBytes: 1024,
                   mimeType: 'application/pdf',
                   fileBytes: null,
-                  quality: 0,
                   providers: mockUploaders,
                   selectedProviderIndex: 0,
                 ),
@@ -220,7 +222,6 @@ void main() {
                   fileSizeBytes: 1024,
                   mimeType: 'image/png',
                   fileBytes: Uint8List(0),
-                  quality: 0,
                   providers: [imageUploader],
                   selectedProviderIndex: 0,
                 ),
@@ -258,7 +259,6 @@ void main() {
                   fileSizeBytes: 1024,
                   mimeType: 'application/pdf',
                   fileBytes: Uint8List(0),
-                  quality: 0,
                   providers: mockUploaders,
                   selectedProviderIndex: 0,
                 ),
@@ -298,7 +298,6 @@ void main() {
                   fileSizeBytes: 1024,
                   mimeType: 'application/pdf',
                   fileBytes: Uint8List(0),
-                  quality: 0,
                   providers: mockUploaders,
                   selectedProviderIndex: 0,
                 ),
@@ -335,7 +334,6 @@ void main() {
                   fileSizeBytes: 1024,
                   mimeType: 'image/png',
                   fileBytes: Uint8List(0),
-                  quality: 0,
                   providers: [imageUploader],
                   selectedProviderIndex: 0,
                 ),
@@ -355,10 +353,8 @@ void main() {
 
       // Quality selector should be shown for image files
       expect(find.byType(SegmentedButton<int>), findsOneWidget);
-      // Check for quality options
-      expect(find.text(l10n.qualityOriginal), findsOneWidget);
-      expect(find.text(l10n.qualityMedium), findsOneWidget);
-      expect(find.text(l10n.qualityLow), findsOneWidget);
+      // Check for quality icons (same icon at 3 sizes)
+      expect(find.byIcon(Icons.photo), findsNWidgets(3));
     });
 
     testWidgets('Quality selector NOT shown for non-image files',
@@ -375,7 +371,6 @@ void main() {
                   fileSizeBytes: 1024,
                   mimeType: 'application/pdf',
                   fileBytes: Uint8List(0),
-                  quality: 0,
                   providers: mockUploaders,
                   selectedProviderIndex: 0,
                 ),
@@ -572,7 +567,6 @@ void main() {
           fileSizeBytes: 1024,
           mimeType: 'application/pdf',
           fileBytes: Uint8List(0),
-          quality: 0,
           providers: mockUploaders,
           selectedProviderIndex: 0,
         ),
@@ -694,7 +688,6 @@ void main() {
           fileSizeBytes: 1024,
           mimeType: 'image/png',
           fileBytes: Uint8List(0),
-          quality: 0,
           providers: [imageUploader],
           selectedProviderIndex: 0,
         ),
@@ -718,10 +711,10 @@ void main() {
 
       // Verify initial quality is 0 (Original)
       expect(notifier.state, isA<UploadFileSelected>());
-      expect((notifier.state as UploadFileSelected).quality, 0);
+      expect(qualityNotifier.value, 0);
 
       // Find and tap the "Medium" quality option (quality value 1)
-      final mediumOption = find.text(l10n.qualityMedium);
+      final mediumOption = find.byIcon(Icons.photo).at(1);
       expect(mediumOption, findsOneWidget);
       // Scroll to the Medium option (might be off-screen due to new UI elements)
       await tester.ensureVisible(mediumOption);
@@ -731,7 +724,7 @@ void main() {
 
       // Verify quality changed to 1 (Medium)
       expect(notifier.state, isA<UploadFileSelected>());
-      expect((notifier.state as UploadFileSelected).quality, 1);
+      expect(qualityNotifier.value, 1);
     });
 
     testWidgets('2. Tap Upload button calls uploadSelected()',
@@ -743,7 +736,6 @@ void main() {
           fileSizeBytes: 1024,
           mimeType: 'application/pdf',
           fileBytes: Uint8List(0),
-          quality: 0,
           providers: mockUploaders,
           selectedProviderIndex: 0,
         ),
@@ -792,7 +784,6 @@ void main() {
           fileSizeBytes: 1024,
           mimeType: 'application/pdf',
           fileBytes: Uint8List(0),
-          quality: 0,
           providers: mockUploaders,
           selectedProviderIndex: 0,
         ),
@@ -1006,7 +997,6 @@ void main() {
           fileSizeBytes: 67,
           mimeType: 'image/png',
           fileBytes: validPngBytes(),
-          quality: 0,
           providers: [imageUploader],
           selectedProviderIndex: 0,
         ),
@@ -1040,7 +1030,6 @@ void main() {
           fileSizeBytes: 1024,
           mimeType: 'application/pdf',
           fileBytes: null,
-          quality: 0,
           providers: mockUploaders,
           selectedProviderIndex: 0,
         ),

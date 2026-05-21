@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image/image.dart' as img;
@@ -24,6 +25,10 @@ String _secureKey(String providerId, String key) =>
     'provider_config_${providerId}_$key';
 
 final _log = Log('UploadNotifier');
+
+/// Notifier for image quality selection (0=original, 1=half, 2=quarter).
+/// Separate from upload state so changing quality doesn't rebuild the screen.
+final qualityNotifier = ValueNotifier<int>(0);
 
 sealed class UploadState {
   final List<UploadResult> results;
@@ -50,7 +55,6 @@ final class UploadFileSelected extends UploadState {
   final int fileSizeBytes;
   final String? mimeType;
   final Uint8List? fileBytes;
-  final int quality;
   final String? selectedExpiry;
 
   const UploadFileSelected({
@@ -58,7 +62,6 @@ final class UploadFileSelected extends UploadState {
     required this.fileSizeBytes,
     this.mimeType,
     this.fileBytes,
-    this.quality = 0,
     this.selectedExpiry,
     super.results,
     super.selectedProviderIndex,
@@ -122,18 +125,13 @@ class UploadNotifier extends Notifier<UploadState> {
   UploadNotifier({List<BaseUploader>? providers})
       : _injectedProviders = providers;
 
-  int _selectedQuality = 0; // 0=original, 1=medium (50%), 2=low (25%)
   String _selectedExpiry = '24h'; // default for configurableExpiry providers
   Uint8List? _originalFileBytes; // saved for crop reset
-  Uint8List?
-      _lastUncompressedBytes; // bytes after crop, before quality compression
 
   String? _lastFilePath;
   Uint8List? _lastFileBytes;
   DateTime _lastSpeedSample = DateTime.now();
   int _lastSampleBytes = 0;
-
-  int get quality => _selectedQuality;
 
   void setExpiry(String expiry) {
     _selectedExpiry = expiry;
@@ -144,7 +142,6 @@ class UploadNotifier extends Notifier<UploadState> {
         fileSizeBytes: prev.fileSizeBytes,
         mimeType: prev.mimeType,
         fileBytes: prev.fileBytes,
-        quality: prev.quality,
         selectedExpiry: expiry,
         results: prev.results,
         selectedProviderIndex: prev.selectedProviderIndex,
@@ -154,86 +151,9 @@ class UploadNotifier extends Notifier<UploadState> {
   }
 
   void setQuality(int q) {
-    _selectedQuality = q;
-    if (state is! UploadFileSelected) return;
-    final prev = state as UploadFileSelected;
-    if (prev.mimeType?.startsWith('image/') != true ||
-        _lastUncompressedBytes == null) {
-      state = UploadFileSelected(
-        fileName: prev.fileName,
-        fileSizeBytes: prev.fileSizeBytes,
-        mimeType: prev.mimeType,
-        fileBytes: prev.fileBytes,
-        quality: q,
-        selectedExpiry: prev.selectedExpiry,
-        results: prev.results,
-        selectedProviderIndex: prev.selectedProviderIndex,
-        providers: prev.providers,
-      );
-      return;
-    }
-
-    if (q == 0) {
-      // Restore to pre-quality bytes (preserving crop)
-      _lastFileBytes = _lastUncompressedBytes;
-      _lastFilePath = null; // resized bytes no longer match original file
-      state = UploadFileSelected(
-        fileName: prev.fileName,
-        fileSizeBytes: _lastUncompressedBytes!.length,
-        mimeType: 'image/jpeg',
-        fileBytes: _lastUncompressedBytes,
-        quality: 0,
-        selectedExpiry: prev.selectedExpiry,
-        results: prev.results,
-        selectedProviderIndex: prev.selectedProviderIndex,
-        providers: prev.providers,
-      );
-      return;
-    }
-
-    // Apply quality resize immediately
-    try {
-      final src = img.decodeImage(_lastUncompressedBytes!);
-      if (src != null) {
-        final ratio = q == 1 ? 0.5 : 0.25;
-        final newW = (src.width * ratio).round();
-        final newH = (src.height * ratio).round();
-        final jpegQuality = q == 1 ? 75 : 50;
-        final resized = img.copyResize(src, width: newW, height: newH);
-        final outBytes = img.encodeJpg(resized, quality: jpegQuality);
-        // Skip if not meaningfully smaller
-        if (outBytes.length < (_lastUncompressedBytes!.length * 0.9)) {
-          _lastFileBytes = outBytes;
-          _lastFilePath = null; // resized bytes no longer match original file
-          state = UploadFileSelected(
-            fileName: '${prev.fileName.replaceAll(RegExp(r'\.\w+$'), '')}.jpg',
-            fileSizeBytes: outBytes.length,
-            mimeType: 'image/jpeg',
-            fileBytes: outBytes,
-            quality: q,
-            selectedExpiry: prev.selectedExpiry,
-            results: prev.results,
-            selectedProviderIndex: prev.selectedProviderIndex,
-            providers: prev.providers,
-          );
-          return;
-        }
-      }
-    } catch (_) {
-      // Fall through to update state without resize
-    }
-    // Resize skipped — just update quality
-    state = UploadFileSelected(
-      fileName: prev.fileName,
-      fileSizeBytes: prev.fileSizeBytes,
-      mimeType: prev.mimeType,
-      fileBytes: prev.fileBytes,
-      quality: q,
-      selectedExpiry: prev.selectedExpiry,
-      results: prev.results,
-      selectedProviderIndex: prev.selectedProviderIndex,
-      providers: prev.providers,
-    );
+    // Quality is stored separately — it only affects upload compression,
+    // not the preview. No state change, so the screen doesn't rebuild.
+    qualityNotifier.value = q;
   }
 
   @override
@@ -252,7 +172,6 @@ class UploadNotifier extends Notifier<UploadState> {
           fileSizeBytes: prev.fileSizeBytes,
           mimeType: prev.mimeType,
           fileBytes: prev.fileBytes,
-          quality: prev.quality,
           selectedExpiry: prev.selectedExpiry,
           results: prev.results,
           selectedProviderIndex: index,
@@ -310,13 +229,12 @@ class UploadNotifier extends Notifier<UploadState> {
 
       // Store request for later upload
       _originalFileBytes = previewBytes;
-      _lastUncompressedBytes = previewBytes;
+      _lastFileBytes = previewBytes;
       state = UploadFileSelected(
         fileName: file.name,
         fileSizeBytes: request.sizeInBytes,
         mimeType: request.mimeType,
         fileBytes: previewBytes,
-        quality: _selectedQuality,
         selectedExpiry: _selectedExpiry,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
@@ -340,6 +258,30 @@ class UploadNotifier extends Notifier<UploadState> {
   }
 
   Future<void> uploadSelected() async {
+    // Apply quality compression at upload time (not during preview)
+    final quality = qualityNotifier.value;
+    if (quality > 0 && _lastFileBytes != null) {
+      final mime = state is UploadFileSelected
+          ? (state as UploadFileSelected).mimeType
+          : null;
+      if (mime?.startsWith('image/') == true) {
+        try {
+          final src = img.decodeImage(_lastFileBytes!);
+          if (src != null) {
+            final ratio = quality == 1 ? 0.5 : 0.25;
+            final newW = (src.width * ratio).round();
+            final newH = (src.height * ratio).round();
+            final jpegQuality = quality == 1 ? 75 : 50;
+            final resized = img.copyResize(src, width: newW, height: newH);
+            final outBytes = img.encodeJpg(resized, quality: jpegQuality);
+            _lastFileBytes = outBytes;
+          }
+        } catch (e) {
+          _log.warn('Quality compression failed: $e', error: e);
+        }
+      }
+    }
+
     FileUploadRequest? request;
     if (_lastFilePath != null) {
       final ioFile = File(_lastFilePath!);
@@ -383,13 +325,12 @@ class UploadNotifier extends Notifier<UploadState> {
       _lastFilePath = filePath;
       _lastFileBytes = null;
       _originalFileBytes = previewBytes;
-      _lastUncompressedBytes = previewBytes;
+      _lastFileBytes = previewBytes;
       state = UploadFileSelected(
         fileName: fileName,
         fileSizeBytes: size,
         mimeType: mimeType,
         fileBytes: previewBytes,
-        quality: _selectedQuality,
         selectedExpiry: _selectedExpiry,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
@@ -511,6 +452,17 @@ class UploadNotifier extends Notifier<UploadState> {
         }
       }
 
+      // Load optional boolean config keys (e.g. send_as_photo) from
+      // secure storage and pass them through to the provider.
+      for (final key in provider.optionalConfigKeys) {
+        final secure = await _secure.read(
+          key: _secureKey(provider.providerId, key),
+        );
+        if (secure != null && secure.isNotEmpty) {
+          config[key] = secure;
+        }
+      }
+
       final allowInsecure = await settingsService.isInsecureConnAllowed();
       if (allowInsecure) {
         config['_allow_insecure_conn'] = 'true';
@@ -621,7 +573,7 @@ class UploadNotifier extends Notifier<UploadState> {
     // Free byte buffers — no longer needed after upload and history save
     _lastFileBytes = null;
     _originalFileBytes = null;
-    _lastUncompressedBytes = null;
+    _lastFileBytes = null;
   }
 
   Future<void> _saveToHistory(
@@ -670,7 +622,7 @@ class UploadNotifier extends Notifier<UploadState> {
   /// [croppedBytes] should be JPEG-encoded bytes ready for upload/preview.
   void applyCrop(Uint8List croppedBytes) {
     _lastFileBytes = croppedBytes;
-    _lastUncompressedBytes = croppedBytes;
+    _lastFileBytes = croppedBytes;
     _lastFilePath = null; // cropped data is no longer a file path
     if (state is UploadFileSelected) {
       final prev = state as UploadFileSelected;
@@ -681,7 +633,6 @@ class UploadNotifier extends Notifier<UploadState> {
         fileSizeBytes: croppedBytes.length,
         mimeType: 'image/jpeg',
         fileBytes: croppedBytes,
-        quality: prev.quality,
         selectedExpiry: prev.selectedExpiry,
         results: prev.results,
         selectedProviderIndex: prev.selectedProviderIndex,
@@ -694,7 +645,7 @@ class UploadNotifier extends Notifier<UploadState> {
   void resetCrop() {
     if (_originalFileBytes == null) return;
     _lastFileBytes = _originalFileBytes;
-    _lastUncompressedBytes = _originalFileBytes;
+    _lastFileBytes = _originalFileBytes;
     _lastFilePath = null;
     if (state is UploadFileSelected) {
       final prev = state as UploadFileSelected;
@@ -703,7 +654,6 @@ class UploadNotifier extends Notifier<UploadState> {
         fileSizeBytes: _originalFileBytes!.length,
         mimeType: prev.mimeType,
         fileBytes: _originalFileBytes,
-        quality: prev.quality,
         selectedExpiry: prev.selectedExpiry,
         results: prev.results,
         selectedProviderIndex: prev.selectedProviderIndex,
@@ -716,7 +666,7 @@ class UploadNotifier extends Notifier<UploadState> {
     _lastFilePath = null;
     _lastFileBytes = null;
     _originalFileBytes = null;
-    _lastUncompressedBytes = null;
+    _lastFileBytes = null;
     state = UploadIdle(
       results: state.results,
       selectedProviderIndex: state.selectedProviderIndex,

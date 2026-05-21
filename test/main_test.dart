@@ -28,6 +28,9 @@ class MockNavUploader implements BaseUploader {
   Map<String, String> get configLabels => {};
 
   @override
+  List<String> get optionalConfigKeys => const [];
+
+  @override
   String? get proxyUrl => null;
 
   @override

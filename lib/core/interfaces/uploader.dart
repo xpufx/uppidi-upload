@@ -11,6 +11,10 @@ abstract class BaseUploader {
   String get providerName;
   bool get supportsWeb;
   List<String> get requiredConfigKeys;
+
+  /// Optional boolean config keys (rendered as checkboxes in the config
+  /// dialog). Each key should have a corresponding label in [configLabels].
+  List<String> get optionalConfigKeys => const [];
   Map<String, String> get configLabels;
   String? get proxyUrl;
 

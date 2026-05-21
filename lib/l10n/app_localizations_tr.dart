@@ -255,10 +255,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get qualityOriginal => 'Orijinal';
 
   @override
-  String get qualityMedium => 'Orta (1920px)';
+  String get qualityMedium => 'Yarım boyut';
 
   @override
-  String get qualityLow => 'Düşük (800px)';
+  String get qualityLow => 'Çeyrek boyut';
 
   @override
   String get uiVariant => 'UI Varyantı';
@@ -659,4 +659,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get configLabelChatId => 'Sohbet ID\'si';
+
+  @override
+  String get configLabelSendAsPhoto => 'Görselleri fotoğraf olarak gönder';
 }

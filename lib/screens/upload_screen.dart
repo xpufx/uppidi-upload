@@ -11,11 +11,13 @@ import 'package:image/image.dart' as img;
 
 import '../core/format.dart';
 import '../core/insecure_upload_warning.dart';
+import '../core/interfaces/base_http_provider.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/metadata_badges.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
 import '../core/provider_config_sheet.dart';
+import '../core/settings_service.dart';
 import '../core/share_message_dialog.dart';
 import '../core/version.dart';
 import '../l10n/app_localizations.dart';
@@ -23,11 +25,72 @@ import '../providers/upload_provider.dart';
 import '../widgets/image_crop_overlay.dart';
 import '../widgets/provider_favicon.dart';
 
-class UploadScreen extends ConsumerWidget {
+class UploadScreen extends ConsumerStatefulWidget {
   const UploadScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UploadScreen> createState() => _UploadScreenState();
+}
+
+class _UploadScreenState extends ConsumerState<UploadScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _previewKey = GlobalKey();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToPreview() {
+    if (!_scrollController.hasClients) return;
+    final ctx = _previewKey.currentContext;
+    if (ctx == null || !ctx.mounted) return;
+    final renderBox = ctx.findRenderObject() as RenderBox?;
+    if (renderBox == null || !renderBox.attached) return;
+
+    // Get the preview's position relative to the scroll viewport
+    final previewGlobal = renderBox.localToGlobal(Offset.zero);
+    final scrollBox = _scrollController.position.context.notificationContext
+        ?.findRenderObject() as RenderBox?;
+    if (scrollBox == null) return;
+    final scrollGlobal = scrollBox.localToGlobal(Offset.zero);
+    final offsetInViewport = previewGlobal.dy - scrollGlobal.dy;
+
+    // Scroll to bring preview to the top of the viewport
+    if (offsetInViewport > 10) {
+      _scrollController.animateTo(
+        _scrollController.offset + offsetInViewport,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Auto-scroll to preview when a file is first selected
+    ref.listen(uploadProvider, (UploadState? prev, UploadState next) {
+      final prevHasFile = prev is UploadFileSelected ||
+          (prev is UploadInProgress && prev.fileName != null) ||
+          (prev is UploadCompleted && prev.fileName != null);
+      final nowHasFile = next is UploadFileSelected ||
+          (next is UploadInProgress && next.fileName != null) ||
+          (next is UploadCompleted && next.fileName != null);
+
+      if (nowHasFile && !prevHasFile) {
+        // Scroll after the current frame AND the next one. The first frame
+        // has Image.memory at 0 height (not decoded yet). The second frame
+        // has the actual image size after decoding. We scroll on the second
+        // to get an accurate measurement.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _scrollToPreview();
+          });
+        });
+      }
+    });
+
     final uploadState = ref.watch(uploadProvider);
     final notifier = ref.read(uploadProvider.notifier);
     final providers = uploadState.providers;
@@ -43,6 +106,7 @@ class UploadScreen extends ConsumerWidget {
     final content = Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
+        controller: _scrollController,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -65,62 +129,63 @@ class UploadScreen extends ConsumerWidget {
               _ProviderConfigStatus(provider: provider),
             ],
             if (webUnsupported) const _WebWarning(),
-            switch (uploadState) {
-              UploadFileSelected(
-                fileName: final n,
-                fileSizeBytes: final s,
-                mimeType: final m,
-                fileBytes: final b
-              ) =>
-                Dismissible(
-                  key: const ValueKey('file-preview'),
-                  direction: DismissDirection.horizontal,
-                  onDismissed: (_) => notifier.clearSelection(),
-                  child: _FilePreview(
-                      fileName: n,
-                      fileSize: s,
+            Padding(
+              key: _previewKey,
+              padding: EdgeInsets.zero,
+              child: switch (uploadState) {
+                UploadFileSelected(
+                  fileName: final n,
+                  fileSizeBytes: final s,
+                  mimeType: final m,
+                  fileBytes: final b
+                ) =>
+                  Dismissible(
+                    key: const ValueKey('file-preview'),
+                    direction: DismissDirection.horizontal,
+                    onDismissed: (_) => notifier.clearSelection(),
+                    child: _FilePreview(
+                        fileName: n,
+                        fileSize: s,
+                        mimeType: m,
+                        fileBytes: b,
+                        provider: provider,
+                        notifier: notifier),
+                  ),
+                UploadInProgress(
+                  fileName: final fn,
+                  fileSizeBytes: final fs,
+                  mimeType: final m,
+                  fileBytes: final fb
+                )
+                    when fn != null =>
+                  _FilePreview(
+                      fileName: fn,
+                      fileSize: fs,
                       mimeType: m,
-                      fileBytes: b,
+                      fileBytes: fb,
                       provider: provider,
                       notifier: notifier),
-                ),
-              UploadInProgress(
-                fileName: final fn,
-                fileSizeBytes: final fs,
-                mimeType: final m,
-                fileBytes: final fb
-              )
-                  when fn != null =>
-                _FilePreview(
-                    fileName: fn,
-                    fileSize: fs,
-                    mimeType: m,
-                    fileBytes: fb,
-                    provider: provider,
-                    notifier: notifier),
-              UploadCompleted(
-                fileName: final fn,
-                fileSizeBytes: final fs,
-                mimeType: final m,
-                fileBytes: final fb
-              )
-                  when fn != null =>
-                _FilePreview(
-                    fileName: fn,
-                    fileSize: fs,
-                    mimeType: m,
-                    fileBytes: fb,
-                    provider: provider,
-                    notifier: notifier),
-              _ => const SizedBox.shrink(),
-            },
+                UploadCompleted(
+                  fileName: final fn,
+                  fileSizeBytes: final fs,
+                  mimeType: final m,
+                  fileBytes: final fb
+                )
+                    when fn != null =>
+                  _FilePreview(
+                      fileName: fn,
+                      fileSize: fs,
+                      mimeType: m,
+                      fileBytes: fb,
+                      provider: provider,
+                      notifier: notifier),
+                _ => const SizedBox.shrink(),
+              },
+            ),
             const SizedBox(height: 12),
             switch (uploadState) {
               UploadIdle() => _PickButton(notifier: notifier),
               UploadFileSelected() => _FileSelectedButtons(notifier: notifier),
-              _ => const SizedBox.shrink(),
-            },
-            switch (uploadState) {
               UploadInProgress(
                 progress: final p,
                 speedLabel: final sp,
@@ -160,7 +225,6 @@ class UploadScreen extends ConsumerWidget {
                       : null,
                   onCancel: () => notifier.clearSelection(),
                 ),
-              _ => const SizedBox.shrink(),
             },
             const SizedBox(height: 8),
           ],
@@ -493,9 +557,6 @@ class _FileSelectedButtons extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(uploadProvider);
-    final mimeType = state is UploadFileSelected ? state.mimeType : null;
-    final quality = state is UploadFileSelected ? state.quality : 0;
-    final showQuality = mimeType?.startsWith('image/') == true;
 
     // Expiry picker — shown when the selected provider supports it
     final provider = state.providers.asMap()[state.selectedProviderIndex];
@@ -518,31 +579,6 @@ class _FileSelectedButtons extends ConsumerWidget {
                 .toList(),
             selected: {currentExpiry ?? expiryOptions.first},
             onSelectionChanged: (v) => notifier.setExpiry(v.first),
-            style: ButtonStyle(
-              visualDensity: VisualDensity.compact,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
-        if (showQuality) ...[
-          SegmentedButton<int>(
-            segments: [
-              ButtonSegment(
-                  value: 0,
-                  label: Text(l10n.qualityOriginal),
-                  icon: const Icon(Icons.high_quality, size: 16)),
-              ButtonSegment(
-                  value: 1,
-                  label: Text(l10n.qualityMedium),
-                  icon: const Icon(Icons.photo_size_select_large, size: 16)),
-              ButtonSegment(
-                  value: 2,
-                  label: Text(l10n.qualityLow),
-                  icon: const Icon(Icons.photo_size_select_small, size: 16)),
-            ],
-            selected: {quality},
-            onSelectionChanged: (v) => notifier.setQuality(v.first),
             style: ButtonStyle(
               visualDensity: VisualDensity.compact,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -600,12 +636,46 @@ class _FilePreview extends StatefulWidget {
 
 class _FilePreviewState extends State<_FilePreview> {
   bool _hasCropped = false;
+  Widget? _cachedImageWidget;
 
   AppLocalizations get _l10n => AppLocalizations.of(context);
 
   bool get _isImage {
     final mime = widget.mimeType ?? '';
     return mime.startsWith('image/');
+  }
+
+  @override
+  void didUpdateWidget(_FilePreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.fileBytes != oldWidget.fileBytes) {
+      _cachedImageWidget = null;
+    }
+  }
+
+  Widget _createImageWidget() {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 260),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Image.memory(
+              widget.fileBytes!,
+              fit: BoxFit.contain,
+              gaplessPlayback: true,
+              errorBuilder: (_, __, ___) =>
+                  const Icon(Icons.broken_image, size: 64),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -699,32 +769,14 @@ class _FilePreviewState extends State<_FilePreview> {
   }
 
   Widget _buildImagePreview() {
+    // Cache the image widget so Flutter skips its subtree when only
+    // the quality/dropdown changes — no layout shift, no re-decode.
+    _cachedImageWidget ??= _createImageWidget();
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // Image
-        Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 260),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color:
-                        Theme.of(context).dividerColor.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Image.memory(
-                  widget.fileBytes!,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.broken_image, size: 64),
-                ),
-              ),
-            ),
-          ),
-        ),
+        _cachedImageWidget!,
         // Crop / Reset button
         Positioned(
           top: 4,
@@ -744,6 +796,48 @@ class _FilePreviewState extends State<_FilePreview> {
               foregroundColor: Theme.of(context).colorScheme.primary,
               padding: const EdgeInsets.all(6),
               minimumSize: const Size(32, 32),
+            ),
+          ),
+        ),
+        // Quality selector — compact icon-only at top-left
+        Positioned(
+          top: 4,
+          left: 4,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest
+                  .withValues(alpha: 0.92),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            padding: const EdgeInsets.all(2),
+            // Quality selector overlay — watches qualityNotifier so only
+            // the overlay rebuilds when quality changes.
+            child: ValueListenableBuilder<int>(
+              valueListenable: qualityNotifier,
+              builder: (context, quality, _) {
+                return SegmentedButton<int>(
+                  segments: [
+                    ButtonSegment(
+                        value: 0, icon: const Icon(Icons.photo, size: 18)),
+                    ButtonSegment(
+                        value: 1, icon: const Icon(Icons.photo, size: 14)),
+                    ButtonSegment(
+                        value: 2, icon: const Icon(Icons.photo, size: 10)),
+                  ],
+                  selected: {quality},
+                  onSelectionChanged: (v) =>
+                      widget.notifier.setQuality(v.first),
+                  style: ButtonStyle(
+                    visualDensity: VisualDensity.compact,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    padding: WidgetStateProperty.all(
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 0)),
+                    minimumSize: WidgetStateProperty.all(const Size(0, 24)),
+                  ),
+                );
+              },
             ),
           ),
         ),

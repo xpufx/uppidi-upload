@@ -200,5 +200,6 @@
 
   "mimeTypesImagesOnly": "qabmey neH",
   "configLabelBotToken": "bot token",
-  "configLabelChatId": "chat ID"
+  "configLabelChatId": "chat ID",
+  "configLabelSendAsPhoto": "qabmey FotoDaq"
 }

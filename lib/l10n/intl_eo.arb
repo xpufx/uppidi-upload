@@ -75,8 +75,8 @@
   "debugLogging": "Ŝalti sencimigan protokoladon",
   "debugLoggingDescription": "Registras plenajn HTTP pet/respond detalojn al la konzolo por sencimigo. Ŝaltu nur kiam bezonate.",
   "qualityOriginal": "Originala",
-  "qualityMedium": "Meza (1920px)",
-  "qualityLow": "Malalta (800px)",
+  "qualityMedium": "Duona",
+  "qualityLow": "Kvarona",
   "uiVariant": "UI Varianto",
   "uiVariantDescription": "Elektu la ĉefekranan provizantan aranĝon: Listo aŭ Ĉipoj.",
   "uiVariantDefault": "Provizanta Listo",
@@ -199,5 +199,6 @@
 
   "mimeTypesImagesOnly": "Nur bildoj",
   "configLabelBotToken": "Bot-Ĵetono",
-  "configLabelChatId": "Babileja ID"
+  "configLabelChatId": "Babileja ID",
+  "configLabelSendAsPhoto": "Sendi bildojn kiel fotoj"
 }

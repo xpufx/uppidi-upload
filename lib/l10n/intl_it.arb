@@ -75,8 +75,8 @@
   "debugLogging": "Abilita debug logging",
   "debugLoggingDescription": "Registra tutti i dettagli di richiesta/risposta HTTP nella console per il debug. Attivalo solo se necessario.",
   "qualityOriginal": "Originale",
-  "qualityMedium": "Media (1920px)",
-  "qualityLow": "Bassa (800px)",
+  "qualityMedium": "Metà",
+  "qualityLow": "Un quarto",
   "uiVariant": "Variante UI",
   "uiVariantDescription": "Scegli il layout dei provider nella schermata principale: Lista o Chip.",
   "uiVariantDefault": "Lista Provider",
@@ -199,5 +199,6 @@
 
   "mimeTypesImagesOnly": "Solo immagini",
   "configLabelBotToken": "Token del Bot",
-  "configLabelChatId": "ID Chat"
+  "configLabelChatId": "ID Chat",
+  "configLabelSendAsPhoto": "Invia immagini come foto"
 }

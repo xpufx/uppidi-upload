@@ -643,4 +643,7 @@ class AppLocalizationsTlh extends AppLocalizations {
 
   @override
   String get configLabelChatId => 'chat ID';
+
+  @override
+  String get configLabelSendAsPhoto => 'qabmey FotoDaq';
 }

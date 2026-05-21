@@ -22,6 +22,9 @@ abstract class BaseHttpProvider implements BaseUploader {
   Map<String, String> get additionalFormFields => const {};
 
   @override
+  List<String> get optionalConfigKeys => const [];
+
+  @override
   ProviderMetadata get metadata => const ProviderMetadata();
 
   @override

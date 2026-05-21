@@ -75,8 +75,8 @@
   "debugLogging": "Hata ayıklama günlüğünü etkinleştir",
   "debugLoggingDescription": "Sorun giderme için tüm HTTP istek/yanıt detaylarını konsola kaydeder. Yalnızca gerektiğinde etkinleştirin.",
   "qualityOriginal": "Orijinal",
-  "qualityMedium": "Orta (1920px)",
-  "qualityLow": "Düşük (800px)",
+  "qualityMedium": "Yarım boyut",
+  "qualityLow": "Çeyrek boyut",
   "uiVariant": "UI Varyantı",
   "uiVariantDescription": "Ana ekran sağlayıcı düzenini seçin: Liste veya Çip.",
   "uiVariantDefault": "Sağlayıcı Listesi",
@@ -199,5 +199,6 @@
 
   "mimeTypesImagesOnly": "Yalnızca görseller",
   "configLabelBotToken": "Bot Tokeni",
-  "configLabelChatId": "Sohbet ID'si"
+  "configLabelChatId": "Sohbet ID'si",
+  "configLabelSendAsPhoto": "Görselleri fotoğraf olarak gönder"
 }

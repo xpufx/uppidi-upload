@@ -2,10 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
-/// Downloads a file from [url] to a temporary directory and returns the local path.
-/// [onProgress] receives (downloadedBytes, totalBytes, bytesPerSec).
-Future<String> downloadFile(String url, {void Function(int, int, int)? onProgress}) async {
-  final dir = await getTemporaryDirectory();
+/// Downloads a file from [url] to the device Downloads folder and returns
+/// the local path. Falls back to temporary directory if Downloads is not
+/// available. [onProgress] receives (downloadedBytes, totalBytes, bytesPerSec).
+Future<String> downloadFile(String url,
+    {void Function(int, int, int)? onProgress}) async {
+  final dir = await getDownloadsDirectory() ?? await getTemporaryDirectory();
   final ext = url.endsWith('.apk') ? '.apk' : '.tar.gz';
   final filePath = '${dir.path}/uppidi-update$ext';
 
@@ -15,7 +17,8 @@ Future<String> downloadFile(String url, {void Function(int, int, int)? onProgres
   int lastBytes = 0;
 
   await dio.download(
-    url, filePath,
+    url,
+    filePath,
     onReceiveProgress: (received, total) {
       final now = DateTime.now();
       final elapsed = now.difference(lastTime).inMilliseconds;
@@ -36,7 +39,8 @@ Future<String> downloadFile(String url, {void Function(int, int, int)? onProgres
 
 /// Downloads an APK from [url] and opens the installer prompt.
 /// [onProgress] receives (downloadedBytes, totalBytes, bytesPerSec).
-Future<void> downloadAndInstallApk(String url, {void Function(int, int, int)? onProgress}) async {
+Future<void> downloadAndInstallApk(String url,
+    {void Function(int, int, int)? onProgress}) async {
   try {
     final filePath = await downloadFile(url, onProgress: onProgress);
 

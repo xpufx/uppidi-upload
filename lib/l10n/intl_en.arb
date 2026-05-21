@@ -75,8 +75,8 @@
   "debugLogging": "Enable debug logging",
   "debugLoggingDescription": "Logs full HTTP request/response details to the console for troubleshooting. Only enable when needed.",
   "qualityOriginal": "Original",
-  "qualityMedium": "Medium (1920px)",
-  "qualityLow": "Low (800px)",
+  "qualityMedium": "Half size",
+  "qualityLow": "Quarter size",
   "uiVariant": "UI Variant",
   "uiVariantDescription": "Choose the main screen provider layout: List or Chips.",
   "uiVariantDefault": "Provider List",
@@ -199,5 +199,6 @@
 
   "mimeTypesImagesOnly": "Images only",
   "configLabelBotToken": "Bot Token",
-  "configLabelChatId": "Chat ID"
+  "configLabelChatId": "Chat ID",
+  "configLabelSendAsPhoto": "Send images as photos"
 }

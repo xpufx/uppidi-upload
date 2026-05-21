@@ -39,6 +39,9 @@ class TestHttpProvider extends BaseHttpProvider {
   Map<String, String> get configLabels => const {'api_key': 'API Key'};
 
   @override
+  List<String> get optionalConfigKeys => const [];
+
+  @override
   String? get proxyUrl => null;
 
   @override

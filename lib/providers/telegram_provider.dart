@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
 
 import '../core/interfaces/base_http_provider.dart';
+import '../core/interfaces/uploader.dart';
+import '../core/logging/log.dart';
 import '../core/models/provider_metadata.dart';
+import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
 import '../core/platform/insecure_adapter.dart';
 
@@ -14,6 +17,7 @@ import '../core/platform/insecure_adapter.dart';
 /// The chat ID can be obtained by messaging the bot and checking
 /// `https://api.telegram.org/bot<token>/getUpdates`.
 class TelegramProvider extends BaseHttpProvider {
+  late final Log _log = Log(runtimeType.toString());
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
         maxFileSizeBytes: 50 * 1024 * 1024, // 50 MB
@@ -47,9 +51,13 @@ class TelegramProvider extends BaseHttpProvider {
   List<String> get requiredConfigKeys => ['bot_token', 'chat_id'];
 
   @override
+  List<String> get optionalConfigKeys => ['send_as_photo'];
+
+  @override
   Map<String, String> get configLabels => const {
         'bot_token': 'Bot Token',
         'chat_id': 'Chat ID',
+        'send_as_photo': 'Send images as photos',
       };
 
   @override
@@ -92,6 +100,80 @@ class TelegramProvider extends BaseHttpProvider {
     return {
       'chat_id': config['chat_id'] ?? '',
     };
+  }
+
+  @override
+  Future<UploadResult> upload(
+    FileUploadRequest request, {
+    UploadProgressCallback? onProgress,
+    CancelToken? cancelToken,
+    Map<String, String> config = const {},
+  }) async {
+    final isImage = request.mimeType?.startsWith('image/') ?? false;
+    final sendAsPhoto = isImage && (config['send_as_photo'] == 'true');
+
+    final endpoint = sendAsPhoto ? '/sendPhoto' : '/sendDocument';
+    final fieldName = sendAsPhoto ? 'photo' : 'document';
+
+    try {
+      final allowInsecure = config['_allow_insecure_conn'] == 'true';
+      final proxyUrl = config['_proxy_url'];
+      final cleanConfig = Map<String, String>.from(config)
+        ..remove('_allow_insecure_conn')
+        ..remove('_proxy_url')
+        ..remove('send_as_photo');
+      final dio = await createHttpClient(cleanConfig,
+          allowInsecureConn: allowInsecure, proxyUrl: proxyUrl);
+
+      final fields = buildFormFields(cleanConfig);
+      _log.info(
+          'Uploading ${request.fileName} → $endpoint as $fieldName (image=$isImage, sendAsPhoto=$sendAsPhoto)');
+
+      final file = MultipartFile.fromStream(
+        () => request.dataStream,
+        request.sizeInBytes,
+        filename: request.fileName,
+        contentType: request.mimeType != null
+            ? DioMediaType.parse(request.mimeType!)
+            : null,
+      );
+      fields[fieldName] = file;
+
+      final response = await dio.post(
+        endpoint,
+        data: FormData.fromMap(fields),
+        onSendProgress: onProgress,
+        cancelToken: cancelToken,
+      );
+
+      return parseResponse(response);
+    } catch (e, stackTrace) {
+      _log.error('Upload failed: $e', error: e, stackTrace: stackTrace);
+      final statusCode = e is DioException ? e.response?.statusCode : null;
+      return UploadResult(
+        success: false,
+        errorMessage: _mapException(e),
+        rawError: e.toString(),
+        statusCode: statusCode,
+        stackTrace: stackTrace.toString(),
+      );
+    }
+  }
+
+  /// Maps common exceptions to localized error keys.
+  String _mapException(Object e) {
+    if (e is DioException) {
+      return switch (e.type) {
+        DioExceptionType.cancel => 'uploadCancelled',
+        DioExceptionType.connectionTimeout ||
+        DioExceptionType.sendTimeout ||
+        DioExceptionType.receiveTimeout ||
+        DioExceptionType.connectionError =>
+          'errorConnectionFailed',
+        _ => 'genericError',
+      };
+    }
+    return 'genericError';
   }
 
   @override
@@ -191,12 +273,12 @@ class TelegramProvider extends BaseHttpProvider {
     return 'Telegram: $description';
   }
 
-  /// Builds a t.me/c/ link from a chat ID and message ID.
+  /// Builds a t.me link from a chat ID and message ID.
   ///
   /// - Supergroups have chat IDs like `-1001234567890` → link is
   ///   `https://t.me/c/1234567890/{message_id}`
   /// - Other groups have negative IDs → `https://t.me/c/{abs_id}/{message_id}`
-  /// - Private chats have positive IDs → deep link via tg://
+  /// - Private chats have positive IDs → `https://t.me/c/{chat_id}/{message_id}`
   String _buildTelegramLink(String chatId, String messageId) {
     var stripped = chatId;
 
@@ -206,10 +288,8 @@ class TelegramProvider extends BaseHttpProvider {
     } else if (stripped.startsWith('-')) {
       // Other negative IDs (private groups)
       stripped = stripped.substring(1);
-    } else {
-      // Positive IDs are private chats — use tg:// deep link
-      return 'tg://openmessage?chat_id=$chatId&message_id=$messageId';
     }
+    // Positive IDs (private chats) are used as-is
 
     return 'https://t.me/c/$stripped/$messageId';
   }

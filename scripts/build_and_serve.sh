@@ -55,15 +55,11 @@ echo "   ✅ No hardcoded strings found"
 # This ensures artifact filenames match the tag/release commit.
 GIT_HASH=$(git rev-parse --short HEAD)
 
-# ── Auto-generate changelog ──────────────────────────────────
-echo "==> Updating CHANGELOG.md..."
+# ── Refresh changelog (no commit — avoids spam in git log) ──
 echo "# Changelog" >CHANGELOG.md
 echo "" >>CHANGELOG.md
-
 git log --oneline --format="- %s" | head -30 >>CHANGELOG.md
-git add CHANGELOG.md 2>/dev/null
-git commit -m "docs: auto-update changelog" --no-verify 2>/dev/null || true
-echo "   ✅ Changelog updated"
+echo "   ✅ Changelog refreshed (unstaged)"
 ARTIFACTS_DIR="/home/xpufx/code/uppidi/.caddy-artifacts"
 mkdir -p "$ARTIFACTS_DIR"
 
@@ -166,6 +162,6 @@ cat <<'CHECKLIST'
 [ ] Desktop: Drag-and-drop a file onto the upload area
 CHECKLIST
 echo ""
-echo "Happy testing!"
+echo "Happy testing! (${GIT_HASH})"
 
 true # ensure script always exits 0 after checklist

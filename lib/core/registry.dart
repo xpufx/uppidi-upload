@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'interfaces/uploader.dart';
+import 'models/provider_instance.dart';
 import 'models/provider_metadata.dart';
+import 'provider_config_sheet.dart';
 import 'settings_service.dart';
 import '../providers/catbox_provider.dart';
 import '../providers/fileditch_provider.dart';
@@ -23,31 +25,75 @@ final enabledProvidersProvider = Provider<List<BaseUploader>>((ref) {
       .toList();
 });
 
-class ProviderRegistry {
-  static final List<BaseUploader> all = [
-    HttpBinProvider(),
-    FileDitchProvider(),
-    FriskProvider(),
-    UguuProvider(name: 'uguu.se', url: 'https://uguu.se'),
-    TmpFileLinkProvider(),
-    CatboxProvider(),
-    FreeImageHostProvider(
-      name: 'freeimage.host',
-      url: 'https://freeimage.host',
-    ),
-    TempShProvider(),
-    LitterboxProvider(),
-    TelegramProvider(),
-    if (devProviders)
-      UguuProvider(
-        name: 'Uguu (milan)',
-        url: 'https://uguu.milan.xpufx.com',
-        endpoint: '/upload.php',
-        metadata: const ProviderMetadata(
-          maxFileSizeBytes: 128 * 1024 * 1024,
-          supportsDirectLink: true,
-          expiryInfo: '8 hours',
-        ),
+/// Base provider types — the "blueprints" that get wrapped with instances.
+final List<BaseUploader> _baseTypes = [
+  HttpBinProvider(),
+  FileDitchProvider(),
+  FriskProvider(),
+  UguuProvider(name: 'uguu.se', url: 'https://uguu.se'),
+  TmpFileLinkProvider(),
+  CatboxProvider(),
+  FreeImageHostProvider(
+    name: 'freeimage.host',
+    url: 'https://freeimage.host',
+  ),
+  TempShProvider(),
+  LitterboxProvider(),
+  TelegramProvider(),
+  if (devProviders)
+    UguuProvider(
+      name: 'Uguu (milan)',
+      url: 'https://uguu.milan.xpufx.com',
+      endpoint: '/upload.php',
+      metadata: const ProviderMetadata(
+        maxFileSizeBytes: 128 * 1024 * 1024,
+        supportsDirectLink: true,
+        expiryInfo: '8 hours',
       ),
-  ];
+    ),
+];
+
+class ProviderRegistry {
+  /// All available provider instances. Populated by [init] at startup.
+  /// Before init, returns the base provider types (for test compatibility).
+  static List<BaseUploader> all = List.of(_baseTypes);
+
+  /// Loads instances from secure storage and builds the provider list.
+  /// Providers without configured instances appear as a single default.
+  /// Providers WITH instances get one entry per instance.
+  static Future<void> init() async {
+    final result = <BaseUploader>[];
+    for (final base in _baseTypes) {
+      final instances = await loadProviderInstances(base.providerId);
+      if (instances.isEmpty) {
+        result.add(base);
+      } else {
+        for (final inst in instances) {
+          result.add(ProviderInstance(base, inst.id, inst.name));
+        }
+      }
+    }
+    all = result;
+  }
+
+  /// Re-runs [init] and notifies watchers so the provider dropdown etc.
+  /// update immediately without restart.
+  static Future<void> refresh(WidgetRef ref) async {
+    await init();
+    ref.invalidate(enabledProvidersProvider);
+  }
+
+  /// Returns the base provider type for a given (possibly instance-scoped)
+  /// providerId.  E.g. `telegram__work` → the TelegramProvider blueprint.
+  static BaseUploader? baseFor(String providerId) {
+    final baseId = providerId.split('__').first;
+    for (final b in _baseTypes) {
+      if (b.providerId == baseId) return b;
+    }
+    return null;
+  }
+
+  /// True when [provider] is a base type (not an instance wrapper).
+  static bool isBaseType(BaseUploader provider) =>
+      provider is! ProviderInstance;
 }

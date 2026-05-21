@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/models/upload_record.dart';
+import 'core/registry.dart';
 import 'core/settings_service.dart';
 import 'core/share_handler.dart';
 import 'core/theme_provider.dart';
@@ -43,6 +44,7 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(UploadRecordAdapter());
   _registerScreens();
+  await ProviderRegistry.init();
   runApp(const ProviderScope(child: UppidiApp()));
 }
 

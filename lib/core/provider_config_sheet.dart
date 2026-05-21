@@ -7,11 +7,81 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../l10n/app_localizations.dart';
 import 'interfaces/uploader.dart';
+import 'models/provider_instance.dart';
+import 'registry.dart';
 
 final _secure = FlutterSecureStorage();
 
 String _configKey(String providerId, String key) =>
     'provider_config_${providerId}_$key';
+
+/// ── Instance storage helpers ────────────────────────────────────────────
+
+/// Metadata for a single provider instance.
+@visibleForTesting
+class ProviderInstanceMeta {
+  final String id;
+  final String name;
+  const ProviderInstanceMeta({required this.id, required this.name});
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
+  factory ProviderInstanceMeta.fromJson(Map<String, dynamic> json) =>
+      ProviderInstanceMeta(
+        id: json['id'] as String,
+        name: json['name'] as String,
+      );
+}
+
+/// Loads the list of instances for a provider. Returns an empty list if
+/// no instances have been configured (caller creates a default).
+Future<List<ProviderInstanceMeta>> loadProviderInstances(
+    String providerId) async {
+  final raw = await _secure.read(key: 'provider_instances_$providerId');
+  if (raw == null) return [];
+  final list = jsonDecode(raw) as List;
+  return list
+      .map((e) => ProviderInstanceMeta.fromJson(e as Map<String, dynamic>))
+      .toList();
+}
+
+/// Persists the instance list for a provider.
+Future<void> saveProviderInstances(
+    String providerId, List<ProviderInstanceMeta> instances) async {
+  await _secure.write(
+    key: 'provider_instances_$providerId',
+    value: jsonEncode(instances.map((e) => e.toJson()).toList()),
+  );
+}
+
+/// Deletes an instance: removes its config keys and removes it from the
+/// instance list.
+Future<void> deleteProviderInstance(
+    String providerId, ProviderInstanceMeta instance,
+    {required List<String> configKeys}) async {
+  for (final key in configKeys) {
+    await _secure.delete(key: _configKey('${providerId}__${instance.id}', key));
+  }
+  final remaining = (await loadProviderInstances(providerId))
+      .where((i) => i.id != instance.id)
+      .toList();
+  if (remaining.isEmpty) {
+    await _secure.delete(key: 'provider_instances_$providerId');
+  } else {
+    await saveProviderInstances(providerId, remaining);
+  }
+}
+
+/// ── Config dialog ───────────────────────────────────────────────────────
+
+/// Splits a providerId like `telegram__work` into (`telegram`, `work`).
+/// For bare ids like `catbox` returns (`catbox`, `default`).
+(String, String) _splitInstanceId(String providerId) {
+  final parts = providerId.split('__');
+  if (parts.length >= 2) {
+    return (parts[0], parts.sublist(1).join('__'));
+  }
+  return (providerId, 'default');
+}
 
 class _TestStep {
   final String label;
@@ -25,25 +95,169 @@ String _resolveCfgLabel(AppLocalizations l10n, String raw) {
   return switch (raw) {
     'Bot Token' => l10n.configLabelBotToken,
     'Chat ID' => l10n.configLabelChatId,
+    'Send images as photos' => l10n.configLabelSendAsPhoto,
     _ => raw,
   };
 }
 
-/// Shows a configuration dialog/sheet for a provider that requires
-/// authentication credentials (e.g. bot tokens, API keys).
-///
-/// Returns `true` if the user saved changes, `false` if cancelled.
+/// Shows the instance manager dialog for a provider that requires
+/// authentication. Always shows the instance list — handles 0, 1, or
+/// many instances with Add / Edit / Delete controls.
+/// After saving, refreshes the provider registry immediately.
 Future<bool> showProviderConfigDialog(
   BuildContext context,
   WidgetRef ref,
   BaseUploader provider,
 ) async {
-  final result = await showDialog<bool>(
+  final baseId = provider.providerId.split('__').first;
+  final base = ProviderRegistry.baseFor(provider.providerId);
+  if (base == null) return false;
+
+  final changed = await showDialog<bool>(
     context: context,
-    builder: (ctx) => _ProviderConfigDialog(provider: provider),
+    builder: (_) => _InstanceListDialog(
+      providerId: baseId,
+      baseProvider: base,
+      ref: ref,
+    ),
   );
-  return result ?? false;
+  if (changed == true) {
+    await ProviderRegistry.refresh(ref);
+  }
+  return changed ?? false;
 }
+
+/// ── Instance list dialog ────────────────────────────────────────────────
+
+class _InstanceListDialog extends ConsumerStatefulWidget {
+  final String providerId;
+  final BaseUploader baseProvider;
+  final WidgetRef ref;
+  const _InstanceListDialog({
+    required this.providerId,
+    required this.baseProvider,
+    required this.ref,
+  });
+
+  @override
+  ConsumerState<_InstanceListDialog> createState() =>
+      _InstanceListDialogState();
+}
+
+class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
+  List<ProviderInstanceMeta> _instances = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _reload();
+  }
+
+  Future<void> _reload() async {
+    final list = await loadProviderInstances(widget.providerId);
+    if (mounted)
+      setState(() {
+        _instances = list;
+        _loading = false;
+      });
+  }
+
+  Future<void> _edit(ProviderInstanceMeta instance) async {
+    final wrapped =
+        ProviderInstance(widget.baseProvider, instance.id, instance.name);
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (_) => _ProviderConfigDialog(provider: wrapped),
+    );
+    if (saved == true) _reload();
+  }
+
+  Future<void> _add() async {
+    final newId = DateTime.now().millisecondsSinceEpoch.toString();
+    final instance = ProviderInstanceMeta(
+        id: newId,
+        name: '${widget.baseProvider.providerName} ${_instances.length + 1}');
+    final wrapped =
+        ProviderInstance(widget.baseProvider, instance.id, instance.name);
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (_) => _ProviderConfigDialog(provider: wrapped),
+    );
+    if (saved == true) _reload();
+  }
+
+  Future<void> _delete(ProviderInstanceMeta instance) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete instance?'),
+        content: Text('Delete "${instance.name}" and all its credentials?'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Delete')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await deleteProviderInstance(widget.providerId, instance,
+        configKeys: widget.baseProvider.requiredConfigKeys);
+    _reload();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return AlertDialog(
+      title: Text('${widget.baseProvider.providerName} Instances'),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : _instances.isEmpty
+                ? Center(
+                    child: Text('No instances configured',
+                        style: theme.textTheme.bodySmall))
+                : ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: _instances.length,
+                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    itemBuilder: (_, i) {
+                      final inst = _instances[i];
+                      return ListTile(
+                        dense: true,
+                        leading: const Icon(Icons.person_outline, size: 20),
+                        title: Text(inst.name),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline, size: 18),
+                          onPressed: () => _delete(inst),
+                        ),
+                        onTap: () => _edit(inst),
+                      );
+                    },
+                  ),
+      ),
+      actions: [
+        TextButton.icon(
+          onPressed: _add,
+          icon: const Icon(Icons.add, size: 16),
+          label: const Text('Add'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text('Done'),
+        ),
+      ],
+    );
+  }
+}
+
+/// ── Instance edit dialog ────────────────────────────────────────────────
 
 class _ProviderConfigDialog extends ConsumerStatefulWidget {
   final BaseUploader provider;
@@ -58,6 +272,8 @@ class _ProviderConfigDialog extends ConsumerStatefulWidget {
 class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   final _formKey = GlobalKey<FormState>();
   late Map<String, TextEditingController> _controllers;
+  final Map<String, bool> _checkboxValues = {};
+  final TextEditingController _nameController = TextEditingController();
   bool _isSaving = false;
   bool _isTesting = false;
 
@@ -71,10 +287,15 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
     for (final key in widget.provider.requiredConfigKeys) {
       _controllers[key] = TextEditingController();
     }
+    for (final key in widget.provider.optionalConfigKeys) {
+      _checkboxValues[key] = false;
+    }
+    _nameController.text = widget.provider.providerName;
     _loadConfig();
   }
 
   Future<void> _loadConfig() async {
+    final (baseId, instanceId) = _splitInstanceId(widget.provider.providerId);
     for (final key in widget.provider.requiredConfigKeys) {
       final value = await _secure.read(
         key: _configKey(widget.provider.providerId, key),
@@ -83,6 +304,31 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
         _controllers[key]!.text = value ?? '';
       }
     }
+    for (final key in widget.provider.optionalConfigKeys) {
+      final value = await _secure.read(
+        key: _configKey(widget.provider.providerId, key),
+      );
+      if (mounted) {
+        _checkboxValues[key] = value == 'true';
+      }
+    }
+    // Load instance name from metadata if available
+    if (mounted) {
+      final instances = await loadProviderInstances(baseId);
+      final match = instances.where((i) => i.id == instanceId);
+      if (match.isNotEmpty) {
+        _nameController.text = match.first.name;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final c in _controllers.values) {
+      c.dispose();
+    }
+    _nameController.dispose();
+    super.dispose();
   }
 
   /// Runs a multi-step auth test. For Telegram: step 1 = bot token (getMe),
@@ -104,7 +350,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
 
       final client = HttpClient();
       try {
-        if (provider.providerId == 'telegram') {
+        if (provider.providerId.split('__').first == 'telegram') {
           // ── Step 1: validate bot_token via getMe ──
           final token = config['bot_token'] ?? '';
           var meRequest = await client.getUrl(
@@ -184,14 +430,6 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   }
 
   @override
-  void dispose() {
-    for (final c in _controllers.values) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
@@ -225,6 +463,19 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                 ),
               ),
               const SizedBox(height: 16),
+              // Instance name field
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Name',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                    helperText: 'A label to identify this instance',
+                  ),
+                ),
+              ),
               ...widget.provider.requiredConfigKeys.map((key) {
                 final label = _resolveCfgLabel(l10n, labels[key] ?? key);
                 final isSecret = key.toLowerCase().contains('token') ||
@@ -248,6 +499,24 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                         return l10n.providerConfigRequired;
                       }
                       return null;
+                    },
+                  ),
+                );
+              }),
+              ...widget.provider.optionalConfigKeys.map((key) {
+                final label = _resolveCfgLabel(l10n, labels[key] ?? key);
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(label, style: theme.textTheme.bodyMedium),
+                    value: _checkboxValues[key] ?? false,
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => _checkboxValues[key] = v);
+                      }
                     },
                   ),
                 );
@@ -293,7 +562,8 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
           onPressed: _isTesting || _isSaving
               ? null
               : () async {
-                  if (!_formKey.currentState!.validate()) return;
+                  // Test uses raw field values — no validation gate so users
+                  // can test partial/in-progress input without saving first.
                   await _testAuth();
                 },
           icon: _isTesting
@@ -323,6 +593,27 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                         await store.delete(key: skey);
                       }
                     }
+                    for (final key in widget.provider.optionalConfigKeys) {
+                      final skey = _configKey(widget.provider.providerId, key);
+                      await store.write(
+                          key: skey,
+                          value: (_checkboxValues[key] ?? false).toString());
+                    }
+                    // Save instance metadata
+                    final (baseId, instanceId) =
+                        _splitInstanceId(widget.provider.providerId);
+                    final instances = await loadProviderInstances(baseId);
+                    final name = _nameController.text.trim();
+                    final existing =
+                        instances.indexWhere((i) => i.id == instanceId);
+                    if (existing >= 0) {
+                      instances[existing] =
+                          ProviderInstanceMeta(id: instanceId, name: name);
+                    } else {
+                      instances.add(
+                          ProviderInstanceMeta(id: instanceId, name: name));
+                    }
+                    await saveProviderInstances(baseId, instances);
                     if (context.mounted) {
                       Navigator.pop(context, true);
                       ScaffoldMessenger.of(context).showSnackBar(
