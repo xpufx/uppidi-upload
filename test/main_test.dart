@@ -35,6 +35,8 @@ class MockNavUploader implements BaseUploader {
 
   @override
   String? get instanceDescription => null;
+  @override
+  List<String> get optionalTextConfigKeys => const [];
 
   @override
   ProviderMetadata get metadata => ProviderMetadata();

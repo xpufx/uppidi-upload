@@ -326,6 +326,9 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
     for (final key in widget.provider.requiredConfigKeys) {
       _controllers[key] = TextEditingController();
     }
+    for (final key in widget.provider.optionalTextConfigKeys) {
+      _controllers[key] = TextEditingController();
+    }
     for (final key in widget.provider.optionalConfigKeys) {
       _checkboxValues[key] = false;
     }
@@ -504,6 +507,15 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
         await store.write(
             key: skey, value: (_checkboxValues[key] ?? false).toString());
       }
+      for (final key in widget.provider.optionalTextConfigKeys) {
+        final value = _controllers[key]?.text.trim() ?? '';
+        final skey = _configKey(widget.provider.providerId, key);
+        if (value.isNotEmpty) {
+          await store.write(key: skey, value: value);
+        } else {
+          await store.delete(key: skey);
+        }
+      }
       // Save instance metadata
       final (baseId, instanceId) = _splitInstanceId(widget.provider.providerId);
       final instances = await loadProviderInstances(baseId);
@@ -537,213 +549,278 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
     final theme = Theme.of(context);
     final labels = widget.provider.configLabels;
 
-    return AlertDialog(
-      title: Row(
+    return Dialog(
+      child: Stack(
         children: [
-          Icon(Icons.vpn_key_outlined,
-              size: 20, color: theme.colorScheme.primary),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              '${widget.provider.providerName} ${l10n.settings}',
-              style: theme.textTheme.titleMedium,
+          // Scrollable content
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Title
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                child: Row(
+                  children: [
+                    Icon(Icons.vpn_key_outlined,
+                        size: 20, color: theme.colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${widget.provider.providerName} ${l10n.settings}',
+                        style: theme.textTheme.titleMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Scrollable form with bottom padding for the floating buttons
+              Flexible(
+                child: Form(
+                  key: _formKey,
+                  child: SingleChildScrollView(
+                    controller: _contentScrollController,
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 80),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          l10n.providerConfigDescription,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // Instance name field
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: TextFormField(
+                            controller: _nameController,
+                            decoration: InputDecoration(
+                              labelText: l10n.configLabelInstanceName,
+                              border: const OutlineInputBorder(),
+                              isDense: true,
+                              helperText: l10n.configInstanceNameHelper,
+                            ),
+                          ),
+                        ),
+                        ...widget.provider.requiredConfigKeys.map((key) {
+                          final label =
+                              _resolveCfgLabel(l10n, labels[key] ?? key);
+                          final isSecret =
+                              key.toLowerCase().contains('token') ||
+                                  key.toLowerCase().contains('key') ||
+                                  key.toLowerCase().contains('secret');
+                          final keys = widget.provider.requiredConfigKeys;
+                          final isLast = keys.lastOrNull == key;
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: TextFormField(
+                              controller: _controllers[key],
+                              textInputAction: isLast
+                                  ? TextInputAction.done
+                                  : TextInputAction.next,
+                              onFieldSubmitted: isLast
+                                  ? (_) {
+                                      if (!_formKey.currentState!.validate())
+                                        return;
+                                      _save();
+                                    }
+                                  : null,
+                              decoration: InputDecoration(
+                                labelText: label,
+                                border: const OutlineInputBorder(),
+                                isDense: true,
+                                helperText: isSecret
+                                    ? l10n.providerConfigSecretHint
+                                    : null,
+                              ),
+                              obscureText: isSecret,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return l10n.providerConfigRequired;
+                                }
+                                return null;
+                              },
+                            ),
+                          );
+                        }),
+                        ...widget.provider.optionalConfigKeys.map((key) {
+                          final label =
+                              _resolveCfgLabel(l10n, labels[key] ?? key);
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: CheckboxListTile(
+                              contentPadding: EdgeInsets.zero,
+                              dense: true,
+                              controlAffinity: ListTileControlAffinity.leading,
+                              title: Text(label,
+                                  style: theme.textTheme.bodyMedium),
+                              value: _checkboxValues[key] ?? false,
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setState(() => _checkboxValues[key] = v);
+                                }
+                              },
+                            ),
+                          );
+                        }),
+                        ...widget.provider.optionalTextConfigKeys.map((key) {
+                          final label =
+                              _resolveCfgLabel(l10n, labels[key] ?? key);
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: TextFormField(
+                              controller: _controllers[key],
+                              decoration: InputDecoration(
+                                labelText: label,
+                                border: const OutlineInputBorder(),
+                                isDense: true,
+                              ),
+                            ),
+                          );
+                        }),
+                        ..._testSteps.map((step) => Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    step.ok ? Icons.check_circle : Icons.error,
+                                    size: 16,
+                                    color: step.ok ? Colors.green : Colors.red,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text('${step.label}: ',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: step.ok
+                                              ? Colors.green.shade800
+                                              : Colors.red.shade800)),
+                                  Expanded(
+                                    child: Text(step.detail,
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: step.ok
+                                                ? Colors.green.shade700
+                                                : Colors.red.shade700)),
+                                  ),
+                                  if (step.rawResponse != null)
+                                    IconButton(
+                                      icon: const Icon(Icons.info_outline,
+                                          size: 14),
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      tooltip: l10n.debugResponse,
+                                      onPressed: () => showDialog(
+                                        context: context,
+                                        builder: (ctx) => AlertDialog(
+                                          title: Text(
+                                              '${step.label} — ${l10n.debugResponse}'),
+                                          content: SingleChildScrollView(
+                                            child: SelectableText(
+                                              step.rawResponse!,
+                                              style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontFamily: 'monospace'),
+                                            ),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(ctx),
+                                              child: Text(l10n.cancel),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            )),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // Floating action bar at bottom
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface.withValues(alpha: 0.95),
+                border: Border(
+                  top: BorderSide(
+                      color: theme.dividerColor.withValues(alpha: 0.2)),
+                ),
+              ),
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text(l10n.cancel),
+                  ),
+                  const SizedBox(width: 8),
+                  OutlinedButton.icon(
+                    onPressed: _isTesting || _isSaving
+                        ? null
+                        : () async {
+                            bool hasEmpty = false;
+                            for (final key
+                                in widget.provider.requiredConfigKeys) {
+                              if ((_controllers[key]?.text.trim() ?? '')
+                                  .isEmpty) {
+                                hasEmpty = true;
+                                break;
+                              }
+                            }
+                            if (hasEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(l10n.fillRequiredFields)),
+                              );
+                              return;
+                            }
+                            await _testAuth();
+                          },
+                    icon: _isTesting
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.wifi_find, size: 18),
+                    label: Text(l10n.testProvider),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton.icon(
+                    onPressed: _isSaving
+                        ? null
+                        : () async {
+                            await _save();
+                          },
+                    icon: _isSaving
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.save, size: 18),
+                    label: Text(l10n.save),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
-      content: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          controller: _contentScrollController,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.providerConfigDescription,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Instance name field
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: l10n.configLabelInstanceName,
-                    border: const OutlineInputBorder(),
-                    isDense: true,
-                    helperText: l10n.configInstanceNameHelper,
-                  ),
-                ),
-              ),
-              ...widget.provider.requiredConfigKeys.map((key) {
-                final label = _resolveCfgLabel(l10n, labels[key] ?? key);
-                final isSecret = key.toLowerCase().contains('token') ||
-                    key.toLowerCase().contains('key') ||
-                    key.toLowerCase().contains('secret');
-                final keys = widget.provider.requiredConfigKeys;
-                final isLast = keys.lastOrNull == key;
-
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: TextFormField(
-                    controller: _controllers[key],
-                    textInputAction:
-                        isLast ? TextInputAction.done : TextInputAction.next,
-                    onFieldSubmitted: isLast
-                        ? (_) {
-                            // Trigger save on Enter from the last field
-                            if (!_formKey.currentState!.validate()) return;
-                            _save();
-                          }
-                        : null,
-                    decoration: InputDecoration(
-                      labelText: label,
-                      border: const OutlineInputBorder(),
-                      isDense: true,
-                      helperText:
-                          isSecret ? l10n.providerConfigSecretHint : null,
-                    ),
-                    obscureText: isSecret,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return l10n.providerConfigRequired;
-                      }
-                      return null;
-                    },
-                  ),
-                );
-              }),
-              ...widget.provider.optionalConfigKeys.map((key) {
-                final label = _resolveCfgLabel(l10n, labels[key] ?? key);
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
-                    controlAffinity: ListTileControlAffinity.leading,
-                    title: Text(label, style: theme.textTheme.bodyMedium),
-                    value: _checkboxValues[key] ?? false,
-                    onChanged: (v) {
-                      if (v != null) {
-                        setState(() => _checkboxValues[key] = v);
-                      }
-                    },
-                  ),
-                );
-              }),
-              ..._testSteps.map((step) => Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Row(
-                      children: [
-                        Icon(
-                          step.ok ? Icons.check_circle : Icons.error,
-                          size: 16,
-                          color: step.ok ? Colors.green : Colors.red,
-                        ),
-                        const SizedBox(width: 6),
-                        Text('${step.label}: ',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: step.ok
-                                    ? Colors.green.shade800
-                                    : Colors.red.shade800)),
-                        Expanded(
-                          child: Text(step.detail,
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: step.ok
-                                      ? Colors.green.shade700
-                                      : Colors.red.shade700)),
-                        ),
-                        if (step.rawResponse != null)
-                          IconButton(
-                            icon: const Icon(Icons.info_outline, size: 14),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            tooltip: l10n.debugResponse,
-                            onPressed: () => showDialog(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                title: Text(
-                                    '${step.label} — ${l10n.debugResponse}'),
-                                content: SingleChildScrollView(
-                                  child: SelectableText(
-                                    step.rawResponse!,
-                                    style: const TextStyle(
-                                        fontSize: 11, fontFamily: 'monospace'),
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(ctx),
-                                    child: Text(l10n.cancel),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  )),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text(l10n.cancel),
-        ),
-        OutlinedButton.icon(
-          onPressed: _isTesting || _isSaving
-              ? null
-              : () async {
-                  // Quick check: don't run test if required fields are empty
-                  bool hasEmpty = false;
-                  for (final key in widget.provider.requiredConfigKeys) {
-                    if ((_controllers[key]?.text.trim() ?? '').isEmpty) {
-                      hasEmpty = true;
-                      break;
-                    }
-                  }
-                  if (hasEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.fillRequiredFields)),
-                    );
-                    return;
-                  }
-                  await _testAuth();
-                },
-          icon: _isTesting
-              ? const SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.wifi_find, size: 18),
-          label: Text(l10n.testProvider),
-        ),
-        FilledButton.icon(
-          onPressed: _isSaving
-              ? null
-              : () async {
-                  await _save();
-                },
-          icon: _isSaving
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.save, size: 18),
-          label: Text(l10n.save),
-        ),
-      ],
     );
   }
 }

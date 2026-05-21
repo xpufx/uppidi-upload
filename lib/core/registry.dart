@@ -16,6 +16,7 @@ import '../providers/telegram_provider.dart';
 import '../providers/tmpfilelink_provider.dart';
 import '../providers/uguu_provider.dart';
 import '../providers/zulip_provider.dart';
+import '../providers/custom_uguu_provider.dart';
 
 const bool devProviders = bool.fromEnvironment('DEV_PROVIDERS');
 
@@ -42,17 +43,7 @@ final List<BaseUploader> _baseTypes = [
   LitterboxProvider(),
   TelegramProvider(),
   ZulipProvider(),
-  if (devProviders)
-    UguuProvider(
-      name: 'Uguu (milan)',
-      url: 'https://uguu.milan.xpufx.com',
-      endpoint: '/upload.php',
-      metadata: const ProviderMetadata(
-        maxFileSizeBytes: 128 * 1024 * 1024,
-        supportsDirectLink: true,
-        expiryInfo: '8 hours',
-      ),
-    ),
+  CustomUguuProvider(),
 ];
 
 class ProviderRegistry {

@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: keep modal after download, Install Now button
 - feat: Zulip channel/topic fields, post to channel after upload
 - fix: auto-scroll test, Enter-to-submit, extract _save(), l10n
 - l10n: fix all hardcoded strings, add new ARB keys
@@ -29,4 +30,3 @@
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
-- fix: Telegram override of createHttpClient bypassed validateStatus fix

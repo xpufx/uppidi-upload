@@ -37,6 +37,9 @@ class ProviderInstance implements BaseUploader {
   List<String> get optionalConfigKeys => _base.optionalConfigKeys;
 
   @override
+  List<String> get optionalTextConfigKeys => _base.optionalTextConfigKeys;
+
+  @override
   Map<String, String> get configLabels => _base.configLabels;
 
   @override

@@ -122,6 +122,9 @@ class SettingsService {
   static const navigationLayoutKey = 'global.nav_layout';
   static const shareMessageKey = 'global.share_message';
   static const lastUsedProviderKey = 'global.last_used_provider';
+  static const sectionBuiltinCollapsed = 'global.section_builtin_collapsed';
+  static const sectionMyProvidersCollapsed =
+      'global.section_myproviders_collapsed';
 
   Future<bool> isInsecureConnAllowed() async {
     final val = await get(insecureConnKey);

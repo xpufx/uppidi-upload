@@ -11,6 +11,7 @@ import 'package:uppidi_upload/core/models/upload_request.dart';
 import 'package:uppidi_upload/core/registry.dart';
 import 'package:uppidi_upload/l10n/app_localizations.dart';
 import 'package:uppidi_upload/core/settings_service.dart';
+import 'package:hive/hive.dart';
 
 /// Mock uploader for testing
 class MockTestUploader implements BaseUploader {
@@ -47,6 +48,8 @@ class MockTestUploader implements BaseUploader {
 
   @override
   String? get instanceDescription => null;
+  @override
+  List<String> get optionalTextConfigKeys => const [];
 
   @override
   ProviderMetadata get metadata => ProviderMetadata(
@@ -75,7 +78,12 @@ void main() {
   late AppLocalizations l10n;
 
   setUpAll(() async {
+    Hive.init('.hive_test_test_screen');
     l10n = await AppLocalizations.delegate.load(const Locale('en'));
+  });
+
+  tearDownAll(() async {
+    await Hive.deleteBoxFromDisk('settings');
   });
 
   group('TestScreen Provider List Tests', () {

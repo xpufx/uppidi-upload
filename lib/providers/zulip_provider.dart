@@ -48,9 +48,11 @@ class ZulipProvider extends BaseHttpProvider {
   @override
   List<String> get requiredConfigKeys =>
       ['zulip_url', 'zulip_email', 'zulip_api_key'];
+  @override
+  List<String> get optionalConfigKeys => const [];
 
   @override
-  List<String> get optionalConfigKeys => ['zulip_channel', 'zulip_topic'];
+  List<String> get optionalTextConfigKeys => ['zulip_channel', 'zulip_topic'];
 
   @override
   String? get instanceDescription =>

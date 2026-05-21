@@ -70,6 +70,8 @@ class MockBaseUploader implements BaseUploader {
 
   @override
   String? get instanceDescription => null;
+  @override
+  List<String> get optionalTextConfigKeys => const [];
 
   @override
   ProviderMetadata get metadata => _metadata;

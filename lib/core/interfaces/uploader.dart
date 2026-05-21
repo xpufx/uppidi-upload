@@ -15,6 +15,11 @@ abstract class BaseUploader {
   /// Optional boolean config keys (rendered as checkboxes in the config
   /// dialog). Each key should have a corresponding label in [configLabels].
   List<String> get optionalConfigKeys => const [];
+
+  /// Optional text config keys (rendered as text fields without validators).
+  /// Unlike [requiredConfigKeys], these can be left empty and don't affect
+  /// the "is configured" check.
+  List<String> get optionalTextConfigKeys => const [];
   Map<String, String> get configLabels;
   String? get proxyUrl;
 

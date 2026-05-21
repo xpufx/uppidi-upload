@@ -25,6 +25,9 @@ abstract class BaseHttpProvider implements BaseUploader {
   List<String> get optionalConfigKeys => const [];
 
   @override
+  List<String> get optionalTextConfigKeys => const [];
+
+  @override
   String? get instanceDescription => null;
 
   @override
