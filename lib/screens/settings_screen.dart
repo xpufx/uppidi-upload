@@ -173,7 +173,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                     onTap: () async {
                       final url = notifier.downloadUrl ??
                           (Platform.isAndroid
-                              ? '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk'
+                              ? '$cdnUrl/uppidi-upload-latest-android.apk'
                               : '$cdnUrl/uppidi-upload-latest-linux.tar.gz');
                       if (url.isEmpty) return;
                       final isMobile = Platform.isAndroid;
@@ -749,7 +749,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                         tooltip: 'Download Android APK',
                         onPressed: () => _downloadAndInstall(
                             context,
-                            '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk',
+                            '$cdnUrl/uppidi-upload-latest-android.apk',
                             'APK'),
                       ),
                       const SizedBox(width: 8),

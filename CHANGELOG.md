@@ -1,5 +1,6 @@
 # Changelog
 
+- chore: keep only latest artifact, remove old builds
 - fix: revert to temp dir for APK, Install Now pops dialog
 - fix: download label redundancy
 - feat: export/import config, Install Now fix, Uguu-like provider
@@ -18,7 +19,6 @@
 - rename My Providers, add provider type dropdown
 - fix: instance names in dropdown, providerName vs displayName
 - fix: Telegram multi-instance, test auth, settings reactivity, apk paths, link format
-- docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog

@@ -74,28 +74,25 @@ echo "   ✅ Stale symlinks cleaned"
 echo "==> Using provider favicons from repo (assets/favicons/)..."
 ls assets/favicons/*.png 2>/dev/null || echo "   (none found)"
 
-# ── Android APK (split-per-abi) ───────────────────────────
-echo "==> Building Android APKs @ ${GIT_HASH} (${BUILD_TYPE})..."
-flutter build apk $BUILD_MODE --split-per-abi --dart-define=GIT_HASH=$GIT_HASH $CDN_DEFINE $DEV_DEFINE
+# ── Android universal APK ──────────────────────────────────
+echo "==> Building Android APK @ ${GIT_HASH} (${BUILD_TYPE})..."
+flutter build apk $BUILD_MODE --dart-define=GIT_HASH=$GIT_HASH $CDN_DEFINE $DEV_DEFINE
 
-echo "==> Deploying APKs..."
+echo "==> Deploying APK..."
 APK_DIR="build/app/outputs/flutter-apk"
-for apk in "$APK_DIR"/app-*-${BUILD_TYPE}.apk; do
-	[ -f "$apk" ] || continue
-	abi=$(basename "$apk" | sed "s/^app-//; s/-${BUILD_TYPE}\.apk$//")
-	dst="uppidi-upload-${VERSION}-${GIT_HASH}-android-${abi}.apk"
-	cp "$apk" "${ARTIFACTS_DIR}/${dst}"
-	ln -sf "$dst" "${ARTIFACTS_DIR}/uppidi-upload-latest-android-${abi}.apk"
-	echo "    ${dst}"
-done
+APK_SRC="${APK_DIR}/app-${BUILD_TYPE}.apk"
+APK_NAME="uppidi-upload-${VERSION}-${GIT_HASH}-android.apk"
+if [ -f "$APK_SRC" ]; then
+	cp "$APK_SRC" "${ARTIFACTS_DIR}/${APK_NAME}"
+	ln -sf "$APK_NAME" "${ARTIFACTS_DIR}/uppidi-upload-latest-android.apk"
+	echo "    ${APK_NAME}"
+fi
 
 echo "==> Writing version file..."
 echo "$GIT_HASH" >"${ARTIFACTS_DIR}/latest.txt"
 
-echo "==> Cleaning old APKs (keep latest 1 per ABI)..."
-for abi in arm64-v8a armeabi-v7a x86_64; do
-	ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-android-${abi}.apk 2>/dev/null | tail -n +2 | xargs -r rm -f
-done
+echo "==> Cleaning old universal APKs (keep latest 1)..."
+ls -t "${ARTIFACTS_DIR}"/uppidi-upload-*-android.apk 2>/dev/null | tail -n +2 | xargs -r rm -f
 
 # ── Linux ──────────────────────────────────────────────────
 LINUX_NAME="uppidi-upload-${VERSION}-${GIT_HASH}-linux.tar.gz"

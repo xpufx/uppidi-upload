@@ -130,7 +130,7 @@ class VersionCheckNotifier extends Notifier<VersionCheckState> {
     // Try arm64-v8a first (~95% of devices), fall back with each attempt.
     // Note: we can't detect the device ABI from Dart without a platform plugin.
     _downloadUrl = Platform.isAndroid
-        ? '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk'
+        ? '$cdnUrl/uppidi-upload-latest-android.apk'
         : '$cdnUrl/uppidi-upload-latest-linux.tar.gz';
   }
 
