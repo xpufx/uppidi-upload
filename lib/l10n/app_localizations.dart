@@ -263,7 +263,7 @@ abstract class AppLocalizations {
   /// No description provided for @providersSection.
   ///
   /// In en, this message translates to:
-  /// **'Provider Configuration'**
+  /// **'My Providers'**
   String get providersSection;
 
   /// No description provided for @historyClearAll.
@@ -1261,6 +1261,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send images as photos'**
   String get configLabelSendAsPhoto;
+
+  /// No description provided for @myProviders.
+  ///
+  /// In en, this message translates to:
+  /// **'My Providers'**
+  String get myProviders;
+
+  /// No description provided for @addProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Add provider'**
+  String get addProvider;
+
+  /// No description provided for @noInstancesConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'No instances configured'**
+  String get noInstancesConfigured;
+
+  /// No description provided for @deleteInstanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete instance?'**
+  String get deleteInstanceTitle;
+
+  /// No description provided for @deleteInstanceConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\" and all its credentials?'**
+  String deleteInstanceConfirm(Object name);
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @fillRequiredFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in required fields first'**
+  String get fillRequiredFields;
+
+  /// No description provided for @debugResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug response'**
+  String get debugResponse;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
 }
 
 class _AppLocalizationsDelegate

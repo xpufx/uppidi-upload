@@ -93,7 +93,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get navProviders => 'Sağlayıcılar';
 
   @override
-  String get providersSection => 'Sağlayıcı Yapılandırması';
+  String get providersSection => 'Sağlayıcılarım';
 
   @override
   String get historyClearAll => 'Tümünü temizle';
@@ -662,4 +662,33 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get configLabelSendAsPhoto => 'Görselleri fotoğraf olarak gönder';
+
+  @override
+  String get myProviders => 'Sağlayıcılarım';
+
+  @override
+  String get addProvider => 'Sağlayıcı ekle';
+
+  @override
+  String get noInstancesConfigured => 'Hiçbir örnek yapılandırılmamış';
+
+  @override
+  String get deleteInstanceTitle => 'Örnek silinsin mi?';
+
+  @override
+  String deleteInstanceConfirm(Object name) {
+    return '\"$name\" ve tüm kimlik bilgileri silinsin mi?';
+  }
+
+  @override
+  String get delete => 'Sil';
+
+  @override
+  String get fillRequiredFields => 'Önce gerekli alanları doldurun';
+
+  @override
+  String get debugResponse => 'Debug response';
+
+  @override
+  String get done => 'Done';
 }

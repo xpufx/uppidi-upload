@@ -25,7 +25,7 @@
   "enableInsecure": "Güvensiz bağlantılara izin ver",
   "proxyUrl": "Proxy URL",
   "navProviders": "Sağlayıcılar",
-  "providersSection": "Sağlayıcı Yapılandırması",
+  "providersSection": "Sağlayıcılarım",
   "historyClearAll": "Tümünü temizle",
   "historyClearConfirm": "Tüm geçmiş silinsin mi?",
   "historyRecords": "{count} kayıt",
@@ -200,5 +200,15 @@
   "mimeTypesImagesOnly": "Yalnızca görseller",
   "configLabelBotToken": "Bot Tokeni",
   "configLabelChatId": "Sohbet ID'si",
-  "configLabelSendAsPhoto": "Görselleri fotoğraf olarak gönder"
+  "configLabelSendAsPhoto": "Görselleri fotoğraf olarak gönder",
+
+  "myProviders": "Sağlayıcılarım",
+  "addProvider": "Sağlayıcı ekle",
+  "noInstancesConfigured": "Hiçbir örnek yapılandırılmamış",
+  "deleteInstanceTitle": "Örnek silinsin mi?",
+  "deleteInstanceConfirm": "\"{name}\" ve tüm kimlik bilgileri silinsin mi?",
+  "delete": "Sil",
+  "fillRequiredFields": "Önce gerekli alanları doldurun",
+  "debugResponse": "Debug response",
+  "done": "Done"
 }

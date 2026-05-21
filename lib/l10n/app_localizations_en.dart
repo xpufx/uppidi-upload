@@ -92,7 +92,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navProviders => 'Providers';
 
   @override
-  String get providersSection => 'Provider Configuration';
+  String get providersSection => 'My Providers';
 
   @override
   String get historyClearAll => 'Clear all';
@@ -657,4 +657,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get configLabelSendAsPhoto => 'Send images as photos';
+
+  @override
+  String get myProviders => 'My Providers';
+
+  @override
+  String get addProvider => 'Add provider';
+
+  @override
+  String get noInstancesConfigured => 'No instances configured';
+
+  @override
+  String get deleteInstanceTitle => 'Delete instance?';
+
+  @override
+  String deleteInstanceConfirm(Object name) {
+    return 'Delete \"$name\" and all its credentials?';
+  }
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get fillRequiredFields => 'Fill in required fields first';
+
+  @override
+  String get debugResponse => 'Debug response';
+
+  @override
+  String get done => 'Done';
 }

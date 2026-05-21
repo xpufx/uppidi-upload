@@ -25,7 +25,7 @@
   "enableInsecure": "Permesi malcertajn konektojn",
   "proxyUrl": "Prokura URL",
   "navProviders": "Provizantoj",
-  "providersSection": "Provizanta Agordo",
+  "providersSection": "Miaj Provizantoj",
   "historyClearAll": "Forigi ĉion",
   "historyClearConfirm": "Ĉu forigi tutan historion?",
   "historyRecords": "{count} registro(j)",
@@ -200,5 +200,15 @@
   "mimeTypesImagesOnly": "Nur bildoj",
   "configLabelBotToken": "Bot-Ĵetono",
   "configLabelChatId": "Babileja ID",
-  "configLabelSendAsPhoto": "Sendi bildojn kiel fotoj"
+  "configLabelSendAsPhoto": "Sendi bildojn kiel fotoj",
+
+  "myProviders": "Miaj Provizantoj",
+  "addProvider": "Aldoni provizanton",
+  "noInstancesConfigured": "Neniu ekzemplero agordita",
+  "deleteInstanceTitle": "Ĉu forigi ekzempleron?",
+  "deleteInstanceConfirm": "Ĉu forigi \"{name}\" kaj ĉiujn ĝiajn akreditaĵojn?",
+  "delete": "Forigi",
+  "fillRequiredFields": "Plenigu la devigajn kampojn unue",
+  "debugResponse": "Debug response",
+  "done": "Done"
 }

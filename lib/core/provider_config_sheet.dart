@@ -87,7 +87,8 @@ class _TestStep {
   final String label;
   final bool ok;
   final String detail;
-  const _TestStep(this.label, this.ok, this.detail);
+  final String? rawResponse;
+  const _TestStep(this.label, this.ok, this.detail, {this.rawResponse});
 }
 
 /// Resolves a config field label to a localized string.
@@ -174,35 +175,31 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
   }
 
   Future<void> _add() async {
-    // Show a dialog to pick which provider type to add an instance for
     final types = ProviderRegistry.instanceTypes;
     if (types.isEmpty) return;
 
-    BaseUploader? chosen;
-    if (types.length == 1) {
-      chosen = types.first;
-    } else {
-      chosen = await showDialog<BaseUploader>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Add provider'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: types
-                .map((t) => ListTile(
-                      dense: true,
-                      title: Text(t.providerName),
-                      subtitle: t.instanceDescription != null
-                          ? Text(t.instanceDescription!,
-                              style: const TextStyle(fontSize: 12))
-                          : null,
-                      onTap: () => Navigator.pop(ctx, t),
-                    ))
-                .toList(),
-          ),
+    // Always show the type picker so the user sees what they're adding.
+    final l10n = AppLocalizations.of(context);
+    final chosen = await showDialog<BaseUploader>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.addProvider),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: types
+              .map((t) => ListTile(
+                    dense: true,
+                    title: Text(t.providerName),
+                    subtitle: t.instanceDescription != null
+                        ? Text(t.instanceDescription!,
+                            style: const TextStyle(fontSize: 12))
+                        : null,
+                    onTap: () => Navigator.pop(ctx, t),
+                  ))
+              .toList(),
         ),
-      );
-    }
+      ),
+    );
     if (chosen == null) return;
 
     final baseId = chosen.providerId;
@@ -222,18 +219,19 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
   }
 
   Future<void> _delete(ProviderInstanceMeta instance) async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete instance?'),
-        content: Text('Delete "${instance.name}" and all its credentials?'),
+        title: Text(l10n.deleteInstanceTitle),
+        content: Text(l10n.deleteInstanceConfirm(instance.name)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(l10n.cancel)),
           TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Delete')),
+              child: Text(l10n.delete)),
         ],
       ),
     );
@@ -246,16 +244,17 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return AlertDialog(
-      title: const Text('My Providers'),
+      title: Text(l10n.myProviders),
       content: SizedBox(
         width: double.maxFinite,
         child: _loading
             ? const Center(child: CircularProgressIndicator())
             : _instances.isEmpty
                 ? Center(
-                    child: Text('No instances configured',
+                    child: Text(l10n.noInstancesConfigured,
                         style: theme.textTheme.bodySmall))
                 : ListView.separated(
                     shrinkWrap: true,
@@ -280,11 +279,11 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
         TextButton.icon(
           onPressed: _add,
           icon: const Icon(Icons.add, size: 16),
-          label: const Text('Add'),
+          label: Text(l10n.addProvider),
         ),
         TextButton(
           onPressed: () => Navigator.pop(context, true),
-          child: const Text('Done'),
+          child: Text(l10n.done),
         ),
       ],
     );
@@ -396,10 +395,12 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
 
           if (meResponse.statusCode == 200 && meJson['ok'] == true) {
             final botName = meJson['result']?['username'] ?? 'unknown';
-            steps.add(_TestStep('Bot token', true, 'Connected as @$botName'));
+            steps.add(_TestStep('Bot token', true, 'Connected as @$botName',
+                rawResponse: meBody));
           } else {
             steps.add(_TestStep(
-                'Bot token', false, meJson['description'] ?? 'Invalid'));
+                'Bot token', false, meJson['description'] ?? 'Invalid',
+                rawResponse: meBody));
             setState(() {
               _testSteps
                 ..clear()
@@ -423,10 +424,12 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
               final title = chatJson['result']?['title'] ??
                   chatJson['result']?['first_name'] ??
                   'found';
-              steps.add(_TestStep('Chat ID', true, 'Chat "$title" accessible'));
+              steps.add(_TestStep('Chat ID', true, 'Chat "$title" accessible',
+                  rawResponse: chatBody));
             } else {
               steps.add(_TestStep(
-                  'Chat ID', false, chatJson['description'] ?? 'Not found'));
+                  'Chat ID', false, chatJson['description'] ?? 'Not found',
+                  rawResponse: chatBody));
             }
           }
         } else {
@@ -580,6 +583,33 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                                       ? Colors.green.shade700
                                       : Colors.red.shade700)),
                         ),
+                        if (step.rawResponse != null)
+                          IconButton(
+                            icon: const Icon(Icons.info_outline, size: 14),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            tooltip: l10n.debugResponse,
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: Text(
+                                    '${step.label} — ${l10n.debugResponse}'),
+                                content: SingleChildScrollView(
+                                  child: SelectableText(
+                                    step.rawResponse!,
+                                    style: const TextStyle(
+                                        fontSize: 11, fontFamily: 'monospace'),
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx),
+                                    child: Text(l10n.cancel),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   )),
@@ -596,8 +626,20 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
           onPressed: _isTesting || _isSaving
               ? null
               : () async {
-                  // Test uses raw field values — no validation gate so users
-                  // can test partial/in-progress input without saving first.
+                  // Quick check: don't run test if required fields are empty
+                  bool hasEmpty = false;
+                  for (final key in widget.provider.requiredConfigKeys) {
+                    if ((_controllers[key]?.text.trim() ?? '').isEmpty) {
+                      hasEmpty = true;
+                      break;
+                    }
+                  }
+                  if (hasEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.fillRequiredFields)),
+                    );
+                    return;
+                  }
                   await _testAuth();
                 },
           icon: _isTesting
@@ -607,7 +649,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.wifi_find, size: 18),
-          label: Text('Test'),
+          label: Text(l10n.testProvider),
         ),
         FilledButton.icon(
           onPressed: _isSaving

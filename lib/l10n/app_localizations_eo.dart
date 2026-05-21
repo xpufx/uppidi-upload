@@ -93,7 +93,7 @@ class AppLocalizationsEo extends AppLocalizations {
   String get navProviders => 'Provizantoj';
 
   @override
-  String get providersSection => 'Provizanta Agordo';
+  String get providersSection => 'Miaj Provizantoj';
 
   @override
   String get historyClearAll => 'Forigi ĉion';
@@ -659,4 +659,33 @@ class AppLocalizationsEo extends AppLocalizations {
 
   @override
   String get configLabelSendAsPhoto => 'Sendi bildojn kiel fotoj';
+
+  @override
+  String get myProviders => 'Miaj Provizantoj';
+
+  @override
+  String get addProvider => 'Aldoni provizanton';
+
+  @override
+  String get noInstancesConfigured => 'Neniu ekzemplero agordita';
+
+  @override
+  String get deleteInstanceTitle => 'Ĉu forigi ekzempleron?';
+
+  @override
+  String deleteInstanceConfirm(Object name) {
+    return 'Ĉu forigi \"$name\" kaj ĉiujn ĝiajn akreditaĵojn?';
+  }
+
+  @override
+  String get delete => 'Forigi';
+
+  @override
+  String get fillRequiredFields => 'Plenigu la devigajn kampojn unue';
+
+  @override
+  String get debugResponse => 'Debug response';
+
+  @override
+  String get done => 'Done';
 }

@@ -87,7 +87,7 @@ class AppLocalizationsTlh extends AppLocalizations {
   String get navProviders => 'ngeDna\'';
 
   @override
-  String get providersSection => 'ngeDna\' pat';
+  String get providersSection => 'QaHwI\'meywIj';
 
   @override
   String get historyClearAll => 'Hoch QIt';
@@ -646,4 +646,33 @@ class AppLocalizationsTlh extends AppLocalizations {
 
   @override
   String get configLabelSendAsPhoto => 'qabmey FotoDaq';
+
+  @override
+  String get myProviders => 'QaHwI\'meywIj';
+
+  @override
+  String get addProvider => 'QaHwI\' lan';
+
+  @override
+  String get noInstancesConfigured => 'pagh rap ta\'';
+
+  @override
+  String get deleteInstanceTitle => 'rap Qaw\'?';
+
+  @override
+  String deleteInstanceConfirm(Object name) {
+    return '\"$name\" rap je Qaw\'?';
+  }
+
+  @override
+  String get delete => 'Qaw\'';
+
+  @override
+  String get fillRequiredFields => 'Dochmey rur qaSpay\'';
+
+  @override
+  String get debugResponse => 'Debug response';
+
+  @override
+  String get done => 'Done';
 }

@@ -26,7 +26,7 @@
   "enableInsecure": "ra'QoS chaw'",
   "proxyUrl": "ra'wI' ray'",
   "navProviders": "ngeDna'",
-  "providersSection": "ngeDna' pat",
+  "providersSection": "QaHwI'meywIj",
   "historyClearAll": "Hoch QIt",
   "historyClearConfirm": "Hoch QonwI' QIt?",
   "historyRecords": "{count} QonwI'",
@@ -201,5 +201,15 @@
   "mimeTypesImagesOnly": "qabmey neH",
   "configLabelBotToken": "bot token",
   "configLabelChatId": "chat ID",
-  "configLabelSendAsPhoto": "qabmey FotoDaq"
+  "configLabelSendAsPhoto": "qabmey FotoDaq",
+
+  "myProviders": "QaHwI'meywIj",
+  "addProvider": "QaHwI' lan",
+  "noInstancesConfigured": "pagh rap ta'",
+  "deleteInstanceTitle": "rap Qaw'?",
+  "deleteInstanceConfirm": "\"{name}\" rap je Qaw'?",
+  "delete": "Qaw'",
+  "fillRequiredFields": "Dochmey rur qaSpay'",
+  "debugResponse": "Debug response",
+  "done": "Done"
 }

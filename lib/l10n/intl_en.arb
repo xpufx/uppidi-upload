@@ -25,7 +25,7 @@
   "enableInsecure": "Allow insecure connections",
   "proxyUrl": "Proxy URL",
   "navProviders": "Providers",
-  "providersSection": "Provider Configuration",
+  "providersSection": "My Providers",
   "historyClearAll": "Clear all",
   "historyClearConfirm": "Delete all history?",
   "historyRecords": "{count} records",
@@ -200,5 +200,15 @@
   "mimeTypesImagesOnly": "Images only",
   "configLabelBotToken": "Bot Token",
   "configLabelChatId": "Chat ID",
-  "configLabelSendAsPhoto": "Send images as photos"
+  "configLabelSendAsPhoto": "Send images as photos",
+
+  "myProviders": "My Providers",
+  "addProvider": "Add provider",
+  "noInstancesConfigured": "No instances configured",
+  "deleteInstanceTitle": "Delete instance?",
+  "deleteInstanceConfirm": "Delete \"{name}\" and all its credentials?",
+  "delete": "Delete",
+  "fillRequiredFields": "Fill in required fields first",
+  "debugResponse": "Debug response",
+  "done": "Done"
 }

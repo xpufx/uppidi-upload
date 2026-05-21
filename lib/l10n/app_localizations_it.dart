@@ -93,7 +93,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get navProviders => 'Provider';
 
   @override
-  String get providersSection => 'Configurazione Servizi';
+  String get providersSection => 'I Miei Provider';
 
   @override
   String get historyClearAll => 'Cancella tutto';
@@ -661,4 +661,33 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get configLabelSendAsPhoto => 'Invia immagini come foto';
+
+  @override
+  String get myProviders => 'I Miei Provider';
+
+  @override
+  String get addProvider => 'Aggiungi provider';
+
+  @override
+  String get noInstancesConfigured => 'Nessuna istanza configurata';
+
+  @override
+  String get deleteInstanceTitle => 'Eliminare istanza?';
+
+  @override
+  String deleteInstanceConfirm(Object name) {
+    return 'Eliminare \"$name\" e tutte le sue credenziali?';
+  }
+
+  @override
+  String get delete => 'Elimina';
+
+  @override
+  String get fillRequiredFields => 'Compila prima i campi obbligatori';
+
+  @override
+  String get debugResponse => 'Debug response';
+
+  @override
+  String get done => 'Done';
 }

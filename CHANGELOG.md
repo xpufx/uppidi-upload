@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: instanceDescription curation for My Providers
 - rename My Providers, add provider type dropdown
 - fix: instance names in dropdown, providerName vs displayName
 - fix: Telegram multi-instance, test auth, settings reactivity, apk paths, link format
@@ -29,4 +30,3 @@
 - docs: auto-update changelog
 - feat: localize remaining provider metadata strings
 - docs: auto-update changelog
-- feat: localize provider metadata (expiry info, descriptions)

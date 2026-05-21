@@ -25,7 +25,7 @@
   "enableInsecure": "Consenti connessioni insicure",
   "proxyUrl": "Proxy URL",
   "navProviders": "Provider",
-  "providersSection": "Configurazione Servizi",
+  "providersSection": "I Miei Provider",
   "historyClearAll": "Cancella tutto",
   "historyClearConfirm": "Eliminare toda la cronologia?",
   "historyRecords": "{count} record",
@@ -200,5 +200,15 @@
   "mimeTypesImagesOnly": "Solo immagini",
   "configLabelBotToken": "Token del Bot",
   "configLabelChatId": "ID Chat",
-  "configLabelSendAsPhoto": "Invia immagini come foto"
+  "configLabelSendAsPhoto": "Invia immagini come foto",
+
+  "myProviders": "I Miei Provider",
+  "addProvider": "Aggiungi provider",
+  "noInstancesConfigured": "Nessuna istanza configurata",
+  "deleteInstanceTitle": "Eliminare istanza?",
+  "deleteInstanceConfirm": "Eliminare \"{name}\" e tutte le sue credenziali?",
+  "delete": "Elimina",
+  "fillRequiredFields": "Compila prima i campi obbligatori",
+  "debugResponse": "Debug response",
+  "done": "Done"
 }
