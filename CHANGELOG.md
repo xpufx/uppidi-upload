@@ -15,6 +15,7 @@
 - docs: auto-update changelog
 - docs: auto-update changelog
 - docs: auto-update changelog
+- docs: auto-update changelog
 - fix: Telegram override of createHttpClient bypassed validateStatus fix
 - docs: auto-update changelog
 - fix: let parseResponse handle all HTTP status codes
@@ -29,4 +30,3 @@
 - docs: auto-update changelog
 - fix: proper locale handling for tlh and eo (custom delegate)
 - fix: remove eo/tlh from language dropdown (break Material locale)
-- feat: two-step auth test in provider config dialog
