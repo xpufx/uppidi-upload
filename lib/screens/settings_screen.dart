@@ -341,7 +341,6 @@ class _GlobalToggles extends ConsumerStatefulWidget {
 class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
   late TextEditingController _proxyController;
   Timer? _proxyDebounce;
-  String _changelogText = 'Changelog not available';
 
   @override
   void initState() {
@@ -349,9 +348,6 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
     _proxyController = TextEditingController();
     Future.microtask(_load);
     Future.microtask(() => ref.read(versionCheckProvider.notifier).check());
-    rootBundle.loadString('CHANGELOG.md').then((t) {
-      if (mounted) setState(() => _changelogText = t);
-    }).catchError((_) {});
   }
 
   @override
