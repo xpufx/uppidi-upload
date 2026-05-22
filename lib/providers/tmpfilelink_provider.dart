@@ -3,8 +3,10 @@ import 'package:dio/dio.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
+import '../core/logging/log.dart';
 
 class TmpFileLinkProvider extends BaseHttpProvider {
+  late final Log _log = Log(runtimeType.toString());
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
         maxFileSizeBytes: 100 * 1024 * 1024,
@@ -53,6 +55,7 @@ class TmpFileLinkProvider extends BaseHttpProvider {
         );
       }
 
+      _log.warn('Unhandled error (returning genericError)');
       return UploadResult(
         success: false,
         errorMessage: 'genericError',
@@ -60,6 +63,7 @@ class TmpFileLinkProvider extends BaseHttpProvider {
       );
     }
 
+    _log.warn('Unhandled error (returning genericError)');
     return UploadResult(
       success: false,
       errorMessage: 'genericError',

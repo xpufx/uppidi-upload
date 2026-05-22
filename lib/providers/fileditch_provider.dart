@@ -5,8 +5,10 @@ import 'package:dio/dio.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
+import '../core/logging/log.dart';
 
 class FileDitchProvider extends BaseHttpProvider {
+  late final Log _log = Log(runtimeType.toString());
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
         maxFileSizeBytes: 100 * 1024 * 1024 * 1024, // 100 GB
@@ -44,6 +46,7 @@ class FileDitchProvider extends BaseHttpProvider {
   @override
   UploadResult parseResponse(Response response) {
     if (response.statusCode != 200) {
+      _log.warn('Unhandled error (returning genericError)');
       return UploadResult(
           success: false,
           errorMessage: 'genericError',
@@ -60,6 +63,7 @@ class FileDitchProvider extends BaseHttpProvider {
         // non-String (e.g. nested objects, numbers).
         json = Map<String, dynamic>.from(body);
       } else {
+        _log.warn('Unhandled error (returning genericError)');
         return UploadResult(
             success: false,
             errorMessage: 'genericError',
@@ -77,6 +81,7 @@ class FileDitchProvider extends BaseHttpProvider {
       return UploadResult(
           success: false, errorMessage: error, statusCode: response.statusCode);
     } catch (e) {
+      _log.warn('Unhandled error (returning genericError)');
       return UploadResult(
           success: false,
           errorMessage: 'genericError',

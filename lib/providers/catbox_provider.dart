@@ -2,8 +2,10 @@ import 'package:dio/dio.dart';
 
 import '../core/interfaces/base_http_provider.dart';
 import '../core/models/upload_result.dart';
+import '../core/logging/log.dart';
 
 class CatboxProvider extends BaseHttpProvider {
+  late final Log _log = Log(runtimeType.toString());
   @override
   String get providerId => 'catbox';
 
@@ -64,6 +66,7 @@ class CatboxProvider extends BaseHttpProvider {
     if (lower.contains('auth')) {
       return 'errorSessionExpired';
     }
+    _log.warn('Unhandled error (returning genericError)');
     return 'genericError';
   }
 }

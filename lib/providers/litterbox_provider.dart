@@ -3,8 +3,10 @@ import 'package:dio/dio.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
+import '../core/logging/log.dart';
 
 class LitterboxProvider extends BaseHttpProvider {
+  late final Log _log = Log(runtimeType.toString());
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
         maxFileSizeBytes: 1024 * 1024 * 1024,
@@ -57,6 +59,7 @@ class LitterboxProvider extends BaseHttpProvider {
   @override
   UploadResult parseResponse(Response response) {
     if (response.statusCode != 200) {
+      _log.warn('Unhandled error (returning genericError)');
       return UploadResult(
           success: false,
           errorMessage: 'genericError',
@@ -70,6 +73,7 @@ class LitterboxProvider extends BaseHttpProvider {
           success: true, url: body, statusCode: response.statusCode);
     }
 
+    _log.warn('Unhandled error (returning genericError)');
     return UploadResult(
         success: false,
         errorMessage: 'genericError',

@@ -2,8 +2,10 @@ import 'package:dio/dio.dart';
 
 import '../core/interfaces/base_http_provider.dart';
 import '../core/models/upload_result.dart';
+import '../core/logging/log.dart';
 
 class HttpBinProvider extends BaseHttpProvider {
+  late final Log _log = Log(runtimeType.toString());
   @override
   String get providerId => 'httpbin';
 

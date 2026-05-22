@@ -3,8 +3,10 @@ import 'package:dio/dio.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
+import '../core/logging/log.dart';
 
 class FreeImageHostProvider extends BaseHttpProvider {
+  late final Log _log = Log(runtimeType.toString());
   final String _name;
   final String _url;
   final String _apiKey;
@@ -66,6 +68,7 @@ class FreeImageHostProvider extends BaseHttpProvider {
     final body = response.data.toString();
     if (body.trimLeft().startsWith('<!DOCTYPE') ||
         body.trimLeft().startsWith('<html')) {
+      _log.warn('Unhandled error (returning genericError)');
       return UploadResult(
         success: false,
         errorMessage: 'genericError',
@@ -91,6 +94,7 @@ class FreeImageHostProvider extends BaseHttpProvider {
     }
 
     final raw = response.data.toString();
+    _log.warn('Unhandled error (returning genericError)');
     return UploadResult(
       success: false,
       errorMessage: 'genericError',
