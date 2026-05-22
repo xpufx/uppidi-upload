@@ -20,6 +20,8 @@ import '../core/version.dart';
 import '../core/version_check_provider.dart';
 import '../l10n/app_localizations.dart';
 
+final _log = Log('Settings');
+
 final insecureConnProvider = FutureProvider<bool>((ref) async {
   final svc = ref.read(settingsServiceProvider);
   return svc.isInsecureConnAllowed();
@@ -290,6 +292,8 @@ class _VersionCheckWidget extends ConsumerWidget {
                           update?.call(() {});
                         }
                       } catch (e) {
+                        _log.error('Version check download failed: $e',
+                            error: e);
                         if (context.mounted) {
                           Navigator.of(context, rootNavigator: true).pop();
                         }
@@ -861,6 +865,7 @@ Future<void> _downloadAndInstall(
     downloadedPath = path;
     update?.call(() {});
   } catch (e) {
+    _log.error('Download failed: $e', error: e);
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1118,12 +1123,13 @@ class _ExportImportCard extends StatelessWidget {
                         );
                       }
                     } catch (e) {
+                      _log.error('Export failed: $e', error: e);
                       if (context.mounted) {
                         showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
                             title: const Text("Export failed"),
-                            content: Text("$e"),
+                            content: SelectableText("$e"),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx),
@@ -1168,12 +1174,13 @@ class _ExportImportCard extends StatelessWidget {
                         );
                       }
                     } catch (e) {
+                      _log.error('Import failed: $e', error: e);
                       if (context.mounted) {
                         showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
                             title: const Text("Import failed"),
-                            content: Text("$e"),
+                            content: SelectableText("$e"),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx),

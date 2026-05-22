@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: add Log instances and error logging to all providers
 - chore: remove unused _changelogText from _GlobalTogglesState
 - fix: re-add _VersionCheckWidget to _aboutCard
 - fix: remove manual file write in export (rely on picker bytes), replace error toasts with dialogs
@@ -29,4 +30,3 @@
 - fix: scroll trusted, telegram link opens app
 - feat: hide unconfigured providers, My Providers on test screen, last-used provider
 - l10n: myProviders, addProvider, delete, done, debug response keys
-- feat: instanceDescription curation for My Providers

@@ -8,6 +8,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../l10n/app_localizations.dart';
 import 'interfaces/uploader.dart';
+import 'logging/log.dart';
 import 'models/provider_instance.dart';
 import 'registry.dart';
 
@@ -316,6 +317,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   final Map<String, bool> _checkboxValues = {};
   final TextEditingController _nameController = TextEditingController();
   final ScrollController _contentScrollController = ScrollController();
+  final _log = Log('ProviderConfig');
   bool _isSaving = false;
   bool _isTesting = false;
   String? _validationError;
@@ -487,6 +489,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       }
     } catch (e) {
       steps.add(_TestStep('Error', false, e.toString()));
+      _log.error('Test auth unexpected error: $e', error: e);
     } finally {
       if (mounted) {
         setState(() {

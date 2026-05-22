@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/connectivity.dart';
 import '../core/interfaces/uploader.dart';
+import '../core/logging/log.dart';
 import '../core/metadata_badges.dart';
 import '../core/models/provider_instance.dart';
 import '../core/models/provider_metadata.dart';
@@ -9,6 +10,8 @@ import '../core/provider_config_sheet.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
 import '../l10n/app_localizations.dart';
+
+final _log = Log('TestScreen');
 
 class TestScreen extends ConsumerStatefulWidget {
   const TestScreen({super.key});
@@ -38,7 +41,9 @@ class _TestScreenState extends ConsumerState<TestScreen> {
           _myProvidersExpanded = myprov != 'true';
         });
       }
-    } catch (_) {}
+    } catch (e) {
+      _log.error('Failed to load section prefs: $e', error: e);
+    }
   }
 
   Future<void> _toggleBuiltin() async {
@@ -48,7 +53,9 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       final svc = ref.read(settingsServiceProvider);
       await svc.set(
           SettingsService.sectionBuiltinCollapsed, newVal ? 'false' : 'true');
-    } catch (_) {}
+    } catch (e) {
+      _log.error('Failed to save builtin section pref: $e', error: e);
+    }
   }
 
   Future<void> _toggleMyProviders() async {
@@ -58,7 +65,9 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       final svc = ref.read(settingsServiceProvider);
       await svc.set(SettingsService.sectionMyProvidersCollapsed,
           newVal ? 'false' : 'true');
-    } catch (_) {}
+    } catch (e) {
+      _log.error('Failed to save MyProviders section pref: $e', error: e);
+    }
   }
 
   @override

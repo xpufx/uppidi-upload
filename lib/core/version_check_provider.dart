@@ -4,7 +4,10 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'logging/log.dart';
 import 'version.dart';
+
+final _log = Log('VersionCheck');
 
 enum VersionCheckState { idle, checking, upToDate, updateAvailable }
 
@@ -31,7 +34,8 @@ class VersionCheckNotifier extends Notifier<VersionCheckState> {
       } else {
         await _checkFromGitHub();
       }
-    } catch (_) {
+    } catch (e) {
+      _log.warn('Version check failed: $e', error: e);
       state = VersionCheckState.idle;
       _lastChecked = null;
     }
