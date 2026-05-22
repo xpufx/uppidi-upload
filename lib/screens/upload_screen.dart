@@ -58,6 +58,7 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
     final scrollBody = Padding(
       padding: const EdgeInsets.all(16),
       child: Scrollbar(
+        controller: _scrollController,
         thumbVisibility: true,
         child: SingleChildScrollView(
           controller: _scrollController,

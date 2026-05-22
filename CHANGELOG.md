@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: remove AppDescription, scroll to top on provider change
 - feat: add Log calls to all catch blocks across the app
 - feat: add Log instances and error logging to all providers
 - chore: remove unused _changelogText from _GlobalTogglesState
@@ -29,4 +30,3 @@
 - feat: add Zulip provider with multi-instance support
 - fix: tg://openmessage for all chat types
 - fix: scroll trusted, telegram link opens app
-- feat: hide unconfigured providers, My Providers on test screen, last-used provider
