@@ -1,5 +1,13 @@
 # Changelog
 
+- fix: remove manual file write in export (rely on picker bytes), replace error toasts with dialogs
+- fix: pin about card to bottom of settings screen, fix export path not found
+- fix: show persistent validation error near buttons instead of invisible snackbar
+- fix: replace invisible snackbar with inline form validation on Test button
+- fix: remove redundant Test title from Providers page
+- fix: add Scrollbar to upload screen, pad content below dev banner
+- fix: pin action buttons to bottom of upload screen (Column + Expanded layout)
+- fix: build number format to fit Android limit
 - fix: cleanup glob, version code, providers.json, compact cards, tests
 - fix: cleanup glob matches symlinks, deletes just-deployed APKs
 - revert: back to split-per-abi, keep cleanup + Install Now
@@ -22,11 +30,3 @@
 - feat: instanceDescription curation for My Providers
 - rename My Providers, add provider type dropdown
 - fix: instance names in dropdown, providerName vs displayName
-- fix: Telegram multi-instance, test auth, settings reactivity, apk paths, link format
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog
-- docs: auto-update changelog

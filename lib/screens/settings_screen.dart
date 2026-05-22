@@ -933,6 +933,7 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                       const SizedBox(height: 2),
                       Text('v$appVersion ($gitHash)',
                           style: theme.textTheme.bodySmall),
+                      _VersionCheckWidget(),
                       const SizedBox(height: 2),
                       Text(Platform.operatingSystem,
                           style: theme.textTheme.bodySmall),
