@@ -787,22 +787,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                     onPressed: _isTesting || _isSaving
                         ? null
                         : () async {
-                            bool hasEmpty = false;
-                            for (final key
-                                in widget.provider.requiredConfigKeys) {
-                              if ((_controllers[key]?.text.trim() ?? '')
-                                  .isEmpty) {
-                                hasEmpty = true;
-                                break;
-                              }
-                            }
-                            if (hasEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text(l10n.fillRequiredFields)),
-                              );
-                              return;
-                            }
+                            if (!_formKey.currentState!.validate()) return;
                             await _testAuth();
                           },
                     icon: _isTesting
