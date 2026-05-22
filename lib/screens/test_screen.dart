@@ -32,11 +32,12 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       final svc = ref.read(settingsServiceProvider);
       final builtin = await svc.get(SettingsService.sectionBuiltinCollapsed);
       final myprov = await svc.get(SettingsService.sectionMyProvidersCollapsed);
-      if (mounted)
+      if (mounted) {
         setState(() {
           _builtinExpanded = builtin != 'true';
           _myProvidersExpanded = myprov != 'true';
         });
+      }
     } catch (_) {}
   }
 

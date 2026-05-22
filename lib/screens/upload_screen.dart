@@ -32,52 +32,8 @@ class UploadScreen extends ConsumerStatefulWidget {
 }
 
 class _UploadScreenState extends ConsumerState<UploadScreen> {
-  final ScrollController _scrollController = ScrollController();
-  final GlobalKey _previewKey = GlobalKey();
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _scrollToPreview() {
-    // Scroll to the preview widget dynamically, so it works regardless of
-    // how much content is above it (description, dropdown, provider info).
-    // Uses a small top alignment to keep the preview slightly below the
-    // top edge of the viewport.
-    final ctx = _previewKey.currentContext;
-    if (ctx == null) return;
-    Scrollable.ensureVisible(
-      ctx,
-      alignment: 0.1,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    // Auto-scroll to preview when a file is first selected
-    ref.listen(uploadProvider, (UploadState? prev, UploadState next) {
-      final prevHasFile = prev is UploadFileSelected ||
-          (prev is UploadInProgress && prev.fileName != null) ||
-          (prev is UploadCompleted && prev.fileName != null);
-      final nowHasFile = next is UploadFileSelected ||
-          (next is UploadInProgress && next.fileName != null) ||
-          (next is UploadCompleted && next.fileName != null);
-
-      if (nowHasFile && !prevHasFile) {
-        // Wait two frames for Image.memory to decode, then scroll to the
-        // preview so the user sees it without manual scrolling.
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _scrollToPreview();
-          });
-        });
-      }
-    });
-
     final uploadState = ref.watch(uploadProvider);
     final notifier = ref.read(uploadProvider.notifier);
     final providers = uploadState.providers;
@@ -90,10 +46,10 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
             defaultTargetPlatform == TargetPlatform.macOS ||
             defaultTargetPlatform == TargetPlatform.windows);
 
-    final content = Padding(
-      padding: const EdgeInsets.all(16.0),
+    // ── Scrollable content (preview, provider info, etc.) ──────────
+    final scrollBody = Padding(
+      padding: const EdgeInsets.all(16),
       child: SingleChildScrollView(
-        controller: _scrollController,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -116,107 +72,117 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
               _ProviderConfigStatus(provider: provider),
             ],
             if (webUnsupported) const _WebWarning(),
-            Padding(
-              key: _previewKey,
-              padding: EdgeInsets.zero,
-              child: switch (uploadState) {
-                UploadFileSelected(
-                  fileName: final n,
-                  fileSizeBytes: final s,
-                  mimeType: final m,
-                  fileBytes: final b
-                ) =>
-                  Dismissible(
-                    key: const ValueKey('file-preview'),
-                    direction: DismissDirection.horizontal,
-                    onDismissed: (_) => notifier.clearSelection(),
-                    child: _FilePreview(
-                        fileName: n,
-                        fileSize: s,
-                        mimeType: m,
-                        fileBytes: b,
-                        provider: provider,
-                        notifier: notifier),
-                  ),
-                UploadInProgress(
-                  fileName: final fn,
-                  fileSizeBytes: final fs,
-                  mimeType: final m,
-                  fileBytes: final fb
-                )
-                    when fn != null =>
-                  _FilePreview(
-                      fileName: fn,
-                      fileSize: fs,
-                      mimeType: m,
-                      fileBytes: fb,
-                      provider: provider,
-                      notifier: notifier),
-                UploadCompleted(
-                  fileName: final fn,
-                  fileSizeBytes: final fs,
-                  mimeType: final m,
-                  fileBytes: final fb
-                )
-                    when fn != null =>
-                  _FilePreview(
-                      fileName: fn,
-                      fileSize: fs,
-                      mimeType: m,
-                      fileBytes: fb,
-                      provider: provider,
-                      notifier: notifier),
-                _ => const SizedBox.shrink(),
-              },
-            ),
-            const SizedBox(height: 12),
             switch (uploadState) {
-              UploadIdle() => _PickButton(notifier: notifier),
-              UploadFileSelected() => _FileSelectedButtons(notifier: notifier),
-              UploadInProgress(
-                progress: final p,
-                speedLabel: final sp,
-                sentBytes: final sb,
-                totalBytes: final tb
+              UploadFileSelected(
+                fileName: final n,
+                fileSizeBytes: final s,
+                mimeType: final m,
+                fileBytes: final b
               ) =>
-                _ProgressSection(
-                  progress: p,
-                  speedLabel: sp,
-                  sentBytes: sb,
-                  totalBytes: tb,
-                  onCancel: notifier.cancelUpload,
+                Dismissible(
+                  key: const ValueKey('file-preview'),
+                  direction: DismissDirection.horizontal,
+                  onDismissed: (_) => notifier.clearSelection(),
+                  child: _FilePreview(
+                      fileName: n,
+                      fileSize: s,
+                      mimeType: m,
+                      fileBytes: b,
+                      provider: provider,
+                      notifier: notifier),
                 ),
-              UploadCompleted(
-                errorMessage: final e,
-                lastResult: final r,
+              UploadInProgress(
                 fileName: final fn,
                 fileSizeBytes: final fs,
                 mimeType: final m,
                 fileBytes: final fb
-              ) =>
-                _ResultBanner(
-                  url: r.url,
-                  errorMessage: e,
-                  fileName: fn,
-                  fileSizeBytes: fs,
-                  mimeType: m,
-                  fileBytes: fb,
-                  provider: provider,
-                  lastResult: r,
-                  onRetry: e != null
-                      ? () async {
-                          final proceed = await checkInsecureWarning(
-                              context, provider!, ref);
-                          if (proceed) notifier.uploadSelected();
-                        }
-                      : null,
-                  onCancel: () => notifier.clearSelection(),
-                ),
+              )
+                  when fn != null =>
+                _FilePreview(
+                    fileName: fn,
+                    fileSize: fs,
+                    mimeType: m,
+                    fileBytes: fb,
+                    provider: provider,
+                    notifier: notifier),
+              UploadCompleted(
+                fileName: final fn,
+                fileSizeBytes: final fs,
+                mimeType: final m,
+                fileBytes: final fb
+              )
+                  when fn != null =>
+                _FilePreview(
+                    fileName: fn,
+                    fileSize: fs,
+                    mimeType: m,
+                    fileBytes: fb,
+                    provider: provider,
+                    notifier: notifier),
+              _ => const SizedBox.shrink(),
             },
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
           ],
         ),
       ),
+    );
+
+    // ── Bottom action bar (always visible) ─────────────────────────
+    final bottomBar = SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: switch (uploadState) {
+          UploadIdle() => _PickButton(notifier: notifier),
+          UploadFileSelected() => _FileSelectedButtons(notifier: notifier),
+          UploadInProgress(
+            progress: final p,
+            speedLabel: final sp,
+            sentBytes: final sb,
+            totalBytes: final tb
+          ) =>
+            _ProgressSection(
+              progress: p,
+              speedLabel: sp,
+              sentBytes: sb,
+              totalBytes: tb,
+              onCancel: notifier.cancelUpload,
+            ),
+          UploadCompleted(
+            errorMessage: final e,
+            lastResult: final r,
+            fileName: final fn,
+            fileSizeBytes: final fs,
+            mimeType: final m,
+            fileBytes: final fb
+          ) =>
+            _ResultBanner(
+              url: r.url,
+              errorMessage: e,
+              fileName: fn,
+              fileSizeBytes: fs,
+              mimeType: m,
+              fileBytes: fb,
+              provider: provider,
+              lastResult: r,
+              onRetry: e != null
+                  ? () async {
+                      final proceed =
+                          await checkInsecureWarning(context, provider!, ref);
+                      if (proceed) notifier.uploadSelected();
+                    }
+                  : null,
+              onCancel: () => notifier.clearSelection(),
+            ),
+        },
+      ),
+    );
+
+    final screen = Column(
+      children: [
+        Expanded(child: scrollBody),
+        bottomBar,
+      ],
     );
 
     if (isDesktop) {
@@ -238,7 +204,7 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
           final isHovering = candidateData.isNotEmpty;
           return Stack(
             children: [
-              content,
+              screen,
               if (isHovering)
                 Positioned.fill(
                   child: Container(
@@ -278,7 +244,7 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
         },
       );
     }
-    return content;
+    return screen;
   }
 }
 
