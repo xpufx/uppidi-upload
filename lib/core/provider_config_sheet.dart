@@ -318,6 +318,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   final ScrollController _contentScrollController = ScrollController();
   bool _isSaving = false;
   bool _isTesting = false;
+  String? _validationError;
 
   /// Each test step: (label, ok?, detail).
   final List<_TestStep> _testSteps = [];
@@ -775,45 +776,69 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                 ),
               ),
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: Text(l10n.cancel),
-                  ),
-                  const SizedBox(width: 8),
-                  OutlinedButton.icon(
-                    onPressed: _isTesting || _isSaving
-                        ? null
-                        : () async {
-                            if (!_formKey.currentState!.validate()) return;
-                            await _testAuth();
-                          },
-                    icon: _isTesting
-                        ? const SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.wifi_find, size: 18),
-                    label: Text(l10n.testProvider),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton.icon(
-                    onPressed: _isSaving
-                        ? null
-                        : () async {
-                            await _save();
-                          },
-                    icon: _isSaving
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.save, size: 18),
-                    label: Text(l10n.save),
+                  if (_validationError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        _validationError!,
+                        style: TextStyle(
+                          color: theme.colorScheme.error,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text(l10n.cancel),
+                      ),
+                      const SizedBox(width: 8),
+                      OutlinedButton.icon(
+                        onPressed: _isTesting || _isSaving
+                            ? null
+                            : () async {
+                                if (!_formKey.currentState!.validate()) {
+                                  setState(() => _validationError =
+                                      l10n.fillRequiredFields);
+                                  return;
+                                }
+                                setState(() => _validationError = null);
+                                await _testAuth();
+                              },
+                        icon: _isTesting
+                            ? const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.wifi_find, size: 18),
+                        label: Text(l10n.testProvider),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton.icon(
+                        onPressed: _isSaving
+                            ? null
+                            : () async {
+                                await _save();
+                              },
+                        icon: _isSaving
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.save, size: 18),
+                        label: Text(l10n.save),
+                      ),
+                    ],
                   ),
                 ],
               ),
