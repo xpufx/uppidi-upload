@@ -85,11 +85,6 @@ class _TestScreenState extends ConsumerState<TestScreen> {
         // ── Test All button ──
         Row(
           children: [
-            Text(l10n.navTest,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(fontWeight: FontWeight.bold)),
             const Spacer(),
             FilledButton.icon(
               onPressed: enabled.isEmpty
