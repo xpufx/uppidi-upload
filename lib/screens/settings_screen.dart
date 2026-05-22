@@ -63,6 +63,8 @@ class SettingsScreen extends ConsumerWidget {
                       ?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               _GlobalToggles(),
+              const SizedBox(height: 16),
+              const _ExportImportCard(),
             ],
           ),
         ),
@@ -787,91 +789,90 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
 /// Shows a download progress dialog and downloads [url], installing it
 /// on Android if applicable.
 Future<void> _downloadAndInstall(
-      BuildContext context, String url, String label) async {
-    var received = 0, total = 0, speed = 0;
-    String? downloadedPath;
-    void Function(void Function())? update;
+    BuildContext context, String url, String label) async {
+  var received = 0, total = 0, speed = 0;
+  String? downloadedPath;
+  void Function(void Function())? update;
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => StatefulBuilder(
-        builder: (ctx, setState) {
-          update = setState;
-          final totalStr =
-              total > 0 ? '${(total / 1048576).toStringAsFixed(1)} MB' : '?';
-          final speedStr =
-              speed > 0 ? '${(speed / 1048576).toStringAsFixed(1)} MB/s' : '';
-          final pct = total > 0 ? received / total : null;
-          final complete = downloadedPath != null;
-          return AlertDialog(
-            title: Text(complete ? 'Download complete' : 'Downloading $label'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (!complete) ...[
-                  if (pct != null)
-                    LinearProgressIndicator(value: pct)
-                  else
-                    const LinearProgressIndicator(),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ] else ...[
-                  const Icon(Icons.check_circle, size: 48, color: Colors.green),
-                  const SizedBox(height: 8),
-                  const Text('APK downloaded'),
-                  const SizedBox(height: 4),
-                  SelectableText(downloadedPath,
-                      style: const TextStyle(fontSize: 11)),
-                ],
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => StatefulBuilder(
+      builder: (ctx, setState) {
+        update = setState;
+        final totalStr =
+            total > 0 ? '${(total / 1048576).toStringAsFixed(1)} MB' : '?';
+        final speedStr =
+            speed > 0 ? '${(speed / 1048576).toStringAsFixed(1)} MB/s' : '';
+        final pct = total > 0 ? received / total : null;
+        final complete = downloadedPath != null;
+        return AlertDialog(
+          title: Text(complete ? 'Download complete' : 'Downloading $label'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!complete) ...[
+                if (pct != null)
+                  LinearProgressIndicator(value: pct)
+                else
+                  const LinearProgressIndicator(),
+                const SizedBox(height: 8),
+                Text(
+                  '${(received / 1048576).toStringAsFixed(1)} / $totalStr $speedStr',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ] else ...[
+                const Icon(Icons.check_circle, size: 48, color: Colors.green),
+                const SizedBox(height: 8),
+                const Text('APK downloaded'),
+                const SizedBox(height: 4),
+                SelectableText(downloadedPath,
+                    style: const TextStyle(fontSize: 11)),
               ],
-            ),
-            actions: complete
-                ? [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text('Done'),
-                    ),
-                    FilledButton.icon(
-                      onPressed: () async {
-                        await OpenFilex.open(
-                          downloadedPath!,
-                          type: 'application/vnd.android.package-archive',
-                        );
-                        if (ctx.mounted) Navigator.pop(ctx);
-                      },
-                      icon: const Icon(Icons.download_done, size: 18),
-                      label: const Text('Install Now'),
-                    ),
-                  ]
-                : null,
-          );
-        },
-      ),
-    );
-
-    try {
-      final path = await downloadFile(url, onProgress: (r, t, s) {
-        received = r;
-        total = t;
-        speed = s;
-        update?.call(() {});
-      });
-      downloadedPath = path;
-      update?.call(() {});
-    } catch (e) {
-      if (context.mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Download failed: $e')),
+            ],
+          ),
+          actions: complete
+              ? [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Done'),
+                  ),
+                  FilledButton.icon(
+                    onPressed: () async {
+                      await OpenFilex.open(
+                        downloadedPath!,
+                        type: 'application/vnd.android.package-archive',
+                      );
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    },
+                    icon: const Icon(Icons.download_done, size: 18),
+                    label: const Text('Install Now'),
+                  ),
+                ]
+              : null,
         );
-      }
+      },
+    ),
+  );
+
+  try {
+    final path = await downloadFile(url, onProgress: (r, t, s) {
+      received = r;
+      total = t;
+      speed = s;
+      update?.call(() {});
+    });
+    downloadedPath = path;
+    update?.call(() {});
+  } catch (e) {
+    if (context.mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Download failed: $e')),
+      );
     }
   }
-
+}
 
 /// ── Bottom cards (about, export/import, always visible) ──────
 
@@ -905,7 +906,6 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
         const Divider(height: 32),
         _aboutCard(l10n, theme),
         const SizedBox(height: 16),
-        _exportImportCard(l10n, theme),
       ],
     );
   }
@@ -928,8 +928,8 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(l10n.appTitle,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold)),
+                          style: theme.textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 2),
                       Text('v$appVersion ($gitHash)',
                           style: theme.textTheme.bodySmall),
@@ -958,10 +958,8 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                   IconButton(
                     icon: const Icon(Icons.desktop_windows, size: 20),
                     tooltip: 'Download Linux',
-                    onPressed: () => _downloadAndInstall(
-                        context,
-                        '$cdnUrl/uppidi-upload-latest-linux.tar.gz',
-                        'Linux'),
+                    onPressed: () => _downloadAndInstall(context,
+                        '$cdnUrl/uppidi-upload-latest-linux.tar.gz', 'Linux'),
                   ),
                   const SizedBox(width: 8),
                   IconButton(
@@ -975,8 +973,7 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                     icon: const Icon(Icons.code, size: 20),
                     tooltip: 'View releases on GitHub',
                     onPressed: () => launchUrl(
-                        Uri.parse(
-                            'https://github.com/$githubRepo/releases'),
+                        Uri.parse('https://github.com/$githubRepo/releases'),
                         mode: LaunchMode.externalApplication),
                   ),
                 ],
@@ -989,8 +986,7 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                   child: OutlinedButton.icon(
                     onPressed: () => _showSystemInfo(context, ref),
                     icon: const Icon(Icons.bug_report, size: 12),
-                    label: Text("Info",
-                        style: const TextStyle(fontSize: 11)),
+                    label: Text("Info", style: const TextStyle(fontSize: 11)),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 4, vertical: 4),
@@ -1036,7 +1032,8 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                       builder: (ctx) => AlertDialog(
                         title: Text("License"),
                         content: SingleChildScrollView(
-                          child: Text("This project is licensed under the GNU General Public License v3.0."),
+                          child: Text(
+                              "This project is licensed under the GNU General Public License v3.0."),
                         ),
                         actions: [
                           TextButton(
@@ -1047,8 +1044,8 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                       ),
                     ),
                     icon: const Icon(Icons.description, size: 12),
-                    label: Text("License",
-                        style: const TextStyle(fontSize: 11)),
+                    label:
+                        Text("License", style: const TextStyle(fontSize: 11)),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 4, vertical: 4),
@@ -1064,8 +1061,18 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
       ),
     );
   }
+}
 
-  Widget _exportImportCard(AppLocalizations l10n, ThemeData theme) {
+/// ── Export/Import card (scrollable with settings) ─────────────────
+
+class _ExportImportCard extends StatelessWidget {
+  const _ExportImportCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -1079,8 +1086,8 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
             Text(
               "Export your provider credentials and app settings to a JSON file for backup or transfer. Import merges all data — existing settings and provider config will be replaced.",
               style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 12),
             Row(
@@ -1091,7 +1098,8 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                       context: context,
                       builder: (ctx) => AlertDialog(
                         title: Text("Export config"),
-                        content: Text("This file will contain API keys, tokens, passwords, and app settings. Keep it safe — anyone with this file can access your accounts."),
+                        content: Text(
+                            "This file will contain API keys, tokens, passwords, and app settings. Keep it safe — anyone with this file can access your accounts."),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, false),
@@ -1109,15 +1117,23 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                       final path = await exportConfig();
                       if (path != null && context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text("Exported to: $path")),
+                          SnackBar(content: Text("Exported to: $path")),
                         );
                       }
                     } catch (e) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text("Export failed: $e")),
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text("Export failed"),
+                            content: Text("$e"),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: Text(l10n.ok),
+                              ),
+                            ],
+                          ),
                         );
                       }
                     }
@@ -1132,7 +1148,8 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                       context: context,
                       builder: (ctx) => AlertDialog(
                         title: Text("Import config"),
-                        content: Text("This will REPLACE all current provider credentials and settings with the data from the imported file. This cannot be undone."),
+                        content: Text(
+                            "This will REPLACE all current provider credentials and settings with the data from the imported file. This cannot be undone."),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, false),
@@ -1155,9 +1172,18 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                       }
                     } catch (e) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text("Import failed: $e")),
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text("Import failed"),
+                            content: Text("$e"),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: Text(l10n.ok),
+                              ),
+                            ],
+                          ),
                         );
                       }
                     }

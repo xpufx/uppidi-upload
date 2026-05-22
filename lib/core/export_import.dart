@@ -47,11 +47,7 @@ Future<String?> exportConfig() async {
   );
   if (outputFile == null) return null;
 
-  // On desktop the picker returns the path but doesn't write — do it here.
-  // On mobile the picker already wrote the bytes, so this is a no-op overwrite.
-  final file = File(outputFile);
-  await file.parent.create(recursive: true);
-  await file.writeAsString(json);
+  // The picker with bytes parameter writes the file on all platforms.
   return outputFile;
 }
 
