@@ -32,6 +32,14 @@ class UploadScreen extends ConsumerStatefulWidget {
 }
 
 class _UploadScreenState extends ConsumerState<UploadScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final uploadState = ref.watch(uploadProvider);
@@ -52,17 +60,21 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
       child: Scrollbar(
         thumbVisibility: true,
         child: SingleChildScrollView(
+          controller: _scrollController,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _AppDescription(),
-              const SizedBox(height: 16),
               _ProviderDropdown(
                 selectedIndex: uploadState.selectedProviderIndex,
                 providers: providers,
                 isUploading: uploadState is UploadInProgress,
                 onChanged: (i) {
-                  if (i != null) notifier.setProvider(i);
+                  if (i != null) {
+                    notifier.setProvider(i);
+                    _scrollController.animateTo(0,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeOut);
+                  }
                 },
               ),
               if (provider != null) ...[
@@ -408,49 +420,6 @@ class _ProviderInfo extends StatelessWidget {
                 ],
               ),
             ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _AppDescription extends StatelessWidget {
-  const _AppDescription();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Card(
-      elevation: 0,
-      color: Theme.of(context)
-          .colorScheme
-          .surfaceContainerHighest
-          .withValues(alpha: 0.5),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(
-              Icons.cloud_upload_outlined,
-              size: 36,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.appDescription,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),

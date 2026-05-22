@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: add Log calls to all catch blocks across the app
 - feat: add Log instances and error logging to all providers
 - chore: remove unused _changelogText from _GlobalTogglesState
 - fix: re-add _VersionCheckWidget to _aboutCard
@@ -29,4 +30,3 @@
 - fix: tg://openmessage for all chat types
 - fix: scroll trusted, telegram link opens app
 - feat: hide unconfigured providers, My Providers on test screen, last-used provider
-- l10n: myProviders, addProvider, delete, done, debug response keys
