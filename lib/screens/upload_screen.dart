@@ -49,80 +49,83 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
     // ── Scrollable content (preview, provider info, etc.) ──────────
     final scrollBody = Padding(
       padding: const EdgeInsets.all(16),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _AppDescription(),
-            const SizedBox(height: 16),
-            _ProviderDropdown(
-              selectedIndex: uploadState.selectedProviderIndex,
-              providers: providers,
-              isUploading: uploadState is UploadInProgress,
-              onChanged: (i) {
-                if (i != null) notifier.setProvider(i);
-              },
-            ),
-            if (provider != null) ...[
-              const SizedBox(height: 8),
-              _ProviderInfo(provider: provider),
-            ],
-            if (provider != null) ...[
-              const SizedBox(height: 8),
-              _ProviderConfigStatus(provider: provider),
-            ],
-            if (webUnsupported) const _WebWarning(),
-            switch (uploadState) {
-              UploadFileSelected(
-                fileName: final n,
-                fileSizeBytes: final s,
-                mimeType: final m,
-                fileBytes: final b
-              ) =>
-                Dismissible(
-                  key: const ValueKey('file-preview'),
-                  direction: DismissDirection.horizontal,
-                  onDismissed: (_) => notifier.clearSelection(),
-                  child: _FilePreview(
-                      fileName: n,
-                      fileSize: s,
+      child: Scrollbar(
+        thumbVisibility: true,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _AppDescription(),
+              const SizedBox(height: 16),
+              _ProviderDropdown(
+                selectedIndex: uploadState.selectedProviderIndex,
+                providers: providers,
+                isUploading: uploadState is UploadInProgress,
+                onChanged: (i) {
+                  if (i != null) notifier.setProvider(i);
+                },
+              ),
+              if (provider != null) ...[
+                const SizedBox(height: 8),
+                _ProviderInfo(provider: provider),
+              ],
+              if (provider != null) ...[
+                const SizedBox(height: 8),
+                _ProviderConfigStatus(provider: provider),
+              ],
+              if (webUnsupported) const _WebWarning(),
+              switch (uploadState) {
+                UploadFileSelected(
+                  fileName: final n,
+                  fileSizeBytes: final s,
+                  mimeType: final m,
+                  fileBytes: final b
+                ) =>
+                  Dismissible(
+                    key: const ValueKey('file-preview'),
+                    direction: DismissDirection.horizontal,
+                    onDismissed: (_) => notifier.clearSelection(),
+                    child: _FilePreview(
+                        fileName: n,
+                        fileSize: s,
+                        mimeType: m,
+                        fileBytes: b,
+                        provider: provider,
+                        notifier: notifier),
+                  ),
+                UploadInProgress(
+                  fileName: final fn,
+                  fileSizeBytes: final fs,
+                  mimeType: final m,
+                  fileBytes: final fb
+                )
+                    when fn != null =>
+                  _FilePreview(
+                      fileName: fn,
+                      fileSize: fs,
                       mimeType: m,
-                      fileBytes: b,
+                      fileBytes: fb,
                       provider: provider,
                       notifier: notifier),
-                ),
-              UploadInProgress(
-                fileName: final fn,
-                fileSizeBytes: final fs,
-                mimeType: final m,
-                fileBytes: final fb
-              )
-                  when fn != null =>
-                _FilePreview(
-                    fileName: fn,
-                    fileSize: fs,
-                    mimeType: m,
-                    fileBytes: fb,
-                    provider: provider,
-                    notifier: notifier),
-              UploadCompleted(
-                fileName: final fn,
-                fileSizeBytes: final fs,
-                mimeType: final m,
-                fileBytes: final fb
-              )
-                  when fn != null =>
-                _FilePreview(
-                    fileName: fn,
-                    fileSize: fs,
-                    mimeType: m,
-                    fileBytes: fb,
-                    provider: provider,
-                    notifier: notifier),
-              _ => const SizedBox.shrink(),
-            },
-            const SizedBox(height: 12),
-          ],
+                UploadCompleted(
+                  fileName: final fn,
+                  fileSizeBytes: final fs,
+                  mimeType: final m,
+                  fileBytes: final fb
+                )
+                    when fn != null =>
+                  _FilePreview(
+                      fileName: fn,
+                      fileSize: fs,
+                      mimeType: m,
+                      fileBytes: fb,
+                      provider: provider,
+                      notifier: notifier),
+                _ => const SizedBox.shrink(),
+              },
+              const SizedBox(height: 12),
+            ],
+          ),
         ),
       ),
     );

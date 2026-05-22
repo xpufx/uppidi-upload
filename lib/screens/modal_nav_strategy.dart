@@ -54,7 +54,10 @@ class _ModalDashboard extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          const _ScreenLookup(screen: AppScreen.upload),
+          Padding(
+            padding: EdgeInsets.only(bottom: devProviders ? 20 : 0),
+            child: const _ScreenLookup(screen: AppScreen.upload),
+          ),
           if (devProviders)
             Positioned(
               left: 0,

@@ -223,7 +223,10 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
 
     return Stack(
       children: [
-        screen,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: screen,
+        ),
         Positioned(
           left: 0,
           right: 0,
