@@ -267,8 +267,10 @@ void main() {
       await tester.pumpWidget(buildTestApp(mockSettings: mockSettings));
       await tester.pumpAndSettle();
 
-      // Toggle the last switch (debug logging)
+      // Toggle the last switch (debug logging) — scroll if needed
       final switches = find.byType(Switch);
+      await tester.ensureVisible(switches.last);
+      await tester.pumpAndSettle();
       await tester.tap(switches.last);
       await tester.pumpAndSettle();
 
@@ -286,8 +288,10 @@ void main() {
       await tester.pumpWidget(buildTestApp(mockSettings: mockSettings));
       await tester.pumpAndSettle();
 
-      // Toggle the last switch (debug logging) off
+      // Toggle the last switch (debug logging) off — scroll if needed
       final switches = find.byType(Switch);
+      await tester.ensureVisible(switches.last);
+      await tester.pumpAndSettle();
       await tester.tap(switches.last);
       await tester.pumpAndSettle();
 

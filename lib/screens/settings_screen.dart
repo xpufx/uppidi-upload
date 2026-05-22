@@ -50,16 +50,23 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
+    return Column(
       children: [
-        Text(l10n.settings,
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 12),
-        _GlobalToggles(),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text(l10n.settings,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              _GlobalToggles(),
+            ],
+          ),
+        ),
+        const _BottomCards(),
       ],
     );
   }
@@ -698,302 +705,6 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
           ),
           const SizedBox(height: 16),
         ],
-        const SizedBox(height: 8),
-        const Divider(height: 32),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: AppLogo(size: 80),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(l10n.versionLabel(appVersion),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleSmall
-                                  ?.copyWith(fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Text(
-                                  '${l10n.providersCount(ProviderRegistry.all.length)} · $gitHash',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(color: Colors.grey)),
-                              const SizedBox(width: 4),
-                              _VersionCheckWidget(),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (cdnUrl.isNotEmpty) ...[
-                      IconButton(
-                        icon: const Icon(Icons.android, size: 20),
-                        tooltip: 'Download Android APK',
-                        onPressed: () => _downloadAndInstall(
-                            context,
-                            '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk',
-                            'APK'),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(Icons.desktop_windows, size: 20),
-                        tooltip: 'Download Linux',
-                        onPressed: () => _downloadAndInstall(
-                            context,
-                            '$cdnUrl/uppidi-upload-latest-linux.tar.gz',
-                            'Linux'),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(Icons.list_alt, size: 20),
-                        tooltip: 'Browse all builds',
-                        onPressed: () => launchUrl(Uri.parse(cdnUrl),
-                            mode: LaunchMode.externalApplication),
-                      ),
-                    ] else ...[
-                      IconButton(
-                        icon: const Icon(Icons.code, size: 20),
-                        tooltip: 'View releases on GitHub',
-                        onPressed: () => launchUrl(
-                            Uri.parse(
-                                'https://github.com/$githubRepo/releases'),
-                            mode: LaunchMode.externalApplication),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _showSystemInfo(context, ref),
-                        icon: const Icon(Icons.bug_report, size: 12),
-                        label:
-                            const Text('Info', style: TextStyle(fontSize: 11)),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 4, vertical: 4),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: Text(l10n.changelogTitle),
-                            content: SingleChildScrollView(
-                              child: Text(_changelogText),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx),
-                                child: Text(l10n.ok),
-                              ),
-                            ],
-                          ),
-                        ),
-                        icon: const Icon(Icons.list_alt, size: 12),
-                        label: const Text('Changelog',
-                            style: TextStyle(fontSize: 11)),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 4, vertical: 4),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: const Text('License'),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'This project is licensed under the GNU General Public License v3.0.',
-                                ),
-                                SizedBox(height: 8),
-                                GestureDetector(
-                                  onTap: () => launchUrl(
-                                    Uri.parse(
-                                        'https://www.gnu.org/licenses/gpl-3.0.txt'),
-                                    mode: LaunchMode.externalApplication,
-                                  ),
-                                  child: Text(
-                                    'https://www.gnu.org/licenses/gpl-3.0.txt',
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx),
-                                child: Text(l10n.ok),
-                              ),
-                            ],
-                          ),
-                        ),
-                        icon: const Icon(Icons.description, size: 12),
-                        label: const Text('License',
-                            style: TextStyle(fontSize: 11)),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 4, vertical: 4),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Export / Import',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall
-                        ?.copyWith(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                Text(
-                  'Export your provider credentials and app settings to a JSON file for backup or transfer. '
-                  'Import merges all data — existing settings and provider config will be replaced.',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: () async {
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: const Text('Export config'),
-                            content: const Text(
-                              'This file will contain API keys, tokens, passwords, and app settings. '
-                              'Keep it safe — anyone with this file can access your accounts.',
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx, false),
-                                child: const Text('Cancel'),
-                              ),
-                              FilledButton(
-                                onPressed: () => Navigator.pop(ctx, true),
-                                child: const Text('Export'),
-                              ),
-                            ],
-                          ),
-                        );
-                        if (confirm != true) return;
-                        try {
-                          final path = await exportConfig();
-                          if (path != null && context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Exported to: $path')),
-                            );
-                          }
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Export failed: $e')),
-                            );
-                          }
-                        }
-                      },
-                      icon: const Icon(Icons.upload, size: 16),
-                      label: const Text('Export'),
-                    ),
-                    const SizedBox(width: 12),
-                    OutlinedButton.icon(
-                      onPressed: () async {
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: const Text('Import config'),
-                            content: const Text(
-                              'This will replace ALL current provider credentials '
-                              'and app settings. This cannot be undone. Continue?',
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx, false),
-                                child: const Text('Cancel'),
-                              ),
-                              FilledButton(
-                                onPressed: () => Navigator.pop(ctx, true),
-                                child: const Text('Import'),
-                              ),
-                            ],
-                          ),
-                        );
-                        if (confirm != true) return;
-                        try {
-                          final msg = await importConfig();
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(msg)),
-                            );
-                          }
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Import failed: $e')),
-                            );
-                          }
-                        }
-                      },
-                      icon: const Icon(Icons.download, size: 16),
-                      label: const Text('Import'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -1071,10 +782,11 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
       ),
     );
   }
+}
 
-  /// Shows a download progress dialog and downloads [url], installing it
-  /// on Android if applicable.
-  Future<void> _downloadAndInstall(
+/// Shows a download progress dialog and downloads [url], installing it
+/// on Android if applicable.
+Future<void> _downloadAndInstall(
       BuildContext context, String url, String label) async {
     var received = 0, total = 0, speed = 0;
     String? downloadedPath;
@@ -1158,5 +870,306 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
         );
       }
     }
+  }
+
+
+/// ── Bottom cards (about, export/import, always visible) ──────
+
+class _BottomCards extends ConsumerStatefulWidget {
+  const _BottomCards();
+
+  @override
+  ConsumerState<_BottomCards> createState() => _BottomCardsState();
+}
+
+class _BottomCardsState extends ConsumerState<_BottomCards> {
+  String _changelogText = 'Changelog not available';
+
+  @override
+  void initState() {
+    super.initState();
+    rootBundle.loadString('CHANGELOG.md').then((t) {
+      if (mounted) setState(() => _changelogText = t);
+    }).catchError((_) {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 8),
+        const Divider(height: 32),
+        _aboutCard(l10n, theme),
+        const SizedBox(height: 16),
+        _exportImportCard(l10n, theme),
+      ],
+    );
+  }
+
+  Widget _aboutCard(AppLocalizations l10n, ThemeData theme) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: AppLogo(size: 80),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(l10n.appTitle,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 2),
+                      Text('v$appVersion ($gitHash)',
+                          style: theme.textTheme.bodySmall),
+                      const SizedBox(height: 2),
+                      Text(Platform.operatingSystem,
+                          style: theme.textTheme.bodySmall),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (cdnUrl.isNotEmpty) ...[
+                  IconButton(
+                    icon: const Icon(Icons.android, size: 20),
+                    tooltip: 'Download Android APK',
+                    onPressed: () => _downloadAndInstall(
+                        context,
+                        '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk',
+                        'APK'),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.desktop_windows, size: 20),
+                    tooltip: 'Download Linux',
+                    onPressed: () => _downloadAndInstall(
+                        context,
+                        '$cdnUrl/uppidi-upload-latest-linux.tar.gz',
+                        'Linux'),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.list_alt, size: 20),
+                    tooltip: 'Browse all builds',
+                    onPressed: () => launchUrl(Uri.parse(cdnUrl),
+                        mode: LaunchMode.externalApplication),
+                  ),
+                ] else ...[
+                  IconButton(
+                    icon: const Icon(Icons.code, size: 20),
+                    tooltip: 'View releases on GitHub',
+                    onPressed: () => launchUrl(
+                        Uri.parse(
+                            'https://github.com/$githubRepo/releases'),
+                        mode: LaunchMode.externalApplication),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _showSystemInfo(context, ref),
+                    icon: const Icon(Icons.bug_report, size: 12),
+                    label: Text("Info",
+                        style: const TextStyle(fontSize: 11)),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 4),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text(l10n.changelogTitle),
+                        content: SingleChildScrollView(
+                          child: Text(_changelogText),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: Text(l10n.ok),
+                          ),
+                        ],
+                      ),
+                    ),
+                    icon: const Icon(Icons.list_alt, size: 12),
+                    label: Text(l10n.changelogTitle,
+                        style: const TextStyle(fontSize: 11)),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 4),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text("License"),
+                        content: SingleChildScrollView(
+                          child: Text("This project is licensed under the GNU General Public License v3.0."),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: Text(l10n.ok),
+                          ),
+                        ],
+                      ),
+                    ),
+                    icon: const Icon(Icons.description, size: 12),
+                    label: Text("License",
+                        style: const TextStyle(fontSize: 11)),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 4),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _exportImportCard(AppLocalizations l10n, ThemeData theme) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Export / Import",
+                style: theme.textTheme.titleSmall
+                    ?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text(
+              "Export your provider credentials and app settings to a JSON file for backup or transfer. Import merges all data — existing settings and provider config will be replaced.",
+              style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text("Export config"),
+                        content: Text("This file will contain API keys, tokens, passwords, and app settings. Keep it safe — anyone with this file can access your accounts."),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: Text(l10n.cancel),
+                          ),
+                          FilledButton(
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: Text("Export"),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm != true) return;
+                    try {
+                      final path = await exportConfig();
+                      if (path != null && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text("Exported to: $path")),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text("Export failed: $e")),
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.upload, size: 16),
+                  label: Text("Export"),
+                ),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text("Import config"),
+                        content: Text("This will REPLACE all current provider credentials and settings with the data from the imported file. This cannot be undone."),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: Text(l10n.cancel),
+                          ),
+                          FilledButton(
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: Text("Import"),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm != true) return;
+                    try {
+                      final msg = await importConfig();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(msg)),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text("Import failed: $e")),
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.download, size: 16),
+                  label: Text("Import"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

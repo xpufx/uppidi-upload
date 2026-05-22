@@ -49,7 +49,9 @@ Future<String?> exportConfig() async {
 
   // On desktop the picker returns the path but doesn't write — do it here.
   // On mobile the picker already wrote the bytes, so this is a no-op overwrite.
-  await File(outputFile).writeAsString(json);
+  final file = File(outputFile);
+  await file.parent.create(recursive: true);
+  await file.writeAsString(json);
   return outputFile;
 }
 
