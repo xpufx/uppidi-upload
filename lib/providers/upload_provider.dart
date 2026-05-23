@@ -418,6 +418,12 @@ class UploadNotifier extends Notifier<UploadState> {
 
     final info = _extractFileInfo(state);
     final cancelToken = CancelToken();
+    // Save message text before state transitions to UploadInProgress
+    var savedMessageText = '';
+    final currentState = state;
+    if (currentState is UploadFileSelected) {
+      savedMessageText = currentState.messageText;
+    }
     state = UploadInProgress(
       progress: 0.0,
       cancelToken: cancelToken,
@@ -514,19 +520,17 @@ class UploadNotifier extends Notifier<UploadState> {
       }
 
       // Override message with user-edited text from the upload screen
-      if (state is UploadFileSelected) {
-        var msg = (state as UploadFileSelected).messageText;
-        if (msg.isEmpty) {
-          msg = config['message_template'] ?? '';
-        }
-        if (msg.isNotEmpty) {
-          final info = _extractFileInfo(state);
-          msg = msg
-              .replaceAll('{filename}', info.fileName ?? request.fileName)
-              .replaceAll('{filesize}', formatSize(request.sizeInBytes))
-              .replaceAll('{provider}', provider.providerName);
-          config['message_text'] = msg;
-        }
+      var msg = savedMessageText;
+      if (msg.isEmpty) {
+        msg = config['message_template'] ?? '';
+      }
+      if (msg.isNotEmpty) {
+        final info = _extractFileInfo(state);
+        msg = msg
+            .replaceAll('{filename}', info.fileName ?? request.fileName)
+            .replaceAll('{filesize}', formatSize(request.sizeInBytes))
+            .replaceAll('{provider}', provider.providerName);
+        config['message_text'] = msg;
       }
 
       final allowInsecure = await settingsService.isInsecureConnAllowed();
