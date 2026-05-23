@@ -477,11 +477,25 @@ class _UploadButton extends ConsumerWidget {
   }
 }
 
-class _FileSelectedButtons extends ConsumerWidget {
+class _FileSelectedButtons extends ConsumerStatefulWidget {
   final UploadNotifier notifier;
   const _FileSelectedButtons({required this.notifier});
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_FileSelectedButtons> createState() =>
+      _FileSelectedButtonsState();
+}
+
+class _FileSelectedButtonsState extends ConsumerState<_FileSelectedButtons> {
+  final _msgController = TextEditingController();
+
+  @override
+  void dispose() {
+    _msgController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(uploadProvider);
 
@@ -495,6 +509,15 @@ class _FileSelectedButtons extends ConsumerWidget {
     final currentExpiry =
         state is UploadFileSelected ? state.selectedExpiry : null;
 
+    final hasMessageTemplate =
+        provider?.optionalTextConfigKeys.contains('message_template') == true;
+    if (hasMessageTemplate && state is UploadFileSelected) {
+      // Sync controller with state messageText on provider change
+      if (_msgController.text != state.messageText) {
+        _msgController.text = state.messageText;
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -505,7 +528,7 @@ class _FileSelectedButtons extends ConsumerWidget {
                     value: opt, label: Text(_expiryDisplayLabel(opt, l10n))))
                 .toList(),
             selected: {currentExpiry ?? expiryOptions.first},
-            onSelectionChanged: (v) => notifier.setExpiry(v.first),
+            onSelectionChanged: (v) => widget.notifier.setExpiry(v.first),
             style: ButtonStyle(
               visualDensity: VisualDensity.compact,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -513,14 +536,30 @@ class _FileSelectedButtons extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
         ],
+        if (hasMessageTemplate) ...[
+          TextFormField(
+            controller: _msgController,
+            decoration: InputDecoration(
+              labelText: 'Message',
+              border: const OutlineInputBorder(),
+              isDense: true,
+              helperText:
+                  'Variables: {filename} {filesize} {provider}  (Zulip also: {url})',
+            ),
+            maxLines: 2,
+            minLines: 1,
+            onChanged: (v) => widget.notifier.setMessage(v),
+          ),
+          const SizedBox(height: 8),
+        ],
         Row(
           children: [
-            Expanded(child: _UploadButton(notifier: notifier)),
+            Expanded(child: _UploadButton(notifier: widget.notifier)),
             const SizedBox(width: 8),
             IconButton(
               icon: const Icon(Icons.close, size: 20),
               tooltip: l10n.clearSelection,
-              onPressed: () => notifier.clearSelection(),
+              onPressed: () => widget.notifier.clearSelection(),
             ),
           ],
         ),

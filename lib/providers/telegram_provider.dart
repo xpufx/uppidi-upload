@@ -54,6 +54,9 @@ class TelegramProvider extends BaseHttpProvider {
   List<String> get optionalConfigKeys => ['send_as_photo'];
 
   @override
+  List<String> get optionalTextConfigKeys => ['message_template'];
+
+  @override
   String? get instanceDescription =>
       'Telegram Bot API — send files to any chat';
 
@@ -62,6 +65,7 @@ class TelegramProvider extends BaseHttpProvider {
         'bot_token': 'Bot Token',
         'chat_id': 'Chat ID',
         'send_as_photo': 'Send images as photos',
+        'message_template': 'Message template',
       };
 
   @override
@@ -130,6 +134,11 @@ class TelegramProvider extends BaseHttpProvider {
           allowInsecureConn: allowInsecure, proxyUrl: proxyUrl);
 
       final fields = buildFormFields(cleanConfig);
+      final message =
+          (config['message_text'] ?? config['message_template'] ?? '').trim();
+      if (message.isNotEmpty) {
+        fields['caption'] = message;
+      }
       _log.info(
           'Uploading ${request.fileName} → $endpoint as $fieldName (image=$isImage, sendAsPhoto=$sendAsPhoto)');
 

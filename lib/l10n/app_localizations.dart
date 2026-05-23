@@ -1412,6 +1412,12 @@ abstract class AppLocalizations {
   /// **'Topic'**
   String get configLabelTopic;
 
+  /// No description provided for @configLabelDirectMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Direct message'**
+  String get configLabelDirectMessage;
+
   /// No description provided for @exportImportTitle.
   ///
   /// In en, this message translates to:

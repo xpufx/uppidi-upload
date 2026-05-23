@@ -54,7 +54,7 @@ class ZulipProvider extends BaseHttpProvider {
 
   @override
   List<String> get optionalTextConfigKeys =>
-      ['zulip_channel', 'zulip_topic', 'zulip_recipient'];
+      ['zulip_channel', 'zulip_topic', 'zulip_recipient', 'message_template'];
 
   @override
   String? get instanceDescription =>
@@ -69,6 +69,7 @@ class ZulipProvider extends BaseHttpProvider {
         'zulip_topic': 'Topic',
         'zulip_recipient': 'Recipient',
         'zulip_direct_message': 'Direct message',
+        'message_template': 'Message template',
       };
 
   @override
@@ -158,13 +159,24 @@ class ZulipProvider extends BaseHttpProvider {
       final result = parseResponse(response);
       if (!result.success) return result;
 
+      // Resolve message content from config
+      var messageContent = config['message_text'] ?? '';
+      if (messageContent.isEmpty) {
+        messageContent = result.url ?? '';
+      } else {
+        messageContent = messageContent
+            .replaceAll('{url}', result.url ?? '')
+            .replaceAll('{filename}', request.fileName)
+            .replaceAll('{provider}', providerName);
+      }
+
       // Post the file URL to the configured channel or send as DM
       if (channel.isNotEmpty) {
         try {
           final msgData = <String, dynamic>{
             'type': 'stream',
             'to': channel,
-            'content': result.url ?? '',
+            'content': messageContent,
           };
           if (topic.isNotEmpty) msgData['topic'] = topic;
 
@@ -188,7 +200,7 @@ class ZulipProvider extends BaseHttpProvider {
           final msgData = <String, dynamic>{
             'type': 'direct',
             'to': '[$recipient]',
-            'content': result.url ?? '',
+            'content': messageContent,
           };
           final msgResponse = await dio.post(
             '/api/v1/messages',

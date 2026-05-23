@@ -217,6 +217,7 @@
   "chatAccessible": "Chat \"{title}\" accessible",
   "configLabelChannel": "Channel",
   "configLabelTopic": "Topic",
+  "configLabelDirectMessage": "Direct message",
 
   "exportImportTitle": "Export / Import",
   "exportImportDescription": "Export your provider credentials and app settings to a JSON file for backup or transfer. Import merges all data — existing settings and provider config will be replaced.",

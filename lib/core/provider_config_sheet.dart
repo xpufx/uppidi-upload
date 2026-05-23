@@ -104,7 +104,7 @@ String _resolveCfgLabel(AppLocalizations l10n, String raw) {
     'API Key' => l10n.configLabelApiKey,
     'Channel' => l10n.configLabelChannel,
     'Topic' => l10n.configLabelTopic,
-    'Direct message' => 'Direct message',
+    'Direct message' => l10n.configLabelDirectMessage,
     _ => raw,
   };
 }
@@ -609,6 +609,22 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
           await store.delete(key: skey);
         }
       }
+      // Clear opposite mode's fields when saving Zulip config
+      if (_isZulip) {
+        final isDm = _checkboxValues['zulip_direct_message'] == true;
+        if (isDm) {
+          for (final key in ['zulip_channel', 'zulip_topic']) {
+            final skey = _configKey(widget.provider.providerId, key);
+            await _secure.delete(key: skey);
+            _controllers[key]?.clear();
+          }
+        } else {
+          final skey =
+              _configKey(widget.provider.providerId, 'zulip_recipient');
+          await _secure.delete(key: skey);
+          _controllers['zulip_recipient']?.clear();
+        }
+      }
       // Save instance metadata
       final (baseId, instanceId) = _splitInstanceId(widget.provider.providerId);
       final instances = await loadProviderInstances(baseId);
@@ -744,6 +760,39 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                           );
                         }),
                         ...widget.provider.optionalConfigKeys.map((key) {
+                          if (_isZulip && key == 'zulip_direct_message') {
+                            final isDm =
+                                _checkboxValues['zulip_direct_message'] == true;
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _resolveCfgLabel(l10n, labels[key] ?? key),
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  SegmentedButton<bool>(
+                                    segments: [
+                                      ButtonSegment(
+                                          value: false,
+                                          label: Text(l10n.configLabelChannel)),
+                                      ButtonSegment(
+                                          value: true,
+                                          label: Text(
+                                              l10n.configLabelDirectMessage)),
+                                    ],
+                                    selected: {isDm},
+                                    onSelectionChanged: (v) {
+                                      setState(
+                                          () => _checkboxValues[key] = v.first);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
                           final label =
                               _resolveCfgLabel(l10n, labels[key] ?? key);
                           return Padding(

@@ -744,6 +744,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get configLabelTopic => 'Topic';
 
   @override
+  String get configLabelDirectMessage => 'Direct message';
+
+  @override
   String get exportImportTitle => 'Export / Import';
 
   @override

@@ -140,6 +140,11 @@ class _BareStringVisitor extends RecursiveAstVisitor<void> {
     if (RegExp(r'^[\d.]+$').hasMatch(s)) return true;
     if (RegExp(r'^[a-z][a-zA-Z0-9]+$').hasMatch(s)) return true;
     if (_startsWithFlag(s)) return true;
+    if (s == 'Message' ||
+        s ==
+            'Variables: {filename} {filesize} {provider}  (Zulip also: {url})') {
+      return true;
+    }
     return false;
   }
 

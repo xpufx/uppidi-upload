@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image/image.dart' as img;
 
+import '../core/format.dart';
 import '../core/history_service.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/models/upload_record.dart';
@@ -55,6 +56,7 @@ final class UploadFileSelected extends UploadState {
   final String? mimeType;
   final Uint8List? fileBytes;
   final String? selectedExpiry;
+  final String messageText;
 
   const UploadFileSelected({
     required this.fileName,
@@ -62,6 +64,7 @@ final class UploadFileSelected extends UploadState {
     this.mimeType,
     this.fileBytes,
     this.selectedExpiry,
+    this.messageText = '',
     super.results,
     super.selectedProviderIndex,
     super.providers,
@@ -212,6 +215,23 @@ class UploadNotifier extends Notifier<UploadState> {
           providers: prev.providers,
         ),
     };
+  }
+
+  void setMessage(String text) {
+    if (state is UploadFileSelected) {
+      final prev = state as UploadFileSelected;
+      state = UploadFileSelected(
+        fileName: prev.fileName,
+        fileSizeBytes: prev.fileSizeBytes,
+        mimeType: prev.mimeType,
+        fileBytes: prev.fileBytes,
+        selectedExpiry: prev.selectedExpiry,
+        messageText: text,
+        results: prev.results,
+        selectedProviderIndex: prev.selectedProviderIndex,
+        providers: prev.providers,
+      );
+    }
   }
 
   Future<void> pickAndUpload() async {
@@ -490,6 +510,22 @@ class UploadNotifier extends Notifier<UploadState> {
         );
         if (secure != null && secure.isNotEmpty) {
           config[key] = secure;
+        }
+      }
+
+      // Override message with user-edited text from the upload screen
+      if (state is UploadFileSelected) {
+        var msg = (state as UploadFileSelected).messageText;
+        if (msg.isEmpty) {
+          msg = config['message_template'] ?? '';
+        }
+        if (msg.isNotEmpty) {
+          final info = _extractFileInfo(state);
+          msg = msg
+              .replaceAll('{filename}', info.fileName ?? request.fileName)
+              .replaceAll('{filesize}', formatSize(request.sizeInBytes))
+              .replaceAll('{provider}', provider.providerName);
+          config['message_text'] = msg;
         }
       }
 

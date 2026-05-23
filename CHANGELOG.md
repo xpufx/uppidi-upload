@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: Zulip channel/DM toggle — mutually exclusive fields
 - fix: upload not loading optionalTextConfigKeys from storage
 - feat: inline Zulip channel/user fetch with suffix icon
 - chore: simplify Zulip API response parsing, add edit tool guidance to AGENTS.md
@@ -29,4 +30,3 @@
 - fix: cleanup glob matches symlinks, deletes just-deployed APKs
 - revert: back to split-per-abi, keep cleanup + Install Now
 - fix: universal APK instead of split-per-abi
-- chore: keep only latest artifact, remove old builds
