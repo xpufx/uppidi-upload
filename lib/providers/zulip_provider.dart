@@ -56,6 +56,10 @@ class ZulipProvider extends BaseHttpProvider {
       ['zulip_channel', 'zulip_topic', 'zulip_recipient'];
 
   @override
+  String? get instanceDescription =>
+      'Zulip — upload files to your Zulip server';
+
+  @override
   Map<String, String> get configLabels => const {
         'zulip_url': 'Server URL',
         'zulip_email': 'Email',

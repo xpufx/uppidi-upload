@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: contain layouts with SafeArea, overflow ellipsis, themed colors, and localized strings
 - feat: Zulip channel/user picking from API + DM support
 - fix: bare strings, provider config UX, import refresh, dev AppImage
 - refactor: extract FilePreview, ProgressSection, ResultBanner into separate files
@@ -29,4 +30,3 @@
 - feat: export/import config, Install Now fix, Uguu-like provider
 - fix: debug buttons on all provider test steps
 - feat: Uguu-like provider, floating buttons, collapsible sections
-- fix: keep modal after download, Install Now button
