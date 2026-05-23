@@ -52,11 +52,8 @@ class ZulipProvider extends BaseHttpProvider {
   List<String> get optionalConfigKeys => const [];
 
   @override
-  List<String> get optionalTextConfigKeys => ['zulip_channel', 'zulip_topic'];
-
-  @override
-  String? get instanceDescription =>
-      'Zulip — upload files to your Zulip server';
+  List<String> get optionalTextConfigKeys =>
+      ['zulip_channel', 'zulip_topic', 'zulip_recipient'];
 
   @override
   Map<String, String> get configLabels => const {
@@ -65,6 +62,7 @@ class ZulipProvider extends BaseHttpProvider {
         'zulip_api_key': 'API Key',
         'zulip_channel': 'Channel',
         'zulip_topic': 'Topic',
+        'zulip_recipient': 'Recipient',
       };
 
   @override
@@ -150,31 +148,53 @@ class ZulipProvider extends BaseHttpProvider {
       );
 
       final result = parseResponse(response);
-      if (!result.success || channel.isEmpty) return result;
+      if (!result.success) return result;
 
-      // Post the file URL to the configured channel
-      try {
-        final msgData = <String, dynamic>{
-          'type': 'stream',
-          'to': channel,
-          'content': result.url ?? '',
-        };
-        if (topic.isNotEmpty) msgData['topic'] = topic;
+      // Post the file URL to the configured channel or send as DM
+      final recipient = (config['zulip_recipient'] ?? '').trim();
+      if (channel.isNotEmpty) {
+        try {
+          final msgData = <String, dynamic>{
+            'type': 'stream',
+            'to': channel,
+            'content': result.url ?? '',
+          };
+          if (topic.isNotEmpty) msgData['topic'] = topic;
 
-        final msgResponse = await dio.post(
-          '/api/v1/messages',
-          data: FormData.fromMap(msgData),
-        );
-        if (msgResponse.statusCode == 200) {
-          final body = msgResponse.data is Map
-              ? (msgResponse.data as Map)['msg'] as String?
-              : null;
-          _log.info('Posted to channel: $channel (${body ?? "ok"})');
-        } else {
-          _log.warn('Failed to post to channel: ${msgResponse.statusCode}');
+          final msgResponse = await dio.post(
+            '/api/v1/messages',
+            data: FormData.fromMap(msgData),
+          );
+          if (msgResponse.statusCode == 200) {
+            final body = msgResponse.data is Map
+                ? (msgResponse.data as Map)['msg'] as String?
+                : null;
+            _log.info('Posted to channel: $channel (${body ?? "ok"})');
+          } else {
+            _log.warn('Failed to post to channel: ${msgResponse.statusCode}');
+          }
+        } catch (e) {
+          _log.warn('Failed to post to channel: $e');
         }
-      } catch (e) {
-        _log.warn('Failed to post to channel: $e');
+      } else if (recipient.isNotEmpty) {
+        try {
+          final msgData = <String, dynamic>{
+            'type': 'direct',
+            'to': '[$recipient]',
+            'content': result.url ?? '',
+          };
+          final msgResponse = await dio.post(
+            '/api/v1/messages',
+            data: FormData.fromMap(msgData),
+          );
+          if (msgResponse.statusCode == 200) {
+            _log.info('Sent DM to user $recipient');
+          } else {
+            _log.warn('Failed to send DM: ${msgResponse.statusCode}');
+          }
+        } catch (e) {
+          _log.warn('Failed to send DM: $e');
+        }
       }
 
       // Upload succeeded regardless of message post outcome

@@ -343,6 +343,13 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   /// Each test step: (label, ok?, detail).
   final List<_TestStep> _testSteps = [];
 
+  // Zulip resources fetched from API (populated after test)
+  List<String> _zulipStreams = [];
+  List<Map<String, dynamic>> _zulipUsers = [];
+  bool _loadingResources = false;
+
+  bool get _isZulip => widget.provider.providerId.split('__').first == 'zulip';
+
   @override
   void initState() {
     super.initState();
@@ -527,6 +534,51 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
         });
         _scrollToTestSteps();
       }
+    }
+  }
+
+  Future<void> _fetchZulipResources() async {
+    setState(() => _loadingResources = true);
+    try {
+      final config = <String, String>{};
+      for (final key in widget.provider.requiredConfigKeys) {
+        final value = _controllers[key]?.text.trim() ?? '';
+        if (value.isNotEmpty) config[key] = value;
+      }
+      final dio = await widget.provider.createHttpClient(config);
+
+      final subsResp = await dio.get('/api/v1/users/me/subscriptions');
+      final subsData =
+          jsonDecode(subsResp.data as String) as Map<String, dynamic>;
+      final subscriptions = subsData['subscriptions'] as List;
+      final streams = subscriptions
+          .map((s) => (s as Map)['name'] as String)
+          .toList()
+        ..sort();
+
+      final usersResp = await dio.get('/api/v1/users');
+      final usersData =
+          jsonDecode(usersResp.data as String) as Map<String, dynamic>;
+      final members = usersData['members'] as List;
+      final users = members.map((m) => m as Map<String, dynamic>).toList()
+        ..sort((a, b) =>
+            (a['full_name'] as String).compareTo(b['full_name'] as String));
+
+      if (mounted) {
+        setState(() {
+          _zulipStreams = streams;
+          _zulipUsers = users;
+        });
+      }
+    } catch (e) {
+      _log.error('Failed to fetch Zulip resources: $e', error: e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load channels/users: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loadingResources = false);
     }
   }
 
@@ -715,6 +767,62 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                         ...widget.provider.optionalTextConfigKeys.map((key) {
                           final label =
                               _resolveCfgLabel(l10n, labels[key] ?? key);
+                          final isChannel = key == 'zulip_channel' &&
+                              _isZulip &&
+                              _zulipStreams.isNotEmpty;
+                          final isRecipient = key == 'zulip_recipient' &&
+                              _isZulip &&
+                              _zulipUsers.isNotEmpty;
+
+                          if (isChannel) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _controllers[key]!.text.isNotEmpty
+                                    ? _controllers[key]!.text
+                                    : null,
+                                decoration: InputDecoration(
+                                  labelText: label,
+                                  border: const OutlineInputBorder(),
+                                  isDense: true,
+                                ),
+                                items: _zulipStreams
+                                    .map((s) => DropdownMenuItem(
+                                        value: s, child: Text(s)))
+                                    .toList(),
+                                onChanged: (v) {
+                                  if (v != null) _controllers[key]!.text = v;
+                                },
+                              ),
+                            );
+                          }
+
+                          if (isRecipient) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _controllers[key]!.text.isNotEmpty
+                                    ? _controllers[key]!.text
+                                    : null,
+                                decoration: InputDecoration(
+                                  labelText: label,
+                                  border: const OutlineInputBorder(),
+                                  isDense: true,
+                                ),
+                                items: _zulipUsers
+                                    .map((u) => DropdownMenuItem(
+                                          value: u['user_id'].toString(),
+                                          child: Text(
+                                              '${u['full_name']} (${u['user_id']})'),
+                                        ))
+                                    .toList(),
+                                onChanged: (v) {
+                                  if (v != null) _controllers[key]!.text = v;
+                                },
+                              ),
+                            );
+                          }
+
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 12),
                             child: TextFormField(
@@ -785,6 +893,26 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                                 ],
                               ),
                             )),
+                        if (_isZulip && _testSteps.any((s) => s.ok))
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: OutlinedButton.icon(
+                              onPressed: _loadingResources
+                                  ? null
+                                  : _fetchZulipResources,
+                              icon: _loadingResources
+                                  ? const SizedBox(
+                                      width: 14,
+                                      height: 14,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
+                                    )
+                                  : const Icon(Icons.cloud_download, size: 16),
+                              label: Text(_zulipStreams.isNotEmpty
+                                  ? 'Reload channels & users'
+                                  : 'Load channels & users'),
+                            ),
+                          ),
                       ],
                     ),
                   ),

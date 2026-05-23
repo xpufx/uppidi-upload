@@ -165,7 +165,7 @@ abstract class BaseHttpProvider implements BaseUploader {
         DioExceptionType.sendTimeout ||
         DioExceptionType.receiveTimeout ||
         DioExceptionType.connectionError =>
-          'errorConnectionFailed',
+          'connectionTimedOut',
         _ => 'genericError',
       };
     }

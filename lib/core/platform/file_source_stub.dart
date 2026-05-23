@@ -4,10 +4,7 @@ import '../mime_types.dart';
 import '../models/upload_request.dart';
 
 Future<FileUploadRequest> createUploadRequest(PlatformFile file) async {
-  final bytes = file.bytes;
-  if (bytes == null) {
-    throw StateError('No file bytes available on web');
-  }
+  final bytes = await file.readAsBytes();
   return FileUploadRequest(
     fileName: file.name,
     mimeType:

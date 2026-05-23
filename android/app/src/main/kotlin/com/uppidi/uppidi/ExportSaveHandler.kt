@@ -40,7 +40,7 @@ class ExportSaveHandler(private val activity: Activity) {
                 val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     putExtra(Intent.EXTRA_TITLE, fileName)
-                    type = "*/*"
+                    type = "application/json"
                 }
 
                 try {
