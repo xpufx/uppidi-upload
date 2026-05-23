@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import 'android_save.dart';
 import 'logging/log.dart';
 import 'settings_service.dart';
 
@@ -41,69 +43,6 @@ Future<String?> buildExportJsonString() async {
   }
 }
 
-/// Tries to save the given [jsonString] to a file via the system file picker.
-/// Returns a map of diagnostic information about the attempt.
-Future<Map<String, dynamic>> trySaveExport(String jsonString) async {
-  final diag = <String, dynamic>{
-    'json_length': jsonString.length,
-    'timestamp': DateTime.now().toIso8601String(),
-  };
-
-  final jsonBytes = utf8.encode(jsonString);
-
-  // Invoke the native "save" method via MethodChannel directly.
-  // Unlike FilePicker.saveFile(), this only gets the path from the
-  // native dialog — it won't try to File().writeAsBytes() on the result.
-  const channel = MethodChannel('miguelruivo.flutter.plugins.filepicker');
-  String? savedPath;
-  try {
-    savedPath = await channel.invokeMethod<String>('save', {
-      'fileName': 'uppidi-export.json',
-      'fileType': 'custom',
-      'allowedExtensions': <String>['json'],
-    });
-    diag['native_returned_path'] = savedPath;
-    diag['user_cancelled'] = savedPath == null;
-  } catch (e) {
-    diag['native_call_error'] = '$e';
-    diag['native_call_error_type'] = e.runtimeType.toString();
-  }
-
-  if (savedPath != null) {
-    diag['path_length'] = savedPath.length;
-    diag['path_starts_with_slash'] = savedPath.startsWith('/');
-    diag['path_starts_with_content'] = savedPath.startsWith('content://');
-    diag['path_contains_document'] = savedPath.contains('/document/');
-    diag['path_uri'] = Uri.tryParse(savedPath)?.toString();
-
-    // Try to write bytes via dart:io File()
-    try {
-      final f = File(savedPath);
-      await f.writeAsBytes(jsonBytes);
-      diag['file_write_ok'] = true;
-      diag['file_size'] = await f.length();
-      diag['file_exists'] = await f.exists();
-    } catch (e) {
-      diag['file_write_error'] = '$e';
-      diag['file_write_error_type'] = e.runtimeType.toString();
-    }
-
-    // Write to a temp file so we can at least confirm the data is correct
-    try {
-      final tmpDir = Directory.systemTemp.createTempSync('uppidi_debug');
-      final tmp = File('${tmpDir.path}/uppidi-export.json');
-      await tmp.writeAsBytes(jsonBytes);
-      diag['temp_file_path'] = tmp.path;
-      diag['temp_file_size'] = await tmp.length();
-      await tmpDir.delete(recursive: true);
-    } catch (e) {
-      diag['temp_file_error'] = '$e';
-    }
-  }
-
-  return diag;
-}
-
 /// Exports all provider config and app settings to a JSON file selected
 /// by the user. Returns the file path on success, null if cancelled.
 Future<String?> exportConfig() async {
@@ -113,7 +52,17 @@ Future<String?> exportConfig() async {
 
   final jsonBytes = utf8.encode(jsonString);
 
-  // Pick save location and write file
+  // Android: use a custom platform channel to bypass the file_picker 12.x
+  // regression where "bytes" was removed from the method channel args.
+  // TODO: Remove this branch after file_picker 12.x stable fixes the issue.
+  if (Platform.isAndroid) {
+    return saveFileOnAndroid(
+      Uint8List.fromList(jsonBytes),
+      'uppidi-export.json',
+    );
+  }
+
+  // Desktop (and other platforms): use FilePicker directly.
   try {
     final outputFile = await FilePicker.saveFile(
       dialogTitle: 'Export config',
