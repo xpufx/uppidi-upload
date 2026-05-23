@@ -742,4 +742,51 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get configLabelTopic => 'Topic';
+
+  @override
+  String get exportImportTitle => 'Export / Import';
+
+  @override
+  String get exportImportDescription =>
+      'Export your provider credentials and app settings to a JSON file for backup or transfer. Import merges all data — existing settings and provider config will be replaced.';
+
+  @override
+  String get exportConfigTitle => 'Export config';
+
+  @override
+  String get exportConfigWarning =>
+      'This file will contain API keys, tokens, passwords, and app settings. Keep it safe — anyone with this file can access your accounts.';
+
+  @override
+  String get importConfigTitle => 'Import config';
+
+  @override
+  String get importConfigWarning =>
+      'This will REPLACE all current provider credentials and settings with the data from the imported file. This cannot be undone.';
+
+  @override
+  String get exportAction => 'Export';
+
+  @override
+  String get importAction => 'Import';
+
+  @override
+  String exportedTo(Object path) {
+    return 'Exported to: $path';
+  }
+
+  @override
+  String get exportFailed => 'Export failed';
+
+  @override
+  String get importFailed => 'Import failed';
+
+  @override
+  String get apkDownloaded => 'APK downloaded';
+
+  @override
+  String get installNow => 'Install Now';
+
+  @override
+  String get downloadComplete => 'Download complete';
 }

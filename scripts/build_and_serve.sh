@@ -34,22 +34,22 @@ sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${VER
 git add "$VERSION_FILE" 2>/dev/null
 echo "   ✅ Version synced"
 
-# ── Hardcoded string check ──────────────────────────────────
-echo "==> Checking for hardcoded strings..."
-HARDCODED=$(grep -rn "Text(\'\|label: \'\|title: \'\|hintText: \'\|tooltip: \'\|child: Text(\'\|subtitle: Text(\'" lib/ --include="*.dart" |
-	grep -v "l10n\." |
-	grep -v "const\|static\|final\|String \|AppLocalizations\|RegExp\|gitHash\|appVersion\|GIT_HASH\|CHANGELOG\|changeLogText\|Proxy\|URL\|API\|OK\|iOS\|HTTP\|SOCKS\|FormatException\|Upload\|Provider\|Settings\|History\|Test\|Share\|Shared\|formatSize\|formatTime\|AppLogo\|Icon(\|Icons\." |
-	grep -v "English\|Türkçe\|Italiano\|Uppidi\|uppidi" |
-	grep -v "share_template\|template\|variables\|examples\|[\"']%[a-z]" |
-	grep -E "['\"][A-Za-z]{3,}" ||
-	true)
-if [ -n "$HARDCODED" ]; then
-	echo "❌ Found hardcoded English strings in UI code:"
-	echo "$HARDCODED"
-	echo "   Replace with l10n.* or add to ARB files."
+# ── Bare string check (no Text('...') without l10n.*) ──────
+echo "==> Checking for bare UI strings..."
+if ! dart run scripts/check_bare_strings.dart 2>&1; then
 	exit 1
 fi
-echo "   ✅ No hardcoded strings found"
+
+# ── Localization check (gen-l10n reports untranslated keys) ─
+echo "==> Checking for untranslated localization keys..."
+GEN_OUTPUT=$(flutter gen-l10n 2>&1 || true)
+if echo "$GEN_OUTPUT" | grep -qi "untranslated\|not translated\|missing\|warning"; then
+	echo "❌ Untranslated localization keys found:"
+	echo "$GEN_OUTPUT"
+	echo "   Add the missing keys to the relevant ARB files."
+	exit 1
+fi
+echo "   ✅ All localization keys translated across all locales"
 
 # ── Capture git hash BEFORE changelog commit ─────────────────
 # This ensures artifact filenames match the tag/release commit.
@@ -118,7 +118,7 @@ echo "==> Cleaning old Linux builds (keep latest 1)..."
 ls -t "${ARTIFACTS_DIR}"/uppidi-upload-[0-9]*-linux.tar.gz 2>/dev/null | tail -n +2 | xargs -r rm -f
 
 # ── AppImage ─────────────────────────────────────────────────
-if [ "$DEV" = false ] && [ -f "$(dirname "$0")/build-appimage.sh" ]; then
+if [ -f "$(dirname "$0")/build-appimage.sh" ]; then
 	echo "==> Building AppImage..."
 	bash "$(dirname "$0")/build-appimage.sh" \
 		--no-flutter-build \

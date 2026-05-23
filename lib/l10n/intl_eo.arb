@@ -216,5 +216,20 @@
   "connectedAs": "Connected as @{username}",
   "chatAccessible": "Chat \"{title}\" accessible",
   "configLabelChannel": "Channel",
-  "configLabelTopic": "Topic"
+  "configLabelTopic": "Topic",
+
+  "exportImportTitle": "Export / Import",
+  "exportImportDescription": "Export your provider credentials and app settings to a JSON file for backup or transfer. Import merges all data — existing settings and provider config will be replaced.",
+  "exportConfigTitle": "Export config",
+  "exportConfigWarning": "This file will contain API keys, tokens, passwords, and app settings. Keep it safe — anyone with this file can access your accounts.",
+  "importConfigTitle": "Import config",
+  "importConfigWarning": "This will REPLACE all current provider credentials and settings with the data from the imported file. This cannot be undone.",
+  "exportAction": "Export",
+  "importAction": "Import",
+  "exportedTo": "Exported to: {path}",
+  "exportFailed": "Export failed",
+  "importFailed": "Import failed",
+  "apkDownloaded": "APK downloaded",
+  "installNow": "Install Now",
+  "downloadComplete": "Download complete"
 }

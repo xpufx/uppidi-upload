@@ -45,6 +45,8 @@ class HttpBinProvider extends BaseHttpProvider {
       );
     }
 
+    _log.warn(
+        'Unexpected response: status=${response.statusCode}, data=${response.data}');
     return UploadResult(
       success: false,
       errorMessage: 'Unexpected response: ${response.data}',

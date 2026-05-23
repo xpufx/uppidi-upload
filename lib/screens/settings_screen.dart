@@ -71,6 +71,7 @@ class SettingsScreen extends ConsumerWidget {
 }
 
 void _showSystemInfo(BuildContext context, WidgetRef ref) {
+  final l10n = AppLocalizations.of(context);
   final buffer = StringBuffer();
   buffer.writeln('=== BUILD ===');
   buffer.writeln('App: Uppidi Upload v$appVersion');
@@ -101,11 +102,11 @@ void _showSystemInfo(BuildContext context, WidgetRef ref) {
   showDialog(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.bug_report, size: 18),
-          SizedBox(width: 8),
-          Text('System Info'),
+          const Icon(Icons.bug_report, size: 18),
+          const SizedBox(width: 8),
+          Text(l10n.systemInfo),
         ],
       ),
       content: SingleChildScrollView(
@@ -116,19 +117,18 @@ void _showSystemInfo(BuildContext context, WidgetRef ref) {
         TextButton.icon(
           onPressed: () => SharePlus.instance.share(ShareParams(text: text)),
           icon: const Icon(Icons.share, size: 16),
-          label: const Text('Share'),
+          label: Text(l10n.share),
         ),
         TextButton(
           onPressed: () {
             Clipboard.setData(ClipboardData(text: text));
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Copied to clipboard')),
+              SnackBar(content: Text(l10n.copiedToClipboard)),
             );
           },
-          child: const Text('Copy All'),
+          child: Text(l10n.copyAll),
         ),
-        TextButton(
-            onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+        TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok)),
       ],
     ),
   );
@@ -203,7 +203,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                             final complete = dlPath != null;
                             return AlertDialog(
                               title: Text(complete
-                                  ? 'Download complete'
+                                  ? l10n.downloadComplete
                                   : l10n.downloadingFile(label)),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
@@ -212,7 +212,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                                         const Icon(Icons.check_circle,
                                             size: 48, color: Colors.green),
                                         const SizedBox(height: 8),
-                                        const Text('APK downloaded'),
+                                        Text(l10n.apkDownloaded),
                                         const SizedBox(height: 4),
                                         SelectableText(dlPath,
                                             style:
@@ -234,7 +234,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                                   ? [
                                       TextButton(
                                         onPressed: () => Navigator.pop(ctx),
-                                        child: const Text('Done'),
+                                        child: Text(l10n.done),
                                       ),
                                       FilledButton.icon(
                                         onPressed: () async {
@@ -247,7 +247,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                                         },
                                         icon: const Icon(Icons.download_done,
                                             size: 18),
-                                        label: const Text('Install Now'),
+                                        label: Text(l10n.installNow),
                                       ),
                                     ]
                                   : null,
@@ -489,13 +489,16 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                   ref.invalidate(localeCodeProvider);
                 }
               },
-              items: const [
-                DropdownMenuItem(value: 'en', child: Text('English')),
-                DropdownMenuItem(value: 'eo', child: Text('Esperanto')),
-                DropdownMenuItem(value: 'it', child: Text('Italiano')),
-                DropdownMenuItem(
+              items: [
+                const DropdownMenuItem(
+                    value: 'en', child: Text('\u{1F1EC}\u{1F1E7} English')),
+                const DropdownMenuItem(value: 'eo', child: Text('Esperanto')),
+                const DropdownMenuItem(
+                    value: 'it', child: Text('\u{1F1EE}\u{1F1F9} Italiano')),
+                const DropdownMenuItem(
                     value: 'tlh', child: Text('Klingon (tlhIngan)')),
-                DropdownMenuItem(value: 'tr', child: Text('Türkçe')),
+                const DropdownMenuItem(
+                    value: 'tr', child: Text('\u{1F1F9}\u{1F1F7} Türkçe')),
               ],
             ),
           ],
@@ -605,10 +608,8 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               onTap: () => showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('Shell Layout'),
-                  content: const Text(
-                    'Choose how screens are organized: "Tabs" uses a tab bar for navigation. "Modals" shows the upload screen always and opens other screens as dialogs.',
-                  ),
+                  title: Text(l10n.shellLayoutTitle),
+                  content: Text(l10n.shellLayoutDescription),
                   actions: [
                     TextButton(
                         onPressed: () => Navigator.pop(ctx),
@@ -626,9 +627,9 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
             const SizedBox(width: 8),
             Expanded(
               child: SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: 'tabs', label: Text('Tabs')),
-                  ButtonSegment(value: 'modals', label: Text('Modals')),
+                segments: [
+                  ButtonSegment(value: 'tabs', label: Text(l10n.tabs)),
+                  ButtonSegment(value: 'modals', label: Text(l10n.modals)),
                 ],
                 selected: {
                   ref.watch(shellTypeProvider).asData?.value ?? 'tabs'
@@ -730,7 +731,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               if (text.isEmpty) {
                 return Center(
                   child: Text(
-                    'No log entries yet.',
+                    l10n.noLogEntries,
                     style: TextStyle(
                         color: Theme.of(ctx).colorScheme.onSurfaceVariant),
                   ),
@@ -754,12 +755,11 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               if (ctx.mounted) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
                   SnackBar(
-                      content:
-                          Text('${l10n.viewDebugLog} — copied to clipboard')),
+                      content: Text(l10n.debugLogCopied(l10n.viewDebugLog))),
                 );
               }
             },
-            child: const Text('Copy'),
+            child: Text(l10n.copy),
           ),
           TextButton(
             onPressed: () async {
@@ -768,7 +768,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                 SharePlus.instance.share(ShareParams(text: text));
               }
             },
-            child: const Text('Share'),
+            child: Text(l10n.share),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx),
@@ -784,6 +784,7 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
 /// on Android if applicable.
 Future<void> _downloadAndInstall(
     BuildContext context, String url, String label) async {
+  final l10n = AppLocalizations.of(context);
   var received = 0, total = 0, speed = 0;
   String? downloadedPath;
   void Function(void Function())? update;
@@ -801,7 +802,8 @@ Future<void> _downloadAndInstall(
         final pct = total > 0 ? received / total : null;
         final complete = downloadedPath != null;
         return AlertDialog(
-          title: Text(complete ? 'Download complete' : 'Downloading $label'),
+          title: Text(
+              complete ? l10n.downloadComplete : l10n.downloadingFile(label)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -818,7 +820,7 @@ Future<void> _downloadAndInstall(
               ] else ...[
                 const Icon(Icons.check_circle, size: 48, color: Colors.green),
                 const SizedBox(height: 8),
-                const Text('APK downloaded'),
+                Text(l10n.apkDownloaded),
                 const SizedBox(height: 4),
                 SelectableText(downloadedPath,
                     style: const TextStyle(fontSize: 11)),
@@ -829,7 +831,7 @@ Future<void> _downloadAndInstall(
               ? [
                   TextButton(
                     onPressed: () => Navigator.pop(ctx),
-                    child: const Text('Done'),
+                    child: Text(l10n.done),
                   ),
                   FilledButton.icon(
                     onPressed: () async {
@@ -840,7 +842,7 @@ Future<void> _downloadAndInstall(
                       if (ctx.mounted) Navigator.pop(ctx);
                     },
                     icon: const Icon(Icons.download_done, size: 18),
-                    label: const Text('Install Now'),
+                    label: Text(l10n.installNow),
                   ),
                 ]
               : null,
@@ -863,7 +865,7 @@ Future<void> _downloadAndInstall(
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Download failed: $e')),
+        SnackBar(content: Text(l10n.downloadFailed('$e'))),
       );
     }
   }
@@ -944,7 +946,7 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                 if (cdnUrl.isNotEmpty) ...[
                   IconButton(
                     icon: const Icon(Icons.android, size: 20),
-                    tooltip: 'Download Android APK',
+                    tooltip: l10n.downloadAndroid,
                     onPressed: () => _downloadAndInstall(
                         context,
                         '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk',
@@ -953,21 +955,21 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                   const SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(Icons.desktop_windows, size: 20),
-                    tooltip: 'Download Linux',
+                    tooltip: l10n.downloadLinux,
                     onPressed: () => _downloadAndInstall(context,
                         '$cdnUrl/uppidi-upload-latest-linux.tar.gz', 'Linux'),
                   ),
                   const SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(Icons.list_alt, size: 20),
-                    tooltip: 'Browse all builds',
+                    tooltip: l10n.browseAllBuilds,
                     onPressed: () => launchUrl(Uri.parse(cdnUrl),
                         mode: LaunchMode.externalApplication),
                   ),
                 ] else ...[
                   IconButton(
                     icon: const Icon(Icons.code, size: 20),
-                    tooltip: 'View releases on GitHub',
+                    tooltip: l10n.viewReleases,
                     onPressed: () => launchUrl(
                         Uri.parse('https://github.com/$githubRepo/releases'),
                         mode: LaunchMode.externalApplication),
@@ -982,7 +984,8 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                   child: OutlinedButton.icon(
                     onPressed: () => _showSystemInfo(context, ref),
                     icon: const Icon(Icons.bug_report, size: 12),
-                    label: Text("Info", style: const TextStyle(fontSize: 11)),
+                    label:
+                        Text(l10n.info, style: const TextStyle(fontSize: 11)),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 4, vertical: 4),
@@ -1026,10 +1029,9 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                     onPressed: () => showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: Text("License"),
+                        title: Text(l10n.license),
                         content: SingleChildScrollView(
-                          child: Text(
-                              "This project is licensed under the GNU General Public License v3.0."),
+                          child: Text(l10n.gplNotice),
                         ),
                         actions: [
                           TextButton(
@@ -1040,8 +1042,8 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                       ),
                     ),
                     icon: const Icon(Icons.description, size: 12),
-                    label:
-                        Text("License", style: const TextStyle(fontSize: 11)),
+                    label: Text(l10n.license,
+                        style: const TextStyle(fontSize: 11)),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 4, vertical: 4),
@@ -1061,11 +1063,11 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
 
 /// ── Export/Import card (scrollable with settings) ─────────────────
 
-class _ExportImportCard extends StatelessWidget {
+class _ExportImportCard extends ConsumerWidget {
   const _ExportImportCard();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
@@ -1075,12 +1077,12 @@ class _ExportImportCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Export / Import",
+            Text(l10n.exportImportTitle,
                 style: theme.textTheme.titleSmall
                     ?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
             Text(
-              "Export your provider credentials and app settings to a JSON file for backup or transfer. Import merges all data — existing settings and provider config will be replaced.",
+              l10n.exportImportDescription,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -1093,9 +1095,8 @@ class _ExportImportCard extends StatelessWidget {
                     final confirm = await showDialog<bool>(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: Text("Export config"),
-                        content: Text(
-                            "This file will contain API keys, tokens, passwords, and app settings. Keep it safe — anyone with this file can access your accounts."),
+                        title: Text(l10n.exportConfigTitle),
+                        content: Text(l10n.exportConfigWarning),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, false),
@@ -1103,7 +1104,7 @@ class _ExportImportCard extends StatelessWidget {
                           ),
                           FilledButton(
                             onPressed: () => Navigator.pop(ctx, true),
-                            child: Text("Export"),
+                            child: Text(l10n.exportAction),
                           ),
                         ],
                       ),
@@ -1113,7 +1114,7 @@ class _ExportImportCard extends StatelessWidget {
                       final path = await exportConfig();
                       if (path != null && context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Exported to: $path")),
+                          SnackBar(content: Text(l10n.exportedTo(path))),
                         );
                       }
                     } catch (e) {
@@ -1122,7 +1123,7 @@ class _ExportImportCard extends StatelessWidget {
                         showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            title: const Text("Export failed"),
+                            title: Text(l10n.exportFailed),
                             content: SelectableText("$e"),
                             actions: [
                               TextButton(
@@ -1136,7 +1137,7 @@ class _ExportImportCard extends StatelessWidget {
                     }
                   },
                   icon: const Icon(Icons.upload, size: 16),
-                  label: Text("Export"),
+                  label: Text(l10n.exportAction),
                 ),
                 const SizedBox(width: 12),
                 OutlinedButton.icon(
@@ -1144,9 +1145,8 @@ class _ExportImportCard extends StatelessWidget {
                     final confirm = await showDialog<bool>(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: Text("Import config"),
-                        content: Text(
-                            "This will REPLACE all current provider credentials and settings with the data from the imported file. This cannot be undone."),
+                        title: Text(l10n.importConfigTitle),
+                        content: Text(l10n.importConfigWarning),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, false),
@@ -1154,7 +1154,7 @@ class _ExportImportCard extends StatelessWidget {
                           ),
                           FilledButton(
                             onPressed: () => Navigator.pop(ctx, true),
-                            child: Text("Import"),
+                            child: Text(l10n.importAction),
                           ),
                         ],
                       ),
@@ -1162,6 +1162,7 @@ class _ExportImportCard extends StatelessWidget {
                     if (confirm != true) return;
                     try {
                       final msg = await importConfig();
+                      await ProviderRegistry.refresh(ref);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(msg)),
@@ -1173,7 +1174,7 @@ class _ExportImportCard extends StatelessWidget {
                         showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            title: const Text("Import failed"),
+                            title: Text(l10n.importFailed),
                             content: SelectableText("$e"),
                             actions: [
                               TextButton(
@@ -1187,7 +1188,7 @@ class _ExportImportCard extends StatelessWidget {
                     }
                   },
                   icon: const Icon(Icons.download, size: 16),
-                  label: Text("Import"),
+                  label: Text(l10n.importAction),
                 ),
               ],
             ),

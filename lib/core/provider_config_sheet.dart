@@ -135,6 +135,24 @@ Future<bool> showProviderConfigDialog(
   return changed ?? false;
 }
 
+/// Opens the config dialog directly for an existing [provider] instance,
+/// skipping the instance list dialog. Saves, refreshes the registry,
+/// and returns true if something changed.
+Future<bool> showProviderEditDialog(
+  BuildContext context,
+  WidgetRef ref,
+  ProviderInstance provider,
+) async {
+  final saved = await showDialog<bool>(
+    context: context,
+    builder: (_) => _ProviderConfigDialog(provider: provider),
+  );
+  if (saved == true) {
+    await ProviderRegistry.refresh(ref);
+  }
+  return saved ?? false;
+}
+
 /// ── Instance list dialog ────────────────────────────────────────────────
 
 class _InstanceListDialog extends ConsumerStatefulWidget {
@@ -358,6 +376,15 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       );
       if (mounted) {
         _checkboxValues[key] = value == 'true';
+      }
+    }
+    // Load optional text config keys
+    for (final key in widget.provider.optionalTextConfigKeys) {
+      final value = await _secure.read(
+        key: _configKey(widget.provider.providerId, key),
+      );
+      if (mounted && _controllers[key] != null) {
+        _controllers[key]!.text = value ?? '';
       }
     }
     // Load instance name from metadata if available

@@ -107,7 +107,7 @@ Future<String> importConfig() async {
 
   String fileContent;
   try {
-    fileContent = await File(result.files.single.path!).readAsString();
+    fileContent = String.fromCharCodes(await result.files.single.readAsBytes());
   } catch (e) {
     _log.error('Failed to read selected file: $e', error: e);
     rethrow;

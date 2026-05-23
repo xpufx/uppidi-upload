@@ -66,8 +66,8 @@ class _ModalDashboard extends StatelessWidget {
               child: Container(
                 color: Colors.orange.shade700,
                 padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-                child: const Text(
-                  'DEV BUILD',
+                child: Text(
+                  l10n.devBuild,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 10,

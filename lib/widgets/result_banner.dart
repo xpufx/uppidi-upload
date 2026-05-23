@@ -56,6 +56,9 @@ class _ResultBannerState extends State<ResultBanner> {
       'failedToReadFile' => l10n.failedToReadFile,
       'noProvidersConfigured' => l10n.noProvidersConfigured,
       'connectionTimedOut' => l10n.connectionTimedOut,
+      'errorConnectionFailed' => l10n.errorConnectionFailed,
+      'invalidMimeType' => l10n.invalidMimeType,
+      'fileSystemError' => l10n.fileSystemError,
       'uploadCancelled' => l10n.uploadCancelled,
       'telegramErrorChatNotFound' => l10n.telegramErrorChatNotFound,
       'telegramErrorBotBlocked' => l10n.telegramErrorBotBlocked,
@@ -66,6 +69,7 @@ class _ResultBannerState extends State<ResultBanner> {
   }
 
   void _showDebugInfo(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final buffer = StringBuffer();
     final result = widget.lastResult;
     final p = widget.provider;
@@ -95,11 +99,11 @@ class _ResultBannerState extends State<ResultBanner> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.bug_report, size: 18),
-            SizedBox(width: 8),
-            Text('Debug Info'),
+            const Icon(Icons.bug_report, size: 18),
+            const SizedBox(width: 8),
+            Text(l10n.debugInfo),
           ],
         ),
         content: SingleChildScrollView(
@@ -110,19 +114,18 @@ class _ResultBannerState extends State<ResultBanner> {
           TextButton.icon(
             onPressed: () => SharePlus.instance.share(ShareParams(text: text)),
             icon: const Icon(Icons.share, size: 16),
-            label: const Text('Share'),
+            label: Text(l10n.share),
           ),
           TextButton(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: text));
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Copied to clipboard')),
+                SnackBar(content: Text(l10n.copiedToClipboard)),
               );
             },
-            child: const Text('Copy All'),
+            child: Text(l10n.copyAll),
           ),
-          TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok)),
         ],
       ),
     );
@@ -159,7 +162,7 @@ class _ResultBannerState extends State<ResultBanner> {
                   icon: const Icon(Icons.bug_report, size: 16),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  tooltip: 'Debug info',
+                  tooltip: l10n.debugInfoTooltip,
                   onPressed: () => _showDebugInfo(context),
                 ),
               ],

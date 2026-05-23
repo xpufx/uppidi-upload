@@ -4,7 +4,7 @@
 
 ```bash
 bash scripts/build_and_serve.sh          # release (Android + Linux + AppImage)
-bash scripts/build_and_serve.sh --dev    # dev (debug + DEV_PROVIDERS, no AppImage)
+bash scripts/build_and_serve.sh --dev    # dev (debug + DEV_PROVIDERS, + AppImage)
 flutter pub get                          # install deps
 dart format .                            # format
 flutter analyze                          # lint
@@ -34,7 +34,7 @@ Update **both** `version:` in `pubspec.yaml` AND `appVersion` in `lib/core/versi
 
 - `snake_case` files/dirs, `PascalCase` classes/enums, `camelCase` functions/variables/constants. Private = `_` prefix.
 - Relative imports for project files. No barrel exports.
-- Never hardcode UI strings — use ARB localizations (`lib/l10n/`) via `AppLocalizations.of(context)`.
+- Never hardcode UI strings — use ARB localizations (`lib/l10n/`) via `AppLocalizations.of(context)`. The build script runs `scripts/check_bare_strings.dart` to enforce this.
 - Never throw exceptions in upload paths — return `UploadResult` with `success: false` and `errorMessage` (a localized key).
 - Use `Log` class (not `print()`).
 
@@ -61,7 +61,7 @@ Update **both** `version:` in `pubspec.yaml` AND `appVersion` in `lib/core/versi
 
 ## Build scripts
 
-- **`bash scripts/build_and_serve.sh`** — the internal release pipeline. Syncs version, checks hardcoded strings, builds Android + Linux, packs artifacts to `.caddy-artifacts/`, updates CHANGELOG. **Use this for all builds.**
+- **`bash scripts/build_and_serve.sh`** — the internal release pipeline. Syncs version, checks for bare UI strings + untranslated ARB keys, builds Android + Linux, packs artifacts to `.caddy-artifacts/`, updates CHANGELOG. **Use this for all builds.**
 - `bash scripts/build_and_serve.sh --dev` — dev build (debug mode + `DEV_PROVIDERS` enabled, no AppImage, skips changelog commit). Adds test/dev-only providers (e.g. self-hosted Uguu instance) guarded by `bool.fromEnvironment('DEV_PROVIDERS')`.
 - `bash scripts/build.sh <target>` — for external contributors who clone the repo. Checks prereqs, builds, deploys to `.caddy-artifacts/`. Targets: `android`, `linux`, `web`, `windows`, `all`.
 - `bash scripts/build-appimage.sh` — AppImage after Linux build (called by build_and_serve.sh).

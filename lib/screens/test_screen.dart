@@ -70,6 +70,14 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     }
   }
 
+  Future<ProviderInstance> _createInstance(
+      WidgetRef ref, BaseUploader base) async {
+    final instances = await loadProviderInstances(base.providerId);
+    final newId = DateTime.now().millisecondsSinceEpoch.toString();
+    final name = '${base.providerName} ${instances.length + 1}';
+    return ProviderInstance(base, newId, name);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -152,26 +160,11 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                 size: 20,
               ),
               const SizedBox(width: 8),
-              Expanded(
-                child: Text(l10n.myProviders,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold)),
-              ),
-              TextButton.icon(
-                onPressed: () async {
-                  final types = ProviderRegistry.instanceTypes;
-                  if (types.isEmpty) return;
-                  final saved =
-                      await showProviderConfigDialog(context, ref, types.first);
-                  if (saved == true) {
-                    ref.invalidate(enabledProvidersProvider);
-                  }
-                },
-                icon: const Icon(Icons.settings, size: 16),
-                label: Text(l10n.providerConfigure),
-              ),
+              Text(l10n.myProviders,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -190,6 +183,52 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                   health: health[p.providerId],
                   showConfigure: true,
                 )),
+          const SizedBox(height: 8),
+          // Add button
+          Center(
+            child: TextButton.icon(
+              onPressed: () async {
+                final types = ProviderRegistry.instanceTypes;
+                if (types.isEmpty) return;
+                if (types.length == 1) {
+                  final instance = await _createInstance(ref, types.first);
+                  if (!context.mounted) return;
+                  final saved =
+                      await showProviderEditDialog(context, ref, instance);
+                  if (saved) ref.invalidate(enabledProvidersProvider);
+                } else {
+                  final chosen = await showDialog<BaseUploader>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text(l10n.addProvider),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: types
+                            .map((t) => ListTile(
+                                  dense: true,
+                                  title: Text(t.providerName),
+                                  subtitle: t.instanceDescription != null
+                                      ? Text(t.instanceDescription!,
+                                          style: const TextStyle(fontSize: 12))
+                                      : null,
+                                  onTap: () => Navigator.pop(ctx, t),
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  );
+                  if (chosen == null) return;
+                  final instance = await _createInstance(ref, chosen);
+                  if (!context.mounted) return;
+                  final saved =
+                      await showProviderEditDialog(context, ref, instance);
+                  if (saved) ref.invalidate(enabledProvidersProvider);
+                }
+              },
+              icon: const Icon(Icons.add, size: 16),
+              label: Text(l10n.addProvider),
+            ),
+          ),
         ],
       ],
     );
@@ -281,7 +320,10 @@ class _ProviderRow extends ConsumerWidget {
                   Row(
                     children: [
                       Flexible(
-                        child: Text(provider.providerName,
+                        child: Text(
+                            provider is ProviderInstance
+                                ? (provider as ProviderInstance).displayName
+                                : provider.providerName,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                                 fontWeight: FontWeight.w600, fontSize: 13)),
@@ -333,13 +375,13 @@ class _ProviderRow extends ConsumerWidget {
                       _runTest(ref, provider, l10n.connectionFailed);
                     },
             ),
-            if (showConfigure)
+            if (showConfigure && provider is ProviderInstance)
               IconButton(
                 icon: const Icon(Icons.settings, size: 18),
                 tooltip: l10n.providerConfigure,
                 onPressed: () async {
-                  final saved =
-                      await showProviderConfigDialog(context, ref, provider);
+                  final saved = await showProviderEditDialog(
+                      context, ref, provider as ProviderInstance);
                   if (saved) ref.invalidate(enabledProvidersProvider);
                 },
               ),

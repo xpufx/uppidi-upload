@@ -212,6 +212,7 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
   }
 
   Widget _buildBody() {
+    final l10n = AppLocalizations.of(context);
     final screen = switch (_selected) {
       _NavTab.upload => const _ScreenLookup(screen: AppScreen.upload),
       _NavTab.history => const _ScreenLookup(screen: AppScreen.history),
@@ -234,8 +235,8 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
           child: Container(
             color: Colors.orange.shade700,
             padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-            child: const Text(
-              'DEV BUILD',
+            child: Text(
+              l10n.devBuild,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 10,

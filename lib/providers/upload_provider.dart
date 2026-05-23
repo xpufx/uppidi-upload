@@ -222,7 +222,7 @@ class UploadNotifier extends Notifier<UploadState> {
 
     final file = pickResult.files.first;
     _lastFilePath = file.path;
-    _lastFileBytes = file.bytes;
+    _lastFileBytes = await file.readAsBytes();
 
     try {
       var request = await createUploadRequest(file);
@@ -231,12 +231,8 @@ class UploadNotifier extends Notifier<UploadState> {
       );
 
       // Read preview bytes
-      Uint8List? previewBytes;
-      if (_lastFileBytes != null) {
-        previewBytes = _lastFileBytes;
-      } else if (file.bytes != null) {
-        previewBytes = file.bytes;
-      } else if (file.path != null) {
+      Uint8List? previewBytes = _lastFileBytes;
+      if (previewBytes == null && file.path != null) {
         previewBytes = await File(file.path!).readAsBytes();
       }
 

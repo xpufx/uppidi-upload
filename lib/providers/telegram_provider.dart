@@ -173,7 +173,7 @@ class TelegramProvider extends BaseHttpProvider {
         DioExceptionType.sendTimeout ||
         DioExceptionType.receiveTimeout ||
         DioExceptionType.connectionError =>
-          'errorConnectionFailed',
+          'connectionTimedOut',
         _ => 'genericError',
       };
     }

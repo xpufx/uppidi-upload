@@ -1411,6 +1411,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Topic'**
   String get configLabelTopic;
+
+  /// No description provided for @exportImportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export / Import'**
+  String get exportImportTitle;
+
+  /// No description provided for @exportImportDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Export your provider credentials and app settings to a JSON file for backup or transfer. Import merges all data — existing settings and provider config will be replaced.'**
+  String get exportImportDescription;
+
+  /// No description provided for @exportConfigTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export config'**
+  String get exportConfigTitle;
+
+  /// No description provided for @exportConfigWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This file will contain API keys, tokens, passwords, and app settings. Keep it safe — anyone with this file can access your accounts.'**
+  String get exportConfigWarning;
+
+  /// No description provided for @importConfigTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import config'**
+  String get importConfigTitle;
+
+  /// No description provided for @importConfigWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This will REPLACE all current provider credentials and settings with the data from the imported file. This cannot be undone.'**
+  String get importConfigWarning;
+
+  /// No description provided for @exportAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get exportAction;
+
+  /// No description provided for @importAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get importAction;
+
+  /// No description provided for @exportedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported to: {path}'**
+  String exportedTo(Object path);
+
+  /// No description provided for @exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed'**
+  String get exportFailed;
+
+  /// No description provided for @importFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed'**
+  String get importFailed;
+
+  /// No description provided for @apkDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'APK downloaded'**
+  String get apkDownloaded;
+
+  /// No description provided for @installNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Install Now'**
+  String get installNow;
+
+  /// No description provided for @downloadComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Download complete'**
+  String get downloadComplete;
 }
 
 class _AppLocalizationsDelegate

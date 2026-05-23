@@ -31,6 +31,7 @@ dev_dependencies:
   flutter_gen_runner: ^5.14.1
   build_runner: ^2.15.0
   flutter_lints: ^6.0.0
+  analyzer: ^10.0.1
 
 flutter:
   uses-material-design: true
