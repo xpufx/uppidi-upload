@@ -37,6 +37,7 @@ Update **both** `version:` in `pubspec.yaml` AND `appVersion` in `lib/core/versi
 - Never hardcode UI strings — use ARB localizations (`lib/l10n/`) via `AppLocalizations.of(context)`. The build script runs `scripts/check_bare_strings.dart` to enforce this.
 - Never throw exceptions in upload paths — return `UploadResult` with `success: false` and `errorMessage` (a localized key).
 - Use `Log` class (not `print()`).
+- When using the edit tool: match the **minimum unique oldString** — just enough to identify the target line(s), never surrounding context. Matching too broadly can silently delete adjacent code (e.g. an `@override` getter between the oldString start and end).
 
 ## Git discipline
 

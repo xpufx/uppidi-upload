@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: handle Dio auto-parsed JSON in Zulip resource fetch
 - fix: Zulip instanceDescription regression + comprehensive config persistence tests
 - fix: contain layouts with SafeArea, overflow ellipsis, themed colors, and localized strings
 - feat: Zulip channel/user picking from API + DM support
@@ -29,4 +30,3 @@
 - fix: revert to temp dir for APK, Install Now pops dialog
 - fix: download label redundancy
 - feat: export/import config, Install Now fix, Uguu-like provider
-- fix: debug buttons on all provider test steps

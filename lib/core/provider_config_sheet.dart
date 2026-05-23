@@ -540,6 +540,8 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   Future<void> _fetchZulipResources() async {
     setState(() => _loadingResources = true);
     try {
+      Map<String, dynamic> toMap(dynamic data) => data as Map<String, dynamic>;
+
       final config = <String, String>{};
       for (final key in widget.provider.requiredConfigKeys) {
         final value = _controllers[key]?.text.trim() ?? '';
@@ -548,20 +550,14 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       final dio = await widget.provider.createHttpClient(config);
 
       final subsResp = await dio.get('/api/v1/users/me/subscriptions');
-      final subsData = subsResp.data is Map
-          ? subsResp.data as Map<String, dynamic>
-          : jsonDecode(subsResp.data as String) as Map<String, dynamic>;
-      final subscriptions = subsData['subscriptions'] as List;
+      final subscriptions = toMap(subsResp.data)['subscriptions'] as List;
       final streams = subscriptions
           .map((s) => (s as Map)['name'] as String)
           .toList()
         ..sort();
 
       final usersResp = await dio.get('/api/v1/users');
-      final usersData = usersResp.data is Map
-          ? usersResp.data as Map<String, dynamic>
-          : jsonDecode(usersResp.data as String) as Map<String, dynamic>;
-      final members = usersData['members'] as List;
+      final members = toMap(usersResp.data)['members'] as List;
       final users = members.map((m) => m as Map<String, dynamic>).toList()
         ..sort((a, b) =>
             (a['full_name'] as String).compareTo(b['full_name'] as String));
