@@ -273,6 +273,7 @@ class UploadNotifier extends Notifier<UploadState> {
   Future<void> uploadSelected() async {
     // Apply quality compression at upload time (not during preview)
     final quality = qualityNotifier.value;
+    bool qualityApplied = false;
     if (quality > 0 && _lastFileBytes != null) {
       final mime = state is UploadFileSelected
           ? (state as UploadFileSelected).mimeType
@@ -288,6 +289,7 @@ class UploadNotifier extends Notifier<UploadState> {
             final resized = img.copyResize(src, width: newW, height: newH);
             final outBytes = img.encodeJpg(resized, quality: jpegQuality);
             _lastFileBytes = outBytes;
+            qualityApplied = true;
           }
         } catch (e) {
           _log.warn('Quality compression failed: $e', error: e);
@@ -296,7 +298,9 @@ class UploadNotifier extends Notifier<UploadState> {
     }
 
     FileUploadRequest? request;
-    if (_lastFilePath != null) {
+    // When quality was applied, use the compressed bytes even if a file path
+    // exists — otherwise the request would read the original uncompressed file.
+    if (_lastFilePath != null && !qualityApplied) {
       final ioFile = File(_lastFilePath!);
       final size = await ioFile.length();
       request = FileUploadRequest(

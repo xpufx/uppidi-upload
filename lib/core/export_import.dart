@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'logging/log.dart';
@@ -11,46 +10,108 @@ import 'settings_service.dart';
 final _log = Log('ExportImport');
 const _secure = FlutterSecureStorage();
 
-/// Exports all provider config and app settings to a JSON file selected
-/// by the user. Returns the file path on success, null if cancelled.
-Future<String?> exportConfig() async {
-  _log.info('Export started');
-  final data = <String, dynamic>{
-    'version': 1,
-    'exported_at': DateTime.now().toIso8601String(),
-    'providers': <String, dynamic>{},
-    'settings': <String, String>{},
-  };
-
-  // Read all secure storage keys (provider instances + credentials)
+/// Builds the export data map and returns it as a pretty-printed JSON string.
+/// Returns null if reading data fails.
+Future<String?> buildExportJsonString() async {
   try {
+    final data = <String, dynamic>{
+      'version': 1,
+      'exported_at': DateTime.now().toIso8601String(),
+      'providers': <String, dynamic>{},
+      'settings': <String, String>{},
+    };
+
     final allSecure = await _secure.readAll();
     for (final entry in allSecure.entries) {
       if (entry.key.startsWith('provider_')) {
         (data['providers'] as Map<String, dynamic>)[entry.key] = entry.value;
       }
     }
-    _log.info('Read ${allSecure.length} secure storage entries');
-  } catch (e) {
-    _log.error('Failed to read secure storage: $e', error: e);
-    rethrow;
-  }
 
-  // Read all Hive settings
-  try {
     final svc = SettingsService();
     final allSettings = await svc.readAll();
     for (final entry in allSettings.entries) {
       (data['settings'] as Map<String, String>)[entry.key] = entry.value;
     }
-    _log.info('Read ${allSettings.length} settings entries');
+
+    return const JsonEncoder.withIndent('  ').convert(data);
   } catch (e) {
-    _log.error('Failed to read settings: $e', error: e);
-    rethrow;
+    _log.error('Failed to build export JSON: $e', error: e);
+    return null;
+  }
+}
+
+/// Tries to save the given [jsonString] to a file via the system file picker.
+/// Returns a map of diagnostic information about the attempt.
+Future<Map<String, dynamic>> trySaveExport(String jsonString) async {
+  final diag = <String, dynamic>{
+    'json_length': jsonString.length,
+    'timestamp': DateTime.now().toIso8601String(),
+  };
+
+  final jsonBytes = utf8.encode(jsonString);
+
+  // Invoke the native "save" method via MethodChannel directly.
+  // Unlike FilePicker.saveFile(), this only gets the path from the
+  // native dialog — it won't try to File().writeAsBytes() on the result.
+  const channel = MethodChannel('miguelruivo.flutter.plugins.filepicker');
+  String? savedPath;
+  try {
+    savedPath = await channel.invokeMethod<String>('save', {
+      'fileName': 'uppidi-export.json',
+      'fileType': 'custom',
+      'allowedExtensions': <String>['json'],
+    });
+    diag['native_returned_path'] = savedPath;
+    diag['user_cancelled'] = savedPath == null;
+  } catch (e) {
+    diag['native_call_error'] = '$e';
+    diag['native_call_error_type'] = e.runtimeType.toString();
   }
 
-  final json = const JsonEncoder.withIndent('  ').convert(data);
-  final jsonBytes = utf8.encode(json);
+  if (savedPath != null) {
+    diag['path_length'] = savedPath.length;
+    diag['path_starts_with_slash'] = savedPath.startsWith('/');
+    diag['path_starts_with_content'] = savedPath.startsWith('content://');
+    diag['path_contains_document'] = savedPath.contains('/document/');
+    diag['path_uri'] = Uri.tryParse(savedPath)?.toString();
+
+    // Try to write bytes via dart:io File()
+    try {
+      final f = File(savedPath);
+      await f.writeAsBytes(jsonBytes);
+      diag['file_write_ok'] = true;
+      diag['file_size'] = await f.length();
+      diag['file_exists'] = await f.exists();
+    } catch (e) {
+      diag['file_write_error'] = '$e';
+      diag['file_write_error_type'] = e.runtimeType.toString();
+    }
+
+    // Write to a temp file so we can at least confirm the data is correct
+    try {
+      final tmpDir = Directory.systemTemp.createTempSync('uppidi_debug');
+      final tmp = File('${tmpDir.path}/uppidi-export.json');
+      await tmp.writeAsBytes(jsonBytes);
+      diag['temp_file_path'] = tmp.path;
+      diag['temp_file_size'] = await tmp.length();
+      await tmpDir.delete(recursive: true);
+    } catch (e) {
+      diag['temp_file_error'] = '$e';
+    }
+  }
+
+  return diag;
+}
+
+/// Exports all provider config and app settings to a JSON file selected
+/// by the user. Returns the file path on success, null if cancelled.
+Future<String?> exportConfig() async {
+  _log.info('Export started');
+  final jsonString = await buildExportJsonString();
+  if (jsonString == null) throw Exception('Failed to build export data');
+
+  final jsonBytes = utf8.encode(jsonString);
 
   // Pick save location and write file
   try {

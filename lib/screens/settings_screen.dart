@@ -52,24 +52,18 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
 
-    return Column(
+    return ListView(
+      padding: const EdgeInsets.all(16),
       children: [
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              Text(l10n.settings,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              _GlobalToggles(),
-              const SizedBox(height: 16),
-              const _ExportImportCard(),
-            ],
-          ),
-        ),
+        Text(l10n.settings,
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        _GlobalToggles(),
+        const SizedBox(height: 16),
+        const _ExportImportCard(),
         const _BottomCards(),
       ],
     );
@@ -1096,6 +1090,7 @@ class _ExportImportCard extends StatelessWidget {
               children: [
                 OutlinedButton.icon(
                   onPressed: () async {
+                    // Step 1: confirmation dialog
                     final confirm = await showDialog<bool>(
                       context: context,
                       builder: (ctx) => AlertDialog(
@@ -1109,27 +1104,22 @@ class _ExportImportCard extends StatelessWidget {
                           ),
                           FilledButton(
                             onPressed: () => Navigator.pop(ctx, true),
-                            child: Text("Export"),
+                            child: Text("Preview & Save"),
                           ),
                         ],
                       ),
                     );
                     if (confirm != true) return;
-                    try {
-                      final path = await exportConfig();
-                      if (path != null && context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Exported to: $path")),
-                        );
-                      }
-                    } catch (e) {
-                      _log.error('Export failed: $e', error: e);
+
+                    // Step 2: build preview
+                    final jsonString = await buildExportJsonString();
+                    if (jsonString == null || !context.mounted) {
                       if (context.mounted) {
                         showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            title: const Text("Export failed"),
-                            content: SelectableText("$e"),
+                            title: const Text("Error"),
+                            content: const Text("Failed to build export data."),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx),
@@ -1139,6 +1129,82 @@ class _ExportImportCard extends StatelessWidget {
                           ),
                         );
                       }
+                      return;
+                    }
+
+                    // Step 3: show preview dialog
+                    final shouldSave = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text("Export preview"),
+                        content: SizedBox(
+                          width: double.maxFinite,
+                          child: SingleChildScrollView(
+                            child: SelectableText(
+                              jsonString,
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: Text(l10n.cancel),
+                          ),
+                          FilledButton(
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: const Text("Save to file"),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (shouldSave != true || !context.mounted) return;
+
+                    // Step 4: attempt save, capture diagnostics
+                    final diag = await trySaveExport(jsonString);
+
+                    // Step 5: show diagnostic dialog
+                    if (!context.mounted) return;
+                    final diagLines = diag.entries
+                        .map((e) => '${e.key}: ${e.value}')
+                        .join('\n');
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text("Save result"),
+                        content: SizedBox(
+                          width: double.maxFinite,
+                          child: SingleChildScrollView(
+                            child: SelectableText(
+                              diagLines,
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: Text(l10n.ok),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (diag['error'] == null &&
+                        diag['user_cancelled'] == false &&
+                        diag['returned_path'] != null &&
+                        context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content:
+                                Text("Exported to: ${diag['returned_path']}")),
+                      );
                     }
                   },
                   icon: const Icon(Icons.upload, size: 16),

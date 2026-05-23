@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: Scrollbar needs controller when ScrollView has one
 - feat: remove AppDescription, scroll to top on provider change
 - feat: add Log calls to all catch blocks across the app
 - feat: add Log instances and error logging to all providers
@@ -29,4 +30,3 @@
 - l10n: fix all hardcoded strings, add new ARB keys
 - feat: add Zulip provider with multi-instance support
 - fix: tg://openmessage for all chat types
-- fix: scroll trusted, telegram link opens app
