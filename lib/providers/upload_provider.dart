@@ -483,6 +483,16 @@ class UploadNotifier extends Notifier<UploadState> {
         }
       }
 
+      // Load optional text config keys (e.g. zulip_channel, zulip_topic).
+      for (final key in provider.optionalTextConfigKeys) {
+        final secure = await _secure.read(
+          key: _secureKey(provider.providerId, key),
+        );
+        if (secure != null && secure.isNotEmpty) {
+          config[key] = secure;
+        }
+      }
+
       final allowInsecure = await settingsService.isInsecureConnAllowed();
       if (allowInsecure) {
         config['_allow_insecure_conn'] = 'true';
