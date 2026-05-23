@@ -1,5 +1,6 @@
 # Changelog
 
+- chore: simplify Zulip API response parsing, add edit tool guidance to AGENTS.md
 - fix: handle Dio auto-parsed JSON in Zulip resource fetch
 - fix: Zulip instanceDescription regression + comprehensive config persistence tests
 - fix: contain layouts with SafeArea, overflow ellipsis, themed colors, and localized strings
@@ -29,4 +30,3 @@
 - chore: keep only latest artifact, remove old builds
 - fix: revert to temp dir for APK, Install Now pops dialog
 - fix: download label redundancy
-- feat: export/import config, Install Now fix, Uguu-like provider

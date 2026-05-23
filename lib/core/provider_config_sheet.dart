@@ -829,6 +829,27 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                                 labelText: label,
                                 border: const OutlineInputBorder(),
                                 isDense: true,
+                                suffixIcon: _isZulip &&
+                                        (key == 'zulip_channel' ||
+                                            key == 'zulip_recipient') &&
+                                        _zulipStreams.isEmpty
+                                    ? _loadingResources
+                                        ? const SizedBox(
+                                            width: 14,
+                                            height: 14,
+                                            child: Padding(
+                                              padding: EdgeInsets.all(10),
+                                              child: CircularProgressIndicator(
+                                                  strokeWidth: 2),
+                                            ),
+                                          )
+                                        : IconButton(
+                                            icon: const Icon(
+                                                Icons.cloud_download,
+                                                size: 18),
+                                            onPressed: _fetchZulipResources,
+                                          )
+                                    : null,
                               ),
                             ),
                           );
@@ -891,24 +912,6 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                                 ],
                               ),
                             )),
-                        if (_isZulip && _testSteps.any((s) => s.ok))
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12),
-                            child: OutlinedButton.icon(
-                              onPressed: _loadingResources
-                                  ? null
-                                  : _fetchZulipResources,
-                              icon: _loadingResources
-                                  ? const SizedBox(
-                                      width: 14,
-                                      height: 14,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2),
-                                    )
-                                  : const Icon(Icons.cloud_download, size: 16),
-                              label: Text(l10n.reloadZulipResources),
-                            ),
-                          ),
                       ],
                     ),
                   ),
