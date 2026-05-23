@@ -548,8 +548,9 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       final dio = await widget.provider.createHttpClient(config);
 
       final subsResp = await dio.get('/api/v1/users/me/subscriptions');
-      final subsData =
-          jsonDecode(subsResp.data as String) as Map<String, dynamic>;
+      final subsData = subsResp.data is Map
+          ? subsResp.data as Map<String, dynamic>
+          : jsonDecode(subsResp.data as String) as Map<String, dynamic>;
       final subscriptions = subsData['subscriptions'] as List;
       final streams = subscriptions
           .map((s) => (s as Map)['name'] as String)
@@ -557,8 +558,9 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
         ..sort();
 
       final usersResp = await dio.get('/api/v1/users');
-      final usersData =
-          jsonDecode(usersResp.data as String) as Map<String, dynamic>;
+      final usersData = usersResp.data is Map
+          ? usersResp.data as Map<String, dynamic>
+          : jsonDecode(usersResp.data as String) as Map<String, dynamic>;
       final members = usersData['members'] as List;
       final users = members.map((m) => m as Map<String, dynamic>).toList()
         ..sort((a, b) =>
