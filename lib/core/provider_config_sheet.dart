@@ -104,6 +104,7 @@ String _resolveCfgLabel(AppLocalizations l10n, String raw) {
     'API Key' => l10n.configLabelApiKey,
     'Channel' => l10n.configLabelChannel,
     'Topic' => l10n.configLabelTopic,
+    'Direct message' => 'Direct message',
     _ => raw,
   };
 }
@@ -762,7 +763,20 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                             ),
                           );
                         }),
-                        ...widget.provider.optionalTextConfigKeys.map((key) {
+                        ...widget.provider.optionalTextConfigKeys.where((key) {
+                          if (!_isZulip) return true;
+                          final isDm =
+                              _checkboxValues['zulip_direct_message'] == true;
+                          if (isDm &&
+                              (key == 'zulip_channel' ||
+                                  key == 'zulip_topic')) {
+                            return false;
+                          }
+                          if (!isDm && key == 'zulip_recipient') {
+                            return false;
+                          }
+                          return true;
+                        }).map((key) {
                           final label =
                               _resolveCfgLabel(l10n, labels[key] ?? key);
                           final isChannel = key == 'zulip_channel' &&

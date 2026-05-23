@@ -48,8 +48,9 @@ class ZulipProvider extends BaseHttpProvider {
   @override
   List<String> get requiredConfigKeys =>
       ['zulip_url', 'zulip_email', 'zulip_api_key'];
+
   @override
-  List<String> get optionalConfigKeys => const [];
+  List<String> get optionalConfigKeys => ['zulip_direct_message'];
 
   @override
   List<String> get optionalTextConfigKeys =>
@@ -67,6 +68,7 @@ class ZulipProvider extends BaseHttpProvider {
         'zulip_channel': 'Channel',
         'zulip_topic': 'Topic',
         'zulip_recipient': 'Recipient',
+        'zulip_direct_message': 'Direct message',
       };
 
   @override
@@ -121,8 +123,10 @@ class ZulipProvider extends BaseHttpProvider {
   }) async {
     _lastServerUrl =
         (config['zulip_url']?.trim() ?? '').replaceAll(RegExp(r'/$'), '');
-    final channel = (config['zulip_channel'] ?? '').trim();
-    final topic = (config['zulip_topic'] ?? '').trim();
+    final isDm = config['zulip_direct_message'] == 'true';
+    final channel = isDm ? '' : (config['zulip_channel'] ?? '').trim();
+    final topic = isDm ? '' : (config['zulip_topic'] ?? '').trim();
+    final recipient = isDm ? (config['zulip_recipient'] ?? '').trim() : '';
 
     try {
       final allowInsecure = config['_allow_insecure_conn'] == 'true';
@@ -155,7 +159,6 @@ class ZulipProvider extends BaseHttpProvider {
       if (!result.success) return result;
 
       // Post the file URL to the configured channel or send as DM
-      final recipient = (config['zulip_recipient'] ?? '').trim();
       if (channel.isNotEmpty) {
         try {
           final msgData = <String, dynamic>{
