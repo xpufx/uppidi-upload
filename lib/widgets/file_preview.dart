@@ -146,6 +146,8 @@ class _FilePreviewState extends State<FilePreview> {
                 const SizedBox(height: 4),
                 Text(
                   widget.mimeType!,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall
@@ -291,17 +293,19 @@ class _FilePreviewState extends State<FilePreview> {
   }
 
   Widget _warningRow(String msg) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Row(
         children: [
           Icon(Icons.warning_amber_rounded,
-              size: 16, color: Colors.orange.shade700),
+              size: 16, color: theme.colorScheme.error),
           const SizedBox(width: 6),
           Expanded(
             child: Text(
               msg,
-              style: TextStyle(fontSize: 12, color: Colors.orange.shade800),
+              style: TextStyle(
+                  fontSize: 12, color: theme.colorScheme.onErrorContainer),
             ),
           ),
         ],

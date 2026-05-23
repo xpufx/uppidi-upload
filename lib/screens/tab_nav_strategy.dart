@@ -77,7 +77,7 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
           ],
         ),
       ),
-      body: _buildBody(),
+      body: SafeArea(child: _buildBody()),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.only(bottom: 4),
         child: BottomNavigationBar(
@@ -100,12 +100,14 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
   Widget _buildLeftRailScaffold(BuildContext context, AppLocalizations l10n) {
     final railWidth = _calculateRailWidth(l10n);
     return Scaffold(
-      body: Row(
-        children: [
-          SizedBox(width: railWidth, child: _buildRailContent(context, l10n)),
-          const VerticalDivider(width: 1),
-          Expanded(child: _buildBody()),
-        ],
+      body: SafeArea(
+        child: Row(
+          children: [
+            SizedBox(width: railWidth, child: _buildRailContent(context, l10n)),
+            const VerticalDivider(width: 1),
+            Expanded(child: _buildBody()),
+          ],
+        ),
       ),
       bottomNavigationBar: _buildBottomBar(context, l10n),
     );
@@ -114,12 +116,14 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
   Widget _buildRightRailScaffold(BuildContext context, AppLocalizations l10n) {
     final railWidth = _calculateRailWidth(l10n);
     return Scaffold(
-      body: Row(
-        children: [
-          Expanded(child: _buildBody()),
-          const VerticalDivider(width: 1),
-          SizedBox(width: railWidth, child: _buildRailContent(context, l10n)),
-        ],
+      body: SafeArea(
+        child: Row(
+          children: [
+            Expanded(child: _buildBody()),
+            const VerticalDivider(width: 1),
+            SizedBox(width: railWidth, child: _buildRailContent(context, l10n)),
+          ],
+        ),
       ),
       bottomNavigationBar: _buildBottomBar(context, l10n),
     );

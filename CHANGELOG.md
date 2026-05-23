@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: Zulip channel/user picking from API + DM support
 - fix: bare strings, provider config UX, import refresh, dev AppImage
 - refactor: extract FilePreview, ProgressSection, ResultBanner into separate files
 - fix: replace broken file_picker saveFile on Android with custom platform channel
@@ -29,4 +30,3 @@
 - fix: debug buttons on all provider test steps
 - feat: Uguu-like provider, floating buttons, collapsible sections
 - fix: keep modal after download, Install Now button
-- feat: Zulip channel/topic fields, post to channel after upload

@@ -11,7 +11,7 @@ Future<T?> showAdaptiveModal<T>({
 }) {
   return showDialog<T>(
     context: context,
-    useSafeArea: false,
+    useSafeArea: true,
     builder: (ctx) => LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 600) {

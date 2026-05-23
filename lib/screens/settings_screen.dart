@@ -52,20 +52,22 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Text(l10n.settings,
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 12),
-        _GlobalToggles(),
-        const SizedBox(height: 16),
-        const _ExportImportCard(),
-        const _BottomCards(),
-      ],
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text(l10n.settings,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          _GlobalToggles(),
+          const SizedBox(height: 16),
+          const _ExportImportCard(),
+          const _BottomCards(),
+        ],
+      ),
     );
   }
 }
@@ -150,7 +152,9 @@ class _VersionCheckWidget extends ConsumerWidget {
     String? ageText;
     if (lastChecked != null && state == VersionCheckState.upToDate) {
       final seconds = DateTime.now().difference(lastChecked).inSeconds;
-      ageText = seconds < 60 ? '${seconds}s ago' : '${seconds ~/ 60}m ago';
+      ageText = seconds < 60
+          ? l10n.secondsAgo(seconds)
+          : l10n.minutesAgo(seconds ~/ 60);
     }
 
     return GestureDetector(
@@ -929,6 +933,8 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                               ?.copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 2),
                       Text('v$appVersion ($gitHash)',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                           style: theme.textTheme.bodySmall),
                       _VersionCheckWidget(),
                       const SizedBox(height: 2),

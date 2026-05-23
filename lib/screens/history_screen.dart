@@ -23,83 +23,94 @@ class HistoryScreen extends ConsumerWidget {
       error: (e, _) => Center(child: Text('${l10n.error}: $e')),
       data: (records) {
         if (records.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.history, size: 64, color: Colors.grey.shade400),
-                const SizedBox(height: 16),
-                Text(l10n.historyEmpty,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.grey.shade500,
-                        )),
-              ],
+          return SafeArea(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.history,
+                      size: 64,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant
+                          .withValues(alpha: 0.4)),
+                  const SizedBox(height: 16),
+                  Text(l10n.historyEmpty,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          )),
+                ],
+              ),
             ),
           );
         }
 
-        return Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Row(
-                children: [
-                  Text(l10n.historyRecords(records.length),
-                      style: Theme.of(context).textTheme.bodySmall),
-                  const Spacer(),
-                  TextButton.icon(
-                    icon: const Icon(Icons.delete_sweep, size: 18),
-                    label: Text(l10n.historyClearAll),
-                    onPressed: () async {
-                      final confirmed = await showDialog<bool>(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          title: Text(l10n.clearHistory),
-                          content: Text(l10n.historyClearConfirm),
-                          actions: [
-                            TextButton(
-                                onPressed: () => Navigator.pop(ctx, false),
-                                child: Text(l10n.cancel)),
-                            TextButton(
-                                onPressed: () => Navigator.pop(ctx, true),
-                                child: Text(l10n.ok)),
-                          ],
-                        ),
-                      );
-                      if (confirmed == true) {
-                        await svc.clearAll();
-                        ref.invalidate(uploadHistoryProvider);
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.only(top: 0),
-                itemCount: records.length,
-                itemBuilder: (context, index) {
-                  final hr = records[index];
-                  return _HistoryTile(
-                    record: hr,
-                    onDelete: () {
-                      svc.delete(hr.key);
-                      ref.invalidate(uploadHistoryProvider);
-                    },
-                    onCopy: () {
-                      if (hr.record.url != null) {
-                        Clipboard.setData(ClipboardData(text: hr.record.url!));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.urlCopiedToClipboard)),
+        return SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(
+                  children: [
+                    Text(l10n.historyRecords(records.length),
+                        style: Theme.of(context).textTheme.bodySmall),
+                    const Spacer(),
+                    TextButton.icon(
+                      icon: const Icon(Icons.delete_sweep, size: 18),
+                      label: Text(l10n.historyClearAll),
+                      onPressed: () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: Text(l10n.clearHistory),
+                            content: Text(l10n.historyClearConfirm),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: Text(l10n.cancel)),
+                              TextButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: Text(l10n.ok)),
+                            ],
+                          ),
                         );
-                      }
-                    },
-                  );
-                },
+                        if (confirmed == true) {
+                          await svc.clearAll();
+                          ref.invalidate(uploadHistoryProvider);
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(top: 0),
+                  itemCount: records.length,
+                  itemBuilder: (context, index) {
+                    final hr = records[index];
+                    return _HistoryTile(
+                      record: hr,
+                      onDelete: () {
+                        svc.delete(hr.key);
+                        ref.invalidate(uploadHistoryProvider);
+                      },
+                      onCopy: () {
+                        if (hr.record.url != null) {
+                          Clipboard.setData(
+                              ClipboardData(text: hr.record.url!));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(l10n.urlCopiedToClipboard)),
+                          );
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

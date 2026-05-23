@@ -908,9 +908,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                                           strokeWidth: 2),
                                     )
                                   : const Icon(Icons.cloud_download, size: 16),
-                              label: Text(_zulipStreams.isNotEmpty
-                                  ? 'Reload channels & users'
-                                  : 'Load channels & users'),
+                              label: Text(l10n.reloadZulipResources),
                             ),
                           ),
                       ],

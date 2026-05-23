@@ -1495,6 +1495,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Download complete'**
   String get downloadComplete;
+
+  /// No description provided for @secondsAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s ago'**
+  String secondsAgo(Object seconds);
+
+  /// No description provided for @minutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m ago'**
+  String minutesAgo(Object minutes);
+
+  /// No description provided for @reloadZulipResources.
+  ///
+  /// In en, this message translates to:
+  /// **'Load channels & users'**
+  String get reloadZulipResources;
 }
 
 class _AppLocalizationsDelegate

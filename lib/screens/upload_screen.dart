@@ -186,11 +186,13 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
       ),
     );
 
-    final screen = Column(
-      children: [
-        Expanded(child: scrollBody),
-        bottomBar,
-      ],
+    final screen = SafeArea(
+      child: Column(
+        children: [
+          Expanded(child: scrollBody),
+          bottomBar,
+        ],
+      ),
     );
 
     if (isDesktop) {
@@ -342,9 +344,12 @@ class _ProviderInfo extends StatelessWidget {
                   Icon(Icons.file_present_outlined,
                       size: 14, color: Colors.grey.shade600),
                   const SizedBox(width: 6),
-                  Text(
-                    l10n.maxFileSize(formatSize(meta.maxFileSizeBytes!)),
-                    style: Theme.of(context).textTheme.bodySmall,
+                  Expanded(
+                    child: Text(
+                      l10n.maxFileSize(formatSize(meta.maxFileSizeBytes!)),
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ),
                 ],
               ),
@@ -541,19 +546,21 @@ class _WebWarning extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Container(
         padding: const EdgeInsets.all(8),
-        color: Colors.orange.shade100,
+        color: theme.colorScheme.errorContainer.withValues(alpha: 0.3),
         child: Row(
           children: [
-            const Icon(Icons.warning_amber, size: 18),
+            Icon(Icons.warning_amber, size: 18, color: theme.colorScheme.error),
             const SizedBox(width: 8),
             Expanded(
                 child: Text(l10n.providerWebNotSupported,
                     style: TextStyle(
-                        color: Colors.orange.shade900, fontSize: 13))),
+                        color: theme.colorScheme.onErrorContainer,
+                        fontSize: 13))),
           ],
         ),
       ),

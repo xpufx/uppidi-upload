@@ -140,9 +140,6 @@ class _BareStringVisitor extends RecursiveAstVisitor<void> {
     if (RegExp(r'^[\d.]+$').hasMatch(s)) return true;
     if (RegExp(r'^[a-z][a-zA-Z0-9]+$').hasMatch(s)) return true;
     if (_startsWithFlag(s)) return true;
-    if (s == 'Load channels & users' || s == 'Reload channels & users') {
-      return true;
-    }
     return false;
   }
 

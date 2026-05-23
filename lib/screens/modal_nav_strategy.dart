@@ -52,33 +52,36 @@ class _ModalDashboard extends StatelessWidget {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: devProviders ? 20 : 0),
-            child: const _ScreenLookup(screen: AppScreen.upload),
-          ),
-          if (devProviders)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                color: Colors.orange.shade700,
-                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-                child: Text(
-                  l10n.devBuild,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(bottom: devProviders ? 20 : 0),
+              child: const _ScreenLookup(screen: AppScreen.upload),
+            ),
+            if (devProviders)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  color: Colors.orange.shade700,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                  child: Text(
+                    l10n.devBuild,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -774,4 +774,17 @@ class AppLocalizationsTlh extends AppLocalizations {
 
   @override
   String get downloadComplete => 'Download complete';
+
+  @override
+  String secondsAgo(Object seconds) {
+    return '${seconds}s ago';
+  }
+
+  @override
+  String minutesAgo(Object minutes) {
+    return '${minutes}m ago';
+  }
+
+  @override
+  String get reloadZulipResources => 'Manage channels & users';
 }
