@@ -354,6 +354,9 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   List<Map<String, dynamic>> _zulipUsers = [];
   bool _loadingResources = false;
 
+  /// Maps user_id → full_name so the recipient field shows a name not a number
+  final Map<String, String> _zulipUserNames = {};
+
   bool get _isZulip => widget.provider.providerId.split('__').first == 'zulip';
 
   @override
@@ -567,6 +570,17 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
         setState(() {
           _zulipStreams = streams;
           _zulipUsers = users;
+          _zulipUserNames
+            ..clear()
+            ..addEntries(users.map((u) =>
+                MapEntry(u['user_id'].toString(), u['full_name'] as String)));
+          // Update recipient field display name if already selected
+          final rc = _controllers['zulip_recipient'];
+          if (rc != null) {
+            final id = rc.text;
+            final dn = _zulipUserNames[id];
+            if (dn != null) rc.text = '$dn ($id)';
+          }
         });
       }
     } catch (e) {
@@ -601,7 +615,12 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
             key: skey, value: (_checkboxValues[key] ?? false).toString());
       }
       for (final key in widget.provider.optionalTextConfigKeys) {
-        final value = _controllers[key]?.text.trim() ?? '';
+        var value = _controllers[key]?.text.trim() ?? '';
+        // Extract numeric ID from display format "John Doe (11)"
+        if (key == 'zulip_recipient') {
+          final match = RegExp(r'\((\d+)\)$').firstMatch(value);
+          if (match != null) value = match.group(1)!;
+        }
         final skey = _configKey(widget.provider.providerId, key);
         if (value.isNotEmpty) {
           await store.write(key: skey, value: value);
@@ -895,7 +914,17 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                                         ))
                                     .toList(),
                                 onChanged: (v) {
-                                  if (v != null) _controllers[key]!.text = v;
+                                  if (v != null) {
+                                    String? name;
+                                    for (final u in _zulipUsers) {
+                                      if (u['user_id'].toString() == v) {
+                                        name = u['full_name'] as String?;
+                                        break;
+                                      }
+                                    }
+                                    _controllers[key]!.text =
+                                        name != null ? '$name ($v)' : v;
+                                  }
                                 },
                               ),
                             );

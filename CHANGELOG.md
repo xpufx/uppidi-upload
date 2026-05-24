@@ -1,5 +1,6 @@
 # Changelog
 
+- test: add httpbin.org integration test for full upload pipeline
 - fix: ensure Zulip message always contains the file URL
 - fix: use ref.watch not ref.listen for config dialog — handles cached provider values
 - refactor: config dialog uses Riverpod provider — no more _loadConfig, message pre-filled
@@ -29,4 +30,3 @@
 - chore: remove unused _changelogText from _GlobalTogglesState
 - fix: re-add _VersionCheckWidget to _aboutCard
 - fix: remove manual file write in export (rely on picker bytes), replace error toasts with dialogs
-- fix: pin about card to bottom of settings screen, fix export path not found

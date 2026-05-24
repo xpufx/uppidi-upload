@@ -128,6 +128,9 @@ class ZulipProvider extends BaseHttpProvider {
     final channel = isDm ? '' : (config['zulip_channel'] ?? '').trim();
     final topic = isDm ? '' : (config['zulip_topic'] ?? '').trim();
     final recipient = isDm ? (config['zulip_recipient'] ?? '').trim() : '';
+    // Handle display format "John Doe (11)" stored by older versions
+    final recipientMatch = RegExp(r'\((\d+)\)$').firstMatch(recipient);
+    final recipientId = recipientMatch?.group(1) ?? recipient;
 
     try {
       final allowInsecure = config['_allow_insecure_conn'] == 'true';
@@ -200,11 +203,11 @@ class ZulipProvider extends BaseHttpProvider {
         } catch (e) {
           _log.warn('Failed to post to channel: $e');
         }
-      } else if (recipient.isNotEmpty) {
+      } else if (recipientId.isNotEmpty) {
         try {
           final msgData = <String, dynamic>{
             'type': 'direct',
-            'to': '[$recipient]',
+            'to': '[$recipientId]',
             'content': messageContent,
           };
           final msgResponse = await dio.post(
@@ -212,7 +215,7 @@ class ZulipProvider extends BaseHttpProvider {
             data: FormData.fromMap(msgData),
           );
           if (msgResponse.statusCode == 200) {
-            _log.info('Sent DM to user $recipient');
+            _log.info('Sent DM to user $recipientId');
           } else {
             _log.warn('Failed to send DM: ${msgResponse.statusCode}');
           }
