@@ -168,6 +168,11 @@ class ZulipProvider extends BaseHttpProvider {
             .replaceAll('{url}', result.url ?? '')
             .replaceAll('{filename}', request.fileName)
             .replaceAll('{provider}', providerName);
+        // Ensure the URL is always present in the message
+        final url = result.url;
+        if (url != null && !messageContent.contains(url)) {
+          messageContent = '$messageContent\n$url';
+        }
       }
 
       // Post the file URL to the configured channel or send as DM

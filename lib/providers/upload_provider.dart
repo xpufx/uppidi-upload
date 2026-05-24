@@ -505,8 +505,8 @@ class UploadNotifier extends Notifier<UploadState> {
       );
 
       // Load ALL stored config from secure storage via the shared provider.
-      // This replaces three separate manual loops — any key stored under
-      // `provider_config_{providerId}_` is automatically included.
+      // Secure storage takes priority over Hive, matching the original
+      // per-key loop behavior (optional/optionalText keys only exist in secure storage).
       final secureConfig =
           await ref.read(providerConfigProvider(provider.providerId).future);
       final config = <String, String>{...hiveConfig, ...secureConfig};

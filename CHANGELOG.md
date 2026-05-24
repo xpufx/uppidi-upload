@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: use ref.watch not ref.listen for config dialog — handles cached provider values
 - refactor: config dialog uses Riverpod provider — no more _loadConfig, message pre-filled
 - docs: bring ARCHITECTURE.md fully up to date — directory listing, versions, state machine, i18n
 - docs: ARCHITECTURE.md is the vision, not a snapshot — deviations are gaps, not patterns
@@ -29,4 +30,3 @@
 - fix: remove manual file write in export (rely on picker bytes), replace error toasts with dialogs
 - fix: pin about card to bottom of settings screen, fix export path not found
 - fix: show persistent validation error near buttons instead of invisible snackbar
-- fix: replace invisible snackbar with inline form validation on Test button
