@@ -621,7 +621,8 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       final data = resp.data is Map
           ? resp.data as Map<String, dynamic>
           : jsonDecode(resp.data as String) as Map<String, dynamic>;
-      final gateways = data['gateways'] as List;
+      final rawGateways = data['gateways'];
+      final gateways = rawGateways is List ? rawGateways : <dynamic>[];
       final names = gateways.map((g) => (g as Map)['name'] as String).toList()
         ..sort();
       if (mounted) {

@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: Matterbridge paired provider — IRC uploads through Catbox/Uguu etc.
 - feat: Matterbridge provider — relay files via API gateways
 - fix: eliminate remaining direct storage reads
 - fix: Telegram message template timing, recipient display name persistence
@@ -29,4 +30,3 @@
 - fix: Scrollbar needs controller when ScrollView has one
 - feat: remove AppDescription, scroll to top on provider change
 - feat: add Log calls to all catch blocks across the app
-- feat: add Log instances and error logging to all providers

@@ -138,6 +138,9 @@ class MatterbridgeProvider extends BaseHttpProvider {
         };
       }
 
+      _log.info(
+          'Matterbridge: gateway=$gateway url=${preUrl.isNotEmpty ? "paired" : "direct"}');
+
       final response = await dio.post(
         '/api/message',
         data: body,
@@ -145,10 +148,11 @@ class MatterbridgeProvider extends BaseHttpProvider {
         onSendProgress: onProgress,
       );
 
+      _log.info('Matterbridge response: ${response.statusCode}');
       if (response.statusCode == 200) {
         return UploadResult(
           success: true,
-          url: '',
+          url: preUrl,
           statusCode: response.statusCode,
           completedAt: DateTime.now(),
         );
