@@ -618,13 +618,19 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       }
       final dio = await widget.provider.createHttpClient(config);
       final resp = await dio.get('/api/gateways');
+      if (resp.statusCode != 200) {
+        throw Exception('HTTP ${resp.statusCode}: ${resp.data}');
+      }
       final data = resp.data is Map
           ? resp.data as Map<String, dynamic>
           : jsonDecode(resp.data as String) as Map<String, dynamic>;
       final rawGateways = data['gateways'];
-      final gateways = rawGateways is List ? rawGateways : <dynamic>[];
-      final names = gateways.map((g) => (g as Map)['name'] as String).toList()
-        ..sort();
+      if (rawGateways is! List) {
+        throw Exception(
+            'Expected "gateways" list, got: $rawGateways  (full response: $data)');
+      }
+      final names =
+          rawGateways.map((g) => (g as Map)['name'] as String).toList()..sort();
       if (mounted) {
         setState(() => _mbGateways = names);
       }
