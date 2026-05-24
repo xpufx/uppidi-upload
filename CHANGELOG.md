@@ -1,5 +1,7 @@
 # Changelog
 
+- docs: update ARCHITECTURE.md to reflect Riverpod config provider architecture
+- refactor: Riverpod config provider — single source of truth for provider config
 - fix: save messageText before state transition to UploadInProgress
 - feat: Zulip Channel/DM SegmentedButton, message template, editable upload message
 - feat: Zulip channel/DM toggle — mutually exclusive fields
@@ -28,5 +30,3 @@
 - fix: add Scrollbar to upload screen, pad content below dev banner
 - fix: pin action buttons to bottom of upload screen (Column + Expanded layout)
 - fix: build number format to fit Android limit
-- fix: cleanup glob, version code, providers.json, compact cards, tests
-- fix: cleanup glob matches symlinks, deletes just-deployed APKs

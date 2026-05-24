@@ -184,6 +184,7 @@ class UploadNotifier extends Notifier<UploadState> {
           mimeType: prev.mimeType,
           fileBytes: prev.fileBytes,
           selectedExpiry: prev.selectedExpiry,
+          messageText: prev.messageText,
           results: prev.results,
           selectedProviderIndex: index,
           providers: prev.providers,
@@ -210,6 +211,7 @@ class UploadNotifier extends Notifier<UploadState> {
           providers: prev.providers,
         ),
     };
+    Future.microtask(() => _loadAndSetMessageTemplate());
   }
 
   void setMessage(String text) {
@@ -226,6 +228,25 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: prev.selectedProviderIndex,
         providers: prev.providers,
       );
+    }
+  }
+
+  Future<void> _loadAndSetMessageTemplate() async {
+    if (state is! UploadFileSelected) return;
+    final providers = state.providers;
+    final idx = state.selectedProviderIndex;
+    if (idx >= providers.length) return;
+    final provider = providers[idx];
+    if (!provider.optionalTextConfigKeys.contains('message_template')) return;
+    try {
+      final config =
+          await ref.read(providerConfigProvider(provider.providerId).future);
+      final template = config['message_template'] ?? '';
+      if (template.isNotEmpty && state is UploadFileSelected) {
+        setMessage(template);
+      }
+    } catch (_) {
+      // Config provider may not be available (e.g. during tests)
     }
   }
 
@@ -264,6 +285,7 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
+      Future.microtask(() => _loadAndSetMessageTemplate());
     } catch (e) {
       _log.warn('Failed to read file: $e', error: e);
       final info = _extractFileInfo(state);
@@ -364,6 +386,7 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
+      Future.microtask(() => _loadAndSetMessageTemplate());
     } catch (e) {
       _log.warn('Failed to read shared file: $e', error: e);
       final info = _extractFileInfo(state);
@@ -684,6 +707,7 @@ class UploadNotifier extends Notifier<UploadState> {
         mimeType: 'image/jpeg',
         fileBytes: croppedBytes,
         selectedExpiry: prev.selectedExpiry,
+        messageText: prev.messageText,
         results: prev.results,
         selectedProviderIndex: prev.selectedProviderIndex,
         providers: prev.providers,
@@ -705,6 +729,7 @@ class UploadNotifier extends Notifier<UploadState> {
         mimeType: prev.mimeType,
         fileBytes: _originalFileBytes,
         selectedExpiry: prev.selectedExpiry,
+        messageText: prev.messageText,
         results: prev.results,
         selectedProviderIndex: prev.selectedProviderIndex,
         providers: prev.providers,

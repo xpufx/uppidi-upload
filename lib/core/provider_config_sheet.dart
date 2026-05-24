@@ -342,6 +342,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   final _log = Log('ProviderConfig');
   bool _isSaving = false;
   bool _isTesting = false;
+  bool _configReady = false;
   String? _validationError;
 
   /// Each test step: (label, ok?, detail).
@@ -368,43 +369,46 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       _checkboxValues[key] = false;
     }
     _nameController.text = widget.provider.providerName;
-    _loadConfig();
+    _loadInstanceName();
+    // Watch the config provider — populates form fields when data arrives,
+    // eliminating the stale-initial-render bug that plagued manual _loadConfig.
+    ref.listen(providerConfigProvider(widget.provider.providerId),
+        (prev, next) {
+      if (next is AsyncData && mounted && next.value != null) {
+        _populateFromConfig(next.value!);
+      }
+    });
   }
 
-  Future<void> _loadConfig() async {
+  Future<void> _loadInstanceName() async {
     final (baseId, instanceId) = _splitInstanceId(widget.provider.providerId);
+    try {
+      final instances = await loadProviderInstances(baseId);
+      final match = instances.where((i) => i.id == instanceId);
+      if (mounted && match.isNotEmpty) {
+        _nameController.text = match.first.name;
+      }
+    } catch (_) {}
+  }
+
+  void _populateFromConfig(Map<String, String> config) {
     for (final key in widget.provider.requiredConfigKeys) {
-      final value = await _secure.read(
-        key: _configKey(widget.provider.providerId, key),
-      );
-      if (mounted && _controllers[key] != null) {
-        _controllers[key]!.text = value ?? '';
+      final value = config[key];
+      if (value != null && _controllers[key] != null) {
+        _controllers[key]!.text = value;
       }
     }
     for (final key in widget.provider.optionalConfigKeys) {
-      final value = await _secure.read(
-        key: _configKey(widget.provider.providerId, key),
-      );
-      if (mounted) {
-        _checkboxValues[key] = value == 'true';
-      }
+      _checkboxValues[key] = config[key] == 'true';
     }
-    // Load optional text config keys
     for (final key in widget.provider.optionalTextConfigKeys) {
-      final value = await _secure.read(
-        key: _configKey(widget.provider.providerId, key),
-      );
-      if (mounted && _controllers[key] != null) {
-        _controllers[key]!.text = value ?? '';
+      final value = config[key];
+      if (value != null && _controllers[key] != null) {
+        _controllers[key]!.text = value;
       }
     }
-    // Load instance name from metadata if available
     if (mounted) {
-      final instances = await loadProviderInstances(baseId);
-      final match = instances.where((i) => i.id == instanceId);
-      if (match.isNotEmpty) {
-        _nameController.text = match.first.name;
-      }
+      setState(() => _configReady = true);
     }
   }
 
@@ -665,6 +669,10 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final labels = widget.provider.configLabels;
+
+    if (!_configReady) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return Dialog(
       child: Stack(
