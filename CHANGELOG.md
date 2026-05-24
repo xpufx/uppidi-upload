@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: Matterbridge gateway fetch now throws on null/unexpected response instead of silently falling back to empty list
 - fix: Matterbridge null gateways, upload logging, paired URL in result
 - feat: Matterbridge paired provider — IRC uploads through Catbox/Uguu etc.
 - feat: Matterbridge provider — relay files via API gateways
@@ -29,4 +30,3 @@
 - fix: replace broken file_picker saveFile on Android with custom platform channel
 - fix: quality resize when file has path, unpin settings bottom card
 - fix: Scrollbar needs controller when ScrollView has one
-- feat: remove AppDescription, scroll to top on provider change

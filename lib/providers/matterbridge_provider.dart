@@ -106,14 +106,13 @@ class MatterbridgeProvider extends BaseHttpProvider {
     Map<String, String> config = const {},
   }) async {
     try {
-      final gateway = config['_gateway'] ?? '';
+      final gateway = (config['mb_gateway'] ?? '').trim();
       final preUrl = config['_pre_uploaded_url'] ?? '';
       final allowInsecure = config['_allow_insecure_conn'] == 'true';
       final proxyUrl = config['_proxy_url'];
       final cleanConfig = Map<String, String>.from(config)
         ..remove('_allow_insecure_conn')
         ..remove('_proxy_url')
-        ..remove('_gateway')
         ..remove('_pre_uploaded_url')
         ..remove('_expiry');
 
