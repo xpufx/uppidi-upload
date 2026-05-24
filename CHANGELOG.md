@@ -1,5 +1,6 @@
 # Changelog
 
+- docs: two checker design docs — raw storage ban and wide config ban; remove Export/Import exception from riverpod doc
 - fix: Matterbridge gateway fetch now throws on null/unexpected response instead of silently falling back to empty list
 - fix: Matterbridge null gateways, upload logging, paired URL in result
 - feat: Matterbridge paired provider — IRC uploads through Catbox/Uguu etc.
@@ -29,4 +30,3 @@
 - refactor: extract FilePreview, ProgressSection, ResultBanner into separate files
 - fix: replace broken file_picker saveFile on Android with custom platform channel
 - fix: quality resize when file has path, unpin settings bottom card
-- fix: Scrollbar needs controller when ScrollView has one

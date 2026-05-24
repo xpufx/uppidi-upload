@@ -40,6 +40,16 @@ if ! dart run scripts/check_bare_strings.dart 2>&1; then
 	exit 1
 fi
 
+# ── Raw storage check (FlutterSecureStorage outside config_provider) ──
+echo "==> Checking for direct storage access..."
+if ! dart run scripts/check_raw_storage.dart 2>&1; then
+	exit 1
+fi
+
+# ── Wide config check (Map<String, String> in upload signatures) ──
+echo "==> Checking for wide config types..."
+dart run scripts/check_wide_config.dart 2>&1 || true
+
 # ── Localization check (gen-l10n reports untranslated keys) ─
 echo "==> Checking for untranslated localization keys..."
 GEN_OUTPUT=$(flutter gen-l10n 2>&1 || true)
