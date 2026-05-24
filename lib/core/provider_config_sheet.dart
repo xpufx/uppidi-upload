@@ -917,6 +917,8 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                           final isGateway = key == 'mb_gateway' &&
                               _isMatterbridge &&
                               _mbGateways.isNotEmpty;
+                          final isPairedProvider =
+                              key == 'paired_provider' && _isMatterbridge;
 
                           if (isChannel) {
                             return Padding(
@@ -992,6 +994,34 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                                 items: _mbGateways
                                     .map((g) => DropdownMenuItem(
                                         value: g, child: Text(g)))
+                                    .toList(),
+                                onChanged: (v) {
+                                  if (v != null) _controllers[key]!.text = v;
+                                },
+                              ),
+                            );
+                          }
+
+                          if (isPairedProvider) {
+                            final uploadProviders = ProviderRegistry.all
+                                .where((p) => !p.isUrlOnly)
+                                .where((p) => p.providerId != 'matterbridge')
+                                .toList();
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _controllers[key]!.text.isNotEmpty
+                                    ? _controllers[key]!.text
+                                    : null,
+                                decoration: InputDecoration(
+                                  labelText: label,
+                                  border: const OutlineInputBorder(),
+                                  isDense: true,
+                                ),
+                                items: uploadProviders
+                                    .map((p) => DropdownMenuItem(
+                                        value: p.providerId,
+                                        child: Text(p.providerName)))
                                     .toList(),
                                 onChanged: (v) {
                                   if (v != null) _controllers[key]!.text = v;

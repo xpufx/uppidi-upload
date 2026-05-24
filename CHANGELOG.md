@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: Matterbridge provider — relay files via API gateways
 - fix: eliminate remaining direct storage reads
 - fix: Telegram message template timing, recipient display name persistence
 - test: add httpbin.org integration test for full upload pipeline
@@ -29,4 +30,3 @@
 - feat: remove AppDescription, scroll to top on provider change
 - feat: add Log calls to all catch blocks across the app
 - feat: add Log instances and error logging to all providers
-- chore: remove unused _changelogText from _GlobalTogglesState

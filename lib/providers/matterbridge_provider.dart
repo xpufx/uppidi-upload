@@ -45,7 +45,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
   List<String> get optionalConfigKeys => const [];
 
   @override
-  List<String> get optionalTextConfigKeys => ['mb_gateway'];
+  List<String> get optionalTextConfigKeys => ['mb_gateway', 'paired_provider'];
 
   @override
   String? get instanceDescription =>
@@ -56,6 +56,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
         'mb_url': 'Server URL',
         'mb_token': 'API Token',
         'mb_gateway': 'Gateway',
+        'paired_provider': 'Upload via',
       };
 
   @override
@@ -106,33 +107,36 @@ class MatterbridgeProvider extends BaseHttpProvider {
   }) async {
     try {
       final gateway = config['_gateway'] ?? '';
+      final preUrl = config['_pre_uploaded_url'] ?? '';
       final allowInsecure = config['_allow_insecure_conn'] == 'true';
       final proxyUrl = config['_proxy_url'];
       final cleanConfig = Map<String, String>.from(config)
         ..remove('_allow_insecure_conn')
         ..remove('_proxy_url')
         ..remove('_gateway')
+        ..remove('_pre_uploaded_url')
         ..remove('_expiry');
 
       final dio = await createHttpClient(cleanConfig,
           allowInsecureConn: allowInsecure, proxyUrl: proxyUrl);
 
-      final bytes = await request.dataStream.first;
-      final b64 = base64Encode(bytes);
-
       final body = <String, dynamic>{
-        'text': request.fileName,
+        'text': preUrl.isNotEmpty ? 'Uploaded: $preUrl' : request.fileName,
         'gateway': gateway,
-        'Extra': {
+      };
+
+      if (preUrl.isEmpty) {
+        final bytes = await request.dataStream.first;
+        body['Extra'] = {
           'file': [
             {
               'Name': request.fileName,
-              'Data': b64,
+              'Data': base64Encode(bytes),
               'Comment': 'from Uppidi',
             },
           ],
-        },
-      };
+        };
+      }
 
       final response = await dio.post(
         '/api/message',

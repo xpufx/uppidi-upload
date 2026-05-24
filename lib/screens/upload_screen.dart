@@ -444,29 +444,36 @@ class _UploadButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final state = ref.watch(uploadProvider);
+    final provider = state.providers.asMap()[state.selectedProviderIndex];
+    final isUrlOnly = provider?.isUrlOnly ?? false;
+
     return ElevatedButton.icon(
-      onPressed: () async {
-        final state = ref.read(uploadProvider);
-        if (state is! UploadFileSelected) return;
-        final provider = state.providers[state.selectedProviderIndex];
+      onPressed: isUrlOnly
+          ? null
+          : () async {
+              final state = ref.read(uploadProvider);
+              if (state is! UploadFileSelected) return;
+              final provider = state.providers[state.selectedProviderIndex];
 
-        // Check if provider requires auth config
-        if (provider.metadata.capabilities
-            .contains(ProviderCapability.requiresAuth)) {
-          final configured = await isProviderConfigured(ref, provider);
-          if (!configured) {
-            if (context.mounted) {
-              showProviderConfigDialog(context, ref, provider);
-            }
-            return;
-          }
-        }
+              // Check if provider requires auth config
+              if (provider.metadata.capabilities
+                  .contains(ProviderCapability.requiresAuth)) {
+                final configured = await isProviderConfigured(ref, provider);
+                if (!configured) {
+                  if (context.mounted) {
+                    showProviderConfigDialog(context, ref, provider);
+                  }
+                  return;
+                }
+              }
 
-        if (!context.mounted) return;
-        final proceed = await checkInsecureWarning(context, provider, ref);
-        if (!proceed) return;
-        notifier.uploadSelected();
-      },
+              if (!context.mounted) return;
+              final proceed =
+                  await checkInsecureWarning(context, provider, ref);
+              if (!proceed) return;
+              notifier.uploadSelected();
+            },
       icon: const Icon(Icons.cloud_upload),
       label: Text(l10n.upload),
       style: ElevatedButton.styleFrom(

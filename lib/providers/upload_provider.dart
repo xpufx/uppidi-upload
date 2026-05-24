@@ -404,6 +404,38 @@ class UploadNotifier extends Notifier<UploadState> {
     }
   }
 
+  /// Returns a progress callback that updates the [UploadInProgress] state.
+  UploadProgressCallback _uploadProgressCallback(CancelToken ct) {
+    return (sent, total) {
+      final current = state;
+      if (current is UploadInProgress) {
+        final now = DateTime.now();
+        final elapsed = now.difference(_lastSpeedSample).inMilliseconds;
+        if (elapsed >= 500) {
+          final bytesDelta = sent - _lastSampleBytes;
+          final secs = elapsed / 1000.0;
+          final bytesPerSec = bytesDelta / secs;
+          final speed = _formatSpeed(bytesPerSec);
+          _lastSpeedSample = now;
+          _lastSampleBytes = sent;
+          state = current.copyWithProgress(
+            sent / total,
+            sent,
+            total,
+            speed,
+          );
+        } else {
+          state = current.copyWithProgress(
+            sent / total,
+            sent,
+            total,
+            current.speedLabel,
+          );
+        }
+      }
+    };
+  }
+
   Future<void> _executeUpload(FileUploadRequest request) async {
     // Save last used provider
     if (state.selectedProviderIndex < state.providers.length) {
@@ -552,36 +584,38 @@ class UploadNotifier extends Notifier<UploadState> {
       // capability will pick it up via buildFormFields).
       config['_expiry'] = _selectedExpiry;
 
+      // Handle paired provider upload (e.g. Matterbridge IRC + Catbox)
+      final pairedId = config['paired_provider'];
+      if (pairedId != null && pairedId.isNotEmpty) {
+        final paired = ProviderRegistry.all
+            .where((p) => p.providerId == pairedId)
+            .firstOrNull;
+        if (paired != null) {
+          final pairedResult = await paired.upload(request,
+              onProgress: _uploadProgressCallback(cancelToken),
+              cancelToken: cancelToken,
+              config: config);
+          if (!pairedResult.success || pairedResult.url == null) {
+            state = UploadCompleted(
+              lastResult: pairedResult,
+              errorMessage: pairedResult.errorMessage ?? 'uploadFailed',
+              fileName: currentFileName,
+              fileSizeBytes: currentFileSize,
+              mimeType: currentMimeType,
+              fileBytes: currentFileBytes,
+              results: state.results,
+              selectedProviderIndex: state.selectedProviderIndex,
+              providers: state.providers,
+            );
+            return;
+          }
+          config['_pre_uploaded_url'] = pairedResult.url!;
+        }
+      }
+
       final result = await provider.upload(
         request,
-        onProgress: (sent, total) {
-          final current = state;
-          if (current is UploadInProgress) {
-            final now = DateTime.now();
-            final elapsed = now.difference(_lastSpeedSample).inMilliseconds;
-            if (elapsed >= 500) {
-              final bytesDelta = sent - _lastSampleBytes;
-              final secs = elapsed / 1000.0;
-              final bytesPerSec = bytesDelta / secs;
-              final speed = _formatSpeed(bytesPerSec);
-              _lastSpeedSample = now;
-              _lastSampleBytes = sent;
-              state = current.copyWithProgress(
-                sent / total,
-                sent,
-                total,
-                speed,
-              );
-            } else {
-              state = current.copyWithProgress(
-                sent / total,
-                sent,
-                total,
-                current.speedLabel,
-              );
-            }
-          }
-        },
+        onProgress: _uploadProgressCallback(cancelToken),
         cancelToken: cancelToken,
         config: config,
       );
