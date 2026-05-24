@@ -20,6 +20,8 @@ class MockNavUploader implements BaseUploader {
 
   @override
   bool get supportsWeb => true;
+  @override
+  bool get isUrlOnly => false;
 
   @override
   List<String> get requiredConfigKeys => [];

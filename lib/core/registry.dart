@@ -11,6 +11,7 @@ import '../providers/freeimage_provider.dart';
 import '../providers/frisk_provider.dart';
 import '../providers/httpbin_provider.dart';
 import '../providers/litterbox_provider.dart';
+import '../providers/matterbridge_provider.dart';
 import '../providers/tempsh_provider.dart';
 import '../providers/telegram_provider.dart';
 import '../providers/tmpfilelink_provider.dart';
@@ -44,6 +45,7 @@ final List<BaseUploader> _baseTypes = [
   TelegramProvider(),
   ZulipProvider(),
   CustomUguuProvider(),
+  MatterbridgeProvider(),
 ];
 
 class ProviderRegistry {

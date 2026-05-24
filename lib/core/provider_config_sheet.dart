@@ -25,13 +25,20 @@ String _configKey(String providerId, String key) =>
 class ProviderInstanceMeta {
   final String id;
   final String name;
-  const ProviderInstanceMeta({required this.id, required this.name});
+  final bool urlOnly;
 
-  Map<String, dynamic> toJson() => {'id': id, 'name': name};
+  const ProviderInstanceMeta({
+    required this.id,
+    required this.name,
+    this.urlOnly = false,
+  });
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name, 'urlOnly': urlOnly};
   factory ProviderInstanceMeta.fromJson(Map<String, dynamic> json) =>
       ProviderInstanceMeta(
         id: json['id'] as String,
         name: json['name'] as String,
+        urlOnly: json['urlOnly'] as bool? ?? false,
       );
 }
 
@@ -357,7 +364,13 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   /// Maps user_id → full_name so the recipient field shows a name not a number
   final Map<String, String> _zulipUserNames = {};
 
+  // Matterbridge gateways fetched from API
+  List<String> _mbGateways = [];
+  bool _loadingMbGateways = false;
+
   bool get _isZulip => widget.provider.providerId.split('__').first == 'zulip';
+  bool get _isMatterbridge =>
+      widget.provider.providerId.split('__').first == 'matterbridge';
 
   @override
   void initState() {
@@ -592,6 +605,37 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
       }
     } finally {
       if (mounted) setState(() => _loadingResources = false);
+    }
+  }
+
+  Future<void> _fetchMatterbridgeGateways() async {
+    setState(() => _loadingMbGateways = true);
+    try {
+      final config = <String, String>{};
+      for (final key in widget.provider.requiredConfigKeys) {
+        final value = _controllers[key]?.text.trim() ?? '';
+        if (value.isNotEmpty) config[key] = value;
+      }
+      final dio = await widget.provider.createHttpClient(config);
+      final resp = await dio.get('/api/gateways');
+      final data = resp.data is Map
+          ? resp.data as Map<String, dynamic>
+          : jsonDecode(resp.data as String) as Map<String, dynamic>;
+      final gateways = data['gateways'] as List;
+      final names = gateways.map((g) => (g as Map)['name'] as String).toList()
+        ..sort();
+      if (mounted) {
+        setState(() => _mbGateways = names);
+      }
+    } catch (e) {
+      _log.error('Failed to fetch Matterbridge gateways: $e', error: e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load gateways: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loadingMbGateways = false);
     }
   }
 
@@ -870,6 +914,9 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                           final isRecipient = key == 'zulip_recipient' &&
                               _isZulip &&
                               _zulipUsers.isNotEmpty;
+                          final isGateway = key == 'mb_gateway' &&
+                              _isMatterbridge &&
+                              _mbGateways.isNotEmpty;
 
                           if (isChannel) {
                             return Padding(
@@ -930,6 +977,29 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                             );
                           }
 
+                          if (isGateway) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _controllers[key]!.text.isNotEmpty
+                                    ? _controllers[key]!.text
+                                    : null,
+                                decoration: InputDecoration(
+                                  labelText: label,
+                                  border: const OutlineInputBorder(),
+                                  isDense: true,
+                                ),
+                                items: _mbGateways
+                                    .map((g) => DropdownMenuItem(
+                                        value: g, child: Text(g)))
+                                    .toList(),
+                                onChanged: (v) {
+                                  if (v != null) _controllers[key]!.text = v;
+                                },
+                              ),
+                            );
+                          }
+
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 12),
                             child: TextFormField(
@@ -938,11 +1008,14 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                                 labelText: label,
                                 border: const OutlineInputBorder(),
                                 isDense: true,
-                                suffixIcon: _isZulip &&
-                                        (key == 'zulip_channel' ||
-                                            key == 'zulip_recipient') &&
-                                        _zulipStreams.isEmpty
-                                    ? _loadingResources
+                                suffixIcon: (_isZulip &&
+                                            (key == 'zulip_channel' ||
+                                                key == 'zulip_recipient') &&
+                                            _zulipStreams.isEmpty) ||
+                                        (_isMatterbridge &&
+                                            key == 'mb_gateway' &&
+                                            _mbGateways.isEmpty)
+                                    ? _loadingResources || _loadingMbGateways
                                         ? const SizedBox(
                                             width: 14,
                                             height: 14,
@@ -956,7 +1029,9 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
                                             icon: const Icon(
                                                 Icons.cloud_download,
                                                 size: 18),
-                                            onPressed: _fetchZulipResources,
+                                            onPressed: _isMatterbridge
+                                                ? _fetchMatterbridgeGateways
+                                                : _fetchZulipResources,
                                           )
                                     : null,
                               ),

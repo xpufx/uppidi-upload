@@ -56,6 +56,8 @@ class MockBaseUploader implements BaseUploader {
 
   @override
   bool get supportsWeb => _supportsWeb;
+  @override
+  bool get isUrlOnly => false;
 
   @override
   List<String> get requiredConfigKeys => _requiredConfigKeys;

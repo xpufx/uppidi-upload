@@ -15,8 +15,11 @@ class ProviderInstance implements BaseUploader {
   final BaseUploader _base;
   final String instanceId;
   final String instanceName;
+  final bool _urlOnly;
 
-  const ProviderInstance(this._base, this.instanceId, this.instanceName);
+  const ProviderInstance(this._base, this.instanceId, this.instanceName,
+      {bool urlOnly = false})
+      : _urlOnly = urlOnly;
 
   @override
   String get providerId => '${_base.providerId}__$instanceId';
@@ -29,6 +32,9 @@ class ProviderInstance implements BaseUploader {
 
   @override
   bool get supportsWeb => _base.supportsWeb;
+
+  @override
+  bool get isUrlOnly => _urlOnly;
 
   @override
   List<String> get requiredConfigKeys => _base.requiredConfigKeys;

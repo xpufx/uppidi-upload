@@ -10,6 +10,10 @@ abstract class BaseUploader {
   String get providerId;
   String get providerName;
   bool get supportsWeb;
+
+  /// True for relay-only providers (e.g. IRC via Matterbridge) that
+  /// can't host files and only forward URLs.
+  bool get isUrlOnly => false;
   List<String> get requiredConfigKeys;
 
   /// Optional boolean config keys (rendered as checkboxes in the config

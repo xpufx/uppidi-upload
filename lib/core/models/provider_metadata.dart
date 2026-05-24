@@ -12,6 +12,10 @@ enum ProviderCapability {
   /// Provider needs an API key, access token, or other credentials
   /// configured in settings before it can be used.
   requiresAuth,
+
+  /// Provider can only relay URLs — no file upload. Shown in History for
+  /// sharing via Matterbridge IRC gateways.
+  urlOnly,
 }
 
 class ProviderMetadata {
