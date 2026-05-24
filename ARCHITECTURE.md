@@ -12,12 +12,11 @@
 | Framework | Flutter 3.16+ | UI framework (6 platforms) |
 | State Mgmt | `flutter_riverpod` ^3.3.1 | DI + reactive state — ALL mutable state flows through Riverpod providers, never read directly from storage |
 | Local DB | `hive` + `hive_flutter` | Settings + upload history |
-| Local DB | `hive` + `hive_flutter` | Settings + upload history |
 | Networking | `dio` ^5.9.2 | HTTP client, streaming, cancel tokens |
 | i18n | `flutter_gen` + ARB files | Compile-time safe localizations |
 | Image processing | `image` ^4.0.0 | Resize, crop, thumbnail |
-| File picking | `file_picker` ^8.0.0 | Cross-platform file selection |
-| Sharing | `share_plus` ^12.0.2 | OS share sheet |
+| File picking | `file_picker` ^12.0.0 | Cross-platform file selection |
+| Sharing | `share_plus` ^13.0.0 | OS share sheet |
 | URL handling | `url_launcher` ^6.3.2 | Open links externally |
 | Linting | `flutter_lints` ^6.0.0 | Default Flutter lints |
 
@@ -31,36 +30,39 @@ lib/
 │   │   ├── uploader.dart              # BaseUploader abstract class (plugin contract)
 │   │   └── base_http_provider.dart    # BaseHttpProvider (common HTTP upload logic)
 │   ├── models/
-│   │   ├── upload_request.dart        # FileUploadRequest (stream-based)
-│   │   ├── upload_result.dart         # UploadResult (success/failure)
-│   │   ├── upload_record.dart         # Hive-serialized upload history
-│   │   └── provider_metadata.dart     # Provider capabilities (file size, MIME, etc.)
+│   │   ├── provider_instance.dart       # ProviderInstance wrapper (multi-instance support)
+│   │   ├── provider_metadata.dart       # Provider capabilities (file size, MIME, etc.)
+│   │   ├── upload_record.dart           # Hive-serialized upload history
+│   │   ├── upload_request.dart          # FileUploadRequest (stream-based)
+│   │   └── upload_result.dart           # UploadResult (success/failure)
 │   ├── platform/
-│   │   ├── file_source.dart           # Conditional export stub/io
-│   │   ├── file_source_stub.dart      # Web stub
-│   │   ├── file_source_io.dart        # IO implementation
-│   │   ├── insecure_adapter.dart      # Conditional export stub/io
-│   │   ├── insecure_adapter_stub.dart # Web stub
-│   │   └── insecure_adapter_io.dart   # Self-signed cert adapter
+│   │   ├── file_source.dart             # Conditional export stub/io
+│   │   ├── file_source_stub.dart        # Web stub
+│   │   ├── file_source_io.dart          # IO implementation
+│   │   ├── insecure_adapter.dart        # Conditional export stub/io
+│   │   ├── insecure_adapter_stub.dart   # Web stub
+│   │   └── insecure_adapter_io.dart     # Self-signed cert adapter
 │   ├── logging/
-│   │   ├── log.dart                   # Logger wrapper around dart:developer
-│   │   └── logging.dart               # Barrel export
-│   ├── registry.dart                  # ProviderRegistry (all providers list) + Riverpod providers
-│   ├── settings_service.dart          # Hive-backed settings CRUD + settings providers
-│   ├── history_service.dart           # Hive-backed upload history CRUD + providers
-│   ├── theme_provider.dart            # Theme mode, seed color, logo path notifiers
-│   ├── connectivity.dart              # Provider health check utility (uses configProvider)
-│   ├── config_provider.dart            # FutureProvider.family — loads all keys from secure storage
-│   ├── version.dart                   # Build-time injected git hash + version
-│   ├── version_check_provider.dart    # CDN-based version check
-│   ├── apk_installer.dart             # Android APK download + install
-│   ├── app_logo.dart                  # Logo widget
-│   ├── format.dart                    # Size formatting utility
-│   ├── metadata_badges.dart           # Provider metadata badge widgets
-│   ├── mime_types.dart                # MIME type detection
-│   ├── share_handler.dart             # Share intent handler (mobile)
-│   ├── share_message_dialog.dart      # Share URL dialog
-│   └── share_template.dart            # Share message templates
+│   │   ├── log.dart                     # Logger wrapper around dart:developer
+│   │   └── logging.dart                 # Barrel export
+│   ├── config_provider.dart             # FutureProvider.family — loads all keys from secure storage
+│   ├── provider_config_sheet.dart       # Config dialog + instance management
+│   ├── registry.dart                   # ProviderRegistry (all providers list) + Riverpod providers
+│   ├── settings_service.dart            # Hive-backed settings CRUD + settings providers
+│   ├── history_service.dart             # Hive-backed upload history CRUD + providers
+│   ├── theme_provider.dart              # Theme mode, seed color, logo path notifiers
+│   ├── connectivity.dart                # Provider health check utility (uses configProvider)
+│   ├── version.dart                     # Build-time injected git hash + version
+│   ├── version_check_provider.dart      # CDN-based version check
+│   ├── apk_installer.dart               # Android APK download + install
+│   ├── app_logo.dart                    # Logo widget
+│   ├── format.dart                      # Size formatting utility
+│   ├── metadata_badges.dart             # Provider metadata badge widgets
+│   ├── mime_types.dart                  # MIME type detection
+│   ├── share_handler.dart               # Share intent handler (mobile)
+│   ├── share_message_dialog.dart        # Share URL dialog
+│   ├── share_template.dart              # Share message templates
+│   └── android_save.dart                # Android SAF export workaround
 ├── providers/                         # Plugin implementations
 │   ├── catbox_provider.dart           # Catbox.moe
 │   ├── httpbin_provider.dart          # HttpBin.org (test)
@@ -68,51 +70,56 @@ lib/
 │   ├── tempsh_provider.dart           # Temp.sh
 │   ├── freeimage_provider.dart        # Freeimage.host
 │   ├── tmpfilelink_provider.dart      # TmpFile.link
+│   ├── litterbox_provider.dart        # Litterbox.catbox.moe
+│   ├── frisk_provider.dart            # Frisk.li
+│   ├── fileditch_provider.dart        # FileDitch
+│   ├── telegram_provider.dart         # Telegram (auth, multi-instance)
+│   ├── zulip_provider.dart            # Zulip (auth, multi-instance)
+│   ├── custom_uguu_provider.dart      # Uguu-compatible self-hosted (auth)
 │   └── upload_provider.dart           # UploadNotifier (state machine + orchestration)
 ├── screens/
 │   ├── shell_strategy.dart            # AppScreen enum + ScreenRegistry
 │   ├── tab_nav_strategy.dart          # Bottom nav (mobile) / left rail (desktop)
 │   ├── modal_nav_strategy.dart        # Alternative modal navigation
-│   ├── upload_screen.dart             # Main upload UI (~1176 lines)
+│   ├── upload_screen.dart             # Main upload UI
 │   ├── history_screen.dart            # Upload history list
 │   ├── history_modal.dart             # History as bottom sheet
 │   ├── providers_modal.dart           # Provider list modal
 │   ├── settings_screen.dart           # App settings
 │   ├── settings_modal.dart            # Settings as modal
 │   ├── test_screen.dart               # Provider health + enable/disable
-│   ├── modal_nav_strategy.dart        # Modal navigation strategy
-│   ├── modal_utils.dart               # Modal helper utilities
-│   └── tab_nav_strategy.dart          # Tab-based navigation strategy
+│   └── modal_utils.dart               # Modal helper utilities
 ├── widgets/
+│   ├── file_preview.dart              # Image preview with crop and quality selector
+│   ├── progress_section.dart          # Animated upload progress bar
+│   ├── result_banner.dart             # Upload result with share/copy/retry
 │   ├── image_crop_overlay.dart        # Image crop UI overlay
 │   └── provider_favicon.dart          # Provider favicon widget
 ├── l10n/
 │   ├── intl_en.arb                    # English strings
+│   ├── intl_eo.arb                    # Esperanto strings
 │   ├── intl_it.arb                    # Italian strings
 │   ├── intl_tr.arb                    # Turkish strings
+│   ├── intl_tlh.arb                   # Klingon strings
 │   ├── app_localizations.dart         # Generated localizations class
 │   ├── app_localizations_en.dart      # Generated EN
+│   ├── app_localizations_eo.dart      # Generated EO
 │   ├── app_localizations_it.dart      # Generated IT
-│   └── app_localizations_tr.dart      # Generated TR
+│   ├── app_localizations_tr.dart      # Generated TR
+│   └── app_localizations_tlh.dart     # Generated TLH
 test/
 ├── widget_test.dart                   # App smoke test
-├── upload_screen_test.dart            # Upload screen widget tests (~1120 lines)
-├── base_http_provider_test.dart       # BaseHttpProvider unit tests
-├── settings_service_test.dart         # Settings service tests
-├── upload_provider_test.dart          # Upload provider tests
-├── provider_unit_test.dart            # Provider unit tests
-├── models_test.dart                   # Model unit tests
-├── state_test.dart                    # State machine tests
-├── main_test.dart                     # Main entry tests
-├── providers_test.dart                # Providers testing
+├── upload_screen_test.dart            # Upload screen widget tests
+├── upload_provider_test.dart          # Upload provider state machine tests
 ├── test_screen_test.dart              # Test screen widget tests
-├── providers/                         # (if any)
+├── providers_test.dart                # Live provider integration tests
+├── core/
+│   └── provider_config_test.dart      # Config persistence + registry tests
 ├── widgets/
-│   ├── settings_screen_test.dart
-│   └── image_crop_overlay_test.dart
-├── functional/
-│   ├── insecure_conn_functional_test.dart
-│   └── proxy_functional_test.dart
+│   └── settings_screen_test.dart
+└── functional/
+    ├── insecure_conn_functional_test.dart
+    └── proxy_functional_test.dart
 ```
 
 ## Core Architecture: Engine & Plugin Model
@@ -191,7 +198,7 @@ UploadIdle → UploadFileSelected → UploadInProgress → UploadCompleted
 
 **State classes (sealed):**
 - `UploadIdle` — waiting for file pick
-- `UploadFileSelected` — file picked, preview visible, quality selectable
+- `UploadFileSelected` — file picked, preview visible, quality selectable, message text editable
 - `UploadInProgress` — active upload with progress, speed, CancelToken
 - `UploadCompleted` — success (URL) or failure (error message)
 
@@ -305,4 +312,4 @@ Writing invalidates the provider and all watchers update automatically.
 - **Release script:** `scripts/build_and_serve.sh` — builds Android APK + Linux release, copies to `.caddy-artifacts/`, updates `latest.txt`
 - **Versioning:** Update `version:` in `pubspec.yaml` AND `appVersion` in `lib/core/version.dart`
 - **CDN:** Static files served via Caddy from `.caddy-artifacts/` directory
-- **i18n:** Run `flutter_gen` to regenerate localizations from ARB files
+- **i18n:** Run `flutter gen-l10n` or `dart run build_runner build` to regenerate localizations from ARB files
