@@ -10,7 +10,7 @@
 |---|---|---|
 | Language | Dart 3.x | Cross-platform via Flutter |
 | Framework | Flutter 3.16+ | UI framework (6 platforms) |
-| State Mgmt | `flutter_riverpod` ^3.3.1 | DI + reactive state — single source of truth for all mutable state |
+| State Mgmt | `flutter_riverpod` ^3.3.1 | DI + reactive state — ALL mutable state flows through Riverpod providers, never read directly from storage |
 | Local DB | `hive` + `hive_flutter` | Settings + upload history |
 | Local DB | `hive` + `hive_flutter` | Settings + upload history |
 | Networking | `dio` ^5.9.2 | HTTP client, streaming, cancel tokens |
@@ -116,6 +116,11 @@ test/
 ```
 
 ## Core Architecture: Engine & Plugin Model
+
+> **Vision, not just description.** This document describes the target
+> architecture. Code that deviates from these patterns (e.g. direct
+> `FlutterSecureStorage` reads) is a known gap tracked for migration.
+> See `docs/designdocs/riverpod-state.md` for the detailed rationale.
 
 ### The Contract (`lib/core/interfaces/uploader.dart`)
 
