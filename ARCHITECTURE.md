@@ -151,22 +151,29 @@ Providers extend `BaseHttpProvider` and only override:
 
 ### Provider Registry (`lib/core/registry.dart`)
 
-All providers registered in a single static list:
+Two layers:
 
+**Base types** — the static blueprints, registered in a single list:
 ```dart
-class ProviderRegistry {
-  static final List<BaseUploader> all = [
-    HttpBinProvider(),
-    UguuProvider(name: 'uguu.se', url: 'https://uguu.se'),
-    TmpFileLinkProvider(),
-    CatboxProvider(),
-    FreeImageHostProvider(name: 'freeimage.host', url: 'https://freeimage.host'),
-    TempShProvider(),
-  ];
-}
+final List<BaseUploader> _baseTypes = [
+  HttpBinProvider(), FileDitchProvider(), FriskProvider(),
+  UguuProvider(name: 'uguu.se', url: 'https://uguu.se'),
+  TmpFileLinkProvider(), CatboxProvider(),
+  FreeImageHostProvider(name: 'freeimage.host', url: 'https://freeimage.host'),
+  TempShProvider(), LitterboxProvider(),
+  TelegramProvider(), ZulipProvider(), CustomUguuProvider(),
+];
 ```
 
-The UI is built from `ProviderRegistry.all`. Adding a provider = one line.
+**Instances** — configured copies of auth providers (Telegram, Zulip). Each
+instance wraps a base type as `ProviderInstance(base, instanceId, name)`.
+The `init()` method loads instances from `FlutterSecureStorage` at startup,
+so auth providers only appear in the UI when configured.  `refresh()` reloads
+instances without restarting the app.
+
+The UI reads from `ProviderRegistry.all` which merges base types (non-auth)
+with loaded instances (auth).  Adding a new auth provider = one line in
+`_baseTypes` + one class implementing `BaseUploader`.
 
 ### Upload State Machine (`lib/providers/upload_provider.dart`)
 
@@ -241,8 +248,14 @@ Upload cancellation:
 | Catbox.moe | File hosting | CatboxProvider |
 | Uguu.se | File hosting | UguuProvider |
 | Temp.sh | Temporary file hosting | TempShProvider |
-| Freeimage.host | Image hosting | FreeImageHostProvider |
 | TmpFile.link | Temporary file hosting | TmpFileLinkProvider |
+| Freeimage.host | Image hosting | FreeImageHostProvider |
+| Litterbox.catbox.moe | Temporary file hosting | LitterboxProvider |
+| Frisk.li | File hosting | FriskProvider |
+| FileDitch | File hosting | FileDitchProvider |
+| Telegram | Chat with bot upload | TelegramProvider (auth, multi-instance) |
+| Zulip | Team chat upload | ZulipProvider (auth, multi-instance) |
+| Uguu-compatible | Self-hosted Uguu | CustomUguuProvider (auth, single-instance) |
 
 ### Configuration Management
 
