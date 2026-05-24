@@ -1,5 +1,9 @@
 # Changelog
 
+- refactor: config dialog uses Riverpod provider — no more _loadConfig, message pre-filled
+- docs: bring ARCHITECTURE.md fully up to date — directory listing, versions, state machine, i18n
+- docs: ARCHITECTURE.md is the vision, not a snapshot — deviations are gaps, not patterns
+- docs: fix ARCHITECTURE.md provider registry to match 12 providers with dynamic initialization
 - docs: update ARCHITECTURE.md to reflect Riverpod config provider architecture
 - refactor: Riverpod config provider — single source of truth for provider config
 - fix: save messageText before state transition to UploadInProgress
@@ -26,7 +30,3 @@
 - fix: pin about card to bottom of settings screen, fix export path not found
 - fix: show persistent validation error near buttons instead of invisible snackbar
 - fix: replace invisible snackbar with inline form validation on Test button
-- fix: remove redundant Test title from Providers page
-- fix: add Scrollbar to upload screen, pad content below dev banner
-- fix: pin action buttons to bottom of upload screen (Column + Expanded layout)
-- fix: build number format to fit Android limit

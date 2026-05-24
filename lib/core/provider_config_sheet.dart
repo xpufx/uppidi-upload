@@ -343,6 +343,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   bool _isSaving = false;
   bool _isTesting = false;
   bool _configReady = false;
+  bool _configPopulated = false;
   String? _validationError;
 
   /// Each test step: (label, ok?, detail).
@@ -370,14 +371,6 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
     }
     _nameController.text = widget.provider.providerName;
     _loadInstanceName();
-    // Watch the config provider — populates form fields when data arrives,
-    // eliminating the stale-initial-render bug that plagued manual _loadConfig.
-    ref.listen(providerConfigProvider(widget.provider.providerId),
-        (prev, next) {
-      if (next is AsyncData && mounted && next.value != null) {
-        _populateFromConfig(next.value!);
-      }
-    });
   }
 
   Future<void> _loadInstanceName() async {
@@ -670,7 +663,18 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
     final theme = Theme.of(context);
     final labels = widget.provider.configLabels;
 
+    // Watch the config provider — returns cached data immediately or triggers
+    // a fresh load. Populate form fields once when data arrives.
+    final configAsync =
+        ref.watch(providerConfigProvider(widget.provider.providerId));
     if (!_configReady) {
+      final data = configAsync.asData?.value;
+      if (data != null && !_configPopulated) {
+        _configPopulated = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _populateFromConfig(data);
+        });
+      }
       return const Center(child: CircularProgressIndicator());
     }
 
