@@ -523,15 +523,11 @@ class UploadNotifier extends Notifier<UploadState> {
       }
 
       // Override message with user-edited text from the upload screen.
-      // Also reload from config provider as fallback — the async microtask
-      // (_loadAndSetMessageTemplate) may not have fired yet if the user
-      // taps Upload immediately after file selection.
+      // savedMessageText is captured before the state transition; if empty,
+      // fall back to the stored template (already loaded via config provider).
       var msg = savedMessageText;
       if (msg.isEmpty) {
         msg = config['message_template'] ?? '';
-      }
-      if (msg.isEmpty) {
-        msg = secureConfig['message_template'] ?? '';
       }
       if (msg.isNotEmpty) {
         final info = _extractFileInfo(state);

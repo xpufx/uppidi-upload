@@ -388,14 +388,16 @@ class _ProviderRow extends ConsumerWidget {
             Switch(
               value: isEnabled,
               onChanged: (v) async {
-                final svc = ref.read(settingsServiceProvider);
-                final current = await svc.getDisabledProviders();
+                final current = Set<String>.from(
+                    await ref.read(disabledProviderIdsProvider.future));
                 if (v) {
                   current.remove(provider.providerId);
                 } else {
                   current.add(provider.providerId);
                 }
-                await svc.setDisabledProviders(current);
+                await ref
+                    .read(settingsServiceProvider)
+                    .setDisabledProviders(current);
                 ref.invalidate(disabledProviderIdsProvider);
               },
             ),

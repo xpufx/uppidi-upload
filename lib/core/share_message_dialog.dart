@@ -32,11 +32,10 @@ class _ShareMessageDialogState extends ConsumerState<ShareMessageDialog> {
   }
 
   Future<void> _loadSavedMessage() async {
-    final svc = ref.read(settingsServiceProvider);
-    final saved = await svc.get(SettingsService.shareMessageKey);
+    final saved = await ref.read(shareMessageProvider.future);
     if (mounted) {
       setState(() {
-        _controller.text = saved ?? '';
+        _controller.text = saved;
       });
     }
   }
@@ -48,6 +47,7 @@ class _ShareMessageDialogState extends ConsumerState<ShareMessageDialog> {
     } else {
       await svc.set(SettingsService.shareMessageKey, text);
     }
+    ref.invalidate(shareMessageProvider);
   }
 
   @override

@@ -22,6 +22,11 @@ final disabledProviderIdsProvider = FutureProvider<Set<String>>((ref) async {
   return ref.read(settingsServiceProvider).getDisabledProviders();
 });
 
+final shareMessageProvider = FutureProvider<String>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  return (await svc.get(SettingsService.shareMessageKey)) ?? '';
+});
+
 final providerHealthProvider =
     FutureProvider<Map<String, ProviderHealthInfo>>((ref) async {
   final cdnUrl = const String.fromEnvironment('CDN_URL', defaultValue: '');

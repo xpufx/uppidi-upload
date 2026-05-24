@@ -1118,10 +1118,10 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
 
 /// Checks whether a provider's required config keys have all been set.
 Future<bool> isProviderConfigured(WidgetRef ref, BaseUploader provider) async {
+  final config =
+      await ref.read(providerConfigProvider(provider.providerId).future);
   for (final key in provider.requiredConfigKeys) {
-    final value = await _secure.read(
-      key: _configKey(provider.providerId, key),
-    );
+    final value = config[key];
     if (value == null || value.trim().isEmpty) {
       return false;
     }
