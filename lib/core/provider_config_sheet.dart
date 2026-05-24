@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../l10n/app_localizations.dart';
+import 'config_provider.dart';
 import 'interfaces/uploader.dart';
 import 'logging/log.dart';
 import 'models/provider_instance.dart';
@@ -266,6 +267,8 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
     if (confirmed != true) return;
     await deleteProviderInstance(widget.providerId, instance,
         configKeys: widget.baseProvider.requiredConfigKeys);
+    ref.invalidate(
+        providerConfigProvider('${widget.providerId}__${instance.id}'));
     _reload();
   }
 
@@ -636,6 +639,8 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
         instances.add(ProviderInstanceMeta(id: instanceId, name: name));
       }
       await saveProviderInstances(baseId, instances);
+      // Invalidate the config provider so all watchers get fresh data.
+      ref.invalidate(providerConfigProvider(widget.provider.providerId));
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         final loc = AppLocalizations.of(context);

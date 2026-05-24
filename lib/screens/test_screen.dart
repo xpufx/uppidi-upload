@@ -417,7 +417,7 @@ void _setResult(WidgetRef ref, String id, _TestResult r) {
 
 Future<void> _runTest(
     WidgetRef ref, BaseUploader p, String connectionFailed) async {
-  final latency = await checkProviderConnectivity(p);
+  final latency = await checkProviderConnectivity(p, ref: ref);
   if (latency != null) {
     _setResult(
         ref,

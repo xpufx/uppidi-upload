@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: save messageText before state transition to UploadInProgress
 - feat: Zulip Channel/DM SegmentedButton, message template, editable upload message
 - feat: Zulip channel/DM toggle — mutually exclusive fields
 - fix: upload not loading optionalTextConfigKeys from storage
@@ -29,4 +30,3 @@
 - fix: build number format to fit Android limit
 - fix: cleanup glob, version code, providers.json, compact cards, tests
 - fix: cleanup glob matches symlinks, deletes just-deployed APKs
-- revert: back to split-per-abi, keep cleanup + Install Now

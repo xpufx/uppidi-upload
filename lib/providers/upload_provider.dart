@@ -4,9 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image/image.dart' as img;
 
+import '../core/config_provider.dart';
 import '../core/format.dart';
 import '../core/history_service.dart';
 import '../core/interfaces/uploader.dart';
@@ -18,11 +18,6 @@ import '../core/models/upload_result.dart';
 import '../core/platform/file_source.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
-
-const _secure = FlutterSecureStorage();
-
-String _secureKey(String providerId, String key) =>
-    'provider_config_${providerId}_$key';
 
 final _log = Log('UploadNotifier');
 
@@ -481,41 +476,26 @@ class UploadNotifier extends Notifier<UploadState> {
 
     try {
       final settingsService = ref.read(settingsServiceProvider);
-      final config = await settingsService.loadProviderConfig(
+      final hiveConfig = await settingsService.loadProviderConfig(
         provider.providerId,
         provider.requiredConfigKeys,
       );
-      // Provider credentials moved to FlutterSecureStorage.
-      // Merge them into the config so the upload has access to tokens.
+
+      // Load ALL stored config from secure storage via the shared provider.
+      // This replaces three separate manual loops — any key stored under
+      // `provider_config_{providerId}_` is automatically included.
+      final secureConfig =
+          await ref.read(providerConfigProvider(provider.providerId).future);
+      final config = <String, String>{...hiveConfig, ...secureConfig};
+
+      // Merge required keys from secure storage as fallback for keys not
+      // in Hive (legacy migration path for credentials stored pre-refactor).
       for (final key in provider.requiredConfigKeys) {
         if (!config.containsKey(key) || config[key]!.isEmpty) {
-          final secure = await _secure.read(
-            key: _secureKey(provider.providerId, key),
-          );
-          if (secure != null && secure.isNotEmpty) {
-            config[key] = secure;
+          final val = secureConfig[key];
+          if (val != null && val.isNotEmpty) {
+            config[key] = val;
           }
-        }
-      }
-
-      // Load optional boolean config keys (e.g. send_as_photo) from
-      // secure storage and pass them through to the provider.
-      for (final key in provider.optionalConfigKeys) {
-        final secure = await _secure.read(
-          key: _secureKey(provider.providerId, key),
-        );
-        if (secure != null && secure.isNotEmpty) {
-          config[key] = secure;
-        }
-      }
-
-      // Load optional text config keys (e.g. zulip_channel, zulip_topic).
-      for (final key in provider.optionalTextConfigKeys) {
-        final secure = await _secure.read(
-          key: _secureKey(provider.providerId, key),
-        );
-        if (secure != null && secure.isNotEmpty) {
-          config[key] = secure;
         }
       }
 
