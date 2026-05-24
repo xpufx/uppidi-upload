@@ -161,17 +161,17 @@ class ZulipProvider extends BaseHttpProvider {
 
       // Resolve message content from config
       var messageContent = config['message_text'] ?? '';
-      if (messageContent.isEmpty) {
-        messageContent = result.url ?? '';
-      } else {
-        messageContent = messageContent
-            .replaceAll('{url}', result.url ?? '')
-            .replaceAll('{filename}', request.fileName)
-            .replaceAll('{provider}', providerName);
-        // Ensure the URL is always present in the message
-        final url = result.url;
-        if (url != null && !messageContent.contains(url)) {
-          messageContent = '$messageContent\n$url';
+      _log.info('Zulip message_content="$messageContent" url="${result.url}"');
+      if (result.url != null) {
+        if (messageContent.isEmpty) {
+          messageContent = result.url!;
+        } else {
+          messageContent = messageContent
+              .replaceAll('{url}', result.url!)
+              .replaceAll('{filename}', request.fileName)
+              .replaceAll('{provider}', providerName);
+          // Always append the URL so the file is reachable from the chat
+          messageContent = '$messageContent\n${result.url}';
         }
       }
 

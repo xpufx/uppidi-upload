@@ -554,4 +554,62 @@ void main() {
       expect(selectedState.selectedProviderIndex, 1);
     });
   });
+
+  group('Full pipeline (httpbin.org)', () {
+    test('file upload completes end-to-end', () async {
+      final notifier = container.read(uploadProvider.notifier);
+
+      // Override the mock uploader to actually POST to httpbin.org
+      mockUploaders[0].uploadCallback =
+          (request, {onProgress, cancelToken, config = const {}}) async {
+        final bytes = await request.dataStream.first;
+        final dio = Dio();
+        try {
+          final response = await dio.post(
+            'https://httpbin.org/post',
+            data: bytes,
+            options: Options(
+              headers: {
+                'Content-Type': request.mimeType ?? 'application/octet-stream'
+              },
+            ),
+            cancelToken: cancelToken,
+            onSendProgress: onProgress,
+          );
+          dio.close();
+          return UploadResult(
+            success: true,
+            url: 'https://httpbin.org/echo',
+            statusCode: response.statusCode,
+            completedAt: DateTime.now(),
+          );
+        } catch (e) {
+          dio.close();
+          return UploadResult(
+            success: false,
+            errorMessage: 'uploadFailed',
+            rawError: e.toString(),
+            completedAt: DateTime.now(),
+          );
+        }
+      };
+
+      await notifier.uploadFromFile(testFile.path, 'text/plain');
+      expect(notifier.state, isA<UploadFileSelected>());
+
+      await notifier.uploadSelected();
+
+      expect(notifier.state, isA<UploadCompleted>());
+      final state = notifier.state as UploadCompleted;
+      if (!state.isSuccess) {
+        final err = state.lastResult.rawError ?? '';
+        if (err.contains('503')) {
+          markTestSkipped('httpbin.org returned 503 — transient, skipping');
+          return;
+        }
+        fail('Upload failed: $err');
+      }
+      expect(state.lastResult.url, isNotNull);
+    });
+  });
 }
