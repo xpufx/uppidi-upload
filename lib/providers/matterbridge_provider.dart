@@ -126,7 +126,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
         'text': message.isNotEmpty
             ? message
             : preUrl.isNotEmpty
-                ? 'Uploaded: $preUrl'
+                ? 'Uppidi Uploaded: $preUrl'
                 : request.fileName,
         'gateway': gateway,
       };
