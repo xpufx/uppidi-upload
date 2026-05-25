@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 
+import 'matterbridge_config.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/logging/log.dart';
@@ -103,23 +104,25 @@ class MatterbridgeProvider extends BaseHttpProvider {
     FileUploadRequest request, {
     UploadProgressCallback? onProgress,
     CancelToken? cancelToken,
-    Map<String, String> config = const {},
+    Object? config,
   }) async {
+    final cfg = config is MatterbridgeConfig
+        ? config
+        : MatterbridgeConfig.fromMap(
+            config is Map<String, String> ? config : {});
+    final gateway = cfg.gateway;
+    final preUrl = cfg.preUploadedUrl ?? '';
+    final message = cfg.messageText ?? '';
+
     try {
-      final gateway = (config['mb_gateway'] ?? '').trim();
-      final preUrl = config['_pre_uploaded_url'] ?? '';
-      final allowInsecure = config['_allow_insecure_conn'] == 'true';
-      final proxyUrl = config['_proxy_url'];
-      final cleanConfig = Map<String, String>.from(config)
-        ..remove('_allow_insecure_conn')
-        ..remove('_proxy_url')
-        ..remove('_pre_uploaded_url')
-        ..remove('_expiry');
+      final dio = Dio(BaseOptions(
+        baseUrl: cfg.serverUrl,
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 60),
+        headers: {'Authorization': 'Bearer ${cfg.token}'},
+        validateStatus: (_) => true,
+      ));
 
-      final dio = await createHttpClient(cleanConfig,
-          allowInsecureConn: allowInsecure, proxyUrl: proxyUrl);
-
-      final message = config['message_text'] ?? '';
       final body = <String, dynamic>{
         'text': message.isNotEmpty
             ? message
@@ -151,6 +154,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
         cancelToken: cancelToken,
         onSendProgress: onProgress,
       );
+      dio.close();
 
       _log.info('Matterbridge response: ${response.statusCode}');
       if (response.statusCode == 200) {

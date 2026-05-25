@@ -18,6 +18,8 @@ import '../core/models/upload_result.dart';
 import '../core/platform/file_source.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
+import 'matterbridge_config.dart';
+import 'matterbridge_provider.dart';
 
 final _log = Log('UploadNotifier');
 
@@ -586,12 +588,22 @@ class UploadNotifier extends Notifier<UploadState> {
         }
       }
 
-      final result = await provider.upload(
-        request,
-        onProgress: _uploadProgressCallback(cancelToken),
-        cancelToken: cancelToken,
-        config: config,
-      );
+      final UploadResult result;
+      if (provider is MatterbridgeProvider) {
+        result = await provider.upload(
+          request,
+          onProgress: _uploadProgressCallback(cancelToken),
+          cancelToken: cancelToken,
+          config: MatterbridgeConfig.fromMap(config),
+        );
+      } else {
+        result = await provider.upload(
+          request,
+          onProgress: _uploadProgressCallback(cancelToken),
+          cancelToken: cancelToken,
+          config: config,
+        );
+      }
 
       // Stamp expiry on the result so the UI and history can display it.
       // Configurable-expiry providers use the user's selection; others use
