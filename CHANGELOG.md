@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: Matterbridge always includes URL, retry preserves messageText, UploadCompleted carries messageText
 - feat: global message template settings card + upload screen pre-fill
 - fix: store Zulip recipient display name so it survives dialog reopen
 - refactor: collapse prefs + instance metadata through Riverpod providers
@@ -29,4 +30,3 @@
 - docs: fix ARCHITECTURE.md provider registry to match 12 providers with dynamic initialization
 - docs: update ARCHITECTURE.md to reflect Riverpod config provider architecture
 - refactor: Riverpod config provider — single source of truth for provider config
-- fix: save messageText before state transition to UploadInProgress

@@ -1454,6 +1454,18 @@ abstract class AppLocalizations {
   /// **'Variables: {vars}'**
   String messageVariables(Object vars);
 
+  /// No description provided for @pasteFromClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste from clipboard'**
+  String get pasteFromClipboard;
+
+  /// No description provided for @clipboardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No image found in clipboard'**
+  String get clipboardEmpty;
+
   /// No description provided for @exportImportTitle.
   ///
   /// In en, this message translates to:

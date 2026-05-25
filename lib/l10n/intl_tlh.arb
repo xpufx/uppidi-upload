@@ -244,5 +244,7 @@
   "matterbridgeSent": "Sent to {gateway}",
   "matterbridgeError": "Matterbridge error: {code}",
   "matterbridgeFailed": "Failed: {error}",
-  "messageVariables": "Variables: {vars}"
+  "messageVariables": "Variables: {vars}",
+  "clipboardEmpty": "No image found in clipboard",
+  "pasteFromClipboard": "Paste from clipboard"
 }

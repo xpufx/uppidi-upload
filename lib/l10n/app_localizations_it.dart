@@ -773,6 +773,12 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get pasteFromClipboard => 'Paste from clipboard';
+
+  @override
+  String get clipboardEmpty => 'No image found in clipboard';
+
+  @override
   String get exportImportTitle => 'Export / Import';
 
   @override

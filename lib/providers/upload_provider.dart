@@ -391,6 +391,25 @@ class UploadNotifier extends Notifier<UploadState> {
     }
   }
 
+  Future<void> uploadFromBytes(Uint8List bytes, String fileName,
+      {String? mimeType}) async {
+    if (state is UploadInProgress) return;
+    _log.info('Pasted/clipboard file: $fileName ($mimeType)');
+    _lastFilePath = null;
+    _lastFileBytes = bytes;
+    _originalFileBytes = bytes;
+    state = UploadFileSelected(
+      fileName: fileName,
+      fileSizeBytes: bytes.length,
+      mimeType: mimeType,
+      fileBytes: bytes,
+      selectedExpiry: _selectedExpiry,
+      results: state.results,
+      selectedProviderIndex: state.selectedProviderIndex,
+      providers: state.providers,
+    );
+  }
+
   /// Returns a progress callback that updates the [UploadInProgress] state.
   UploadProgressCallback _uploadProgressCallback(CancelToken ct) {
     return (sent, total) {

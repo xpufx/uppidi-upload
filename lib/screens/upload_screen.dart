@@ -1,14 +1,16 @@
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pasteboard/pasteboard.dart';
 
+import '../core/config_provider.dart';
 import '../core/format.dart';
 import '../core/insecure_upload_warning.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/metadata_badges.dart';
 import '../core/models/provider_instance.dart';
 import '../core/models/provider_metadata.dart';
-import '../core/config_provider.dart';
 import '../core/provider_config_sheet.dart';
 import '../core/settings_service.dart';
 import '../l10n/app_localizations.dart';
@@ -198,64 +200,18 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
     );
 
     if (isDesktop) {
-      return DragTarget<String>(
-        onWillAcceptWithDetails: (_) => true,
-        onAcceptWithDetails: (details) {
-          final lines = details.data.split(RegExp(r'[\r\n]+'));
-          for (final line in lines) {
-            final uri = Uri.tryParse(line.trim());
-            if (uri != null && uri.scheme == 'file' && uri.path.isNotEmpty) {
-              final path = Uri.decodeFull(uri.path);
-              notifier.uploadFromFile(path, null);
-              break; // takes first file only
-            }
+      return DropTarget(
+        onDragDone: (detail) {
+          for (final file in detail.files) {
+            final path = file.path;
+            notifier.uploadFromFile(path, file.mimeType);
+            break;
           }
         },
-        builder: (context, candidateData, rejectedData) {
-          final l10n = AppLocalizations.of(context);
-          final isHovering = candidateData.isNotEmpty;
-          return Stack(
-            children: [
-              screen,
-              if (isHovering)
-                Positioned.fill(
-                  child: Container(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.08),
-                    child: Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.cloud_upload,
-                                color: Theme.of(context).colorScheme.primary),
-                            const SizedBox(width: 12),
-                            Text(
-                              l10n.dropFileToUpload,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          );
-        },
+        child: screen,
       );
     }
+
     return screen;
   }
 }
@@ -433,9 +389,32 @@ class _PickButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    return ElevatedButton(
-      onPressed: () => notifier.pickAndUpload(),
-      child: Text(l10n.pickAndUpload),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ElevatedButton(
+          onPressed: () => notifier.pickAndUpload(),
+          child: Text(l10n.pickAndUpload),
+        ),
+        const SizedBox(width: 8),
+        IconButton(
+          icon: const Icon(Icons.content_paste, size: 20),
+          tooltip: l10n.pasteFromClipboard,
+          onPressed: () async {
+            final img = await Pasteboard.image;
+            if (img != null) {
+              notifier.uploadFromBytes(img, 'clipboard.png',
+                  mimeType: 'image/png');
+            } else {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.clipboardEmpty)),
+                );
+              }
+            }
+          },
+        ),
+      ],
     );
   }
 }
