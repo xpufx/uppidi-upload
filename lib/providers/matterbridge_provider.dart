@@ -45,7 +45,8 @@ class MatterbridgeProvider extends BaseHttpProvider {
   List<String> get optionalConfigKeys => const [];
 
   @override
-  List<String> get optionalTextConfigKeys => ['mb_gateway', 'paired_provider'];
+  List<String> get optionalTextConfigKeys =>
+      ['mb_gateway', 'paired_provider', 'message_template'];
 
   @override
   String? get instanceDescription =>
@@ -57,6 +58,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
         'mb_token': 'API Token',
         'mb_gateway': 'Gateway',
         'paired_provider': 'Upload via',
+        'message_template': 'Message template',
       };
 
   @override
@@ -119,8 +121,13 @@ class MatterbridgeProvider extends BaseHttpProvider {
       final dio = await createHttpClient(cleanConfig,
           allowInsecureConn: allowInsecure, proxyUrl: proxyUrl);
 
+      final message = config['message_text'] ?? '';
       final body = <String, dynamic>{
-        'text': preUrl.isNotEmpty ? 'Uploaded: $preUrl' : request.fileName,
+        'text': message.isNotEmpty
+            ? message
+            : preUrl.isNotEmpty
+                ? 'Uploaded: $preUrl'
+                : request.fileName,
         'gateway': gateway,
       };
 

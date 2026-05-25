@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: eliminate 3 analyzer warnings, finalize export/import Riverpod migration
 - feat: add check_raw_storage and check_wide_config static analyzers
 - docs: two checker design docs — raw storage ban and wide config ban; remove Export/Import exception from riverpod doc
 - fix: Matterbridge gateway fetch now throws on null/unexpected response instead of silently falling back to empty list
@@ -29,4 +30,3 @@
 - feat: Zulip channel/user picking from API + DM support
 - fix: bare strings, provider config UX, import refresh, dev AppImage
 - refactor: extract FilePreview, ProgressSection, ResultBanner into separate files
-- fix: replace broken file_picker saveFile on Android with custom platform channel
