@@ -10,6 +10,7 @@ import '../core/models/provider_instance.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/config_provider.dart';
 import '../core/provider_config_sheet.dart';
+import '../core/settings_service.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 import '../widgets/file_preview.dart';
@@ -524,8 +525,18 @@ class _FileSelectedButtonsState extends ConsumerState<_FileSelectedButtons> {
         state is UploadFileSelected ? state.selectedExpiry : null;
 
     if (state is UploadFileSelected) {
+      // Pre-fill from global template on first load
+      if (_msgController.text.isEmpty && state.messageText.isEmpty) {
+        final globalTemplate =
+            ref.read(globalMessageTemplateProvider).asData?.value ?? '';
+        if (globalTemplate.isNotEmpty) {
+          _msgController.text = globalTemplate;
+          widget.notifier.setMessage(globalTemplate);
+        }
+      }
       // Sync controller with state messageText on provider change
-      if (_msgController.text != state.messageText) {
+      if (_msgController.text != state.messageText &&
+          state.messageText.isNotEmpty) {
         _msgController.text = state.messageText;
       }
     }

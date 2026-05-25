@@ -65,6 +65,7 @@ class SettingsScreen extends ConsumerWidget {
           _GlobalToggles(),
           const SizedBox(height: 16),
           const _ExportImportCard(),
+          const _MessageTemplateCard(),
           const _BottomCards(),
         ],
       ),
@@ -1061,6 +1062,82 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// ── Message template card ─────────────────────────────────────
+
+class _MessageTemplateCard extends ConsumerWidget {
+  const _MessageTemplateCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final templateAsync = ref.watch(globalMessageTemplateProvider);
+    final controller =
+        TextEditingController(text: templateAsync.asData?.value ?? '');
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Share message',
+                  style: theme.textTheme.titleSmall
+                      ?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text(
+                'Default message template for all providers. '
+                'Overridden per-upload on the upload screen.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: controller,
+                decoration: InputDecoration(
+                  labelText: 'Message template',
+                  border: const OutlineInputBorder(),
+                  isDense: true,
+                  helperText:
+                      l10n.messageVariables('{url} {filename} {filesize}'),
+                ),
+                maxLines: 3,
+                minLines: 1,
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: FilledButton.icon(
+                  onPressed: () async {
+                    final svc = ref.read(settingsServiceProvider);
+                    final text = controller.text.trim();
+                    if (text.isEmpty) {
+                      await svc.remove(SettingsService.messageTemplateKey);
+                    } else {
+                      await svc.set(SettingsService.messageTemplateKey, text);
+                    }
+                    ref.invalidate(globalMessageTemplateProvider);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Message template saved')),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.save, size: 16),
+                  label: Text(l10n.save),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
