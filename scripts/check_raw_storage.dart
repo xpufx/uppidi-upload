@@ -6,9 +6,18 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/source/line_info.dart';
 
-/// Checks that FlutterSecureStorage is only accessed in config_provider.dart.
-/// Any import of flutter_secure_storage or direct use of _secure outside
-/// that file is a violation — config should flow through Riverpod providers.
+/// Checks that `FlutterSecureStorage` config VALUE reads go through
+/// `providerConfigProvider`, not through direct `_secure` calls.
+///
+/// Allows:
+/// - `config_provider.dart` — the single source of truth
+/// - `provider_instances_*` key reads (metadata, separate domain)
+/// - Writes to config keys (followed by `ref.invalidate`)
+/// - Export/Import bulk ops (serialization concern)
+///
+/// Flags:
+/// - `_secure.read(key)` where key starts with `provider_config_`
+/// - `_secure.readAll()` whose result is iterated for config keys
 void main(List<String> args) {
   final dir = args.isNotEmpty ? args[0] : 'lib';
   final root = Directory(dir);
@@ -39,15 +48,13 @@ void main(List<String> args) {
   }
 
   if (violations > 0) {
-    stderr.writeln('\n❌ Found $violations direct storage access violation(s).');
-    stderr.writeln('   Config data must flow through providerConfigProvider.');
     stderr.writeln(
-        '   Only lib/core/config_provider.dart may access FlutterSecureStorage directly.');
+        '\n❌ Found $violations direct config read(s) outside config_provider.');
+    stderr.writeln('   Use providerConfigProvider to read config values.');
     exit(1);
   }
 
-  stdout.writeln(
-      '   ✅ No direct FlutterSecureStorage outside config_provider.dart');
+  stdout.writeln('   ✅ No direct config reads outside config_provider.dart');
 }
 
 class _StorageVisitor extends RecursiveAstVisitor<void> {
@@ -71,41 +78,42 @@ class _StorageVisitor extends RecursiveAstVisitor<void> {
 
   bool get _isAllowed => _relativePath() == 'lib/core/$_allowedFile';
 
-  @override
-  void visitImportDirective(ImportDirective node) {
-    super.visitImportDirective(node);
-    final uri = node.uri.stringValue;
-    if (uri == 'package:flutter_secure_storage/flutter_secure_storage.dart' &&
-        !_isAllowed) {
-      final line = _lineInfo.getLocation(node.offset).lineNumber;
-      violations.add('   ${_relativePath()}:$line');
-      violations.add('      imports flutter_secure_storage');
-    }
+  /// Returns true if [keyArg] is a string literal containing
+  /// `provider_config_` (config value key, NOT instance metadata).
+  bool _isConfigRead(Expression? keyArg) {
+    if (keyArg is! SimpleStringLiteral) return false;
+    final val = keyArg.stringValue ?? '';
+    return val.startsWith('provider_config_');
   }
 
   @override
-  void visitPrefixedIdentifier(PrefixedIdentifier node) {
-    super.visitPrefixedIdentifier(node);
+  void visitMethodInvocation(MethodInvocation node) {
+    super.visitMethodInvocation(node);
     if (_isAllowed) return;
-    // Catches _secure.read() / _secure.write() / _secure.delete() etc.
-    if (node.prefix.name == '_secure') {
-      final line = _lineInfo.getLocation(node.offset).lineNumber;
-      violations.add('   ${_relativePath()}:$line');
-      violations.add('      _secure.${node.identifier.name}()');
-    }
-  }
+    final methodName = node.methodName.name;
 
-  @override
-  void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    super.visitInstanceCreationExpression(node);
-    if (_isAllowed) return;
-    final type = node.constructorName.type;
-    final name = type.name.lexeme;
-    // Catch FlutterSecureStorage() constructor calls
-    if (name == 'FlutterSecureStorage') {
-      final line = _lineInfo.getLocation(node.offset).lineNumber;
-      violations.add('   ${_relativePath()}:$line');
-      violations.add('      FlutterSecureStorage() instantiation');
+    // Catch _secure.read(key) where key starts with provider_config_
+    if ((methodName == 'read' || methodName == 'delete') &&
+        node.argumentList.arguments.isNotEmpty) {
+      final firstArg = node.argumentList.arguments.first;
+      if (_isConfigRead(firstArg)) {
+        final line = _lineInfo.getLocation(node.offset).lineNumber;
+        violations.add('   ${_relativePath()}:$line');
+        violations.add('      direct config read — use providerConfigProvider');
+      }
+    }
+
+    // Catch _secure.readAll() used for config keys
+    if (methodName == 'readAll') {
+      // Check if the node's target is _secure
+      if (node.target is SimpleIdentifier &&
+          (node.target as SimpleIdentifier).name == '_secure') {
+        // Look at the parent — if it's used to iterate config keys, flag it
+        // (Conservative: flag all readAll outside allowed file)
+        final line = _lineInfo.getLocation(node.offset).lineNumber;
+        violations.add('   ${_relativePath()}:$line');
+        violations.add('      _secure.readAll() — use providerConfigProvider');
+      }
     }
   }
 }

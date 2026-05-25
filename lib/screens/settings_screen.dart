@@ -1117,7 +1117,7 @@ class _ExportImportCard extends ConsumerWidget {
                     );
                     if (confirm != true) return;
                     try {
-                      final path = await exportConfig();
+                      final path = await exportConfig(ref: ref);
                       if (path != null && context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(l10n.exportedTo(path))),
@@ -1167,7 +1167,7 @@ class _ExportImportCard extends ConsumerWidget {
                     );
                     if (confirm != true) return;
                     try {
-                      final msg = await importConfig();
+                      final msg = await importConfig(ref: ref);
                       await ProviderRegistry.refresh(ref);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(

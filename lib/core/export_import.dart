@@ -3,10 +3,13 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'android_save.dart';
+import 'config_provider.dart';
 import 'logging/log.dart';
+import 'registry.dart';
 import 'settings_service.dart';
 
 final _log = Log('ExportImport');
@@ -14,7 +17,8 @@ const _secure = FlutterSecureStorage();
 
 /// Builds the export data map and returns it as a pretty-printed JSON string.
 /// Returns null if reading data fails.
-Future<String?> buildExportJsonString() async {
+/// When [ref] is provided, reads config through providerConfigProvider.
+Future<String?> buildExportJsonString({WidgetRef? ref}) async {
   try {
     final data = <String, dynamic>{
       'version': 1,
@@ -23,10 +27,17 @@ Future<String?> buildExportJsonString() async {
       'settings': <String, String>{},
     };
 
-    final allSecure = await _secure.readAll();
-    for (final entry in allSecure.entries) {
-      if (entry.key.startsWith('provider_')) {
-        (data['providers'] as Map<String, dynamic>)[entry.key] = entry.value;
+    if (ref != null) {
+      // Read via Riverpod providers
+      for (final p in ProviderRegistry.all) {
+        try {
+          final cfg =
+              await ref.read(providerConfigProvider(p.providerId).future);
+          for (final e in cfg.entries) {
+            (data['providers'] as Map<String, dynamic>)[
+                'provider_config_${p.providerId}_${e.key}'] = e.value;
+          }
+        } catch (_) {}
       }
     }
 
@@ -45,9 +56,9 @@ Future<String?> buildExportJsonString() async {
 
 /// Exports all provider config and app settings to a JSON file selected
 /// by the user. Returns the file path on success, null if cancelled.
-Future<String?> exportConfig() async {
+Future<String?> exportConfig({WidgetRef? ref}) async {
   _log.info('Export started');
-  final jsonString = await buildExportJsonString();
+  final jsonString = await buildExportJsonString(ref: ref);
   if (jsonString == null) throw Exception('Failed to build export data');
 
   final jsonBytes = utf8.encode(jsonString);
@@ -86,7 +97,7 @@ Future<String?> exportConfig() async {
 /// Imports provider config and app settings from a user-selected JSON file.
 /// Replaces ALL existing provider data and settings. Returns a descriptive
 /// string on success, or throws on failure.
-Future<String> importConfig() async {
+Future<String> importConfig({WidgetRef? ref}) async {
   _log.info('Import started');
   // Pick file to import
   FilePickerResult? result;
@@ -132,13 +143,10 @@ Future<String> importConfig() async {
 
   // 1. Clear existing provider data in secure storage
   try {
-    final allSecure = await _secure.readAll();
     int cleared = 0;
-    for (final key in allSecure.keys) {
-      if (key.startsWith('provider_')) {
-        await _secure.delete(key: key);
-        cleared++;
-      }
+    for (final key in providers.keys) {
+      await _secure.delete(key: key);
+      cleared++;
     }
     _log.info('Cleared $cleared provider entries');
   } catch (e) {
@@ -148,8 +156,24 @@ Future<String> importConfig() async {
 
   // 2. Write imported provider data
   try {
+    final importedIds = <String>{};
     for (final entry in providers.entries) {
       await _secure.write(key: entry.key, value: entry.value as String);
+      // Extract providerId from key: "provider_config_zulip__12345_bot_token"
+      final key = entry.key;
+      if (key.startsWith('provider_config_')) {
+        final rest = key.substring('provider_config_'.length);
+        final underscoreIdx = rest.indexOf('_');
+        if (underscoreIdx > 0) {
+          importedIds.add(rest.substring(0, underscoreIdx));
+        }
+      }
+    }
+    // Invalidate all imported providers so consumers see fresh data
+    if (ref != null) {
+      for (final id in importedIds) {
+        ref.invalidate(providerConfigProvider(id));
+      }
     }
     _log.info('Wrote ${providers.length} provider keys');
   } catch (e) {
