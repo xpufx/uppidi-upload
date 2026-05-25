@@ -8,6 +8,7 @@ import '../core/interfaces/uploader.dart';
 import '../core/metadata_badges.dart';
 import '../core/models/provider_instance.dart';
 import '../core/models/provider_metadata.dart';
+import '../core/config_provider.dart';
 import '../core/provider_config_sheet.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
@@ -446,10 +447,16 @@ class _UploadButton extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(uploadProvider);
     final provider = state.providers.asMap()[state.selectedProviderIndex];
-    final isUrlOnly = provider?.isUrlOnly ?? false;
+    var isUrlShareOnly = provider?.isUrlShareOnly ?? false;
+    // Matterbridge needs a paired provider to upload files (IRC gateways)
+    if (provider?.providerId.startsWith('matterbridge') == true) {
+      final config = ref.watch(providerConfigProvider(provider!.providerId));
+      final paired = config.asData?.value['paired_provider'] ?? '';
+      isUrlShareOnly = paired.isEmpty;
+    }
 
     return ElevatedButton.icon(
-      onPressed: isUrlOnly
+      onPressed: isUrlShareOnly
           ? null
           : () async {
               final state = ref.read(uploadProvider);

@@ -1,5 +1,6 @@
 # Changelog
 
+- refactor: global message template — single share message for all providers
 - refactor: deduplicate _mapException — inherit from BaseHttpProvider
 - chore: branded Matterbridge fallback text
 - fix: Matterbridge message template support
@@ -29,4 +30,3 @@
 - feat: inline Zulip channel/user fetch with suffix icon
 - chore: simplify Zulip API response parsing, add edit tool guidance to AGENTS.md
 - fix: handle Dio auto-parsed JSON in Zulip resource fetch
-- fix: Zulip instanceDescription regression + comprehensive config persistence tests

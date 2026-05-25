@@ -1011,7 +1011,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
 
                           if (isPairedProvider) {
                             final uploadProviders = ProviderRegistry.all
-                                .where((p) => !p.isUrlOnly)
+                                .where((p) => !p.isUrlShareOnly)
                                 .where((p) => p.providerId != 'matterbridge')
                                 .toList();
                             return Padding(

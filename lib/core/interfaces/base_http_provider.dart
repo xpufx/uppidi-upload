@@ -16,7 +16,7 @@ abstract class BaseHttpProvider implements BaseUploader {
   late final Log _log = Log(runtimeType.toString());
 
   @override
-  bool get isUrlOnly => false;
+  bool get isUrlShareOnly => false;
 
   String get baseUrl;
   String get uploadEndpoint;

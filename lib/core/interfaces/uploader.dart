@@ -13,7 +13,7 @@ abstract class BaseUploader {
 
   /// True for relay-only providers (e.g. IRC via Matterbridge) that
   /// can't host files and only forward URLs.
-  bool get isUrlOnly => false;
+  bool get isUrlShareOnly => false;
   List<String> get requiredConfigKeys;
 
   /// Optional boolean config keys (rendered as checkboxes in the config

@@ -34,7 +34,7 @@ class ProviderInstance implements BaseUploader {
   bool get supportsWeb => _base.supportsWeb;
 
   @override
-  bool get isUrlOnly => _urlOnly;
+  bool get isUrlShareOnly => _urlOnly;
 
   @override
   List<String> get requiredConfigKeys => _base.requiredConfigKeys;
