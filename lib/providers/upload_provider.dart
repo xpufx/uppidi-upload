@@ -106,6 +106,7 @@ final class UploadCompleted extends UploadState {
   final int fileSizeBytes;
   final String? mimeType;
   final Uint8List? fileBytes;
+  final String messageText;
 
   bool get isSuccess => lastResult.success;
 
@@ -116,6 +117,7 @@ final class UploadCompleted extends UploadState {
     this.fileSizeBytes = 0,
     this.mimeType,
     this.fileBytes,
+    this.messageText = '',
     super.results,
     super.selectedProviderIndex,
     super.providers,
@@ -207,6 +209,7 @@ class UploadNotifier extends Notifier<UploadState> {
           mimeType: prev.mimeType,
           fileBytes: prev.fileBytes,
           selectedExpiry: _selectedExpiry,
+          messageText: prev.messageText,
           results: prev.results,
           selectedProviderIndex: index,
           providers: prev.providers,
@@ -649,6 +652,7 @@ class UploadNotifier extends Notifier<UploadState> {
         fileSizeBytes: currentFileSize,
         mimeType: currentMimeType,
         fileBytes: currentFileBytes,
+        messageText: savedMessageText,
         results: [resultWithExpiry, ...state.results],
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
@@ -677,6 +681,7 @@ class UploadNotifier extends Notifier<UploadState> {
         fileSizeBytes: currentFileSize,
         mimeType: currentMimeType,
         fileBytes: currentFileBytes,
+        messageText: savedMessageText,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,

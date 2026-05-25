@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: global message template settings card + upload screen pre-fill
 - fix: store Zulip recipient display name so it survives dialog reopen
 - refactor: collapse prefs + instance metadata through Riverpod providers
 - feat: typed configs for Telegram and Zulip — zero wide config violations
@@ -29,4 +30,3 @@
 - docs: update ARCHITECTURE.md to reflect Riverpod config provider architecture
 - refactor: Riverpod config provider — single source of truth for provider config
 - fix: save messageText before state transition to UploadInProgress
-- feat: Zulip Channel/DM SegmentedButton, message template, editable upload message

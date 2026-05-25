@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import 'matterbridge_config.dart';
+import '../core/format.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/logging/log.dart';
@@ -112,7 +113,18 @@ class MatterbridgeProvider extends BaseHttpProvider {
             config is Map<String, String> ? config : {});
     final gateway = cfg.gateway;
     final preUrl = cfg.preUploadedUrl ?? '';
-    final message = cfg.messageText ?? '';
+    var message = cfg.messageText ?? '';
+    if (preUrl.isNotEmpty) {
+      message = message
+          .replaceAll('{url}', preUrl)
+          .replaceAll('{filename}', request.fileName)
+          .replaceAll('{filesize}', formatSize(request.sizeInBytes));
+      if (message.isEmpty) {
+        message = 'Uppidi Uploaded: $preUrl';
+      } else {
+        message = '$message\n$preUrl';
+      }
+    }
 
     try {
       final dio = Dio(BaseOptions(
@@ -124,11 +136,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
       ));
 
       final body = <String, dynamic>{
-        'text': message.isNotEmpty
-            ? message
-            : preUrl.isNotEmpty
-                ? 'Uppidi Uploaded: $preUrl'
-                : request.fileName,
+        'text': message,
         'gateway': gateway,
       };
 
