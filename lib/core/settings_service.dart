@@ -32,6 +32,18 @@ final globalMessageTemplateProvider = FutureProvider<String>((ref) async {
   return (await svc.get(SettingsService.messageTemplateKey)) ?? '';
 });
 
+final sectionBuiltinCollapsedProvider = FutureProvider<bool>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  final val = await svc.get(SettingsService.sectionBuiltinCollapsed);
+  return val == 'true';
+});
+
+final sectionMyProvidersCollapsedProvider = FutureProvider<bool>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  final val = await svc.get(SettingsService.sectionMyProvidersCollapsed);
+  return val == 'true';
+});
+
 final providerHealthProvider =
     FutureProvider<Map<String, ProviderHealthInfo>>((ref) async {
   final cdnUrl = const String.fromEnvironment('CDN_URL', defaultValue: '');

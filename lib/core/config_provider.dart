@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -30,4 +32,13 @@ Future<Map<String, String>> _loadProviderConfig(String providerId) async {
 final providerConfigProvider =
     FutureProvider.family<Map<String, String>, String>(
   (ref, providerId) => _loadProviderConfig(providerId),
+);
+
+final providerInstancesProvider = FutureProvider.family<List<dynamic>, String>(
+  (ref, providerId) async {
+    final raw = await _secure.read(key: 'provider_instances_$providerId');
+    if (raw == null) return [];
+    final list = jsonDecode(raw) as List;
+    return list;
+  },
 );

@@ -190,12 +190,20 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
   }
 
   Future<void> _reload() async {
-    final list = await loadProviderInstances(widget.providerId);
-    if (mounted) {
-      setState(() {
-        _instances = list;
-        _loading = false;
-      });
+    try {
+      final raw =
+          await ref.read(providerInstancesProvider(widget.providerId).future);
+      if (mounted) {
+        setState(() {
+          _instances = raw
+              .map((e) =>
+                  ProviderInstanceMeta.fromJson(e as Map<String, dynamic>))
+              .toList();
+          _loading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -276,6 +284,7 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
         configKeys: widget.baseProvider.requiredConfigKeys);
     ref.invalidate(
         providerConfigProvider('${widget.providerId}__${instance.id}'));
+    ref.invalidate(providerInstancesProvider(widget.providerId));
     _reload();
   }
 
@@ -392,10 +401,13 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
   Future<void> _loadInstanceName() async {
     final (baseId, instanceId) = _splitInstanceId(widget.provider.providerId);
     try {
-      final instances = await loadProviderInstances(baseId);
-      final match = instances.where((i) => i.id == instanceId);
-      if (mounted && match.isNotEmpty) {
-        _nameController.text = match.first.name;
+      final raw = await ref.read(providerInstancesProvider(baseId).future);
+      for (final e in raw) {
+        final meta = ProviderInstanceMeta.fromJson(e as Map<String, dynamic>);
+        if (meta.id == instanceId) {
+          if (mounted) _nameController.text = meta.name;
+          return;
+        }
       }
     } catch (_) {}
   }
@@ -706,6 +718,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
         instances.add(ProviderInstanceMeta(id: instanceId, name: name));
       }
       await saveProviderInstances(baseId, instances);
+      ref.invalidate(providerInstancesProvider(baseId));
       // Invalidate the config provider so all watchers get fresh data.
       ref.invalidate(providerConfigProvider(widget.provider.providerId));
       if (context.mounted) {

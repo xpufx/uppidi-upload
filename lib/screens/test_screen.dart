@@ -32,13 +32,12 @@ class _TestScreenState extends ConsumerState<TestScreen> {
 
   Future<void> _loadPrefs() async {
     try {
-      final svc = ref.read(settingsServiceProvider);
-      final builtin = await svc.get(SettingsService.sectionBuiltinCollapsed);
-      final myprov = await svc.get(SettingsService.sectionMyProvidersCollapsed);
+      final builtin = await ref.read(sectionBuiltinCollapsedProvider.future);
+      final myprov = await ref.read(sectionMyProvidersCollapsedProvider.future);
       if (mounted) {
         setState(() {
-          _builtinExpanded = builtin != 'true';
-          _myProvidersExpanded = myprov != 'true';
+          _builtinExpanded = !builtin;
+          _myProvidersExpanded = !myprov;
         });
       }
     } catch (e) {
@@ -53,6 +52,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       final svc = ref.read(settingsServiceProvider);
       await svc.set(
           SettingsService.sectionBuiltinCollapsed, newVal ? 'false' : 'true');
+      ref.invalidate(sectionBuiltinCollapsedProvider);
     } catch (e) {
       _log.error('Failed to save builtin section pref: $e', error: e);
     }
@@ -65,6 +65,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       final svc = ref.read(settingsServiceProvider);
       await svc.set(SettingsService.sectionMyProvidersCollapsed,
           newVal ? 'false' : 'true');
+      ref.invalidate(sectionMyProvidersCollapsedProvider);
     } catch (e) {
       _log.error('Failed to save MyProviders section pref: $e', error: e);
     }

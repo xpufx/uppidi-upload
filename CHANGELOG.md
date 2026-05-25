@@ -1,5 +1,6 @@
 # Changelog
 
+- feat: typed configs for Telegram and Zulip — zero wide config violations
 - feat: typed MatterbridgeConfig, dispatch in _executeUpload
 - refactor: isUrlOnly → isUrlShareOnly, Matterbridge derives from paired_provider
 - refactor: global message template — single share message for all providers
@@ -29,4 +30,3 @@
 - feat: Zulip Channel/DM SegmentedButton, message template, editable upload message
 - feat: Zulip channel/DM toggle — mutually exclusive fields
 - fix: upload not loading optionalTextConfigKeys from storage
-- feat: inline Zulip channel/user fetch with suffix icon
