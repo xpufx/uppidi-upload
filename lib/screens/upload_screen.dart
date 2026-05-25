@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,6 +29,7 @@ class UploadScreen extends ConsumerStatefulWidget {
 
 class _UploadScreenState extends ConsumerState<UploadScreen> {
   final ScrollController _scrollController = ScrollController();
+  bool _isHovering = false;
 
   @override
   void dispose() {
@@ -45,10 +46,6 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
         ? providers[uploadState.selectedProviderIndex]
         : null;
     final webUnsupported = kIsWeb && provider != null && !provider.supportsWeb;
-    final isDesktop = !kIsWeb &&
-        (defaultTargetPlatform == TargetPlatform.linux ||
-            defaultTargetPlatform == TargetPlatform.macOS ||
-            defaultTargetPlatform == TargetPlatform.windows);
 
     // ── Scrollable content (preview, provider info, etc.) ──────────
     final scrollBody = Padding(
@@ -199,16 +196,57 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
       ),
     );
 
-    if (isDesktop) {
+    if (!kIsWeb) {
       return DropTarget(
         onDragDone: (detail) {
+          setState(() => _isHovering = false);
           for (final file in detail.files) {
             final path = file.path;
             notifier.uploadFromFile(path, file.mimeType);
             break;
           }
         },
-        child: screen,
+        onDragEntered: (_) => setState(() => _isHovering = true),
+        onDragExited: (_) => setState(() => _isHovering = false),
+        child: Stack(
+          children: [
+            screen,
+            if (_isHovering)
+              Positioned.fill(
+                child: Container(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.08),
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.cloud_upload,
+                              color: Theme.of(context).colorScheme.primary),
+                          const SizedBox(width: 12),
+                          Text(
+                            AppLocalizations.of(context).dropFileToUpload,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       );
     }
 
@@ -397,23 +435,24 @@ class _PickButton extends ConsumerWidget {
           child: Text(l10n.pickAndUpload),
         ),
         const SizedBox(width: 8),
-        IconButton(
-          icon: const Icon(Icons.content_paste, size: 20),
-          tooltip: l10n.pasteFromClipboard,
-          onPressed: () async {
-            final img = await Pasteboard.image;
-            if (img != null) {
-              notifier.uploadFromBytes(img, 'clipboard.png',
-                  mimeType: 'image/png');
-            } else {
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.clipboardEmpty)),
-                );
+        if (!kIsWeb)
+          IconButton(
+            icon: const Icon(Icons.content_paste, size: 20),
+            tooltip: l10n.pasteFromClipboard,
+            onPressed: () async {
+              final img = await Pasteboard.image;
+              if (img != null) {
+                notifier.uploadFromBytes(img, 'clipboard.png',
+                    mimeType: 'image/png');
+              } else {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.clipboardEmpty)),
+                  );
+                }
               }
-            }
-          },
-        ),
+            },
+          ),
       ],
     );
   }
