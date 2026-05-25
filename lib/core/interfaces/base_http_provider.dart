@@ -132,7 +132,7 @@ abstract class BaseHttpProvider implements BaseUploader {
       final statusCode = e is DioException ? e.response?.statusCode : null;
       return UploadResult(
         success: false,
-        errorMessage: _mapException(e),
+        errorMessage: mapException(e),
         rawError: e.toString(),
         statusCode: statusCode,
         stackTrace: stackTrace.toString(),
@@ -153,7 +153,7 @@ abstract class BaseHttpProvider implements BaseUploader {
 
   UploadResult parseResponse(Response response);
 
-  String _mapException(Object e) {
+  String mapException(Object e) {
     if (e is FormatException) {
       return 'invalidMimeType';
     }

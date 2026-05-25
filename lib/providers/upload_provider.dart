@@ -232,21 +232,26 @@ class UploadNotifier extends Notifier<UploadState> {
   }
 
   Future<void> _loadAndSetMessageTemplate() async {
-    if (state is! UploadFileSelected) return;
+    final template = await _loadMessageTemplate();
+    if (template.isNotEmpty && state is UploadFileSelected) {
+      setMessage(template);
+    }
+  }
+
+  Future<String> _loadMessageTemplate() async {
     final providers = state.providers;
     final idx = state.selectedProviderIndex;
-    if (idx >= providers.length) return;
+    if (idx >= providers.length) return '';
     final provider = providers[idx];
-    if (!provider.optionalTextConfigKeys.contains('message_template')) return;
+    if (!provider.optionalTextConfigKeys.contains('message_template')) {
+      return '';
+    }
     try {
       final config =
           await ref.read(providerConfigProvider(provider.providerId).future);
-      final template = config['message_template'] ?? '';
-      if (template.isNotEmpty && state is UploadFileSelected) {
-        setMessage(template);
-      }
+      return config['message_template'] ?? '';
     } catch (_) {
-      // Config provider may not be available (e.g. during tests)
+      return '';
     }
   }
 
@@ -275,17 +280,21 @@ class UploadNotifier extends Notifier<UploadState> {
       // Store request for later upload
       _originalFileBytes = previewBytes;
       _lastFileBytes = previewBytes;
+      final template = await _loadMessageTemplate();
       state = UploadFileSelected(
         fileName: file.name,
         fileSizeBytes: request.sizeInBytes,
         mimeType: request.mimeType,
         fileBytes: previewBytes,
         selectedExpiry: _selectedExpiry,
+        messageText: template,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
-      Future.microtask(() => _loadAndSetMessageTemplate());
+      if (template.isEmpty) {
+        Future.microtask(() => _loadAndSetMessageTemplate());
+      }
     } catch (e) {
       _log.warn('Failed to read file: $e', error: e);
       final info = _extractFileInfo(state);

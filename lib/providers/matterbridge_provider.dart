@@ -175,7 +175,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
       _log.error('Matterbridge upload failed: $e', error: e, stackTrace: st);
       return UploadResult(
         success: false,
-        errorMessage: _mapException(e),
+        errorMessage: mapException(e),
         rawError: e.toString(),
         completedAt: DateTime.now(),
       );
@@ -186,20 +186,5 @@ class MatterbridgeProvider extends BaseHttpProvider {
   UploadResult parseResponse(Response response) {
     // Not used — upload handles its own response.
     return UploadResult(success: true, completedAt: DateTime.now());
-  }
-
-  String _mapException(Object e) {
-    if (e is DioException) {
-      return switch (e.type) {
-        DioExceptionType.cancel => 'uploadCancelled',
-        DioExceptionType.connectionTimeout ||
-        DioExceptionType.sendTimeout ||
-        DioExceptionType.receiveTimeout ||
-        DioExceptionType.connectionError =>
-          'connectionTimedOut',
-        _ => 'genericError',
-      };
-    }
-    return 'genericError';
   }
 }

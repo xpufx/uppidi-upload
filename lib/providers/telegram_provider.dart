@@ -165,28 +165,12 @@ class TelegramProvider extends BaseHttpProvider {
       final statusCode = e is DioException ? e.response?.statusCode : null;
       return UploadResult(
         success: false,
-        errorMessage: _mapException(e),
+        errorMessage: mapException(e),
         rawError: e.toString(),
         statusCode: statusCode,
         stackTrace: stackTrace.toString(),
       );
     }
-  }
-
-  /// Maps common exceptions to localized error keys.
-  String _mapException(Object e) {
-    if (e is DioException) {
-      return switch (e.type) {
-        DioExceptionType.cancel => 'uploadCancelled',
-        DioExceptionType.connectionTimeout ||
-        DioExceptionType.sendTimeout ||
-        DioExceptionType.receiveTimeout ||
-        DioExceptionType.connectionError =>
-          'connectionTimedOut',
-        _ => 'genericError',
-      };
-    }
-    return 'genericError';
   }
 
   @override
