@@ -211,7 +211,6 @@ class UploadNotifier extends Notifier<UploadState> {
           providers: prev.providers,
         ),
     };
-    Future.microtask(() => _loadAndSetMessageTemplate());
   }
 
   void setMessage(String text) {
@@ -228,30 +227,6 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: prev.selectedProviderIndex,
         providers: prev.providers,
       );
-    }
-  }
-
-  Future<void> _loadAndSetMessageTemplate() async {
-    final template = await _loadMessageTemplate();
-    if (template.isNotEmpty && state is UploadFileSelected) {
-      setMessage(template);
-    }
-  }
-
-  Future<String> _loadMessageTemplate() async {
-    final providers = state.providers;
-    final idx = state.selectedProviderIndex;
-    if (idx >= providers.length) return '';
-    final provider = providers[idx];
-    if (!provider.optionalTextConfigKeys.contains('message_template')) {
-      return '';
-    }
-    try {
-      final config =
-          await ref.read(providerConfigProvider(provider.providerId).future);
-      return config['message_template'] ?? '';
-    } catch (_) {
-      return '';
     }
   }
 
@@ -280,21 +255,16 @@ class UploadNotifier extends Notifier<UploadState> {
       // Store request for later upload
       _originalFileBytes = previewBytes;
       _lastFileBytes = previewBytes;
-      final template = await _loadMessageTemplate();
       state = UploadFileSelected(
         fileName: file.name,
         fileSizeBytes: request.sizeInBytes,
         mimeType: request.mimeType,
         fileBytes: previewBytes,
         selectedExpiry: _selectedExpiry,
-        messageText: template,
         results: state.results,
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
-      if (template.isEmpty) {
-        Future.microtask(() => _loadAndSetMessageTemplate());
-      }
     } catch (e) {
       _log.warn('Failed to read file: $e', error: e);
       final info = _extractFileInfo(state);
@@ -395,7 +365,6 @@ class UploadNotifier extends Notifier<UploadState> {
         selectedProviderIndex: state.selectedProviderIndex,
         providers: state.providers,
       );
-      Future.microtask(() => _loadAndSetMessageTemplate());
     } catch (e) {
       _log.warn('Failed to read shared file: $e', error: e);
       final info = _extractFileInfo(state);
@@ -564,12 +533,7 @@ class UploadNotifier extends Notifier<UploadState> {
       }
 
       // Override message with user-edited text from the upload screen.
-      // savedMessageText is captured before the state transition; if empty,
-      // fall back to the stored template (already loaded via config provider).
       var msg = savedMessageText;
-      if (msg.isEmpty) {
-        msg = config['message_template'] ?? '';
-      }
       if (msg.isNotEmpty) {
         final info = _extractFileInfo(state);
         msg = msg

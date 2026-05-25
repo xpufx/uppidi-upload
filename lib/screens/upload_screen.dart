@@ -516,9 +516,7 @@ class _FileSelectedButtonsState extends ConsumerState<_FileSelectedButtons> {
     final currentExpiry =
         state is UploadFileSelected ? state.selectedExpiry : null;
 
-    final hasMessageTemplate =
-        provider?.optionalTextConfigKeys.contains('message_template') == true;
-    if (hasMessageTemplate && state is UploadFileSelected) {
+    if (state is UploadFileSelected) {
       // Sync controller with state messageText on provider change
       if (_msgController.text != state.messageText) {
         _msgController.text = state.messageText;
@@ -543,22 +541,19 @@ class _FileSelectedButtonsState extends ConsumerState<_FileSelectedButtons> {
           ),
           const SizedBox(height: 8),
         ],
-        if (hasMessageTemplate) ...[
-          TextFormField(
-            controller: _msgController,
-            decoration: InputDecoration(
-              labelText: 'Message',
-              border: const OutlineInputBorder(),
-              isDense: true,
-              helperText:
-                  'Variables: {filename} {filesize} {provider}  (Zulip also: {url})',
-            ),
-            maxLines: 2,
-            minLines: 1,
-            onChanged: (v) => widget.notifier.setMessage(v),
+        TextFormField(
+          controller: _msgController,
+          decoration: InputDecoration(
+            labelText: 'Message',
+            border: const OutlineInputBorder(),
+            isDense: true,
+            helperText: l10n.messageVariables('{url} {filename} {filesize}'),
           ),
-          const SizedBox(height: 8),
-        ],
+          maxLines: 2,
+          minLines: 1,
+          onChanged: (v) => widget.notifier.setMessage(v),
+        ),
+        const SizedBox(height: 8),
         Row(
           children: [
             Expanded(child: _UploadButton(notifier: widget.notifier)),

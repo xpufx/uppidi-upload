@@ -27,6 +27,11 @@ final shareMessageProvider = FutureProvider<String>((ref) async {
   return (await svc.get(SettingsService.shareMessageKey)) ?? '';
 });
 
+final globalMessageTemplateProvider = FutureProvider<String>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  return (await svc.get(SettingsService.messageTemplateKey)) ?? '';
+});
+
 final providerHealthProvider =
     FutureProvider<Map<String, ProviderHealthInfo>>((ref) async {
   final cdnUrl = const String.fromEnvironment('CDN_URL', defaultValue: '');
@@ -125,6 +130,7 @@ class SettingsService {
   static const insecureMutedKey = 'global.insecure_muted_providers';
   static const navigationLayoutKey = 'global.nav_layout';
   static const shareMessageKey = 'global.share_message';
+  static const messageTemplateKey = 'global.message_template';
   static const lastUsedProviderKey = 'global.last_used_provider';
   static const sectionBuiltinCollapsed = 'global.section_builtin_collapsed';
   static const sectionMyProvidersCollapsed =

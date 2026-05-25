@@ -748,6 +748,32 @@ class AppLocalizationsTr extends AppLocalizations {
   String get configLabelDirectMessage => 'Direct message';
 
   @override
+  String get matterbridgeSend => 'Send via Matterbridge';
+
+  @override
+  String get matterbridgeNotConfigured => 'Matterbridge not fully configured';
+
+  @override
+  String matterbridgeSent(Object gateway) {
+    return 'Sent to $gateway';
+  }
+
+  @override
+  String matterbridgeError(Object code) {
+    return 'Matterbridge error: $code';
+  }
+
+  @override
+  String matterbridgeFailed(Object error) {
+    return 'Failed: $error';
+  }
+
+  @override
+  String messageVariables(Object vars) {
+    return 'Variables: $vars';
+  }
+
+  @override
   String get exportImportTitle => 'Export / Import';
 
   @override

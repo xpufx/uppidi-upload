@@ -45,8 +45,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
   List<String> get optionalConfigKeys => const [];
 
   @override
-  List<String> get optionalTextConfigKeys =>
-      ['mb_gateway', 'paired_provider', 'message_template'];
+  List<String> get optionalTextConfigKeys => ['mb_gateway', 'paired_provider'];
 
   @override
   String? get instanceDescription =>
@@ -58,7 +57,6 @@ class MatterbridgeProvider extends BaseHttpProvider {
         'mb_token': 'API Token',
         'mb_gateway': 'Gateway',
         'paired_provider': 'Upload via',
-        'message_template': 'Message template',
       };
 
   @override

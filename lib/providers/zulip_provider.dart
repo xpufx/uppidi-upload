@@ -54,7 +54,7 @@ class ZulipProvider extends BaseHttpProvider {
 
   @override
   List<String> get optionalTextConfigKeys =>
-      ['zulip_channel', 'zulip_topic', 'zulip_recipient', 'message_template'];
+      ['zulip_channel', 'zulip_topic', 'zulip_recipient'];
 
   @override
   String? get instanceDescription =>
@@ -69,7 +69,6 @@ class ZulipProvider extends BaseHttpProvider {
         'zulip_topic': 'Topic',
         'zulip_recipient': 'Recipient',
         'zulip_direct_message': 'Direct message',
-        'message_template': 'Message template',
       };
 
   @override

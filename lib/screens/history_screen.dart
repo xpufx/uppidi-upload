@@ -1,10 +1,14 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../core/config_provider.dart';
 import '../core/format.dart';
 import '../core/history_service.dart';
+import '../core/interfaces/uploader.dart';
+import '../core/registry.dart';
 import '../core/share_message_dialog.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/provider_favicon.dart';
@@ -17,6 +21,9 @@ class HistoryScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final historyAsync = ref.watch(uploadHistoryProvider);
     final svc = ref.read(historyServiceProvider);
+    final mbInstances = ProviderRegistry.all
+        .where((p) => p.providerId.startsWith('matterbridge'))
+        .toList();
 
     return historyAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -105,6 +112,13 @@ class HistoryScreen extends ConsumerWidget {
                           );
                         }
                       },
+                      onMatterbridge:
+                          mbInstances.isNotEmpty && hr.record.url != null
+                              ? () => _shareViaMatterbridge(
+                                  context, ref, hr.record.url!,
+                                  fileName: hr.record.fileName,
+                                  providerName: hr.record.providerName)
+                              : null,
                     );
                   },
                 ),
@@ -121,11 +135,13 @@ class _HistoryTile extends StatelessWidget {
   final HistoryRecord record;
   final VoidCallback onDelete;
   final VoidCallback onCopy;
+  final VoidCallback? onMatterbridge;
 
   const _HistoryTile({
     required this.record,
     required this.onDelete,
     required this.onCopy,
+    this.onMatterbridge,
   });
 
   @override
@@ -248,10 +264,105 @@ class _HistoryTile extends StatelessWidget {
                   },
                   tooltip: l10n.shareUrl,
                 ),
+              if (onMatterbridge != null && r.url != null)
+                IconButton(
+                  icon: const Icon(Icons.cell_tower, size: 18),
+                  onPressed: onMatterbridge,
+                  tooltip: l10n.matterbridgeSend,
+                ),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+Future<void> _shareViaMatterbridge(
+    BuildContext context, WidgetRef ref, String url,
+    {String? fileName, String? providerName}) async {
+  final instances = ProviderRegistry.all
+      .where((p) => p.providerId.startsWith('matterbridge'))
+      .toList();
+  if (instances.isEmpty) return;
+
+  BaseUploader? chosen;
+  if (instances.length == 1) {
+    chosen = instances.first;
+  } else {
+    final mbL10n = AppLocalizations.of(context);
+    chosen = await showDialog<BaseUploader>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(mbL10n.matterbridgeSend),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: instances
+              .map((p) => ListTile(
+                    dense: true,
+                    title: Text(p.providerName),
+                    onTap: () => Navigator.pop(ctx, p),
+                  ))
+              .toList(),
+        ),
+      ),
+    );
+  }
+  if (chosen == null) return;
+
+  try {
+    final config =
+        await ref.read(providerConfigProvider(chosen.providerId).future);
+    final gateway = config['mb_gateway'] ?? '';
+    final serverUrl = (config['mb_url'] ?? '').trim();
+    final token = (config['mb_token'] ?? '').trim();
+    if (gateway.isEmpty || serverUrl.isEmpty || token.isEmpty) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Matterbridge not fully configured')),
+        );
+      }
+      return;
+    }
+
+    // Resolve message template the same way upload does
+    var message = config['message_text'] ?? config['message_template'] ?? '';
+    if (message.isEmpty) {
+      message = url;
+    } else {
+      message = message
+          .replaceAll('{url}', url)
+          .replaceAll('{filename}', fileName ?? 'file')
+          .replaceAll('{provider}', providerName ?? '');
+    }
+
+    final dio = Dio();
+    try {
+      final response = await dio.post(
+        '${serverUrl.replaceAll(RegExp(r'/$'), '')}/api/message',
+        data: {'text': message, 'gateway': gateway},
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      dio.close();
+      if (context.mounted) {
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Sent to ${chosen.providerName}')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Matterbridge error: ${response.statusCode}')),
+          );
+        }
+      }
+    } catch (e) {
+      dio.close();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: $e')),
+        );
+      }
+    }
+  } catch (_) {}
 }

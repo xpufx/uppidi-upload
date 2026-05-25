@@ -1,5 +1,7 @@
 # Changelog
 
+- refactor: deduplicate _mapException — inherit from BaseHttpProvider
+- chore: branded Matterbridge fallback text
 - fix: Matterbridge message template support
 - chore: build script — wire checkers into pipeline
 - fix: eliminate 3 analyzer warnings, finalize export/import Riverpod migration
@@ -28,5 +30,3 @@
 - chore: simplify Zulip API response parsing, add edit tool guidance to AGENTS.md
 - fix: handle Dio auto-parsed JSON in Zulip resource fetch
 - fix: Zulip instanceDescription regression + comprehensive config persistence tests
-- fix: contain layouts with SafeArea, overflow ellipsis, themed colors, and localized strings
-- feat: Zulip channel/user picking from API + DM support

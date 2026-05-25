@@ -1418,6 +1418,42 @@ abstract class AppLocalizations {
   /// **'Direct message'**
   String get configLabelDirectMessage;
 
+  /// No description provided for @matterbridgeSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send via Matterbridge'**
+  String get matterbridgeSend;
+
+  /// No description provided for @matterbridgeNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Matterbridge not fully configured'**
+  String get matterbridgeNotConfigured;
+
+  /// No description provided for @matterbridgeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to {gateway}'**
+  String matterbridgeSent(Object gateway);
+
+  /// No description provided for @matterbridgeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Matterbridge error: {code}'**
+  String matterbridgeError(Object code);
+
+  /// No description provided for @matterbridgeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed: {error}'**
+  String matterbridgeFailed(Object error);
+
+  /// No description provided for @messageVariables.
+  ///
+  /// In en, this message translates to:
+  /// **'Variables: {vars}'**
+  String messageVariables(Object vars);
+
   /// No description provided for @exportImportTitle.
   ///
   /// In en, this message translates to:

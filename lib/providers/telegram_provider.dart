@@ -54,7 +54,7 @@ class TelegramProvider extends BaseHttpProvider {
   List<String> get optionalConfigKeys => ['send_as_photo'];
 
   @override
-  List<String> get optionalTextConfigKeys => ['message_template'];
+  List<String> get optionalTextConfigKeys => const [];
 
   @override
   String? get instanceDescription =>
@@ -65,7 +65,6 @@ class TelegramProvider extends BaseHttpProvider {
         'bot_token': 'Bot Token',
         'chat_id': 'Chat ID',
         'send_as_photo': 'Send images as photos',
-        'message_template': 'Message template',
       };
 
   @override
@@ -134,8 +133,7 @@ class TelegramProvider extends BaseHttpProvider {
           allowInsecureConn: allowInsecure, proxyUrl: proxyUrl);
 
       final fields = buildFormFields(cleanConfig);
-      final message =
-          (config['message_text'] ?? config['message_template'] ?? '').trim();
+      final message = (config['message_text'] ?? '').trim();
       if (message.isNotEmpty) {
         fields['caption'] = message;
       }

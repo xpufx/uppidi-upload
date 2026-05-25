@@ -237,5 +237,11 @@
   "secondsAgo": "{seconds}s ago",
   "minutesAgo": "{minutes}m ago",
 
-  "reloadZulipResources": "Manage channels & users"
+  "reloadZulipResources": "Manage channels & users",
+  "matterbridgeSend": "Send via Matterbridge",
+  "matterbridgeNotConfigured": "Matterbridge not fully configured",
+  "matterbridgeSent": "Sent to {gateway}",
+  "matterbridgeError": "Matterbridge error: {code}",
+  "matterbridgeFailed": "Failed: {error}",
+  "messageVariables": "Variables: {vars}"
 }
