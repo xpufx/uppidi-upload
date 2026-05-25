@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import 'telegram_config.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/logging/log.dart';
@@ -114,18 +115,23 @@ class TelegramProvider extends BaseHttpProvider {
     FileUploadRequest request, {
     UploadProgressCallback? onProgress,
     CancelToken? cancelToken,
-    Map<String, String> config = const {},
+    Object? config,
   }) async {
+    final cfg = config is TelegramConfig
+        ? config
+        : TelegramConfig.fromMap(config is Map<String, String> ? config : {});
     final isImage = request.mimeType?.startsWith('image/') ?? false;
-    final sendAsPhoto = isImage && (config['send_as_photo'] == 'true');
+    final sendAsPhoto = isImage && cfg.sendAsPhoto;
 
     final endpoint = sendAsPhoto ? '/sendPhoto' : '/sendDocument';
     final fieldName = sendAsPhoto ? 'photo' : 'document';
 
     try {
-      final allowInsecure = config['_allow_insecure_conn'] == 'true';
-      final proxyUrl = config['_proxy_url'];
-      final cleanConfig = Map<String, String>.from(config)
+      final rawConfig =
+          config is Map<String, String> ? config : <String, String>{};
+      final allowInsecure = rawConfig['_allow_insecure_conn'] == 'true';
+      final proxyUrl = rawConfig['_proxy_url'];
+      final cleanConfig = Map<String, String>.from(rawConfig)
         ..remove('_allow_insecure_conn')
         ..remove('_proxy_url')
         ..remove('send_as_photo');
@@ -133,9 +139,8 @@ class TelegramProvider extends BaseHttpProvider {
           allowInsecureConn: allowInsecure, proxyUrl: proxyUrl);
 
       final fields = buildFormFields(cleanConfig);
-      final message = (config['message_text'] ?? '').trim();
-      if (message.isNotEmpty) {
-        fields['caption'] = message;
+      if (cfg.messageText != null && cfg.messageText!.isNotEmpty) {
+        fields['caption'] = cfg.messageText;
       }
       _log.info(
           'Uploading ${request.fileName} → $endpoint as $fieldName (image=$isImage, sendAsPhoto=$sendAsPhoto)');

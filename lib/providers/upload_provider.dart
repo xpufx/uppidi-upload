@@ -20,6 +20,10 @@ import '../core/registry.dart';
 import '../core/settings_service.dart';
 import 'matterbridge_config.dart';
 import 'matterbridge_provider.dart';
+import 'telegram_config.dart';
+import 'telegram_provider.dart';
+import 'zulip_config.dart';
+import 'zulip_provider.dart';
 
 final _log = Log('UploadNotifier');
 
@@ -595,6 +599,20 @@ class UploadNotifier extends Notifier<UploadState> {
           onProgress: _uploadProgressCallback(cancelToken),
           cancelToken: cancelToken,
           config: MatterbridgeConfig.fromMap(config),
+        );
+      } else if (provider is TelegramProvider) {
+        result = await provider.upload(
+          request,
+          onProgress: _uploadProgressCallback(cancelToken),
+          cancelToken: cancelToken,
+          config: TelegramConfig.fromMap(config),
+        );
+      } else if (provider is ZulipProvider) {
+        result = await provider.upload(
+          request,
+          onProgress: _uploadProgressCallback(cancelToken),
+          cancelToken: cancelToken,
+          config: ZulipConfig.fromMap(config),
         );
       } else {
         result = await provider.upload(

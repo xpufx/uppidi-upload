@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 
+import 'zulip_config.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/logging/log.dart';
@@ -119,22 +120,19 @@ class ZulipProvider extends BaseHttpProvider {
     FileUploadRequest request, {
     UploadProgressCallback? onProgress,
     CancelToken? cancelToken,
-    Map<String, String> config = const {},
+    Object? config,
   }) async {
-    _lastServerUrl =
-        (config['zulip_url']?.trim() ?? '').replaceAll(RegExp(r'/$'), '');
-    final isDm = config['zulip_direct_message'] == 'true';
-    final channel = isDm ? '' : (config['zulip_channel'] ?? '').trim();
-    final topic = isDm ? '' : (config['zulip_topic'] ?? '').trim();
-    final recipient = isDm ? (config['zulip_recipient'] ?? '').trim() : '';
-    // Handle display format "John Doe (11)" stored by older versions
-    final recipientMatch = RegExp(r'\((\d+)\)$').firstMatch(recipient);
-    final recipientId = recipientMatch?.group(1) ?? recipient;
+    final cfg = config is ZulipConfig
+        ? config
+        : ZulipConfig.fromMap(config is Map<String, String> ? config : {});
+    _lastServerUrl = cfg.serverUrl.replaceAll(RegExp(r'/$'), '');
 
     try {
-      final allowInsecure = config['_allow_insecure_conn'] == 'true';
-      final proxyUrl = config['_proxy_url'];
-      final cleanConfig = Map<String, String>.from(config)
+      final rawConfig =
+          (config is Map<String, String> ? config : <String, String>{});
+      final allowInsecure = rawConfig['_allow_insecure_conn'] == 'true';
+      final proxyUrl = rawConfig['_proxy_url'];
+      final cleanConfig = Map<String, String>.from(rawConfig)
         ..remove('_allow_insecure_conn')
         ..remove('_proxy_url')
         ..remove('send_as_photo');
@@ -162,7 +160,7 @@ class ZulipProvider extends BaseHttpProvider {
       if (!result.success) return result;
 
       // Resolve message content from config
-      var messageContent = config['message_text'] ?? '';
+      var messageContent = rawConfig['message_text'] ?? '';
       _log.info('Zulip message_content="$messageContent" url="${result.url}"');
       if (result.url != null) {
         if (messageContent.isEmpty) {
@@ -178,14 +176,14 @@ class ZulipProvider extends BaseHttpProvider {
       }
 
       // Post the file URL to the configured channel or send as DM
-      if (channel.isNotEmpty) {
+      if (cfg.channel.isNotEmpty) {
         try {
           final msgData = <String, dynamic>{
             'type': 'stream',
-            'to': channel,
+            'to': cfg.channel,
             'content': messageContent,
           };
-          if (topic.isNotEmpty) msgData['topic'] = topic;
+          if (cfg.topic.isNotEmpty) msgData['topic'] = cfg.topic;
 
           final msgResponse = await dio.post(
             '/api/v1/messages',
@@ -195,18 +193,18 @@ class ZulipProvider extends BaseHttpProvider {
             final body = msgResponse.data is Map
                 ? (msgResponse.data as Map)['msg'] as String?
                 : null;
-            _log.info('Posted to channel: $channel (${body ?? "ok"})');
+            _log.info('Posted to channel: ${cfg.channel} (${body ?? "ok"})');
           } else {
             _log.warn('Failed to post to channel: ${msgResponse.statusCode}');
           }
         } catch (e) {
           _log.warn('Failed to post to channel: $e');
         }
-      } else if (recipientId.isNotEmpty) {
+      } else if (cfg.recipient.isNotEmpty) {
         try {
           final msgData = <String, dynamic>{
             'type': 'direct',
-            'to': '[$recipientId]',
+            'to': '[${cfg.recipient}]',
             'content': messageContent,
           };
           final msgResponse = await dio.post(
@@ -214,7 +212,7 @@ class ZulipProvider extends BaseHttpProvider {
             data: FormData.fromMap(msgData),
           );
           if (msgResponse.statusCode == 200) {
-            _log.info('Sent DM to user $recipientId');
+            _log.info('Sent DM to user ${cfg.recipient}');
           } else {
             _log.warn('Failed to send DM: ${msgResponse.statusCode}');
           }
