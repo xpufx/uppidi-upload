@@ -133,6 +133,9 @@ if [ -f "$(dirname "$0")/build-appimage.sh" ]; then
 	bash "$(dirname "$0")/build-appimage.sh" \
 		--no-flutter-build \
 		"--hash=${GIT_HASH}"
+
+	echo "==> Cleaning old AppImages (keep latest 1)..."
+	ls -t "${ARTIFACTS_DIR}"/uppidi-upload-[0-9]*-x86_64.AppImage 2>/dev/null | tail -n +2 | xargs -r rm -f
 fi
 
 echo ""
