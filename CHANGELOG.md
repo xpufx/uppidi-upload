@@ -1,5 +1,6 @@
 # Changelog
 
+- refactor: collapse prefs + instance metadata through Riverpod providers
 - feat: typed configs for Telegram and Zulip — zero wide config violations
 - feat: typed MatterbridgeConfig, dispatch in _executeUpload
 - refactor: isUrlOnly → isUrlShareOnly, Matterbridge derives from paired_provider
@@ -29,4 +30,3 @@
 - fix: save messageText before state transition to UploadInProgress
 - feat: Zulip Channel/DM SegmentedButton, message template, editable upload message
 - feat: Zulip channel/DM toggle — mutually exclusive fields
-- fix: upload not loading optionalTextConfigKeys from storage

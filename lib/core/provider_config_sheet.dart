@@ -678,12 +678,7 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
             key: skey, value: (_checkboxValues[key] ?? false).toString());
       }
       for (final key in widget.provider.optionalTextConfigKeys) {
-        var value = _controllers[key]?.text.trim() ?? '';
-        // Extract numeric ID from display format "John Doe (11)"
-        if (key == 'zulip_recipient') {
-          final match = RegExp(r'\((\d+)\)$').firstMatch(value);
-          if (match != null) value = match.group(1)!;
-        }
+        final value = _controllers[key]?.text.trim() ?? '';
         final skey = _configKey(widget.provider.providerId, key);
         if (value.isNotEmpty) {
           await store.write(key: skey, value: value);
