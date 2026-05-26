@@ -44,6 +44,7 @@ Update **both** `version:` in `pubspec.yaml` AND `appVersion` in `lib/core/versi
 - Never `git add` with globs (`git add .`, `git add *`). Always add files explicitly.
 - Before adding a new file, consider whether it belongs in git (build artifacts, generated files, and IDE config generally do not).
 - When unsure whether a file should be tracked, ask the user.
+- Never attempt to elevate privileges (sudo, su, etc.). If a tool or dependency is missing, ask the user to install it.
 - Update `.gitignore` proactively for file types that should never be committed.
 
 ## Key source files
