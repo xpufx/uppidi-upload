@@ -1,0 +1,95 @@
+name: macOS / iOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Override version (e.g. 1.2.0+6). Blank = from pubspec.yaml'
+        required: false
+        type: string
+      dev:
+        description: 'Dev build (DEV_PROVIDERS enabled)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      hash: ${{ steps.resolve.outputs.hash }}
+      dev_define: ${{ steps.resolve.outputs.dev_define }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: resolve
+        shell: bash
+        run: |
+          ver="${{ inputs.version }}"
+          if [ -z "$ver" ]; then
+            ver=$(grep '^version:' pubspec.yaml | sed 's/version: *//')
+          fi
+          hash=$(git rev-parse --short HEAD)
+          dev="${{ inputs.dev == true && 'true' || 'false' }}"
+          if [ "$dev" = "true" ]; then
+            echo "dev_define=--dart-define=DEV_PROVIDERS=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "dev_define=" >> "$GITHUB_OUTPUT"
+          fi
+          echo "version=$ver" >> "$GITHUB_OUTPUT"
+          echo "hash=$hash" >> "$GITHUB_OUTPUT"
+
+  macos:
+    needs: version
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Sync version
+        run: |
+          sed -i '' "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${{ needs.version.outputs.version }}';/" lib/core/version.dart
+      - run: |
+          flutter build macos --release \
+            --dart-define=GIT_HASH=${{ needs.version.outputs.hash }} \
+            ${{ needs.version.outputs.dev_define }}
+      - name: Package
+        run: |
+          cd build/macos/Build/Products/Release
+          zip -r ../../../../../uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-macos.zip uppidi.app
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-macos
+          path: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-macos.zip
+
+  ios:
+    needs: version
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Sync version
+        run: |
+          sed -i '' "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${{ needs.version.outputs.version }}';/" lib/core/version.dart
+      - name: Build iOS (unsigned)
+        run: |
+          flutter build ios --release --no-codesign \
+            --dart-define=GIT_HASH=${{ needs.version.outputs.hash }} \
+            ${{ needs.version.outputs.dev_define }}
+      - name: Package .app
+        run: |
+          cd build/ios/iphoneos
+          zip -r ../../../uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-ios.zip Runner.app
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-ios
+          path: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-ios.zip
