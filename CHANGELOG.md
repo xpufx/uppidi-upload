@@ -1,32 +1,23 @@
 # Changelog
 
-- fix: restore hover overlay, gate DropTarget on !kIsWeb, hide paste on web
-- feat: desktop drag-drop + clipboard paste support
-- fix: Matterbridge always includes URL, retry preserves messageText, UploadCompleted carries messageText
-- feat: global message template settings card + upload screen pre-fill
-- fix: store Zulip recipient display name so it survives dialog reopen
-- refactor: collapse prefs + instance metadata through Riverpod providers
-- feat: typed configs for Telegram and Zulip — zero wide config violations
-- feat: typed MatterbridgeConfig, dispatch in _executeUpload
-- refactor: isUrlOnly → isUrlShareOnly, Matterbridge derives from paired_provider
-- refactor: global message template — single share message for all providers
-- refactor: deduplicate _mapException — inherit from BaseHttpProvider
-- chore: branded Matterbridge fallback text
-- fix: Matterbridge message template support
-- chore: build script — wire checkers into pipeline
-- fix: eliminate 3 analyzer warnings, finalize export/import Riverpod migration
-- feat: add check_raw_storage and check_wide_config static analyzers
-- docs: two checker design docs — raw storage ban and wide config ban; remove Export/Import exception from riverpod doc
-- fix: Matterbridge gateway fetch now throws on null/unexpected response instead of silently falling back to empty list
-- fix: Matterbridge null gateways, upload logging, paired URL in result
-- feat: Matterbridge paired provider — IRC uploads through Catbox/Uguu etc.
-- feat: Matterbridge provider — relay files via API gateways
-- fix: eliminate remaining direct storage reads
-- fix: Telegram message template timing, recipient display name persistence
-- test: add httpbin.org integration test for full upload pipeline
-- fix: ensure Zulip message always contains the file URL
-- fix: use ref.watch not ref.listen for config dialog — handles cached provider values
-- refactor: config dialog uses Riverpod provider — no more _loadConfig, message pre-filled
-- docs: bring ARCHITECTURE.md fully up to date — directory listing, versions, state machine, i18n
-- docs: ARCHITECTURE.md is the vision, not a snapshot — deviations are gaps, not patterns
-- docs: fix ARCHITECTURE.md provider registry to match 12 providers with dynamic initialization
+## 1.4.0 — "What's worth doing, is worth overdoing!"
+
+### New Providers
+- **Telegram** — full Bot API uploader with multi-instance support. Send files as documents or images with captions, `send_as_photo` toggle, message template support.
+- **Zulip** — Zulip server uploader. Channel/DM SegmentedButton toggle, API-fetched channel and user dropdowns, message posting to streams or direct messages.
+- **CustomUguu** — self-hosted Uguu-compatible provider for your own server.
+- **Matterbridge** — relay files to IRC, Discord, Telegram, Slack, Matrix, and other protocols via the Matterbridge API. Requires an existing Matterbridge server. Configure URL + token, fetch available gateways, pair with an upload provider (Catbox, Uguu, etc.) for text-only protocols.
+
+### New Features
+- Desktop drag-and-drop — real OS file drops from file manager with hover overlay (Linux, macOS, Windows).
+- Clipboard paste — paste images from clipboard via the paste button.
+- Global message template — configure in Settings, pre-filled on every upload, editable per-upload. Variables: {url} {filename} {filesize}.
+- History "Share via Matterbridge" — post any past upload's URL to a Matterbridge gateway.
+
+### Architecture
+- Riverpod config provider — single source of truth for all config. Enforced by `check_raw_storage` in CI.
+- Typed config classes — MatterbridgeConfig, TelegramConfig, ZulipConfig with named fields instead of raw Map<String, String>.
+- Export/Import through Riverpod — reads per-provider, invalidates after write.
+- Static analyzers — three checks run in every build: bare strings, raw storage access, wide config types.
+- httpbin.org integration test — full upload pipeline against a real HTTP endpoint.
+- 180 tests, 0 analyzer issues, all checkers green.
