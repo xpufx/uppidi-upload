@@ -181,8 +181,10 @@ jobs:
             org.freedesktop.Sdk//24.08
       - name: Prepare bundle sources
         run: |
-          mkdir -p flatpak-src
+          mkdir -p flatpak-src/lib
           cp -r build/linux/x64/release/bundle/* flatpak-src/
+          # Bundle libsecret for flutter_secure_storage
+          cp /lib/x86_64-linux-gnu/libsecret-1.so.0 flatpak-src/lib/
       - name: Build Flatpak
         run: |
           flatpak-builder --force-clean --repo=repo build-dir com.uppidi.uppidi.yml
@@ -190,7 +192,8 @@ jobs:
         run: |
           flatpak build-bundle repo \
             uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-linux.flatpak \
-            com.uppidi.uppidi
+            com.uppidi.uppidi \
+            ${{ needs.version.outputs.version }}
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
