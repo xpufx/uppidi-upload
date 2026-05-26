@@ -192,6 +192,12 @@ jobs:
             convert flatpak-src/share/icons/hicolor/256x256/apps/com.uppidi.uppidi.png \
               -resize ${sz}x${sz} "$srcdir/com.uppidi.uppidi.png"
           done
+          # Generate metainfo so flatpak list shows Version column
+          mkdir -p flatpak-src/share/metainfo
+          sed -e "s/__VERSION__/${{ needs.version.outputs.version }}/g" \
+              -e "s/__DATE__/$(date -I)/g" \
+              com.uppidi.uppidi.metainfo.xml \
+              > flatpak-src/share/metainfo/com.uppidi.uppidi.metainfo.xml
       - name: Build Flatpak
         run: |
           flatpak-builder --force-clean --repo=repo --default-branch=${{ needs.version.outputs.version }} build-dir com.uppidi.uppidi.yml

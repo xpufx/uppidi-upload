@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.uppidi.uppidi</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Uppidi Upload</name>
+  <summary>A simple, cross-platform file uploader</summary>
+  <description><p>Upload files to multiple hosting services.</p></description>
+  <launchable type="desktop-id">com.uppidi.uppidi.desktop</launchable>
+  <releases>
+    <release version="__VERSION__" date="__DATE__"/>
+  </releases>
+</component>
