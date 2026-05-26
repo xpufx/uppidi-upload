@@ -15,7 +15,7 @@ Uppidi Upload is an open source, cross-platform application for uploading media 
 ## Features
 
 - **13 providers** — public services and your own authenticated infrastructure
-- **Desktop-first** — drag files from your file manager, paste from clipboard, hover overlay feedback
+- **Desktop drag & drop** — drag files from your file manager, paste from clipboard, hover overlay feedback
 - **Message templates** — global template with `{url}`, `{filename}`, `{filesize}`, editable per upload
 - **History relay** — re-share any past upload to a Matterbridge gateway
 - **Cross-platform** — Android, Linux, Windows, macOS, Web
