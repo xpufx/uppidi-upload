@@ -10,6 +10,7 @@ import '../core/config_provider.dart';
 import '../core/format.dart';
 import '../core/history_service.dart';
 import '../core/interfaces/uploader.dart';
+import '../core/mime_types.dart';
 import '../core/models/upload_record.dart';
 import '../core/logging/log.dart';
 import '../core/models/provider_metadata.dart';
@@ -356,6 +357,9 @@ class UploadNotifier extends Notifier<UploadState> {
       final ioFile = File(filePath);
       final size = await ioFile.length();
       final fileName = ioFile.uri.pathSegments.last;
+      final detectedMime = mimeType ??
+          mimeTypeFromExtension(
+              fileName.contains('.') ? fileName.split('.').last : '');
 
       final previewBytes = await ioFile.readAsBytes();
       _log.info('Shared file: $filePath ($mimeType)');
@@ -367,7 +371,7 @@ class UploadNotifier extends Notifier<UploadState> {
       state = UploadFileSelected(
         fileName: fileName,
         fileSizeBytes: size,
-        mimeType: mimeType,
+        mimeType: detectedMime,
         fileBytes: previewBytes,
         selectedExpiry: _selectedExpiry,
         results: state.results,

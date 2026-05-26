@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: restore hover overlay, gate DropTarget on !kIsWeb, hide paste on web
 - feat: desktop drag-drop + clipboard paste support
 - fix: Matterbridge always includes URL, retry preserves messageText, UploadCompleted carries messageText
 - feat: global message template settings card + upload screen pre-fill
@@ -29,4 +30,3 @@
 - docs: bring ARCHITECTURE.md fully up to date — directory listing, versions, state machine, i18n
 - docs: ARCHITECTURE.md is the vision, not a snapshot — deviations are gaps, not patterns
 - docs: fix ARCHITECTURE.md provider registry to match 12 providers with dynamic initialization
-- docs: update ARCHITECTURE.md to reflect Riverpod config provider architecture
