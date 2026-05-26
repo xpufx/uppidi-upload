@@ -59,7 +59,15 @@ jobs:
       - name: Package
         run: |
           cd build/macos/Build/Products/Release
-          app=$(ls *.app | head -1)
+          echo "Contents:"
+          ls -la
+          app=$(find . -maxdepth 1 -name '*.app' -print -quit)
+          if [ -z "$app" ]; then
+            echo "ERROR: no .app bundle found"
+            exit 1
+          fi
+          app="${app#./}"
+          echo "Packaging: $app"
           zip -r ../../../../../uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-macos.zip "$app"
       - name: Upload artifact
         uses: actions/upload-artifact@v7
@@ -88,7 +96,15 @@ jobs:
       - name: Package .app
         run: |
           cd build/ios/iphoneos
-          app=$(ls *.app | head -1)
+          echo "Contents:"
+          ls -la
+          app=$(find . -maxdepth 1 -name '*.app' -print -quit)
+          if [ -z "$app" ]; then
+            echo "ERROR: no .app bundle found"
+            exit 1
+          fi
+          app="${app#./}"
+          echo "Packaging: $app"
           zip -r ../../../uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-ios.zip "$app"
       - name: Upload artifact
         uses: actions/upload-artifact@v7
