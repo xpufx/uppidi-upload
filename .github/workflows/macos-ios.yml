@@ -59,7 +59,7 @@ jobs:
       - name: Package
         run: |
           cd build/macos/Build/Products/Release
-          zip -r ../../../../../uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-macos.zip uppidi_upload.app
+          zip -r ../../../../../uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-macos.zip Runner.app
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
