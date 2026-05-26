@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/models/upload_record.dart';
@@ -44,7 +45,21 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(UploadRecordAdapter());
   _registerScreens();
-  await ProviderRegistry.init();
+  try {
+    await ProviderRegistry.init();
+  } on PlatformException catch (e) {
+    stderr.writeln('FATAL: ${e.code}: ${e.message}');
+    if (e.code == 'KeyringLocked') {
+      stderr.writeln(
+          'The desktop secret service keyring is locked or inaccessible.\n'
+          'Ensure GNOME Keyring / KDE Wallet is unlocked.\n'
+          'For Flatpak: the sandbox needs D-Bus access — '
+          'restart your session or run:\n'
+          '  flatpak override --user com.uppidi.uppidi '
+          '--talk-name=org.freedesktop.secrets');
+    }
+    exit(1);
+  }
   runApp(const ProviderScope(child: UppidiApp()));
 }
 

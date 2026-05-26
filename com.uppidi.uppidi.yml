@@ -11,6 +11,7 @@ finish-args:
   - --share=ipc
   - --device=dri
   - --filesystem=host
+  - --talk-name=org.freedesktop.secrets
 
 modules:
   - name: uppidi

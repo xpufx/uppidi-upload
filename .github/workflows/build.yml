@@ -164,7 +164,7 @@ jobs:
           cache: true
       - run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev flatpak flatpak-builder
+          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev flatpak flatpak-builder imagemagick
       - run: flutter pub get
       - name: Sync version
         run: |
@@ -185,6 +185,13 @@ jobs:
           cp -r build/linux/x64/release/bundle/* flatpak-src/
           # Bundle libsecret for flutter_secure_storage
           cp /lib/x86_64-linux-gnu/libsecret-1.so.0 flatpak-src/lib/
+          # Generate standard icon sizes for desktop integration
+          for sz in 48 64 128; do
+            srcdir=flatpak-src/share/icons/hicolor/${sz}x${sz}/apps
+            mkdir -p "$srcdir"
+            convert flatpak-src/share/icons/hicolor/256x256/apps/com.uppidi.uppidi.png \
+              -resize ${sz}x${sz} "$srcdir/com.uppidi.uppidi.png"
+          done
       - name: Build Flatpak
         run: |
           flatpak-builder --force-clean --repo=repo --default-branch=${{ needs.version.outputs.version }} build-dir com.uppidi.uppidi.yml
