@@ -59,7 +59,8 @@ jobs:
       - name: Package
         run: |
           cd build/macos/Build/Products/Release
-          zip -r ../../../../../uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-macos.zip Runner.app
+          app=$(ls *.app | head -1)
+          zip -r ../../../../../uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-macos.zip "$app"
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
@@ -87,7 +88,8 @@ jobs:
       - name: Package .app
         run: |
           cd build/ios/iphoneos
-          zip -r ../../../uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-ios.zip Runner.app
+          app=$(ls *.app | head -1)
+          zip -r ../../../uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-ios.zip "$app"
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:

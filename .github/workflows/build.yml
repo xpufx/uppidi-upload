@@ -187,7 +187,7 @@ jobs:
           cp /lib/x86_64-linux-gnu/libsecret-1.so.0 flatpak-src/lib/
       - name: Build Flatpak
         run: |
-          flatpak-builder --force-clean --repo=repo build-dir com.uppidi.uppidi.yml
+          flatpak-builder --force-clean --repo=repo --default-branch=${{ needs.version.outputs.version }} build-dir com.uppidi.uppidi.yml
       - name: Create bundle
         run: |
           flatpak build-bundle repo \
