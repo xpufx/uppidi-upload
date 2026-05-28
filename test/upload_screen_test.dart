@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -121,8 +123,8 @@ void main() {
     await Hive.openBox<String>('settings');
   });
 
-  tearDownAll(() async {
-    await Hive.deleteBoxFromDisk('settings');
+  tearDownAll(() {
+    Directory('.hive_test_upload_screen').deleteSync(recursive: true);
   });
 
   group('Upload Screen Widget Tests', () {
