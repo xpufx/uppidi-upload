@@ -45,6 +45,12 @@ After any round of edits and before committing, run `git diff --stat`
 and verify only the intended files are changed. If unexpected files
 or deletions appear, investigate and revert before proceeding.
 
+Then run `git diff` (no flags) and inspect every hunk — especially
+deletions. The edit tool can silently eat adjacent code when oldString
+matches too broadly. If you see lines removed that you didn't intend
+to delete, you caught a scope leak. This is the most important check
+before committing.
+
 ## Git discipline
 
 - Never `git add` with globs (`git add .`, `git add *`). Always add files explicitly.
