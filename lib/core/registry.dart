@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'interfaces/uploader.dart';
 import 'models/provider_instance.dart';
 import 'models/provider_metadata.dart';
-import 'provider_config_sheet.dart';
+import 'provider_storage_service.dart';
 import 'settings_service.dart';
 import '../providers/catbox_provider.dart';
 import '../providers/fileditch_provider.dart';

@@ -2,7 +2,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage_platform_interface/flutter_secure_storage_platform_interface.dart';
 
-import 'package:uppidi_upload/core/provider_config_sheet.dart';
+import 'package:uppidi_upload/core/provider_storage_service.dart';
 import 'package:uppidi_upload/core/registry.dart';
 import 'package:uppidi_upload/core/models/provider_instance.dart';
 import 'package:uppidi_upload/providers/telegram_provider.dart';

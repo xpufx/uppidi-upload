@@ -7,6 +7,7 @@ import '../core/metadata_badges.dart';
 import '../core/models/provider_instance.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/provider_config_sheet.dart';
+import '../core/provider_storage_service.dart';
 import '../core/registry.dart';
 import '../core/settings_service.dart';
 import '../l10n/app_localizations.dart';
