@@ -79,7 +79,7 @@ jobs:
           name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-android-${{ matrix.abi }}${{ needs.version.outputs.suffix }}
           path: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-android-${{ matrix.abi }}${{ needs.version.outputs.suffix }}.apk
 
-  linux:
+  linux-build:
     needs: version
     runs-on: ubuntu-22.04
     steps:
@@ -90,7 +90,7 @@ jobs:
           cache: true
       - run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev liblzma-dev file wget appstream squashfs-tools libfuse2
+          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev liblzma-dev
       - run: flutter pub get
       - name: Sync version
         run: |
@@ -99,6 +99,20 @@ jobs:
           flutter build linux --release \
             --dart-define=GIT_HASH=${{ needs.version.outputs.hash }} \
             ${{ needs.version.outputs.dev_define }}
+      - name: Upload bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-bundle-${{ needs.version.outputs.hash }}
+          path: build/linux/x64/release/bundle
+
+  linux-tarball:
+    needs: [version, linux-build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: linux-bundle-${{ needs.version.outputs.hash }}
+          path: build/linux/x64/release/bundle
       - name: Package tarball
         run: |
           tar -czf \
@@ -109,6 +123,19 @@ jobs:
         with:
           name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-linux${{ needs.version.outputs.suffix }}
           path: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-linux.tar.gz
+
+  linux-appimage:
+    needs: [version, linux-build]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
+        with:
+          name: linux-bundle-${{ needs.version.outputs.hash }}
+          path: build/linux/x64/release/bundle
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq file wget appstream squashfs-tools libfuse2
       - name: Build AppImage
         if: ${{ inputs.dev != true }}
         env:
@@ -153,26 +180,18 @@ jobs:
           name: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-windows${{ needs.version.outputs.suffix }}
           path: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-windows.zip
 
-  flatpak:
-    needs: version
+  linux-flatpak:
+    needs: [version, linux-build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: subosito/flutter-action@v2
+      - uses: actions/download-artifact@v8
         with:
-          channel: stable
-          cache: true
+          name: linux-bundle-${{ needs.version.outputs.hash }}
+          path: build/linux/x64/release/bundle
       - run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev flatpak flatpak-builder imagemagick
-      - run: flutter pub get
-      - name: Sync version
-        run: |
-          sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${{ needs.version.outputs.version }}';/" lib/core/version.dart
-      - run: |
-          flutter build linux --release \
-            --dart-define=GIT_HASH=${{ needs.version.outputs.hash }} \
-            ${{ needs.version.outputs.dev_define }}
+          sudo apt-get install -y -qq libsecret-1-dev flatpak flatpak-builder imagemagick
       - name: Setup Flatpak runtime
         run: |
           flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -215,7 +234,7 @@ jobs:
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [version, android, linux, windows, flatpak]
+    needs: [version, android, linux-tarball, linux-appimage, linux-flatpak, windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write

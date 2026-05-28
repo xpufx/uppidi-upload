@@ -138,10 +138,47 @@ if [ -f "$(dirname "$0")/build-appimage.sh" ]; then
 	ls -t "${ARTIFACTS_DIR}"/uppidi-upload-[0-9]*-x86_64.AppImage 2>/dev/null | tail -n +2 | xargs -r rm -f
 fi
 
+# ── Flatpak ──────────────────────────────────────────────────
+if command -v flatpak-builder &>/dev/null; then
+	echo "==> Building Flatpak..."
+	FLATPAK_SRC="flatpak-src"
+	mkdir -p "$FLATPAK_SRC/lib"
+	cp -r "build/linux/x64/${BUILD_TYPE}/bundle"/* "$FLATPAK_SRC/"
+	cp /lib/x86_64-linux-gnu/libsecret-1.so.0 "$FLATPAK_SRC/lib/" 2>/dev/null || true
+	for sz in 48 64 128; do
+		srcdir="$FLATPAK_SRC/share/icons/hicolor/${sz}x${sz}/apps"
+		mkdir -p "$srcdir"
+		convert "$FLATPAK_SRC/share/icons/hicolor/256x256/apps/com.uppidi.uppidi.png" \
+			-resize ${sz}x${sz} "$srcdir/com.uppidi.uppidi.png" 2>/dev/null || true
+	done
+	mkdir -p "$FLATPAK_SRC/share/metainfo"
+	sed -e "s/__VERSION__/$VERSION/g" \
+		-e "s/__DATE__/$(date -I)/g" \
+		com.uppidi.uppidi.metainfo.xml \
+		>"$FLATPAK_SRC/share/metainfo/com.uppidi.uppidi.metainfo.xml"
+	FLATPAK_NAME="uppidi-upload-${VERSION}-${GIT_HASH}-linux.flatpak"
+	flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
+	flatpak install -y --noninteractive --user flathub \
+		org.freedesktop.Platform//24.08 \
+		org.freedesktop.Sdk//24.08 2>/dev/null || true
+	if flatpak-builder --force-clean --repo=repo --default-branch="$VERSION" build-dir com.uppidi.uppidi.yml 2>&1; then
+		flatpak build-bundle repo "${ARTIFACTS_DIR}/${FLATPAK_NAME}" com.uppidi.uppidi "$VERSION"
+		ln -sf "$FLATPAK_NAME" "${ARTIFACTS_DIR}/uppidi-upload-latest-linux.flatpak"
+		echo "    ${FLATPAK_NAME}"
+		echo "==> Cleaning old Flatpaks (keep latest 1)..."
+		ls -t "${ARTIFACTS_DIR}"/uppidi-upload-[0-9]*-linux.flatpak 2>/dev/null | tail -n +2 | xargs -r rm -f
+	else
+		echo "   ⏭️  Flatpak build failed — skipping"
+	fi
+else
+	echo "   ⏭️  flatpak-builder not found — skipping Flatpak"
+fi
+
 echo ""
 echo "==> Done (${BUILD_TYPE})"
 echo "    uppidi-upload-${VERSION}-${GIT_HASH}-android-{arm64-v8a,armeabi-v7a,x86_64}.apk"
-echo "    ${LINUX_NAME}"
+echo "    uppidi-upload-${VERSION}-${GIT_HASH}-linux.tar.gz"
+echo "    uppidi-upload-${VERSION}-${GIT_HASH}-linux.flatpak"
 
 # ── Tag release (only once per version) ──────────────────────────
 if [ "$DEV" = false ]; then
