@@ -100,4 +100,6 @@ Uppidi does not store, view, or keep copies of files you upload. Your files go d
 
 Uppidi Upload is released under the GNU General Public License v3 (GPLv3). See the [LICENSE](LICENSE) file for full details.
 
-> **AI (LLM) Usage Notice:** This project is being developed with extensive AI assistance. The app is tested manually on Android and Linux.
+##AI (LLM) Usage Notice##
+
+This project is being developed with extensive AI assistance. The app is tested manually on Android and Linux.
