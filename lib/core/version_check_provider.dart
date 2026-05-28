@@ -9,64 +9,85 @@ import 'version.dart';
 
 final _log = Log('VersionCheck');
 
-enum VersionCheckState { idle, checking, upToDate, updateAvailable }
+sealed class VersionCheckState {
+  const VersionCheckState();
+}
+
+class VersionCheckIdle extends VersionCheckState {
+  const VersionCheckIdle();
+}
+
+class VersionCheckChecking extends VersionCheckState {
+  const VersionCheckChecking();
+}
+
+class VersionCheckUpToDate extends VersionCheckState {
+  final String latestHash;
+  final DateTime lastChecked;
+  const VersionCheckUpToDate(this.latestHash, this.lastChecked);
+}
+
+class VersionCheckUpdateAvailable extends VersionCheckState {
+  final String latestHash;
+  final DateTime lastChecked;
+  final String downloadUrl;
+  const VersionCheckUpdateAvailable(
+    this.latestHash,
+    this.lastChecked,
+    this.downloadUrl,
+  );
+}
 
 class VersionCheckNotifier extends Notifier<VersionCheckState> {
-  String? _latestHash;
-  String? _downloadUrl;
-  DateTime? _lastChecked;
   int _tick = 0;
   Timer? _ticker;
 
   @override
   VersionCheckState build() {
     ref.onDispose(() => _ticker?.cancel());
-    return VersionCheckState.idle;
+    return const VersionCheckIdle();
   }
 
   Future<void> check() async {
     _ticker?.cancel();
-    state = VersionCheckState.checking;
-    _lastChecked = DateTime.now();
+    final now = DateTime.now();
+    state = const VersionCheckChecking();
     try {
       if (cdnUrl.isNotEmpty) {
-        await _checkFromCdn();
+        await _checkFromCdn(now);
       } else {
-        await _checkFromGitHub();
+        await _checkFromGitHub(now);
       }
     } catch (e) {
       _log.warn('Version check failed: $e', error: e);
-      state = VersionCheckState.idle;
-      _lastChecked = null;
+      state = const VersionCheckIdle();
     }
-    if (state == VersionCheckState.upToDate ||
-        state == VersionCheckState.updateAvailable) {
+    if (state is VersionCheckUpToDate || state is VersionCheckUpdateAvailable) {
       _startTicker();
     }
   }
 
-  Future<void> _checkFromCdn() async {
+  Future<void> _checkFromCdn(DateTime now) async {
     final client = HttpClient();
     try {
       final request = await client.getUrl(Uri.parse('$cdnUrl/latest.txt'));
       final response = await request.close();
       if (response.statusCode == 200) {
         final body = await response.transform(utf8.decoder).join();
-        _latestHash = body.trim();
-        _buildDownloadUrl();
-        state = (_latestHash!.isNotEmpty && _latestHash != gitHash)
-            ? VersionCheckState.updateAvailable
-            : VersionCheckState.upToDate;
+        final latestHash = body.trim();
+        final downloadUrl = _buildDownloadUrl();
+        state = (latestHash.isNotEmpty && latestHash != gitHash)
+            ? VersionCheckUpdateAvailable(latestHash, now, downloadUrl)
+            : VersionCheckUpToDate(latestHash, now);
       } else {
-        state = VersionCheckState.idle;
-        _lastChecked = null;
+        state = const VersionCheckIdle();
       }
     } finally {
       client.close();
     }
   }
 
-  Future<void> _checkFromGitHub() async {
+  Future<void> _checkFromGitHub(DateTime now) async {
     final client = HttpClient();
     try {
       final request = await client.getUrl(
@@ -79,22 +100,20 @@ class VersionCheckNotifier extends Notifier<VersionCheckState> {
         final body = await response.transform(utf8.decoder).join();
         final json = jsonDecode(body) as Map<String, dynamic>;
         final tagName = json['tag_name'] as String? ?? '';
-        _latestHash = tagName.startsWith('v') ? tagName.substring(1) : tagName;
+        final latestHash =
+            tagName.startsWith('v') ? tagName.substring(1) : tagName;
 
         // Pick the right asset for this platform
         final assets = json['assets'] as List? ?? [];
+        String? downloadUrl;
         if (Platform.isAndroid) {
-          // Try arm64-v8a first (most common), fall back to armeabi-v7a,
-          // then x86_64. Never use .last — that picks the alphabetically
-          // last APK which is x86_64 (wrong for almost every device).
           const abiPriority = ['arm64-v8a', 'armeabi-v7a', 'x86_64'];
-          _downloadUrl = null;
           for (final abi in abiPriority) {
             final match = assets.cast<Map<String, dynamic>>().where(
                   (a) => (a['name'] as String).contains('-$abi.apk'),
                 );
             if (match.isNotEmpty) {
-              _downloadUrl = match.first['browser_download_url'] as String?;
+              downloadUrl = match.first['browser_download_url'] as String?;
               break;
             }
           }
@@ -105,35 +124,29 @@ class VersionCheckNotifier extends Notifier<VersionCheckState> {
               return name.endsWith('.AppImage') || name.endsWith('.tar.gz');
             },
           );
-          // Prefer AppImage over tar.gz
           final appImage = desktopAssets.where(
             (a) => (a['name'] as String).endsWith('.AppImage'),
           );
-          _downloadUrl = appImage.isNotEmpty
+          downloadUrl = appImage.isNotEmpty
               ? appImage.first['browser_download_url'] as String?
               : desktopAssets.isNotEmpty
                   ? desktopAssets.first['browser_download_url'] as String?
                   : null;
         }
 
-        state = (_latestHash!.isNotEmpty && _latestHash != appVersion)
-            ? VersionCheckState.updateAvailable
-            : VersionCheckState.upToDate;
+        state = (latestHash.isNotEmpty && latestHash != appVersion)
+            ? VersionCheckUpdateAvailable(latestHash, now, downloadUrl ?? '')
+            : VersionCheckUpToDate(latestHash, now);
       } else {
-        state = VersionCheckState.idle;
-        _lastChecked = null;
+        state = const VersionCheckIdle();
       }
     } finally {
       client.close();
     }
   }
 
-  void _buildDownloadUrl() {
-    // Build CDN download URL the same way settings_screen does.
-    // The CDN hosts symlinks for each ABI (arm64-v8a, armeabi-v7a, x86_64).
-    // Try arm64-v8a first (~95% of devices), fall back with each attempt.
-    // Note: we can't detect the device ABI from Dart without a platform plugin.
-    _downloadUrl = Platform.isAndroid
+  String _buildDownloadUrl() {
+    return Platform.isAndroid
         ? '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk'
         : '$cdnUrl/uppidi-upload-latest-linux.tar.gz';
   }
@@ -141,23 +154,15 @@ class VersionCheckNotifier extends Notifier<VersionCheckState> {
   void _startTicker() {
     _ticker?.cancel();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (state == VersionCheckState.upToDate ||
-          state == VersionCheckState.updateAvailable) {
+      if (state is VersionCheckUpToDate ||
+          state is VersionCheckUpdateAvailable) {
         _tick++;
-        // Update the age ticker so UI watching it can refresh "Xs ago" text.
-        // Avoids the hack of `state = state` which caused unnecessary rebuilds
-        // of every widget watching the main versionCheckProvider.
         ref.read(versionCheckAgeTicker.notifier).set(_tick);
       } else {
         _ticker?.cancel();
       }
     });
   }
-
-  String? get latestHash => _latestHash;
-  String? get downloadUrl => _downloadUrl;
-  DateTime? get lastChecked => _lastChecked;
-  int get tick => _tick;
 }
 
 final versionCheckProvider =

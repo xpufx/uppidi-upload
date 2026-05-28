@@ -142,8 +142,6 @@ class _VersionCheckWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(versionCheckProvider);
-    final notifier = ref.read(versionCheckProvider.notifier);
-    final lastChecked = notifier.lastChecked;
 
     // Watch the age ticker so this widget rebuilds every second to update
     // the "Xs ago" text — avoids the old `state = state` no-op hack.
@@ -151,15 +149,15 @@ class _VersionCheckWidget extends ConsumerWidget {
 
     // Age text only for upToDate (checkmark state)
     String? ageText;
-    if (lastChecked != null && state == VersionCheckState.upToDate) {
-      final seconds = DateTime.now().difference(lastChecked).inSeconds;
+    if (state is VersionCheckUpToDate) {
+      final seconds = DateTime.now().difference(state.lastChecked).inSeconds;
       ageText = seconds < 60
           ? l10n.secondsAgo(seconds)
           : l10n.minutesAgo(seconds ~/ 60);
     }
 
     return GestureDetector(
-      onTap: state == VersionCheckState.checking
+      onTap: state is VersionCheckChecking
           ? null
           : () => ref.read(versionCheckProvider.notifier).check(),
       child: Column(
@@ -167,22 +165,27 @@ class _VersionCheckWidget extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           switch (state) {
-            VersionCheckState.idle =>
+            VersionCheckIdle() =>
               const Icon(Icons.refresh, size: 14, color: Colors.grey),
-            VersionCheckState.checking => const SizedBox(
+            VersionCheckChecking() => const SizedBox(
                 width: 14,
                 height: 14,
                 child: CircularProgressIndicator(strokeWidth: 1.5),
               ),
-            VersionCheckState.upToDate =>
+            VersionCheckUpToDate() =>
               const Icon(Icons.check_circle, size: 14, color: Colors.green),
-            VersionCheckState.updateAvailable => Row(
+            VersionCheckUpdateAvailable(
+              :final downloadUrl,
+              :final latestHash
+            ) =>
+              Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   GestureDetector(
                     onTap: () async {
-                      final url = notifier.downloadUrl ??
-                          (Platform.isAndroid
+                      final url = downloadUrl.isNotEmpty
+                          ? downloadUrl
+                          : (Platform.isAndroid
                               ? '$cdnUrl/uppidi-upload-latest-android-arm64-v8a.apk'
                               : '$cdnUrl/uppidi-upload-latest-linux.tar.gz');
                       if (url.isEmpty) return;
@@ -313,7 +316,7 @@ class _VersionCheckWidget extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        notifier.latestHash ?? '',
+                        latestHash,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             fontSize: 10,

@@ -553,8 +553,7 @@ class _FileSelectedButtonsState extends ConsumerState<_FileSelectedButtons> {
         }
       }
       // Sync controller with state messageText on provider change
-      if (_msgController.text != state.messageText &&
-          state.messageText.isNotEmpty) {
+      if (_msgController.text != state.messageText) {
         _msgController.text = state.messageText;
       }
     }

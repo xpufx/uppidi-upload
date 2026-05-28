@@ -36,11 +36,13 @@ sealed class UploadState {
   final List<UploadResult> results;
   final int selectedProviderIndex;
   final List<BaseUploader> providers;
+  final String? selectedExpiry;
 
   const UploadState({
     this.results = const [],
     this.selectedProviderIndex = 0,
     this.providers = const [],
+    this.selectedExpiry,
   });
 }
 
@@ -49,6 +51,7 @@ final class UploadIdle extends UploadState {
     super.results,
     super.selectedProviderIndex,
     super.providers,
+    super.selectedExpiry,
   });
 }
 
@@ -57,7 +60,6 @@ final class UploadFileSelected extends UploadState {
   final int fileSizeBytes;
   final String? mimeType;
   final Uint8List? fileBytes;
-  final String? selectedExpiry;
   final String messageText;
 
   const UploadFileSelected({
@@ -65,11 +67,11 @@ final class UploadFileSelected extends UploadState {
     required this.fileSizeBytes,
     this.mimeType,
     this.fileBytes,
-    this.selectedExpiry,
     this.messageText = '',
     super.results,
     super.selectedProviderIndex,
     super.providers,
+    super.selectedExpiry,
   });
 }
 
@@ -97,6 +99,7 @@ final class UploadInProgress extends UploadState {
     super.results,
     super.selectedProviderIndex,
     super.providers,
+    super.selectedExpiry,
   });
 }
 
@@ -122,6 +125,7 @@ final class UploadCompleted extends UploadState {
     super.results,
     super.selectedProviderIndex,
     super.providers,
+    super.selectedExpiry,
   });
 }
 
@@ -131,16 +135,15 @@ class UploadNotifier extends Notifier<UploadState> {
   UploadNotifier({List<BaseUploader>? providers})
       : _injectedProviders = providers;
 
-  String _selectedExpiry = '24h'; // default for configurableExpiry providers
+  final String _selectedExpiry =
+      '24h'; // default for configurableExpiry providers
   Uint8List? _originalFileBytes; // saved for crop reset
 
-  String? _lastFilePath;
   Uint8List? _lastFileBytes;
   DateTime _lastSpeedSample = DateTime.now();
   int _lastSampleBytes = 0;
 
   void setExpiry(String expiry) {
-    _selectedExpiry = expiry;
     if (state is UploadFileSelected) {
       final prev = state as UploadFileSelected;
       state = UploadFileSelected(
@@ -149,6 +152,7 @@ class UploadNotifier extends Notifier<UploadState> {
         mimeType: prev.mimeType,
         fileBytes: prev.fileBytes,
         selectedExpiry: expiry,
+        messageText: prev.messageText,
         results: prev.results,
         selectedProviderIndex: prev.selectedProviderIndex,
         providers: prev.providers,
@@ -180,7 +184,7 @@ class UploadNotifier extends Notifier<UploadState> {
       }
     });
 
-    return UploadIdle(providers: enabled);
+    return UploadIdle(providers: enabled, selectedExpiry: _selectedExpiry);
   }
 
   void setProvider(int index) {
@@ -209,7 +213,7 @@ class UploadNotifier extends Notifier<UploadState> {
           fileSizeBytes: prev.fileSizeBytes,
           mimeType: prev.mimeType,
           fileBytes: prev.fileBytes,
-          selectedExpiry: _selectedExpiry,
+          selectedExpiry: prev.selectedExpiry,
           messageText: prev.messageText,
           results: prev.results,
           selectedProviderIndex: index,
@@ -247,7 +251,6 @@ class UploadNotifier extends Notifier<UploadState> {
     if (pickResult == null || pickResult.files.isEmpty) return;
 
     final file = pickResult.files.first;
-    _lastFilePath = file.path;
     _lastFileBytes = await file.readAsBytes();
 
     try {
@@ -293,25 +296,28 @@ class UploadNotifier extends Notifier<UploadState> {
   }
 
   Future<void> uploadSelected() async {
+    final currentFile =
+        state is UploadFileSelected ? state as UploadFileSelected : null;
+    if (currentFile == null) return;
+
+    Uint8List? uploadBytes = currentFile.fileBytes;
+    String uploadName = currentFile.fileName;
+    String? uploadMime = currentFile.mimeType;
+
     // Apply quality compression at upload time (not during preview)
     final quality = qualityNotifier.value;
-    bool qualityApplied = false;
-    if (quality > 0 && _lastFileBytes != null) {
-      final mime = state is UploadFileSelected
-          ? (state as UploadFileSelected).mimeType
-          : null;
-      if (mime?.startsWith('image/') == true) {
+    if (quality > 0 && uploadBytes != null) {
+      final mime = uploadMime;
+      if (mime != null && mime.startsWith('image/')) {
         try {
-          final src = img.decodeImage(_lastFileBytes!);
+          final src = img.decodeImage(uploadBytes);
           if (src != null) {
             final ratio = quality == 1 ? 0.5 : 0.25;
             final newW = (src.width * ratio).round();
             final newH = (src.height * ratio).round();
             final jpegQuality = quality == 1 ? 75 : 50;
             final resized = img.copyResize(src, width: newW, height: newH);
-            final outBytes = img.encodeJpg(resized, quality: jpegQuality);
-            _lastFileBytes = outBytes;
-            qualityApplied = true;
+            uploadBytes = img.encodeJpg(resized, quality: jpegQuality);
           }
         } catch (e) {
           _log.warn('Quality compression failed: $e', error: e);
@@ -319,33 +325,14 @@ class UploadNotifier extends Notifier<UploadState> {
       }
     }
 
-    FileUploadRequest? request;
-    // When quality was applied, use the compressed bytes even if a file path
-    // exists — otherwise the request would read the original uncompressed file.
-    if (_lastFilePath != null && !qualityApplied) {
-      final ioFile = File(_lastFilePath!);
-      final size = await ioFile.length();
-      request = FileUploadRequest(
-        fileName: ioFile.uri.pathSegments.last,
-        mimeType: state is UploadFileSelected
-            ? (state as UploadFileSelected).mimeType
-            : null,
-        sizeInBytes: size,
-        dataStream: ioFile.openRead(),
-      );
-    } else if (_lastFileBytes != null) {
-      request = FileUploadRequest(
-        fileName: state is UploadFileSelected
-            ? (state as UploadFileSelected).fileName
-            : 'file',
-        mimeType: state is UploadFileSelected
-            ? (state as UploadFileSelected).mimeType
-            : null,
-        sizeInBytes: _lastFileBytes!.length,
-        dataStream: Stream.value(_lastFileBytes!),
-      );
-    }
-    if (request == null) return;
+    if (uploadBytes == null) return;
+
+    final request = FileUploadRequest(
+      fileName: uploadName,
+      mimeType: uploadMime,
+      sizeInBytes: uploadBytes.length,
+      dataStream: Stream.value(uploadBytes),
+    );
 
     await _executeUpload(request);
   }
@@ -364,7 +351,6 @@ class UploadNotifier extends Notifier<UploadState> {
       final previewBytes = await ioFile.readAsBytes();
       _log.info('Shared file: $filePath ($mimeType)');
 
-      _lastFilePath = filePath;
       _lastFileBytes = null;
       _originalFileBytes = previewBytes;
       _lastFileBytes = previewBytes;
@@ -399,7 +385,6 @@ class UploadNotifier extends Notifier<UploadState> {
       {String? mimeType}) async {
     if (state is UploadInProgress) return;
     _log.info('Pasted/clipboard file: $fileName ($mimeType)');
-    _lastFilePath = null;
     _lastFileBytes = bytes;
     _originalFileBytes = bytes;
     state = UploadFileSelected(
@@ -762,8 +747,6 @@ class UploadNotifier extends Notifier<UploadState> {
   /// [croppedBytes] should be JPEG-encoded bytes ready for upload/preview.
   void applyCrop(Uint8List croppedBytes) {
     _lastFileBytes = croppedBytes;
-    _lastFileBytes = croppedBytes;
-    _lastFilePath = null; // cropped data is no longer a file path
     if (state is UploadFileSelected) {
       final prev = state as UploadFileSelected;
       final croppedName =
@@ -786,8 +769,6 @@ class UploadNotifier extends Notifier<UploadState> {
   void resetCrop() {
     if (_originalFileBytes == null) return;
     _lastFileBytes = _originalFileBytes;
-    _lastFileBytes = _originalFileBytes;
-    _lastFilePath = null;
     if (state is UploadFileSelected) {
       final prev = state as UploadFileSelected;
       state = UploadFileSelected(
@@ -805,7 +786,6 @@ class UploadNotifier extends Notifier<UploadState> {
   }
 
   void clearSelection() {
-    _lastFilePath = null;
     _lastFileBytes = null;
     _originalFileBytes = null;
     _lastFileBytes = null;

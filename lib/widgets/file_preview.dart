@@ -49,6 +49,7 @@ class _FilePreviewState extends State<FilePreview> {
     super.didUpdateWidget(oldWidget);
     if (widget.fileBytes != oldWidget.fileBytes) {
       _cachedImageWidget = null;
+      _hasCropped = false;
     }
   }
 
