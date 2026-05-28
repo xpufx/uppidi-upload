@@ -39,6 +39,12 @@ Update **both** `version:` in `pubspec.yaml` AND `appVersion` in `lib/core/versi
 - Use `Log` class (not `print()`).
 - When using the edit tool: match the **minimum unique oldString** — just enough to identify the target line(s), never surrounding context. Matching too broadly can silently delete adjacent code (e.g. an `@override` getter between the oldString start and end).
 
+## Scope guard
+
+After any round of edits and before committing, run `git diff --stat`
+and verify only the intended files are changed. If unexpected files
+or deletions appear, investigate and revert before proceeding.
+
 ## Git discipline
 
 - Never `git add` with globs (`git add .`, `git add *`). Always add files explicitly.
