@@ -77,6 +77,7 @@ before committing.
 
 - **`bash scripts/build_and_serve.sh`** — the internal release pipeline. Syncs version, checks for bare UI strings + untranslated ARB keys, builds Android + Linux, packs artifacts to `.caddy-artifacts/`, updates CHANGELOG. **Use this for all builds.**
 - `bash scripts/build_and_serve.sh --dev` — dev build (debug mode + `DEV_PROVIDERS` enabled, no AppImage, skips changelog commit). Adds test/dev-only providers (e.g. self-hosted Uguu instance) guarded by `bool.fromEnvironment('DEV_PROVIDERS')`.
+- **Worktree builds**: when run from a git worktree, artifacts go to `<main-repo>/.caddy-artifacts/worktrees/<worktree-name>/`. Main repo artifacts are never touched. The `--dev` flag works the same.
 - `bash scripts/build.sh <target>` — for external contributors who clone the repo. Checks prereqs, builds, deploys to `.caddy-artifacts/`. Targets: `android`, `linux`, `web`, `windows`, `all`.
 - `bash scripts/build-appimage.sh` — AppImage after Linux build (called by build_and_serve.sh).
 - `bash scripts/download_favicons.sh` — refresh provider favicons in `assets/favicons/`.

@@ -5,7 +5,8 @@ export ANDROID_HOME="$HOME/.android"
 export ANDROID_SDK_ROOT="$ANDROID_HOME"
 export PATH="$HOME/.flutter/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
 
-cd /home/xpufx/code/uppidi
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$PROJECT_ROOT"
 
 # ── Parse args ─────────────────────────────────────────────────
 DEV=false
@@ -72,7 +73,18 @@ echo "# Changelog" >CHANGELOG.md
 echo "" >>CHANGELOG.md
 git log --oneline --format="- %s" | head -30 >>CHANGELOG.md
 echo "   ✅ Changelog refreshed (unstaged)"
-ARTIFACTS_DIR="/home/xpufx/code/uppidi/.caddy-artifacts"
+GIT_DIR=$(git rev-parse --git-dir 2>/dev/null || echo "")
+case "$GIT_DIR" in
+*/worktrees/*)
+	WORKTREE_NAME=$(basename "$PROJECT_ROOT")
+	MAIN_REPO_DIR="${GIT_DIR%/worktrees/*}"
+	MAIN_REPO_DIR="${MAIN_REPO_DIR%/.git}"
+	ARTIFACTS_DIR="${MAIN_REPO_DIR}/.caddy-artifacts/worktrees/${WORKTREE_NAME}"
+	;;
+*)
+	ARTIFACTS_DIR="${PROJECT_ROOT}/.caddy-artifacts"
+	;;
+esac
 mkdir -p "$ARTIFACTS_DIR"
 
 # ── Stale symlink cleanup ──────────────────────────────────
@@ -132,7 +144,8 @@ if [ -f "$(dirname "$0")/build-appimage.sh" ]; then
 	echo "==> Building AppImage..."
 	bash "$(dirname "$0")/build-appimage.sh" \
 		--no-flutter-build \
-		"--hash=${GIT_HASH}"
+		"--hash=${GIT_HASH}" \
+		"--artifacts-dir=${ARTIFACTS_DIR}"
 
 	echo "==> Cleaning old AppImages (keep latest 1)..."
 	ls -t "${ARTIFACTS_DIR}"/uppidi-upload-[0-9]*-x86_64.AppImage 2>/dev/null | tail -n +2 | xargs -r rm -f

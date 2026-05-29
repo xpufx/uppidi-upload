@@ -21,10 +21,12 @@ fail() { echo -e "  ${RED}✘${NC} $1"; }
 
 SKIP_FLUTTER=false
 OVERRIDE_HASH=""
+OVERRIDE_ARTIFACTS_DIR=""
 for arg in "$@"; do
 	case "$arg" in
 	--no-flutter-build) SKIP_FLUTTER=true ;;
 	--hash=*) OVERRIDE_HASH="${arg#--hash=}" ;;
+	--artifacts-dir=*) OVERRIDE_ARTIFACTS_DIR="${arg#--artifacts-dir=}" ;;
 	esac
 done
 
@@ -148,7 +150,7 @@ echo "  $OUTPUT"
 echo ""
 echo -e "${BOLD}Step 4: Deploying to .caddy-artifacts/...${NC}"
 
-DEST_DIR="${PROJECT_DIR}/.caddy-artifacts"
+DEST_DIR="${OVERRIDE_ARTIFACTS_DIR:-${PROJECT_DIR}/.caddy-artifacts}"
 mkdir -p "$DEST_DIR"
 
 FILENAME="uppidi-upload-${VER}-${HASH}-x86_64.AppImage"
