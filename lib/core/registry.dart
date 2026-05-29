@@ -7,6 +7,7 @@ import 'provider_storage_service.dart';
 import 'settings_service.dart';
 import '../providers/catbox_provider.dart';
 import '../providers/fileditch_provider.dart';
+import '../providers/local_provider.dart';
 import '../providers/freeimage_provider.dart';
 import '../providers/frisk_provider.dart';
 import '../providers/httpbin_provider.dart';
@@ -31,6 +32,7 @@ final enabledProvidersProvider = Provider<List<BaseUploader>>((ref) {
 /// Base provider types — the "blueprints" that get wrapped with instances.
 final List<BaseUploader> _baseTypes = [
   HttpBinProvider(),
+  LocalProvider(),
   FileDitchProvider(),
   FriskProvider(),
   UguuProvider(name: 'uguu.se', url: 'https://uguu.se'),

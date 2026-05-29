@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
+
+import '../core/android_save.dart';
 
 import '../core/format.dart';
 import '../core/interfaces/uploader.dart';
@@ -213,6 +217,45 @@ class _FilePreviewState extends State<FilePreview> {
     if (edited == null || !mounted) return;
     widget.notifier.applyCrop(edited);
     setState(() => _hasCropped = true);
+
+    if (!mounted) return;
+    final saveResult = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Save a copy?'),
+        content: const Text('Save the edited image to disk'
+            ' in addition to uploading?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('No'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    if (saveResult != true || !mounted) return;
+    final raw = edited;
+    String? savedPath;
+    if (Platform.isAndroid) {
+      savedPath = await saveFileOnAndroid(raw, '${widget.fileName}_edited.jpg');
+    } else {
+      savedPath = await FilePicker.saveFile(
+        dialogTitle: 'Save edited image',
+        fileName: '${widget.fileName}_edited.jpg',
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png'],
+        bytes: raw,
+      );
+    }
+    if (savedPath != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Saved: $savedPath')),
+      );
+    }
   }
 
   List<Widget> _buildWarnings() {
