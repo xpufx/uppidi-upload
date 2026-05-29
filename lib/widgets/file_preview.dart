@@ -83,86 +83,76 @@ class _FilePreviewState extends State<FilePreview> {
     final warnings = _buildWarnings();
 
     return Padding(
-      padding: const EdgeInsets.only(top: 12),
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (widget.fileBytes != null && _isImage) ...[
-                _buildImagePreview(),
-                const SizedBox(height: 12),
-              ] else if (_isImage) ...[
-                const Center(
-                    child: Icon(Icons.image_outlined,
-                        size: 80, color: Colors.grey)),
-                const SizedBox(height: 12),
-              ] else ...[
-                Center(
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Icon(Icons.insert_drive_file,
-                        size: 48, color: Colors.grey),
-                  ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.fileBytes != null && _isImage) ...[
+            _buildImagePreview(),
+            const SizedBox(height: 12),
+          ] else if (_isImage) ...[
+            const Center(
+                child:
+                    Icon(Icons.image_outlined, size: 80, color: Colors.grey)),
+            const SizedBox(height: 12),
+          ] else ...[
+            Center(
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                const SizedBox(height: 12),
-              ],
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.fileName,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      formatSize(widget.fileSize),
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                ],
+                child: const Icon(Icons.insert_drive_file,
+                    size: 48, color: Colors.grey),
               ),
-              if (widget.mimeType != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  widget.mimeType!,
+            ),
+            const SizedBox(height: 12),
+          ],
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  widget.fileName,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: Colors.grey),
                 ),
-              ],
-              if (warnings.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                const Divider(),
-                ...warnings,
-              ],
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  formatSize(widget.fileSize),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
             ],
           ),
-        ),
+          if (widget.mimeType != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              widget.mimeType!,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: Colors.grey),
+            ),
+          ],
+          if (warnings.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            const Divider(),
+            ...warnings,
+          ],
+        ],
       ),
     );
   }
@@ -203,32 +193,67 @@ class _FilePreviewState extends State<FilePreview> {
               color: Theme.of(context)
                   .colorScheme
                   .surfaceContainerHighest
-                  .withValues(alpha: 0.92),
+                  .withValues(alpha: 0.55),
               borderRadius: BorderRadius.circular(16),
             ),
-            padding: const EdgeInsets.all(2),
+            padding: const EdgeInsets.all(6),
             child: ValueListenableBuilder<int>(
               valueListenable: qualityNotifier,
               builder: (context, quality, _) {
-                return SegmentedButton<int>(
-                  segments: [
-                    ButtonSegment(
-                        value: 0, icon: const Icon(Icons.photo, size: 18)),
-                    ButtonSegment(
-                        value: 1, icon: const Icon(Icons.photo, size: 14)),
-                    ButtonSegment(
-                        value: 2, icon: const Icon(Icons.photo, size: 10)),
+                final theme = Theme.of(context);
+                final primary = theme.colorScheme.primary;
+                const iconSizes = [20.0, 16.0, 13.0];
+                const labels = ['100%', '50%', '25%'];
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ...List.generate(
+                        3,
+                        (i) => Padding(
+                              padding: EdgeInsets.only(left: i > 0 ? 4 : 0),
+                              child: GestureDetector(
+                                onTap: () => widget.notifier.setQuality(i),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: quality == i
+                                          ? primary
+                                          : Colors.grey.shade300,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Opacity(
+                                        opacity: quality == i ? 1.0 : 0.25,
+                                        child: Text(
+                                          '\u{1F5BC}',
+                                          style: TextStyle(
+                                            fontSize: iconSizes[i] * 1.2,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        labels[i],
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          color: quality == i
+                                              ? primary
+                                              : Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )),
                   ],
-                  selected: {quality},
-                  onSelectionChanged: (v) =>
-                      widget.notifier.setQuality(v.first),
-                  style: ButtonStyle(
-                    visualDensity: VisualDensity.compact,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    padding: WidgetStateProperty.all(
-                        const EdgeInsets.symmetric(horizontal: 4, vertical: 0)),
-                    minimumSize: WidgetStateProperty.all(const Size(0, 24)),
-                  ),
                 );
               },
             ),
