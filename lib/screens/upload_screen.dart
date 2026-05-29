@@ -5,6 +5,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
+import 'package:pasteboard/pasteboard.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/config_provider.dart';
@@ -157,6 +158,13 @@ class _UploadScreenState extends ConsumerState<UploadScreen>
                     UploadIdle() => _EmptyUploadState(
                         key: const ValueKey('idle'),
                         onPick: notifier.pickAndUpload,
+                        onPaste: () async {
+                          final img = await Pasteboard.image;
+                          if (img != null) {
+                            notifier.uploadFromBytes(img, 'clipboard.png',
+                                mimeType: 'image/png');
+                          }
+                        },
                       ),
                     UploadFileSelected(
                       fileName: final n,
@@ -797,17 +805,7 @@ class _BottomActionBar extends ConsumerWidget {
       child: SafeArea(
         top: false,
         child: switch (uploadState) {
-          UploadIdle() => SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.upload_file),
-                label: Text(l10n.chooseFile),
-                onPressed: notifier.pickAndUpload,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(48),
-                ),
-              ),
-            ),
+          UploadIdle() => const SizedBox.shrink(),
           UploadFileSelected() => _FileSelectedBottomBar(notifier: notifier),
           UploadInProgress() => SizedBox(
               width: double.infinity,
@@ -1173,8 +1171,13 @@ class _ProgressOverlay extends StatelessWidget {
 /// Empty state shown when no file is selected.
 class _EmptyUploadState extends StatelessWidget {
   final VoidCallback onPick;
+  final VoidCallback onPaste;
 
-  const _EmptyUploadState({super.key, required this.onPick});
+  const _EmptyUploadState({
+    super.key,
+    required this.onPick,
+    required this.onPaste,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1205,6 +1208,12 @@ class _EmptyUploadState extends StatelessWidget {
               icon: const Icon(Icons.upload_file),
               label: Text(l10n.chooseFile),
               style: FilledButton.styleFrom(minimumSize: const Size(200, 48)),
+            ),
+            const SizedBox(height: 16),
+            TextButton.icon(
+              onPressed: onPaste,
+              icon: const Icon(Icons.content_paste),
+              label: Text(l10n.pasteFromClipboard),
             ),
           ],
         ),

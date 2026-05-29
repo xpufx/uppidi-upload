@@ -175,9 +175,9 @@ void main() {
       );
 
       await tester.pumpAndSettle();
-      // _PickButton displays an ElevatedButton with chooseFile text
+      // _PickButton displays a button with chooseFile text
       expect(find.text(l10n.chooseFile), findsWidgets);
-      expect(find.byType(ElevatedButton), findsWidgets);
+      expect(find.byType(FilledButton), findsOneWidget);
     });
   });
 

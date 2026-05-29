@@ -205,7 +205,7 @@ class _FilePreviewState extends State<FilePreview> {
               outputFormat: OutputFormat.jpg,
               jpegQuality: 100,
             ),
-            designMode: ImageEditorDesignMode.material,
+            designMode: ImageEditorDesignMode.cupertino,
           ),
         ),
       ),
