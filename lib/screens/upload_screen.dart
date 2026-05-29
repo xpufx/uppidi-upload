@@ -1,8 +1,11 @@
+import 'dart:async';
+import 'dart:typed_data';
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pasteboard/pasteboard.dart';
 
 import '../core/config_provider.dart';
 import '../core/format.dart';
@@ -12,11 +15,11 @@ import '../core/metadata_badges.dart';
 import '../core/models/provider_instance.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/provider_config_sheet.dart';
+import '../core/models/upload_result.dart';
 import '../core/settings_service.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 import '../widgets/file_preview.dart';
-import '../widgets/progress_section.dart';
 import '../widgets/provider_favicon.dart';
 import '../widgets/result_banner.dart';
 
@@ -27,14 +30,47 @@ class UploadScreen extends ConsumerStatefulWidget {
   ConsumerState<UploadScreen> createState() => _UploadScreenState();
 }
 
-class _UploadScreenState extends ConsumerState<UploadScreen> {
+class _UploadScreenState extends ConsumerState<UploadScreen>
+    with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   bool _isHovering = false;
+  late final AnimationController _staggerController;
+  late final Animation<double> _providerCardAnim;
+  late final Animation<double> _infoCardAnim;
+  late final Animation<double> _contentAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _staggerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _providerCardAnim = CurvedAnimation(
+      parent: _staggerController,
+      curve: const Interval(0.0, 0.3, curve: Curves.easeOut),
+    );
+    _infoCardAnim = CurvedAnimation(
+      parent: _staggerController,
+      curve: const Interval(0.15, 0.45, curve: Curves.easeOut),
+    );
+    _contentAnim = CurvedAnimation(
+      parent: _staggerController,
+      curve: const Interval(0.3, 0.6, curve: Curves.easeOut),
+    );
+    _staggerController.forward();
+  }
 
   @override
   void dispose() {
+    _staggerController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _restartStagger() {
+    _staggerController.reset();
+    _staggerController.forward();
   }
 
   @override
@@ -46,8 +82,13 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
         ? providers[uploadState.selectedProviderIndex]
         : null;
     final webUnsupported = kIsWeb && provider != null && !provider.supportsWeb;
+    final accentColor =
+        Theme.of(context).colorScheme.primary.withValues(alpha: 0.7);
 
-    // ── Scrollable content (preview, provider info, etc.) ──────────
+    ref.listen(uploadProvider, (prev, next) {
+      if (prev.runtimeType != next.runtimeType) _restartStagger();
+    });
+
     final scrollBody = Padding(
       padding: const EdgeInsets.all(16),
       child: Scrollbar(
@@ -58,134 +99,180 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _ProviderDropdown(
-                selectedIndex: uploadState.selectedProviderIndex,
-                providers: providers,
-                isUploading: uploadState is UploadInProgress,
-                onChanged: (i) {
-                  if (i != null) {
-                    notifier.setProvider(i);
-                    _scrollController.animateTo(0,
+              FadeTransition(
+                opacity: _providerCardAnim,
+                child: _ProviderSelectionCard(
+                  selectedIndex: uploadState.selectedProviderIndex,
+                  providers: providers,
+                  isUploading: uploadState is UploadInProgress,
+                  hasFile: uploadState is! UploadIdle,
+                  accentColor: accentColor,
+                  onChanged: (i) {
+                    if (i != null) {
+                      notifier.setProvider(i);
+                      _scrollController.animateTo(
+                        0,
                         duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeOut);
-                  }
-                },
+                        curve: Curves.easeOut,
+                      );
+                    }
+                  },
+                ),
               ),
-              if (provider != null) ...[
-                const SizedBox(height: 8),
-                _ProviderInfo(provider: provider),
-              ],
-              if (provider != null) ...[
-                const SizedBox(height: 8),
-                _ProviderConfigStatus(provider: provider),
-              ],
-              if (webUnsupported) const _WebWarning(),
-              switch (uploadState) {
-                UploadFileSelected(
-                  fileName: final n,
-                  fileSizeBytes: final s,
-                  mimeType: final m,
-                  fileBytes: final b
-                ) =>
-                  Dismissible(
-                    key: const ValueKey('file-preview'),
-                    direction: DismissDirection.horizontal,
-                    onDismissed: (_) => notifier.clearSelection(),
-                    child: FilePreview(
-                        fileName: n,
-                        fileSize: s,
-                        mimeType: m,
-                        fileBytes: b,
+              const SizedBox(height: 16),
+              FadeTransition(
+                opacity: _infoCardAnim,
+                child: Column(
+                  children: [
+                    if (webUnsupported) const _WebWarningCard(),
+                    if (provider != null &&
+                        provider.metadata.capabilities.contains(
+                          ProviderCapability.requiresAuth,
+                        ))
+                      _ProviderConfigStatusCard(
                         provider: provider,
-                        notifier: notifier),
-                  ),
-                UploadInProgress(
-                  fileName: final fn,
-                  fileSizeBytes: final fs,
-                  mimeType: final m,
-                  fileBytes: final fb
-                )
-                    when fn != null =>
-                  FilePreview(
-                      fileName: fn,
-                      fileSize: fs,
-                      mimeType: m,
-                      fileBytes: fb,
-                      provider: provider,
-                      notifier: notifier),
-                UploadCompleted(
-                  fileName: final fn,
-                  fileSizeBytes: final fs,
-                  mimeType: final m,
-                  fileBytes: final fb
-                )
-                    when fn != null =>
-                  FilePreview(
-                      fileName: fn,
-                      fileSize: fs,
-                      mimeType: m,
-                      fileBytes: fb,
-                      provider: provider,
-                      notifier: notifier),
-                _ => const SizedBox.shrink(),
-              },
-              const SizedBox(height: 12),
+                        accentColor: accentColor,
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              FadeTransition(
+                opacity: _contentAnim,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 0.05),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: switch (uploadState) {
+                    UploadIdle() => _EmptyUploadState(
+                        key: const ValueKey('idle'),
+                        onPick: notifier.pickAndUpload,
+                      ),
+                    UploadFileSelected(
+                      fileName: final n,
+                      fileSizeBytes: final s,
+                      mimeType: final m,
+                      fileBytes: final b,
+                    ) =>
+                      Column(
+                        key: const ValueKey('file-selected'),
+                        children: [
+                          Dismissible(
+                            key: const ValueKey('file-preview'),
+                            direction: DismissDirection.horizontal,
+                            onDismissed: (_) => notifier.clearSelection(),
+                            child: _FilePreviewCard(
+                              fileName: n,
+                              fileSize: s,
+                              mimeType: m,
+                              fileBytes: b,
+                              provider: provider,
+                              notifier: notifier,
+                              accentColor: accentColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    UploadInProgress(
+                      fileBytes: final fb,
+                      fileName: final fn,
+                      fileSizeBytes: final fs,
+                      mimeType: final m,
+                      progress: final p,
+                      speedLabel: final sp,
+                      sentBytes: final sb,
+                      totalBytes: final tb,
+                    ) =>
+                      Column(
+                        key: const ValueKey('upload-progress'),
+                        children: [
+                          Stack(
+                            children: [
+                              _FilePreviewCard(
+                                fileName: fn,
+                                fileSize: fs,
+                                mimeType: m,
+                                fileBytes: fb,
+                                provider: provider,
+                                notifier: notifier,
+                                accentColor: accentColor,
+                              ),
+                              _ProgressOverlay(
+                                progress: p,
+                                speedLabel: sp,
+                                sentBytes: sb,
+                                totalBytes: tb,
+                                onCancel: notifier.cancelUpload,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    UploadCompleted(
+                      lastResult: final r,
+                      errorMessage: final e,
+                      fileName: final fn,
+                      fileSizeBytes: final fs,
+                      mimeType: final m,
+                      fileBytes: final fb,
+                    ) =>
+                      Column(
+                        key: const ValueKey('upload-completed'),
+                        children: [
+                          _FilePreviewCard(
+                            fileName: fn,
+                            fileSize: fs,
+                            mimeType: m,
+                            fileBytes: fb,
+                            provider: provider,
+                            notifier: notifier,
+                            accentColor: accentColor,
+                          ),
+                          const SizedBox(height: 16),
+                          _ResultBannerCard(
+                            url: r.url,
+                            errorMessage: e,
+                            fileName: fn,
+                            fileSizeBytes: fs,
+                            mimeType: m,
+                            fileBytes: fb,
+                            provider: provider,
+                            lastResult: r,
+                            accentColor: accentColor,
+                            onRetry: e != null
+                                ? () async {
+                                    final proceed = await checkInsecureWarning(
+                                      context,
+                                      provider!,
+                                      ref,
+                                    );
+                                    if (proceed) notifier.uploadSelected();
+                                  }
+                                : null,
+                            onCancel: () => notifier.clearSelection(),
+                          ),
+                        ],
+                      ),
+                  },
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
 
-    // ── Bottom action bar (always visible) ─────────────────────────
-    final bottomBar = SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        child: switch (uploadState) {
-          UploadIdle() => _PickButton(notifier: notifier),
-          UploadFileSelected() => _FileSelectedButtons(notifier: notifier),
-          UploadInProgress(
-            progress: final p,
-            speedLabel: final sp,
-            sentBytes: final sb,
-            totalBytes: final tb
-          ) =>
-            ProgressSection(
-              progress: p,
-              speedLabel: sp,
-              sentBytes: sb,
-              totalBytes: tb,
-              onCancel: notifier.cancelUpload,
-            ),
-          UploadCompleted(
-            errorMessage: final e,
-            lastResult: final r,
-            fileName: final fn,
-            fileSizeBytes: final fs,
-            mimeType: final m,
-            fileBytes: final fb
-          ) =>
-            ResultBanner(
-              url: r.url,
-              errorMessage: e,
-              fileName: fn,
-              fileSizeBytes: fs,
-              mimeType: m,
-              fileBytes: fb,
-              provider: provider,
-              lastResult: r,
-              onRetry: e != null
-                  ? () async {
-                      final proceed =
-                          await checkInsecureWarning(context, provider!, ref);
-                      if (proceed) notifier.uploadSelected();
-                    }
-                  : null,
-              onCancel: () => notifier.clearSelection(),
-            ),
-        },
-      ),
-    );
+    final bottomBar = _BottomActionBar(notifier: notifier);
 
     final screen = SafeArea(
       child: Column(
@@ -198,222 +285,203 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
 
     if (!kIsWeb) {
       return DropTarget(
-        onDragDone: (detail) {
-          setState(() => _isHovering = false);
-          for (final file in detail.files) {
-            final path = file.path;
-            notifier.uploadFromFile(path, file.mimeType);
-            break;
-          }
-        },
         onDragEntered: (_) => setState(() => _isHovering = true),
         onDragExited: (_) => setState(() => _isHovering = false),
-        child: Stack(
-          children: [
-            screen,
-            if (_isHovering)
-              Positioned.fill(
-                child: Container(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .primary
-                      .withValues(alpha: 0.08),
-                  child: Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.cloud_upload,
-                              color: Theme.of(context).colorScheme.primary),
-                          const SizedBox(width: 12),
-                          Text(
-                            AppLocalizations.of(context).dropFileToUpload,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+        onDragDone: (details) {
+          setState(() => _isHovering = false);
+          final file = details.files.first;
+          notifier.uploadFromFile(file.path, file.mimeType);
+        },
+        child: Container(
+          decoration: _isHovering
+              ? BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2,
                   ),
-                ),
-              ),
-          ],
+                  borderRadius: BorderRadius.circular(12),
+                )
+              : null,
+          child: screen,
         ),
       );
     }
-
     return screen;
   }
 }
 
-class _ProviderDropdown extends StatelessWidget {
-  final int selectedIndex;
+/// Provider selection dropdown wrapped in a card with hover animation.
+class _ProviderSelectionCard extends ConsumerStatefulWidget {
+  final int? selectedIndex;
   final List<BaseUploader> providers;
   final bool isUploading;
-  final ValueChanged<int?> onChanged;
-
-  const _ProviderDropdown({
+  final bool hasFile;
+  final Color? accentColor;
+  final void Function(int?)? onChanged;
+  const _ProviderSelectionCard({
     required this.selectedIndex,
     required this.providers,
     required this.isUploading,
+    required this.hasFile,
+    this.accentColor,
     required this.onChanged,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final selectedProvider =
-        selectedIndex < providers.length ? providers[selectedIndex] : null;
-    return Tooltip(
-      message: selectedProvider != null
-          ? (selectedProvider is ProviderInstance
-              ? selectedProvider.displayName
-              : selectedProvider.providerName)
-          : '',
-      child: DropdownButton<int>(
-        value: selectedIndex,
-        isExpanded: true,
-        onChanged: isUploading ? null : onChanged,
-        items: providers.asMap().entries.map((entry) {
-          final p = entry.value;
-          final online = !kIsWeb || p.supportsWeb;
-          return DropdownMenuItem(
-            value: entry.key,
-            enabled: online,
-            child: Row(
-              children: [
-                ProviderFavicon(
-                  providerId: p.providerId,
-                  size: 20,
-                  iconColor: online
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).disabledColor,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                    child: Text(
-                  p is ProviderInstance ? p.displayName : p.providerName,
-                  overflow: TextOverflow.ellipsis,
-                  style: online
-                      ? null
-                      : TextStyle(color: Theme.of(context).disabledColor),
-                )),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
+  ConsumerState<_ProviderSelectionCard> createState() =>
+      _ProviderSelectionCardState();
 }
 
-class _ProviderInfo extends StatelessWidget {
-  final BaseUploader? provider;
-  const _ProviderInfo({required this.provider});
+class _ProviderSelectionCardState
+    extends ConsumerState<_ProviderSelectionCard> {
+  bool _isHovering = false;
+  bool _showInfo = false;
+  Timer? _infoTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startInfoTimer();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ProviderSelectionCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!oldWidget.hasFile && widget.hasFile && _showInfo) {
+      _dismissInfo();
+    }
+  }
+
+  @override
+  void dispose() {
+    _infoTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startInfoTimer() {
+    _infoTimer?.cancel();
+    _infoTimer = Timer(const Duration(seconds: 6), () {
+      if (mounted && _showInfo) {
+        setState(() => _showInfo = false);
+      }
+    });
+  }
+
+  void _dismissInfo() {
+    _infoTimer?.cancel();
+    setState(() => _showInfo = false);
+  }
+
+  void _toggleInfo() {
+    setState(() => _showInfo = !_showInfo);
+    if (!_showInfo) {
+      _infoTimer?.cancel();
+    } else {
+      _startInfoTimer();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final p = provider;
-    if (p == null) return const SizedBox.shrink();
-    final meta = p.metadata;
     final l10n = AppLocalizations.of(context);
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
+    final provider = widget.selectedIndex != null &&
+            widget.selectedIndex! < widget.providers.length
+        ? widget.providers[widget.selectedIndex!]
+        : null;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      cursor: SystemMouseCursors.click,
+      child: Card(
+        elevation: _isHovering ? 4 : 2,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            metadataBadges(meta),
-            if (meta.maxFileSizeBytes != null) ...[
-              const SizedBox(height: 4),
-              Row(
+            if (widget.accentColor != null)
+              Container(height: 3, color: widget.accentColor),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
                 children: [
-                  Icon(Icons.file_present_outlined,
-                      size: 14, color: Colors.grey.shade600),
-                  const SizedBox(width: 6),
                   Expanded(
-                    child: Text(
-                      l10n.maxFileSize(formatSize(meta.maxFileSizeBytes!)),
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            if (meta.allowedMimeTypes != null) ...[
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(Icons.check_circle_outline,
-                      size: 14, color: Colors.grey.shade600),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      l10n.acceptedFiles(
-                          resolveMimeLabel(l10n, meta.mimeTypeLabel)),
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            if (meta.expiryInfo != null) ...[
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(Icons.timer_outlined,
-                      size: 14, color: Colors.grey.shade600),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      l10n.expiryInfo(resolveExpiry(l10n, meta.expiryInfo!)),
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            if (meta.supportsDirectLink) ...[
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(Icons.link, size: 14, color: Colors.green.shade600),
-                  const SizedBox(width: 6),
-                  Text(
-                    l10n.supportsDirectLinks,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.green.shade700,
+                    child: DropdownButtonFormField<int?>(
+                      key: ValueKey('provider_${widget.selectedIndex}'),
+                      isDense: true,
+                      isExpanded: true,
+                      initialValue: widget.selectedIndex,
+                      disabledHint: Text(l10n.noProvidersAvailable),
+                      decoration: InputDecoration(
+                        labelText: l10n.providersSection,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                  ),
-                ],
-              ),
-            ],
-            if (meta.requiresAccount) ...[
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(Icons.account_circle_outlined,
-                      size: 14, color: Colors.orange.shade600),
-                  const SizedBox(width: 6),
-                  Text(
-                    l10n.requiresAccount,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.orange.shade700,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
                         ),
+                      ),
+                      items: [
+                        for (final p in widget.providers.asMap().entries)
+                          DropdownMenuItem<int>(
+                            value: p.key,
+                            child: Row(
+                              children: [
+                                ProviderFavicon(
+                                  providerId: p.value.providerId,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    p.value is ProviderInstance
+                                        ? (p.value as ProviderInstance)
+                                            .displayName
+                                        : p.value.providerName,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                metadataBadges(p.value.metadata, context),
+                              ],
+                            ),
+                          ),
+                      ],
+                      onChanged: widget.isUploading ? null : widget.onChanged,
+                    ),
                   ),
+                  if (provider != null) ...[
+                    IconButton(
+                      icon: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(
+                          _showInfo ? Icons.info : Icons.info_outline,
+                          key: ValueKey(_showInfo),
+                          size: 20,
+                        ),
+                      ),
+                      tooltip: l10n.providerInfoTitle,
+                      onPressed: _toggleInfo,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.settings_outlined),
+                      tooltip: l10n.providerConfigure,
+                      onPressed: () =>
+                          showProviderConfigDialog(context, ref, provider),
+                    ),
+                  ],
                 ],
               ),
-            ],
+            ),
+            if (provider != null)
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: _showInfo
+                    ? _ProviderInfoCard(provider: provider)
+                    : const SizedBox.shrink(),
+              ),
           ],
         ),
       ),
@@ -421,104 +489,367 @@ class _ProviderInfo extends StatelessWidget {
   }
 }
 
-class _PickButton extends ConsumerWidget {
-  final UploadNotifier notifier;
-  const _PickButton({required this.notifier});
+/// Provider info card with metadata badges and color-coded capability rows.
+class _ProviderInfoCard extends StatelessWidget {
+  final BaseUploader provider;
+
+  const _ProviderInfoCard({required this.provider});
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ElevatedButton(
-          onPressed: () => notifier.pickAndUpload(),
-          child: Text(l10n.pickAndUpload),
-        ),
-        const SizedBox(width: 8),
-        if (!kIsWeb)
-          IconButton(
-            icon: const Icon(Icons.content_paste, size: 20),
-            tooltip: l10n.pasteFromClipboard,
-            onPressed: () async {
-              final img = await Pasteboard.image;
-              if (img != null) {
-                notifier.uploadFromBytes(img, 'clipboard.png',
-                    mimeType: 'image/png');
-              } else {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.clipboardEmpty)),
-                  );
-                }
-              }
-            },
+    final meta = provider.metadata;
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.providerInfoTitle,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
-      ],
-    );
-  }
-}
-
-class _UploadButton extends ConsumerWidget {
-  final UploadNotifier notifier;
-  const _UploadButton({required this.notifier});
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final state = ref.watch(uploadProvider);
-    final provider = state.providers.asMap()[state.selectedProviderIndex];
-    var isUrlShareOnly = provider?.isUrlShareOnly ?? false;
-    // Matterbridge needs a paired provider to upload files (IRC gateways)
-    if (provider?.providerId.startsWith('matterbridge') == true) {
-      final config = ref.watch(providerConfigProvider(provider!.providerId));
-      final paired = config.asData?.value['paired_provider'] ?? '';
-      isUrlShareOnly = paired.isEmpty;
-    }
-
-    return ElevatedButton.icon(
-      onPressed: isUrlShareOnly
-          ? null
-          : () async {
-              final state = ref.read(uploadProvider);
-              if (state is! UploadFileSelected) return;
-              final provider = state.providers[state.selectedProviderIndex];
-
-              // Check if provider requires auth config
-              if (provider.metadata.capabilities
-                  .contains(ProviderCapability.requiresAuth)) {
-                final configured = await isProviderConfigured(ref, provider);
-                if (!configured) {
-                  if (context.mounted) {
-                    showProviderConfigDialog(context, ref, provider);
-                  }
-                  return;
-                }
-              }
-
-              if (!context.mounted) return;
-              final proceed =
-                  await checkInsecureWarning(context, provider, ref);
-              if (!proceed) return;
-              notifier.uploadSelected();
-            },
-      icon: const Icon(Icons.cloud_upload),
-      label: Text(l10n.upload),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          const SizedBox(height: 16),
+          _InfoRow(
+            icon: Icons.folder_open,
+            label: l10n.navProviders,
+            value: provider.providerName,
+          ),
+          if (meta.maxFileSizeBytes != null) ...[
+            const SizedBox(height: 8),
+            _InfoRow(
+              icon: Icons.storage,
+              label: l10n.maxFileSize(formatSize(meta.maxFileSizeBytes!)),
+              value: formatSize(meta.maxFileSizeBytes!),
+            ),
+          ],
+          if (meta.supportsDirectLink) ...[
+            const SizedBox(height: 8),
+            _InfoRow(
+              icon: Icons.link,
+              label: l10n.supportsDirectLinks,
+              value: l10n.enabled,
+            ),
+          ],
+          if (meta.requiresAccount) ...[
+            const SizedBox(height: 8),
+            _InfoRow(
+              icon: Icons.person,
+              label: l10n.requiresAccount,
+              value: l10n.enabled,
+            ),
+          ],
+        ],
       ),
     );
   }
 }
 
-class _FileSelectedButtons extends ConsumerStatefulWidget {
-  final UploadNotifier notifier;
-  const _FileSelectedButtons({required this.notifier});
+/// Provider config status card — shows a warning banner when auth is needed
+/// but not yet configured.
+class _ProviderConfigStatusCard extends ConsumerStatefulWidget {
+  final BaseUploader provider;
+  final Color? accentColor;
+  const _ProviderConfigStatusCard({required this.provider, this.accentColor});
+
   @override
-  ConsumerState<_FileSelectedButtons> createState() =>
-      _FileSelectedButtonsState();
+  ConsumerState<_ProviderConfigStatusCard> createState() =>
+      _ProviderConfigStatusCardState();
 }
 
-class _FileSelectedButtonsState extends ConsumerState<_FileSelectedButtons> {
+class _ProviderConfigStatusCardState
+    extends ConsumerState<_ProviderConfigStatusCard> {
+  int _configVersion = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    return FutureBuilder<bool>(
+      key: ValueKey('config_${widget.provider.providerId}_$_configVersion'),
+      future: isProviderConfigured(ref, widget.provider),
+      builder: (context, snapshot) {
+        final configured = snapshot.data ?? false;
+        if (configured) return const SizedBox.shrink();
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Colors.orange.shade200),
+            ),
+            color: Colors.orange.shade50,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.warning_amber,
+                    size: 20,
+                    color: Colors.orange.shade700,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      l10n.providerConfigNotConfigured(
+                        widget.provider.providerName,
+                      ),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.orange.shade900,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton.tonalIcon(
+                    onPressed: () async {
+                      final saved = await showProviderConfigDialog(
+                        context,
+                        ref,
+                        widget.provider,
+                      );
+                      if (saved && mounted) {
+                        setState(() => _configVersion++);
+                      }
+                    },
+                    icon: const Icon(Icons.settings, size: 16),
+                    label: Text(l10n.providerConfigure),
+                    style: FilledButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Web unsupported warning card.
+class _WebWarningCard extends StatelessWidget {
+  const _WebWarningCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        color: Theme.of(context).colorScheme.errorContainer,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: Theme.of(context).colorScheme.onErrorContainer,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  l10n.providerWebNotSupported,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// File preview wrapped in a card.
+class _FilePreviewCard extends StatelessWidget {
+  const _FilePreviewCard({
+    required this.fileName,
+    required this.fileSize,
+    this.mimeType,
+    this.fileBytes,
+    this.provider,
+    required this.notifier,
+    this.accentColor,
+  });
+
+  final String? fileName;
+  final int fileSize;
+  final String? mimeType;
+  final Uint8List? fileBytes;
+  final BaseUploader? provider;
+  final UploadNotifier notifier;
+  final Color? accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (accentColor != null) Container(height: 3, color: accentColor),
+          FilePreview(
+            fileName: fileName ?? '',
+            fileSize: fileSize,
+            mimeType: mimeType,
+            fileBytes: fileBytes,
+            provider: provider,
+            notifier: notifier,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Result banner wrapped in a card.
+class _ResultBannerCard extends StatelessWidget {
+  const _ResultBannerCard({
+    this.url,
+    this.errorMessage,
+    this.fileName,
+    this.fileSizeBytes = 0,
+    this.mimeType,
+    this.fileBytes,
+    this.provider,
+    this.lastResult,
+    this.onRetry,
+    required this.onCancel,
+    this.accentColor,
+  });
+
+  final String? url;
+  final String? errorMessage;
+  final String? fileName;
+  final int fileSizeBytes;
+  final String? mimeType;
+  final Uint8List? fileBytes;
+  final BaseUploader? provider;
+  final UploadResult? lastResult;
+  final VoidCallback? onRetry;
+  final VoidCallback onCancel;
+  final Color? accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ResultBanner(
+        url: url,
+        errorMessage: errorMessage,
+        fileName: fileName,
+        fileSizeBytes: fileSizeBytes,
+        mimeType: mimeType,
+        fileBytes: fileBytes,
+        provider: provider,
+        lastResult: lastResult,
+        onRetry: onRetry,
+        onCancel: onCancel,
+      ),
+    );
+  }
+}
+
+/// Bottom action bar with state-aware buttons.
+class _BottomActionBar extends ConsumerWidget {
+  final UploadNotifier notifier;
+  const _BottomActionBar({required this.notifier});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final uploadState = ref.watch(uploadProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: switch (uploadState) {
+          UploadIdle() => SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.upload_file),
+                label: Text(l10n.chooseFile),
+                onPressed: notifier.pickAndUpload,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
+              ),
+            ),
+          UploadFileSelected() => _FileSelectedBottomBar(notifier: notifier),
+          UploadInProgress() => SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.cancel),
+                label: Text(l10n.cancelUpload),
+                onPressed: notifier.cancelUpload,
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
+              ),
+            ),
+          UploadCompleted() => SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.upload_file),
+                label: Text(l10n.chooseFile),
+                onPressed: notifier.pickAndUpload,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
+              ),
+            ),
+        },
+      ),
+    );
+  }
+}
+
+/// Bottom bar content for file-selected state — expiry picker, message,
+/// upload and cancel buttons.
+class _FileSelectedBottomBar extends ConsumerStatefulWidget {
+  final UploadNotifier notifier;
+  const _FileSelectedBottomBar({required this.notifier});
+
+  @override
+  ConsumerState<_FileSelectedBottomBar> createState() =>
+      _FileSelectedBottomBarState();
+}
+
+class _FileSelectedBottomBarState
+    extends ConsumerState<_FileSelectedBottomBar> {
   final _msgController = TextEditingController();
 
   @override
@@ -531,8 +862,6 @@ class _FileSelectedButtonsState extends ConsumerState<_FileSelectedButtons> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(uploadProvider);
-
-    // Expiry picker — shown when the selected provider supports it
     final provider = state.providers.asMap()[state.selectedProviderIndex];
     final meta = provider?.metadata;
     final hasConfigurableExpiry =
@@ -543,7 +872,6 @@ class _FileSelectedButtonsState extends ConsumerState<_FileSelectedButtons> {
         state is UploadFileSelected ? state.selectedExpiry : null;
 
     if (state is UploadFileSelected) {
-      // Pre-fill from global template on first load
       if (_msgController.text.isEmpty && state.messageText.isEmpty) {
         final globalTemplate =
             ref.read(globalMessageTemplateProvider).asData?.value ?? '';
@@ -552,20 +880,24 @@ class _FileSelectedButtonsState extends ConsumerState<_FileSelectedButtons> {
           widget.notifier.setMessage(globalTemplate);
         }
       }
-      // Sync controller with state messageText on provider change
       if (_msgController.text != state.messageText) {
         _msgController.text = state.messageText;
       }
     }
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (hasConfigurableExpiry && expiryOptions.isNotEmpty) ...[
           SegmentedButton<String>(
             segments: expiryOptions
-                .map((opt) => ButtonSegment(
-                    value: opt, label: Text(_expiryDisplayLabel(opt, l10n))))
+                .map(
+                  (opt) => ButtonSegment(
+                    value: opt,
+                    label: Text(_expiryDisplayLabel(opt, l10n)),
+                  ),
+                )
                 .toList(),
             selected: {currentExpiry ?? expiryOptions.first},
             onSelectionChanged: (v) => widget.notifier.setExpiry(v.first),
@@ -605,8 +937,103 @@ class _FileSelectedButtonsState extends ConsumerState<_FileSelectedButtons> {
   }
 }
 
+/// Upload button with provider config + insecure warning checks.
+class _UploadButton extends ConsumerWidget {
+  final UploadNotifier notifier;
+  const _UploadButton({required this.notifier});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final state = ref.watch(uploadProvider);
+    final provider = state.providers.asMap()[state.selectedProviderIndex];
+    var isUrlShareOnly = provider?.isUrlShareOnly ?? false;
+    if (provider?.providerId.startsWith('matterbridge') == true) {
+      final config = ref.watch(providerConfigProvider(provider!.providerId));
+      final paired = config.asData?.value['paired_provider'] ?? '';
+      isUrlShareOnly = paired.isEmpty;
+    }
+
+    return ElevatedButton.icon(
+      onPressed: isUrlShareOnly
+          ? null
+          : () async {
+              final state = ref.read(uploadProvider);
+              if (state is! UploadFileSelected) return;
+              final provider = state.providers[state.selectedProviderIndex];
+
+              if (provider.metadata.capabilities.contains(
+                ProviderCapability.requiresAuth,
+              )) {
+                final configured = await isProviderConfigured(ref, provider);
+                if (!configured) {
+                  if (context.mounted) {
+                    showProviderConfigDialog(context, ref, provider);
+                  }
+                  return;
+                }
+              }
+
+              if (!context.mounted) return;
+              final proceed = await checkInsecureWarning(
+                context,
+                provider,
+                ref,
+              );
+              if (!proceed) return;
+              notifier.uploadSelected();
+            },
+      icon: const Icon(Icons.cloud_upload),
+      label: Text(l10n.upload),
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size.fromHeight(48),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+      ),
+    );
+  }
+}
+
+/// Helper widget for info rows.
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(value, style: Theme.of(context).textTheme.bodyMedium),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// Converts an API expiry value to a friendly display label.
-/// [l10n] must be provided since this is called from widget code.
 String _expiryDisplayLabel(String value, AppLocalizations l10n) {
   return switch (value) {
     '1h' => l10n.expiry1Hour,
@@ -616,110 +1043,172 @@ String _expiryDisplayLabel(String value, AppLocalizations l10n) {
   };
 }
 
-class _WebWarning extends StatelessWidget {
-  const _WebWarning();
+/// Progress overlay shown on top of the file preview during upload.
+class _ProgressOverlay extends StatelessWidget {
+  final double? progress;
+  final String speedLabel;
+  final int sentBytes;
+  final int totalBytes;
+  final VoidCallback onCancel;
+
+  const _ProgressOverlay({
+    this.progress,
+    this.speedLabel = '',
+    this.sentBytes = 0,
+    this.totalBytes = 0,
+    required this.onCancel,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        color: theme.colorScheme.errorContainer.withValues(alpha: 0.3),
-        child: Row(
-          children: [
-            Icon(Icons.warning_amber, size: 18, color: theme.colorScheme.error),
-            const SizedBox(width: 8),
-            Expanded(
-                child: Text(l10n.providerWebNotSupported,
-                    style: TextStyle(
-                        color: theme.colorScheme.onErrorContainer,
-                        fontSize: 13))),
-          ],
+    final pct = ((progress ?? 0) * 100).toStringAsFixed(0);
+    final hasData = sentBytes > 0;
+
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: 0.0),
+                  Colors.black.withValues(alpha: 0.75),
+                ],
+              ),
+            ),
+            padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '$pct%',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    if (hasData && speedLabel.isNotEmpty)
+                      Row(
+                        children: [
+                          const Icon(Icons.speed,
+                              size: 16, color: Colors.white70),
+                          const SizedBox(width: 4),
+                          Text(
+                            speedLabel,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6,
+                    backgroundColor: Colors.white.withValues(alpha: 0.15),
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+                if (hasData) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        formatSize(sentBytes),
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: Colors.white60),
+                      ),
+                      Text(
+                        formatSize(totalBytes),
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: Colors.white60),
+                      ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 12),
+                Center(
+                  child: TextButton.icon(
+                    onPressed: onCancel,
+                    icon: const Icon(
+                      Icons.close,
+                      size: 16,
+                      color: Colors.white70,
+                    ),
+                    label: Text(
+                      l10n.cancelUpload,
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-/// Shows a warning banner when the selected provider requires auth
-/// configuration but hasn't been set up yet.
-class _ProviderConfigStatus extends ConsumerStatefulWidget {
-  final BaseUploader provider;
+/// Empty state shown when no file is selected.
+class _EmptyUploadState extends StatelessWidget {
+  final VoidCallback onPick;
 
-  const _ProviderConfigStatus({required this.provider});
-
-  @override
-  ConsumerState<_ProviderConfigStatus> createState() =>
-      _ProviderConfigStatusState();
-}
-
-class _ProviderConfigStatusState extends ConsumerState<_ProviderConfigStatus> {
-  int _configVersion = 0;
+  const _EmptyUploadState({super.key, required this.onPick});
 
   @override
   Widget build(BuildContext context) {
-    // Only show for providers that require auth
-    if (!widget.provider.metadata.capabilities
-        .contains(ProviderCapability.requiresAuth)) {
-      return const SizedBox.shrink();
-    }
-
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    // Re-run the future when configVersion increments (after save).
-    return FutureBuilder<bool>(
-      key: ValueKey('config_${widget.provider.providerId}_$_configVersion'),
-      future: isProviderConfigured(ref, widget.provider),
-      builder: (context, snapshot) {
-        final configured = snapshot.data ?? false;
-        if (configured) return const SizedBox.shrink();
-
-        return Card(
-          color: Colors.orange.shade50,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.orange.shade200),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Icon(Icons.warning_amber,
-                    size: 20, color: Colors.orange.shade700),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    l10n.providerConfigNotConfigured(
-                        widget.provider.providerName),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.orange.shade900,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                FilledButton.tonalIcon(
-                  onPressed: () async {
-                    final saved = await showProviderConfigDialog(
-                        context, ref, widget.provider);
-                    if (saved && mounted) {
-                      setState(() => _configVersion++);
-                    }
-                  },
-                  icon: const Icon(Icons.settings, size: 16),
-                  label: Text(l10n.providerConfigure),
-                  style: FilledButton.styleFrom(
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ),
-              ],
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.cloud_upload_outlined,
+              size: 72,
+              color: theme.colorScheme.primary.withValues(alpha: 0.25),
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 16),
+            Text(
+              l10n.dropFileToUpload,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: onPick,
+              icon: const Icon(Icons.upload_file),
+              label: Text(l10n.chooseFile),
+              style: FilledButton.styleFrom(minimumSize: const Size(200, 48)),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -361,7 +361,7 @@ class _ProviderRow extends ConsumerWidget {
                         ],
                       ),
                     ),
-                  metadataBadges(provider.metadata),
+                  metadataBadges(provider.metadata, context),
                 ],
               ),
             ),

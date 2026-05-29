@@ -37,44 +37,46 @@ IconData mimeIcon(ProviderMetadata meta) {
   return Icons.insert_drive_file;
 }
 
-Widget metadataBadges(ProviderMetadata meta) {
+Widget metadataBadges(ProviderMetadata meta, BuildContext context) {
+  final theme = Theme.of(context);
   final chips = <Widget>[];
 
   if (meta.fileSizeLabel.isNotEmpty) {
-    chips.add(_buildBadge(meta.fileSizeLabel, icon: Icons.storage));
+    chips.add(
+        _buildBadge(meta.fileSizeLabel, icon: Icons.storage, theme: theme));
   }
   if (meta.allowedMimeTypes != null) {
-    chips.add(_buildBadge(null, icon: mimeIcon(meta)));
+    chips.add(_buildBadge(null, icon: mimeIcon(meta), theme: theme));
   }
   if (meta.expiryInfo != null && meta.expiryInfo!.isNotEmpty) {
-    // Expiry info is stored as raw keys; resolve via l10n at display time.
-    // Badge has no l10n access — show raw value (the resolved version
-    // appears in _ProviderInfo via resolveExpiry + l10n.expiryInfo).
-    chips.add(_buildBadge(meta.expiryInfo!, icon: Icons.calendar_today));
+    chips.add(_buildBadge(meta.expiryInfo!,
+        icon: Icons.calendar_today, theme: theme));
   }
 
   if (chips.isEmpty) return const SizedBox.shrink();
   return Row(mainAxisSize: MainAxisSize.min, children: chips);
 }
 
-Widget _buildBadge(String? label, {IconData? icon}) {
+Widget _buildBadge(String? label, {IconData? icon, required ThemeData theme}) {
+  final bg = theme.colorScheme.primaryContainer;
+  final fg = theme.colorScheme.onPrimaryContainer;
   return Padding(
     padding: const EdgeInsets.only(left: 4),
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: bg,
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) Icon(icon, size: 14, color: Colors.blue),
+          if (icon != null) Icon(icon, size: 14, color: fg),
           if (label != null && label.isNotEmpty) ...[
             const SizedBox(width: 2),
             Flexible(
               child: Text(label,
-                  style: const TextStyle(fontSize: 10, color: Colors.blue),
+                  style: TextStyle(fontSize: 10, color: fg),
                   overflow: TextOverflow.ellipsis),
             ),
           ],
