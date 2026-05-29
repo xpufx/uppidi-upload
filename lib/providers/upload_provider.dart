@@ -28,10 +28,6 @@ import 'zulip_provider.dart';
 
 final _log = Log('UploadNotifier');
 
-/// Notifier for image quality selection (0=original, 1=half, 2=quarter).
-/// Separate from upload state so changing quality doesn't rebuild the screen.
-final qualityNotifier = ValueNotifier<int>(0);
-
 sealed class UploadState {
   final List<UploadResult> results;
   final int selectedProviderIndex;
@@ -158,12 +154,6 @@ class UploadNotifier extends Notifier<UploadState> {
         providers: prev.providers,
       );
     }
-  }
-
-  void setQuality(int q) {
-    // Quality is stored separately — it only affects upload compression,
-    // not the preview. No state change, so the screen doesn't rebuild.
-    qualityNotifier.value = q;
   }
 
   @override
@@ -303,27 +293,6 @@ class UploadNotifier extends Notifier<UploadState> {
     Uint8List? uploadBytes = currentFile.fileBytes;
     String uploadName = currentFile.fileName;
     String? uploadMime = currentFile.mimeType;
-
-    // Apply quality compression at upload time (not during preview)
-    final quality = qualityNotifier.value;
-    if (quality > 0 && uploadBytes != null) {
-      final mime = uploadMime;
-      if (mime != null && mime.startsWith('image/')) {
-        try {
-          final src = img.decodeImage(uploadBytes);
-          if (src != null) {
-            final ratio = quality == 1 ? 0.5 : 0.25;
-            final newW = (src.width * ratio).round();
-            final newH = (src.height * ratio).round();
-            final jpegQuality = quality == 1 ? 75 : 50;
-            final resized = img.copyResize(src, width: newW, height: newH);
-            uploadBytes = img.encodeJpg(resized, quality: jpegQuality);
-          }
-        } catch (e) {
-          _log.warn('Quality compression failed: $e', error: e);
-        }
-      }
-    }
 
     if (uploadBytes == null) return;
 
@@ -698,7 +667,6 @@ class UploadNotifier extends Notifier<UploadState> {
     // Free byte buffers — no longer needed after upload and history save
     _lastFileBytes = null;
     _originalFileBytes = null;
-    _lastFileBytes = null;
   }
 
   Future<void> _saveToHistory(
@@ -788,7 +756,6 @@ class UploadNotifier extends Notifier<UploadState> {
   void clearSelection() {
     _lastFileBytes = null;
     _originalFileBytes = null;
-    _lastFileBytes = null;
     state = UploadIdle(
       results: state.results,
       selectedProviderIndex: state.selectedProviderIndex,

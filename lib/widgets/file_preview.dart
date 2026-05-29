@@ -1,16 +1,15 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:image/image.dart' as img;
+import 'package:pro_image_editor/pro_image_editor.dart';
 
 import '../core/format.dart';
 import '../core/interfaces/uploader.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
-import 'image_crop_overlay.dart';
 
-/// Previews a selected file (image or document) with crop and quality
-/// controls for images. Used inside the upload screen.
+/// Previews a selected file (image or document) with edit controls for
+/// images (opens the full image editor). Used inside the upload screen.
 class FilePreview extends StatefulWidget {
   final String fileName;
   final int fileSize;
@@ -168,14 +167,14 @@ class _FilePreviewState extends State<FilePreview> {
           top: 4,
           right: 4,
           child: IconButton(
-            icon: Icon(_hasCropped ? Icons.restore : Icons.crop),
-            tooltip: _hasCropped ? _l10n.resetCrop : _l10n.apply,
+            icon: Icon(_hasCropped ? Icons.restore : Icons.edit),
+            tooltip: _hasCropped ? _l10n.resetCrop : 'Edit image',
             onPressed: _hasCropped
                 ? () {
                     widget.notifier.resetCrop();
                     setState(() => _hasCropped = false);
                   }
-                : _enterCropMode,
+                : _openEditor,
             style: IconButton.styleFrom(
               backgroundColor:
                   Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -185,115 +184,34 @@ class _FilePreviewState extends State<FilePreview> {
             ),
           ),
         ),
-        Positioned(
-          top: 4,
-          left: 4,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context)
-                  .colorScheme
-                  .surfaceContainerHighest
-                  .withValues(alpha: 0.55),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: const EdgeInsets.all(6),
-            child: ValueListenableBuilder<int>(
-              valueListenable: qualityNotifier,
-              builder: (context, quality, _) {
-                final theme = Theme.of(context);
-                final primary = theme.colorScheme.primary;
-                const iconSizes = [20.0, 16.0, 13.0];
-                const labels = ['100%', '50%', '25%'];
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ...List.generate(
-                        3,
-                        (i) => Padding(
-                              padding: EdgeInsets.only(left: i > 0 ? 4 : 0),
-                              child: GestureDetector(
-                                onTap: () => widget.notifier.setQuality(i),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: quality == i
-                                          ? primary
-                                          : Colors.grey.shade300,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Opacity(
-                                        opacity: quality == i ? 1.0 : 0.25,
-                                        child: Text(
-                                          '\u{1F5BC}',
-                                          style: TextStyle(
-                                            fontSize: iconSizes[i] * 1.2,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 2),
-                                      Text(
-                                        labels[i],
-                                        style: TextStyle(
-                                          fontSize: 9,
-                                          color: quality == i
-                                              ? primary
-                                              : Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            )),
-                  ],
-                );
-              },
-            ),
-          ),
-        ),
       ],
     );
   }
 
-  Future<void> _enterCropMode() async {
+  Future<void> _openEditor() async {
     if (widget.fileBytes == null) return;
-    final decoded = img.decodeImage(widget.fileBytes!);
-    if (decoded == null) return;
-    final cropW = decoded.width;
-    final cropH = decoded.height;
-
     if (!mounted) return;
-    final cropRect = await ImageCropOverlay.show(
-      context: context,
-      imageBytes: widget.fileBytes!,
-      imageWidth: cropW,
-      imageHeight: cropH,
+    final edited = await Navigator.push<Uint8List>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProImageEditor.memory(
+          widget.fileBytes!,
+          callbacks: ProImageEditorCallbacks(
+            onImageEditingComplete: (bytes) async =>
+                Navigator.pop(context, bytes),
+          ),
+          configs: const ProImageEditorConfigs(
+            imageGeneration: ImageGenerationConfigs(
+              outputFormat: OutputFormat.jpg,
+              jpegQuality: 100,
+            ),
+            designMode: ImageEditorDesignMode.material,
+          ),
+        ),
+      ),
     );
-
-    if (cropRect == null) return;
-
-    final src = img.decodeImage(widget.fileBytes!);
-    if (src == null || !mounted) return;
-
-    final cropped = img.copyCrop(
-      src,
-      x: cropRect.left.toInt(),
-      y: cropRect.top.toInt(),
-      width: cropRect.width.toInt(),
-      height: cropRect.height.toInt(),
-    );
-
-    final outBytes = img.encodeJpg(cropped, quality: 90);
-    widget.notifier.applyCrop(outBytes);
-    if (!mounted) return;
+    if (edited == null || !mounted) return;
+    widget.notifier.applyCrop(edited);
     setState(() => _hasCropped = true);
   }
 

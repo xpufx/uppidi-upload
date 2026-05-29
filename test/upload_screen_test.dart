@@ -19,7 +19,6 @@ import 'package:uppidi_upload/core/models/upload_result.dart';
 import 'package:uppidi_upload/core/models/upload_request.dart';
 import 'package:uppidi_upload/l10n/app_localizations.dart';
 import 'package:uppidi_upload/core/settings_service.dart';
-import 'package:uppidi_upload/widgets/image_crop_overlay.dart';
 
 /// Mock UploadNotifier to control initial state
 class MockUploadNotifier extends UploadNotifier {
@@ -150,8 +149,8 @@ void main() {
       );
 
       await tester.pumpAndSettle();
-      // Verify provider dropdown (DropdownButton) is rendered
-      expect(find.byType(DropdownButton<int>), findsOneWidget);
+      // Verify provider dropdown is rendered
+      expect(find.byType(DropdownButtonFormField<int?>), findsOneWidget);
     });
 
     testWidgets('2. Shows pick button when idle', (WidgetTester tester) async {
@@ -176,80 +175,9 @@ void main() {
       );
 
       await tester.pumpAndSettle();
-      // _PickButton displays an ElevatedButton with pickAndUpload text
-      expect(find.text(l10n.pickAndUpload), findsOneWidget);
+      // _PickButton displays an ElevatedButton with chooseFile text
+      expect(find.text(l10n.chooseFile), findsWidgets);
       expect(find.byType(ElevatedButton), findsWidgets);
-    });
-
-    testWidgets('3a. Quality selector hidden for non-images',
-        (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
-
-      // Test non-image file (PDF)
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            uploadProvider.overrideWith(() {
-              return MockUploadNotifier(
-                initialTestState: UploadFileSelected(
-                  fileName: 'test.pdf',
-                  fileSizeBytes: 1024,
-                  mimeType: 'application/pdf',
-                  fileBytes: null,
-                  providers: mockUploaders,
-                  selectedProviderIndex: 0,
-                ),
-                providers: mockUploaders,
-              );
-            }),
-          ],
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(body: const UploadScreen()),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-      // Quality selector (SegmentedButton) should not be present for non-images
-      expect(find.byType(SegmentedButton<int>), findsNothing);
-    });
-
-    testWidgets('3b. Quality selector shown for images',
-        (WidgetTester tester) async {
-      final imageUploader = MockUploader(isImageProvider: true);
-
-      // Test image file (PNG)
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            uploadProvider.overrideWith(() {
-              return MockUploadNotifier(
-                initialTestState: UploadFileSelected(
-                  fileName: 'test.png',
-                  fileSizeBytes: 1024,
-                  mimeType: 'image/png',
-                  fileBytes: Uint8List(0),
-                  providers: [imageUploader],
-                  selectedProviderIndex: 0,
-                ),
-                providers: [imageUploader],
-              );
-            }),
-          ],
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(body: const UploadScreen()),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-      // Quality selector should be shown for image files
-      expect(find.byType(SegmentedButton<int>), findsOneWidget,
-          reason: 'Quality segmented button should be present for image files');
     });
   });
 
@@ -328,78 +256,6 @@ void main() {
       expect(find.text('test.pdf'), findsOneWidget);
       expect(find.byType(Card), findsWidgets); // File preview is in a Card
     });
-
-    testWidgets('Quality selector shown for image files',
-        (WidgetTester tester) async {
-      final imageUploader = MockUploader(isImageProvider: true);
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            uploadProvider.overrideWith(() {
-              return MockUploadNotifier(
-                initialTestState: UploadFileSelected(
-                  fileName: 'test.png',
-                  fileSizeBytes: 1024,
-                  mimeType: 'image/png',
-                  fileBytes: Uint8List(0),
-                  providers: [imageUploader],
-                  selectedProviderIndex: 0,
-                ),
-                providers: [imageUploader],
-              );
-            }),
-          ],
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(body: const UploadScreen()),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // Quality selector should be shown for image files
-      expect(find.byType(SegmentedButton<int>), findsOneWidget);
-      // Check for quality icons (same icon at 3 sizes)
-      expect(find.byIcon(Icons.photo), findsNWidgets(3));
-    });
-
-    testWidgets('Quality selector NOT shown for non-image files',
-        (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            uploadProvider.overrideWith(() {
-              return MockUploadNotifier(
-                initialTestState: UploadFileSelected(
-                  fileName: 'test.pdf',
-                  fileSizeBytes: 1024,
-                  mimeType: 'application/pdf',
-                  fileBytes: Uint8List(0),
-                  providers: mockUploaders,
-                  selectedProviderIndex: 0,
-                ),
-                providers: mockUploaders,
-              );
-            }),
-          ],
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(body: const UploadScreen()),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // Quality selector should NOT be present for non-image files
-      expect(find.byType(SegmentedButton<int>), findsNothing);
-    });
   });
 
   group('InProgress State Tests', () {
@@ -448,8 +304,8 @@ void main() {
       expect(find.text('100 B/s'), findsOneWidget);
       expect(find.byIcon(Icons.speed), findsOneWidget);
 
-      // Cancel button should be visible
-      expect(find.text(l10n.cancelUpload), findsOneWidget);
+      // Cancel button should be visible (in overlay + bottom bar)
+      expect(find.text(l10n.cancelUpload), findsWidgets);
       expect(find.byIcon(Icons.close), findsWidgets);
     });
   });
@@ -601,7 +457,7 @@ void main() {
       expect(find.text('test.pdf'), findsOneWidget);
 
       // Change provider via dropdown
-      final dropdown = find.byType(DropdownButton<int>);
+      final dropdown = find.byType(DropdownButtonFormField<int?>);
       expect(dropdown, findsOneWidget);
 
       await tester.tap(dropdown);
@@ -717,23 +573,6 @@ void main() {
       );
 
       await tester.pumpAndSettle();
-
-      // Verify initial quality is 0 (Original)
-      expect(notifier.state, isA<UploadFileSelected>());
-      expect(qualityNotifier.value, 0);
-
-      // Find and tap the "Medium" quality option (quality value 1)
-      final mediumOption = find.byIcon(Icons.photo).at(1);
-      expect(mediumOption, findsOneWidget);
-      // Scroll to the Medium option (might be off-screen due to new UI elements)
-      await tester.ensureVisible(mediumOption);
-      await tester.pumpAndSettle();
-      await tester.tap(mediumOption);
-      await tester.pump();
-
-      // Verify quality changed to 1 (Medium)
-      expect(notifier.state, isA<UploadFileSelected>());
-      expect(qualityNotifier.value, 1);
     });
 
     testWidgets('2. Tap Upload button calls uploadSelected()',
@@ -827,7 +666,7 @@ void main() {
 
       // Verify state is UploadIdle (pick button reappears)
       expect(notifier.state, isA<UploadIdle>());
-      expect(find.text(l10n.pickAndUpload), findsOneWidget);
+      expect(find.text(l10n.chooseFile), findsWidgets);
     });
 
     testWidgets('4. Tap Cancel during upload returns to UploadIdle',
@@ -866,20 +705,19 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Verify Cancel button is present
+      // Verify Cancel button is present (in overlay + bottom bar)
       final cancelButton = find.text(l10n.cancelUpload);
-      expect(cancelButton, findsOneWidget);
+      expect(cancelButton, findsWidgets);
 
-      // Tap the Cancel button
-      // Scroll to the Cancel button (might be off-screen due to new UI elements)
-      await tester.ensureVisible(cancelButton);
+      // Tap the first Cancel button (overlay)
+      await tester.ensureVisible(cancelButton.first);
       await tester.pumpAndSettle();
-      await tester.tap(cancelButton);
+      await tester.tap(cancelButton.first);
       await tester.pumpAndSettle();
 
       // Verify state is UploadIdle
       expect(notifier.state, isA<UploadIdle>());
-      expect(find.text(l10n.pickAndUpload), findsOneWidget);
+      expect(find.text(l10n.chooseFile), findsWidgets);
     });
 
     testWidgets('5. Tap Retry on failure calls uploadSelected()',
@@ -1027,8 +865,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Crop icon should be visible for image files
-      expect(find.byIcon(Icons.crop), findsOneWidget);
+      // Edit icon should be visible for image files
+      expect(find.byIcon(Icons.edit), findsOneWidget);
     });
 
     testWidgets('Crop icon NOT visible for non-image files', (tester) async {
@@ -1060,57 +898,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Crop icon should NOT be present for non-image files
-      expect(find.byIcon(Icons.crop), findsNothing);
-    });
-
-    testWidgets('ImageCropOverlay shows Apply and Cancel buttons',
-        (tester) async {
-      final bytes = validPngBytes();
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          home: const Scaffold(body: Center(child: SizedBox())),
-        ),
-      );
-
-      ImageCropOverlay.show(
-        context: tester.element(find.byType(SizedBox)),
-        imageBytes: bytes,
-        imageWidth: 100,
-        imageHeight: 100,
-      );
-      await tester.pumpAndSettle();
-
-      // Apply and Cancel buttons should be present
-      expect(find.text('Apply'), findsOneWidget);
-      expect(find.byTooltip('Cancel'), findsOneWidget);
-    });
-
-    testWidgets('ImageCropOverlay Cancel button closes the dialog',
-        (tester) async {
-      final bytes = validPngBytes();
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          home: const Scaffold(body: Center(child: SizedBox())),
-        ),
-      );
-
-      ImageCropOverlay.show(
-        context: tester.element(find.byType(SizedBox)),
-        imageBytes: bytes,
-        imageWidth: 100,
-        imageHeight: 100,
-      );
-      await tester.pumpAndSettle();
-
-      // Tap Cancel (X icon button in leading)
-      await tester.tap(find.byTooltip('Cancel'));
-      await tester.pumpAndSettle();
-
-      // Dialog should be dismissed
-      expect(find.byType(ImageCropOverlay), findsNothing);
+      // Edit icon should NOT be present for non-image files
+      expect(find.byIcon(Icons.edit), findsNothing);
     });
   });
 }

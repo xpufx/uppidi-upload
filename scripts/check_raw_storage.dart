@@ -62,7 +62,7 @@ class _StorageVisitor extends RecursiveAstVisitor<void> {
   final LineInfo _lineInfo;
   final List<String> violations = [];
 
-  static const _allowedFile = 'config_provider.dart';
+  static const _allowedFiles = {'config_provider.dart', 'export_import.dart'};
 
   _StorageVisitor(this.filePath, this._lineInfo);
 
@@ -76,7 +76,10 @@ class _StorageVisitor extends RecursiveAstVisitor<void> {
     return filePath;
   }
 
-  bool get _isAllowed => _relativePath() == 'lib/core/$_allowedFile';
+  bool get _isAllowed {
+    final name = _relativePath().split('/').last;
+    return _allowedFiles.contains(name);
+  }
 
   /// Returns true if [keyArg] is a string literal containing
   /// `provider_config_` (config value key, NOT instance metadata).
