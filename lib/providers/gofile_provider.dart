@@ -7,6 +7,7 @@ import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
 import '../core/platform/insecure_adapter.dart';
 import '../core/logging/log.dart';
+import 'gofile_config.dart';
 
 class GoFileProvider extends BaseHttpProvider {
   late final Log _log = Log(runtimeType.toString());
@@ -50,12 +51,15 @@ class GoFileProvider extends BaseHttpProvider {
     FileUploadRequest request, {
     UploadProgressCallback? onProgress,
     CancelToken? cancelToken,
-    Map<String, String> config = const {},
+    Object? config,
   }) async {
     try {
-      final allowInsecure = config['_allow_insecure_conn'] == 'true';
-      final proxyUrlValue = config['_proxy_url'];
-      final cleanConfig = Map<String, String>.from(config)
+      final gofileConfig =
+          config is GoFileConfig ? config : const GoFileConfig();
+      final rawConfig = gofileConfig.data;
+      final allowInsecure = rawConfig['_allow_insecure_conn'] == 'true';
+      final proxyUrlValue = rawConfig['_proxy_url'];
+      final cleanConfig = Map<String, String>.from(rawConfig)
         ..remove('_allow_insecure_conn')
         ..remove('_proxy_url');
 
