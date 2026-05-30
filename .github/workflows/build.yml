@@ -244,11 +244,17 @@ jobs:
           fetch-depth: 0
       - name: Download all artifacts
         uses: actions/download-artifact@v8
-      - name: Create release and upload artifacts
+      - name: Create draft release
         run: |
           gh release create ${{ github.ref_name }} \
             --draft \
-            --generate-notes \
-            $(find . -type f -name 'uppidi-upload-*.*')
+            --generate-notes || true
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Upload release assets
+        run: |
+          gh release upload ${{ github.ref_name }} \
+            $(find . -type f -name 'uppidi-upload-*.*') \
+            --clobber
         env:
           GH_TOKEN: ${{ github.token }}

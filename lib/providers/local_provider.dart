@@ -18,6 +18,9 @@ class LocalProvider implements BaseUploader {
   String get providerName => 'Local (Image Editor)';
   @override
   bool get supportsWeb => false;
+
+  @override
+  bool get supportsMessage => false;
   @override
   bool get isUrlShareOnly => false;
   @override
@@ -31,7 +34,8 @@ class LocalProvider implements BaseUploader {
   @override
   String? get proxyUrl => null;
   @override
-  String? get instanceDescription => null;
+  String? get instanceDescription =>
+      'Saves the edited image to your device\'s local storage. No upload to a remote server.';
 
   @override
   ProviderMetadata get metadata => const ProviderMetadata();
@@ -50,7 +54,7 @@ class LocalProvider implements BaseUploader {
     FileUploadRequest request, {
     UploadProgressCallback? onProgress,
     CancelToken? cancelToken,
-    Map<String, String> config = const {},
+    Object? config,
   }) async {
     try {
       final raw = await request.dataStream.first;
@@ -58,7 +62,11 @@ class LocalProvider implements BaseUploader {
       String? savedPath;
 
       if (Platform.isAndroid) {
-        savedPath = await saveFileOnAndroid(bytes, request.fileName);
+        savedPath = await saveFileOnAndroid(
+          bytes,
+          request.fileName,
+          mimeType: request.mimeType ?? 'image/jpeg',
+        );
       } else {
         savedPath = await FilePicker.saveFile(
           dialogTitle: 'Save image',

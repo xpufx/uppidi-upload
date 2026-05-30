@@ -116,15 +116,32 @@ class _BareStringVisitor extends RecursiveAstVisitor<void> {
   }
 
   void _checkStringArg(Expression expr) {
+    if (expr is ConditionalExpression) {
+      _checkStringArg(expr.thenExpression);
+      _checkStringArg(expr.elseExpression);
+      return;
+    }
+    if (expr is StringInterpolation) {
+      final allText = expr.elements.every((e) => e is InterpolationString);
+      if (allText) {
+        final value = expr.elements
+            .whereType<InterpolationString>()
+            .map((e) => e.value)
+            .join();
+        _reportIfBare(value, expr.offset);
+      }
+      return;
+    }
     if (expr is! SimpleStringLiteral) return;
-    final value = expr.stringValue;
-    if (value == null) return;
+    _reportIfBare(expr.stringValue, expr.offset);
+  }
 
+  void _reportIfBare(String? value, int offset) {
+    if (value == null) return;
     if (value.trim().isEmpty) return;
     if (value.length <= 1) return;
     if (_isAllowed(value)) return;
 
-    final offset = expr.offset;
     final line = _lineInfo.getLocation(offset).lineNumber;
     violations.add('   ${_relativePath()}:$line');
     violations.add('      "$value"');
@@ -140,11 +157,6 @@ class _BareStringVisitor extends RecursiveAstVisitor<void> {
     if (RegExp(r'^[\d.]+$').hasMatch(s)) return true;
     if (RegExp(r'^[a-z][a-zA-Z0-9]+$').hasMatch(s)) return true;
     if (_startsWithFlag(s)) return true;
-    if (s == 'Message' ||
-        s ==
-            'Variables: {filename} {filesize} {provider}  (Zulip also: {url})') {
-      return true;
-    }
     return false;
   }
 

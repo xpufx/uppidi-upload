@@ -1,23 +1,32 @@
 # Changelog
 
-## 1.4.0 — "What's worth doing, is worth overdoing!"
-
-### New Providers
-- **Telegram** — full Bot API uploader with multi-instance support. Send files as documents or images with captions, `send_as_photo` toggle, message template support.
-- **Zulip** — Zulip server uploader. Channel/DM SegmentedButton toggle, API-fetched channel and user dropdowns, message posting to streams or direct messages.
-- **CustomUguu** — self-hosted Uguu-compatible provider for your own server.
-- **Matterbridge** — relay files to IRC, Discord, Telegram, Slack, Matrix, and other protocols via the Matterbridge API. Requires an existing Matterbridge server. Configure URL + token, fetch available gateways, pair with an upload provider (Catbox, Uguu, etc.) for text-only protocols.
-
-### New Features
-- Desktop drag-and-drop — real OS file drops from file manager with hover overlay (Linux, macOS, Windows).
-- Clipboard paste — paste images from clipboard via the paste button.
-- Global message template — configure in Settings, pre-filled on every upload, editable per-upload. Variables: {url} {filename} {filesize}.
-- History "Share via Matterbridge" — post any past upload's URL to a Matterbridge gateway.
-
-### Architecture
-- Riverpod config provider — single source of truth for all config. Enforced by `check_raw_storage` in CI.
-- Typed config classes — MatterbridgeConfig, TelegramConfig, ZulipConfig with named fields instead of raw Map<String, String>.
-- Export/Import through Riverpod — reads per-provider, invalidates after write.
-- Static analyzers — three checks run in every build: bare strings, raw storage access, wide config types.
-- httpbin.org integration test — full upload pipeline against a real HTTP endpoint.
-- 180 tests, 0 analyzer issues, all checkers green.
+- feat: add Local (Image Editor) provider + save-a-copy after editing
+- feat: remove duplicate Choose File, add paste button, switch to Cupertino editor design
+- feat: embed pro_image_editor, remove quality selector, drop ImageCropOverlay
+- Merge remote-tracking branch 'origin/opencode/gentle-cabin'
+- build: worktree-aware artifact paths, AppImage --artifacts-dir flag
+- Merge branch 'opencode/gentle-cabin'
+- redesign upload screen: card layout, quality chips, progress overlay, theme badges
+- feat: v2 structured export/import, extract provider_storage_service
+- fix: clean Hive test directory via Directory.deleteSync in tearDownAll
+- ci: split linux into build + 3 packaging jobs, add flatpak to build_and_serve.sh
+- docs: strengthen scope guard to require full diff inspection
+- docs: add scope guard rule to AGENTS.md
+- fix: address code review findings (#3, #5, #6, #7)
+- minor README change
+- minor README change
+- fix: macos/ios ci packaging — use find instead of ls, add error handling
+- fix: flatpak version in flatpak list, add .flatpak-builder to gitignore
+- fix: flatpak D-Bus secrets, icon sizes, graceful KeyringLocked exit
+- fix: flatpak version branch, macOS/iOS .app wildcard, iOS 14.0 target
+- docs: add rule to never attempt privilege escalation
+- docs: remove web from supported platforms
+- docs: fix 'desktop-first' to 'desktop drag & drop'
+- docs: update README for v1.4.0, fix flatpak library bundling
+- fix: macOS build artifact name is Runner.app
+- ci: add libsecret-1-dev dep, fix macOS app name
+- ci: add manual macOS/iOS build workflow
+- chore: bump to 1.4.0
+- fix: detect MIME type from extension when drag-drop provides null mimeType
+- fix: restore hover overlay, gate DropTarget on !kIsWeb, hide paste on web
+- feat: desktop drag-drop + clipboard paste support

@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Uppidi Upload
 Comment=A simple, cross-platform file uploader
-Exec=uppidi
+Exec=/app/uppidi
 Icon=com.uppidi.uppidi
 Terminal=false
 Type=Application

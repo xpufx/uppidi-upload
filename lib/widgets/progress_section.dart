@@ -83,9 +83,9 @@ class _ProgressSectionState extends State<ProgressSection>
                   Text(
                     '$pct%',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                   ),
                   if (hasData && widget.speedLabel.isNotEmpty)
                     Row(
@@ -98,11 +98,11 @@ class _ProgressSectionState extends State<ProgressSection>
                         const SizedBox(width: 4),
                         Text(
                           widget.speedLabel,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: Colors.grey.shade600,
-                                fontWeight: FontWeight.w500,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.grey.shade600,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                         ),
                       ],
                     ),
@@ -132,14 +132,14 @@ class _ProgressSectionState extends State<ProgressSection>
                     Text(
                       formatSize(widget.sentBytes),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade600,
-                      ),
+                            color: Colors.grey.shade600,
+                          ),
                     ),
                     Text(
                       formatSize(widget.totalBytes),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade500,
-                      ),
+                            color: Colors.grey.shade500,
+                          ),
                     ),
                   ],
                 ),

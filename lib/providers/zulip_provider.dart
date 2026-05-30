@@ -47,6 +47,9 @@ class ZulipProvider extends BaseHttpProvider {
   bool get supportsWeb => false;
 
   @override
+  bool get supportsMessage => true;
+
+  @override
   List<String> get requiredConfigKeys =>
       ['zulip_url', 'zulip_email', 'zulip_api_key'];
 

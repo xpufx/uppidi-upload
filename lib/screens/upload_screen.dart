@@ -12,7 +12,6 @@ import '../core/config_provider.dart';
 import '../core/format.dart';
 import '../core/insecure_upload_warning.dart';
 import '../core/interfaces/uploader.dart';
-import '../core/metadata_badges.dart';
 import '../core/models/provider_instance.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/provider_config_sheet.dart';
@@ -415,48 +414,56 @@ class _ProviderSelectionCardState
               child: Row(
                 children: [
                   Expanded(
-                    child: DropdownButtonFormField<int?>(
-                      key: ValueKey('provider_${widget.selectedIndex}'),
-                      isDense: true,
-                      isExpanded: true,
-                      initialValue: widget.selectedIndex,
-                      disabledHint: Text(l10n.noProvidersAvailable),
-                      decoration: InputDecoration(
-                        labelText: l10n.providersSection,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        popupMenuTheme: PopupMenuThemeData(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
-                      items: [
-                        for (final p in widget.providers.asMap().entries)
-                          DropdownMenuItem<int>(
-                            value: p.key,
-                            child: Row(
-                              children: [
-                                ProviderFavicon(
-                                  providerId: p.value.providerId,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    p.value is ProviderInstance
-                                        ? (p.value as ProviderInstance)
-                                            .displayName
-                                        : p.value.providerName,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                metadataBadges(p.value.metadata, context),
-                              ],
-                            ),
+                      child: DropdownButtonFormField<int?>(
+                        key: ValueKey('provider_${widget.selectedIndex}'),
+                        isDense: true,
+                        isExpanded: true,
+                        initialValue: widget.selectedIndex,
+                        disabledHint: Text(l10n.noProvidersAvailable),
+                        decoration: InputDecoration(
+                          labelText: l10n.providersSection,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                      ],
-                      onChanged: widget.isUploading ? null : widget.onChanged,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        ),
+                        items: [
+                          for (final p in widget.providers.asMap().entries)
+                            DropdownMenuItem<int>(
+                              value: p.key,
+                              child: Row(
+                                children: [
+                                  ProviderFavicon(
+                                    providerId: p.value.providerId,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      p.value is ProviderInstance
+                                          ? (p.value as ProviderInstance)
+                                              .displayName
+                                          : p.value.providerName,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                        onChanged: widget.isUploading ? null : widget.onChanged,
+                      ),
                     ),
                   ),
                   if (provider != null) ...[
@@ -555,6 +562,14 @@ class _ProviderInfoCard extends StatelessWidget {
               icon: Icons.person,
               label: l10n.requiresAccount,
               value: l10n.enabled,
+            ),
+          ],
+          if (provider.instanceDescription != null) ...[
+            const SizedBox(height: 8),
+            _InfoRow(
+              icon: Icons.info_outline,
+              label: '',
+              value: provider.instanceDescription!,
             ),
           ],
         ],
@@ -790,6 +805,24 @@ class _BottomActionBar extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final uploadState = ref.watch(uploadProvider);
 
+    final Widget? bottomChild = switch (uploadState) {
+      UploadFileSelected() => _FileSelectedBottomBar(notifier: notifier),
+      UploadInProgress() => SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            icon: const Icon(Icons.cancel),
+            label: Text(l10n.cancelUpload),
+            onPressed: notifier.cancelUpload,
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+            ),
+          ),
+        ),
+      _ => null,
+    };
+
+    if (bottomChild == null) return const SizedBox.shrink();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -802,35 +835,7 @@ class _BottomActionBar extends ConsumerWidget {
           ),
         ],
       ),
-      child: SafeArea(
-        top: false,
-        child: switch (uploadState) {
-          UploadIdle() => const SizedBox.shrink(),
-          UploadFileSelected() => _FileSelectedBottomBar(notifier: notifier),
-          UploadInProgress() => SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                icon: const Icon(Icons.cancel),
-                label: Text(l10n.cancelUpload),
-                onPressed: notifier.cancelUpload,
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(48),
-                ),
-              ),
-            ),
-          UploadCompleted() => SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.upload_file),
-                label: Text(l10n.chooseFile),
-                onPressed: notifier.pickAndUpload,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(48),
-                ),
-              ),
-            ),
-        },
-      ),
+      child: SafeArea(top: false, child: bottomChild),
     );
   }
 }
@@ -906,19 +911,21 @@ class _FileSelectedBottomBarState
           ),
           const SizedBox(height: 8),
         ],
-        TextFormField(
-          controller: _msgController,
-          decoration: InputDecoration(
-            labelText: 'Message',
-            border: const OutlineInputBorder(),
-            isDense: true,
-            helperText: l10n.messageVariables('{url} {filename} {filesize}'),
+        if (provider?.supportsMessage == true) ...[
+          TextFormField(
+            controller: _msgController,
+            decoration: InputDecoration(
+              labelText: 'Message',
+              border: const OutlineInputBorder(),
+              isDense: true,
+              helperText: l10n.messageVariables('{url} {filename} {filesize}'),
+            ),
+            maxLines: 2,
+            minLines: 1,
+            onChanged: (v) => widget.notifier.setMessage(v),
           ),
-          maxLines: 2,
-          minLines: 1,
-          onChanged: (v) => widget.notifier.setMessage(v),
-        ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 8),
+        ],
         Row(
           children: [
             Expanded(child: _UploadButton(notifier: widget.notifier)),
@@ -945,6 +952,7 @@ class _UploadButton extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(uploadProvider);
     final provider = state.providers.asMap()[state.selectedProviderIndex];
+    final isLocal = provider?.providerId == 'local';
     var isUrlShareOnly = provider?.isUrlShareOnly ?? false;
     if (provider?.providerId.startsWith('matterbridge') == true) {
       final config = ref.watch(providerConfigProvider(provider!.providerId));
@@ -972,6 +980,15 @@ class _UploadButton extends ConsumerWidget {
                 }
               }
 
+              if (provider.providerId == 'local' && !notifier.isModified) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('No changes to save')),
+                  );
+                }
+                return;
+              }
+
               if (!context.mounted) return;
               final proceed = await checkInsecureWarning(
                 context,
@@ -981,8 +998,8 @@ class _UploadButton extends ConsumerWidget {
               if (!proceed) return;
               notifier.uploadSelected();
             },
-      icon: const Icon(Icons.cloud_upload),
-      label: Text(l10n.upload),
+      icon: Icon(isLocal ? Icons.save : Icons.cloud_upload),
+      label: Text(isLocal ? l10n.save : l10n.upload),
       style: ElevatedButton.styleFrom(
         minimumSize: const Size.fromHeight(48),
         backgroundColor: Theme.of(context).colorScheme.primary,

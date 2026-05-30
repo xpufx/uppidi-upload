@@ -28,6 +28,7 @@ class ExportSaveHandler(private val activity: Activity) {
             if (call.method == "saveFile") {
                 val bytes = call.argument<ByteArray>("bytes")
                 val fileName = call.argument<String>("fileName") ?: "export.json"
+                val mimeType = call.argument<String>("mimeType") ?: "application/json"
 
                 if (pendingResult != null) {
                     result.error("already_active", "Save dialog is already active", null)
@@ -40,7 +41,7 @@ class ExportSaveHandler(private val activity: Activity) {
                 val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     putExtra(Intent.EXTRA_TITLE, fileName)
-                    type = "application/json"
+                    type = mimeType
                 }
 
                 try {

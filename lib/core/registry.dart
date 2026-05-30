@@ -7,6 +7,7 @@ import 'provider_storage_service.dart';
 import 'settings_service.dart';
 import '../providers/catbox_provider.dart';
 import '../providers/fileditch_provider.dart';
+import '../providers/gofile_provider.dart';
 import '../providers/local_provider.dart';
 import '../providers/freeimage_provider.dart';
 import '../providers/frisk_provider.dart';
@@ -34,6 +35,7 @@ final List<BaseUploader> _baseTypes = [
   HttpBinProvider(),
   LocalProvider(),
   FileDitchProvider(),
+  GoFileProvider(),
   FriskProvider(),
   UguuProvider(name: 'uguu.se', url: 'https://uguu.se'),
   TmpFileLinkProvider(),

@@ -133,11 +133,17 @@ class UploadNotifier extends Notifier<UploadState> {
 
   final String _selectedExpiry =
       '24h'; // default for configurableExpiry providers
-  Uint8List? _originalFileBytes; // saved for crop reset
+  Uint8List? _originalFileBytes;
+  String? _originalFileName;
+  String? _originalMimeType;
 
   Uint8List? _lastFileBytes;
   DateTime _lastSpeedSample = DateTime.now();
   int _lastSampleBytes = 0;
+
+  /// Whether the file has been edited via the image editor.
+  bool get isModified =>
+      _originalFileBytes != null && _originalFileBytes != _lastFileBytes;
 
   void setExpiry(String expiry) {
     if (state is UploadFileSelected) {
@@ -257,6 +263,8 @@ class UploadNotifier extends Notifier<UploadState> {
 
       // Store request for later upload
       _originalFileBytes = previewBytes;
+      _originalFileName = file.name;
+      _originalMimeType = request.mimeType;
       _lastFileBytes = previewBytes;
       state = UploadFileSelected(
         fileName: file.name,
@@ -322,6 +330,8 @@ class UploadNotifier extends Notifier<UploadState> {
 
       _lastFileBytes = null;
       _originalFileBytes = previewBytes;
+      _originalFileName = fileName;
+      _originalMimeType = detectedMime;
       _lastFileBytes = previewBytes;
       state = UploadFileSelected(
         fileName: fileName,
@@ -356,6 +366,8 @@ class UploadNotifier extends Notifier<UploadState> {
     _log.info('Pasted/clipboard file: $fileName ($mimeType)');
     _lastFileBytes = bytes;
     _originalFileBytes = bytes;
+    _originalFileName = fileName;
+    _originalMimeType = mimeType;
     state = UploadFileSelected(
       fileName: fileName,
       fileSizeBytes: bytes.length,
@@ -711,19 +723,20 @@ class UploadNotifier extends Notifier<UploadState> {
     );
   }
 
-  /// Applies a crop operation: replaces file bytes with the cropped version.
-  /// [croppedBytes] should be JPEG-encoded bytes ready for upload/preview.
-  void applyCrop(Uint8List croppedBytes) {
-    _lastFileBytes = croppedBytes;
+  /// Applies an edit operation: replaces file bytes with the edited version.
+  void applyEdit(Uint8List editedBytes, {String? outputMimeType}) {
+    final mime = outputMimeType ?? 'image/jpeg';
+    _lastFileBytes = editedBytes;
     if (state is UploadFileSelected) {
       final prev = state as UploadFileSelected;
-      final croppedName =
-          '${prev.fileName.replaceAll(RegExp(r'\.\w+$'), '')}.jpg';
+      final ext = _extensionForMime(mime);
+      final editedName =
+          '${prev.fileName.replaceAll(RegExp(r'\.\w+$'), '')}.$ext';
       state = UploadFileSelected(
-        fileName: croppedName,
-        fileSizeBytes: croppedBytes.length,
-        mimeType: 'image/jpeg',
-        fileBytes: croppedBytes,
+        fileName: editedName,
+        fileSizeBytes: editedBytes.length,
+        mimeType: mime,
+        fileBytes: editedBytes,
         selectedExpiry: prev.selectedExpiry,
         messageText: prev.messageText,
         results: prev.results,
@@ -733,16 +746,26 @@ class UploadNotifier extends Notifier<UploadState> {
     }
   }
 
-  /// Resets the image back to the original pre-crop bytes.
-  void resetCrop() {
+  static String _extensionForMime(String mime) {
+    return switch (mime) {
+      'image/png' => 'png',
+      'image/bmp' => 'bmp',
+      'image/tiff' || 'image/tif' => 'tiff',
+      _ => 'jpg',
+    };
+  }
+
+  /// Resets the image back to the original pre-edit bytes, filename, and
+  /// mime type.
+  void revertEdits() {
     if (_originalFileBytes == null) return;
     _lastFileBytes = _originalFileBytes;
     if (state is UploadFileSelected) {
       final prev = state as UploadFileSelected;
       state = UploadFileSelected(
-        fileName: prev.fileName.replaceAll('.jpg', '_original'),
+        fileName: _originalFileName ?? prev.fileName,
         fileSizeBytes: _originalFileBytes!.length,
-        mimeType: prev.mimeType,
+        mimeType: _originalMimeType ?? prev.mimeType,
         fileBytes: _originalFileBytes,
         selectedExpiry: prev.selectedExpiry,
         messageText: prev.messageText,
@@ -756,6 +779,8 @@ class UploadNotifier extends Notifier<UploadState> {
   void clearSelection() {
     _lastFileBytes = null;
     _originalFileBytes = null;
+    _originalFileName = null;
+    _originalMimeType = null;
     state = UploadIdle(
       results: state.results,
       selectedProviderIndex: state.selectedProviderIndex,

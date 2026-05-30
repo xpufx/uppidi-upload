@@ -76,6 +76,7 @@ Future<String?> exportConfig({WidgetRef? ref}) async {
     return saveFileOnAndroid(
       Uint8List.fromList(jsonBytes),
       'uppidi-export.json',
+      mimeType: 'application/json',
     );
   }
 

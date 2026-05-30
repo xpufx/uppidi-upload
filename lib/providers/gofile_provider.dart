@@ -1,0 +1,167 @@
+import 'package:dio/dio.dart';
+
+import '../core/interfaces/base_http_provider.dart';
+import '../core/interfaces/uploader.dart';
+import '../core/models/provider_metadata.dart';
+import '../core/models/upload_request.dart';
+import '../core/models/upload_result.dart';
+import '../core/platform/insecure_adapter.dart';
+import '../core/logging/log.dart';
+
+class GoFileProvider extends BaseHttpProvider {
+  late final Log _log = Log(runtimeType.toString());
+
+  @override
+  ProviderMetadata get metadata => const ProviderMetadata(
+        maxFileSizeBytes: null,
+        expiryInfo: '10 days without download (free tier)',
+        supportsDirectLink: false,
+      );
+
+  @override
+  String get providerId => 'gofile';
+
+  @override
+  String get providerName => 'GoFile';
+
+  @override
+  bool get supportsWeb => true;
+
+  @override
+  List<String> get requiredConfigKeys => [];
+
+  @override
+  Map<String, String> get configLabels => {};
+
+  @override
+  String? get proxyUrl => null;
+
+  @override
+  String get baseUrl => 'https://api.gofile.io';
+
+  @override
+  String get uploadEndpoint => '/servers';
+
+  @override
+  String get fileFormFieldName => 'file';
+
+  @override
+  Future<UploadResult> upload(
+    FileUploadRequest request, {
+    UploadProgressCallback? onProgress,
+    CancelToken? cancelToken,
+    Map<String, String> config = const {},
+  }) async {
+    try {
+      final allowInsecure = config['_allow_insecure_conn'] == 'true';
+      final proxyUrlValue = config['_proxy_url'];
+      final cleanConfig = Map<String, String>.from(config)
+        ..remove('_allow_insecure_conn')
+        ..remove('_proxy_url');
+
+      final dio = await createHttpClient(cleanConfig,
+          allowInsecureConn: allowInsecure, proxyUrl: proxyUrlValue);
+
+      final serverResponse = await dio.get('/servers');
+
+      if (serverResponse.statusCode != 200 ||
+          serverResponse.data is! Map<String, dynamic>) {
+        return UploadResult(
+          success: false,
+          errorMessage: 'genericError',
+          statusCode: serverResponse.statusCode,
+        );
+      }
+
+      final serverData = serverResponse.data as Map<String, dynamic>;
+      if (serverData['status'] != 'ok') {
+        return UploadResult(
+          success: false,
+          errorMessage: 'genericError',
+          statusCode: serverResponse.statusCode,
+        );
+      }
+
+      final servers = serverData['data']['servers'] as List;
+      if (servers.isEmpty) {
+        return UploadResult(
+          success: false,
+          errorMessage: 'genericError',
+          statusCode: serverResponse.statusCode,
+        );
+      }
+
+      final serverName = servers[0]['name'] as String;
+      final uploadUrl = 'https://$serverName.gofile.io/uploadFile';
+
+      final fields = <String, dynamic>{
+        fileFormFieldName: MultipartFile.fromStream(
+          () => request.dataStream,
+          request.sizeInBytes,
+          filename: request.fileName,
+          contentType: request.mimeType != null
+              ? DioMediaType.parse(request.mimeType!)
+              : null,
+        ),
+      };
+
+      final uploadDio = Dio(BaseOptions(
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        validateStatus: (_) => true,
+      ));
+
+      if (allowInsecure) {
+        configureInsecureConn(uploadDio);
+      }
+
+      if (proxyUrlValue != null && proxyUrlValue.isNotEmpty) {
+        configureProxy(uploadDio, proxyUrlValue);
+      }
+
+      final response = await uploadDio.post(
+        uploadUrl,
+        data: FormData.fromMap(fields),
+        onSendProgress: onProgress,
+        cancelToken: cancelToken,
+      );
+
+      return parseResponse(response);
+    } catch (e, stackTrace) {
+      _log.error('Upload failed: $e', error: e, stackTrace: stackTrace);
+      final statusCode = e is DioException ? e.response?.statusCode : null;
+      return UploadResult(
+        success: false,
+        errorMessage: mapException(e),
+        rawError: e.toString(),
+        statusCode: statusCode,
+        stackTrace: stackTrace.toString(),
+      );
+    }
+  }
+
+  @override
+  UploadResult parseResponse(Response response) {
+    if (response.statusCode == 200 && response.data is Map) {
+      final data = response.data as Map<String, dynamic>;
+      if (data['status'] == 'ok' && data['data'] is Map) {
+        final resultData = data['data'] as Map<String, dynamic>;
+        final downloadPage = resultData['downloadPage'] as String?;
+        if (downloadPage != null && downloadPage.isNotEmpty) {
+          return UploadResult(
+            success: true,
+            url: downloadPage,
+            statusCode: response.statusCode,
+          );
+        }
+      }
+    }
+
+    _log.warn('Unhandled error (returning genericError)');
+    return UploadResult(
+      success: false,
+      errorMessage: 'genericError',
+      statusCode: response.statusCode,
+    );
+  }
+}

@@ -93,7 +93,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get navProviders => 'Provider';
 
   @override
-  String get providersSection => 'I Miei Provider';
+  String get providersSection => 'Provider';
 
   @override
   String get historyClearAll => 'Cancella tutto';
@@ -837,4 +837,152 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get reloadZulipResources => 'Manage channels & users';
+
+  @override
+  String get undo => 'Indietro';
+
+  @override
+  String get redo => 'Ripeti';
+
+  @override
+  String get remove => 'Rimuovi';
+
+  @override
+  String get rotate => 'Ruota';
+
+  @override
+  String get flip => 'Capovolgi';
+
+  @override
+  String get ratio => 'Rapporto';
+
+  @override
+  String get reset => 'Reimposta';
+
+  @override
+  String get search => 'Cerca';
+
+  @override
+  String get none => 'Nessuno';
+
+  @override
+  String get color => 'Colore';
+
+  @override
+  String get opacity => 'Opacità';
+
+  @override
+  String get fill => 'Riempi';
+
+  @override
+  String get eraser => 'Gomma';
+
+  @override
+  String get lineWidth => 'Spessore linea';
+
+  @override
+  String get strokeWidth => 'Spessore tratto';
+
+  @override
+  String get edit => 'Modifica';
+
+  @override
+  String get brightness => 'Luminosità';
+
+  @override
+  String get contrast => 'Contrasto';
+
+  @override
+  String get saturation => 'Saturazione';
+
+  @override
+  String get exposure => 'Esposizione';
+
+  @override
+  String get hue => 'Tonalità';
+
+  @override
+  String get temperature => 'Temperatura';
+
+  @override
+  String get sharpness => 'Nitidezza';
+
+  @override
+  String get fade => 'Dissolvenza';
+
+  @override
+  String get textAlign => 'Allineamento';
+
+  @override
+  String get fontScale => 'Dimensione testo';
+
+  @override
+  String get backgroundMode => 'Sfondo';
+
+  @override
+  String get inputHintText => 'Inserisci testo...';
+
+  @override
+  String get closeEditorWarningTitle => 'Annullare le modifiche?';
+
+  @override
+  String get closeEditorWarningMessage =>
+      'Ci sono modifiche non salvate. Sei sicuro di volerle annullare?';
+
+  @override
+  String get closeEditorWarningConfirmBtn => 'Annulla';
+
+  @override
+  String get arrow => 'Freccia';
+
+  @override
+  String get line => 'Linea';
+
+  @override
+  String get rectangle => 'Rettangolo';
+
+  @override
+  String get circle => 'Cerchio';
+
+  @override
+  String get moveAndZoom => 'Sposta e Zoom';
+
+  @override
+  String get freestyle => 'Disegno libero';
+
+  @override
+  String get toggleFill => 'Attiva/disattiva riempimento';
+
+  @override
+  String get changeOpacity => 'Cambia opacità';
+
+  @override
+  String get back => 'Indietro';
+
+  @override
+  String get blurTool => 'Sfoca';
+
+  @override
+  String get emojiTool => 'Emoji';
+
+  @override
+  String get filterTool => 'Filtro';
+
+  @override
+  String get paintTool => 'Disegna';
+
+  @override
+  String get stickerTool => 'Adesivi';
+
+  @override
+  String get textTool => 'Testo';
+
+  @override
+  String get tuneTool => 'Regola';
+
+  @override
+  String get revertEdits => 'Annulla modifiche';
+
+  @override
+  String get editImage => 'Modifica immagine';
 }

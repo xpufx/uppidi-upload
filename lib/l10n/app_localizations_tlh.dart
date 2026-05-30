@@ -87,7 +87,7 @@ class AppLocalizationsTlh extends AppLocalizations {
   String get navProviders => 'ngeDna\'';
 
   @override
-  String get providersSection => 'QaHwI\'meywIj';
+  String get providersSection => 'QaHwI\'mey';
 
   @override
   String get historyClearAll => 'Hoch QIt';
@@ -822,4 +822,152 @@ class AppLocalizationsTlh extends AppLocalizations {
 
   @override
   String get reloadZulipResources => 'Manage channels & users';
+
+  @override
+  String get undo => 'lI\' QIt';
+
+  @override
+  String get redo => 'qa\' lI\'';
+
+  @override
+  String get remove => 'Qaw\'';
+
+  @override
+  String get rotate => 'mum';
+
+  @override
+  String get flip => 'choH';
+
+  @override
+  String get ratio => 'rap';
+
+  @override
+  String get reset => 'qa\' pat';
+
+  @override
+  String get search => 'nIv';
+
+  @override
+  String get none => 'pagh';
+
+  @override
+  String get color => 'lang';
+
+  @override
+  String get opacity => 'qab wov';
+
+  @override
+  String get fill => 'ngeb';
+
+  @override
+  String get eraser => 'Qaw\'wI\'';
+
+  @override
+  String get lineWidth => 'targh tIn';
+
+  @override
+  String get strokeWidth => 'targh tIn';
+
+  @override
+  String get edit => 'choH';
+
+  @override
+  String get brightness => 'wov';
+
+  @override
+  String get contrast => 'Qap';
+
+  @override
+  String get saturation => 'Do\'';
+
+  @override
+  String get exposure => 'leS';
+
+  @override
+  String get hue => 'lang nI\'';
+
+  @override
+  String get temperature => 'Hat';
+
+  @override
+  String get sharpness => 'pe\'';
+
+  @override
+  String get fade => 'vIH';
+
+  @override
+  String get textAlign => 'ghItlh pat';
+
+  @override
+  String get fontScale => 'ghItlh tIn';
+
+  @override
+  String get backgroundMode => 'Dung qab';
+
+  @override
+  String get inputHintText => 'ghItlh yIqel...';
+
+  @override
+  String get closeEditorWarningTitle => 'choH Qaw\'?';
+
+  @override
+  String get closeEditorWarningMessage =>
+      'choHmey yIqelbe\'. choH Qaw\'? DIch yIjatlh?';
+
+  @override
+  String get closeEditorWarningConfirmBtn => 'Qaw\'';
+
+  @override
+  String get arrow => 'bach\'';
+
+  @override
+  String get line => 'targh';
+
+  @override
+  String get rectangle => 'loDnal tet';
+
+  @override
+  String get circle => 'raq';
+
+  @override
+  String get moveAndZoom => 'vIH je tIn';
+
+  @override
+  String get freestyle => 'nItlh';
+
+  @override
+  String get toggleFill => 'ngeb choH';
+
+  @override
+  String get changeOpacity => 'qab wov choH';
+
+  @override
+  String get back => 'qa\'Daq';
+
+  @override
+  String get blurTool => 'pojh';
+
+  @override
+  String get emojiTool => 'qoQ';
+
+  @override
+  String get filterTool => 'vIt';
+
+  @override
+  String get paintTool => 'pIj';
+
+  @override
+  String get stickerTool => 'Qogh';
+
+  @override
+  String get textTool => 'ghItlh';
+
+  @override
+  String get tuneTool => 'QoQ';
+
+  @override
+  String get revertEdits => 'choH QIt';
+
+  @override
+  String get editImage => 'qab choH';
 }

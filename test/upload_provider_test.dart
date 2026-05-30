@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -56,6 +57,8 @@ class MockBaseUploader implements BaseUploader {
 
   @override
   bool get supportsWeb => _supportsWeb;
+  @override
+  bool get supportsMessage => false;
   @override
   bool get isUrlShareOnly => false;
 
@@ -679,6 +682,39 @@ void main() {
         'send_as_photo': 'true',
       });
       expect(fields['chat_id'], '12345');
+    });
+  });
+
+  group('isModified', () {
+    test('is false after file selection (no edits)', () async {
+      final notifier = container.read(uploadProvider.notifier);
+      await notifier.uploadFromFile(testFile.path, 'text/plain');
+      expect(notifier.isModified, false);
+    });
+
+    test('is true after applyEdit', () async {
+      final notifier = container.read(uploadProvider.notifier);
+      await notifier.uploadFromFile(testFile.path, 'text/plain');
+      notifier.applyEdit(Uint8List.fromList('modified content'.codeUnits));
+      expect(notifier.isModified, true);
+    });
+
+    test('returns to false after revertEdits', () async {
+      final notifier = container.read(uploadProvider.notifier);
+      await notifier.uploadFromFile(testFile.path, 'text/plain');
+      notifier.applyEdit(Uint8List.fromList('modified content'.codeUnits));
+      expect(notifier.isModified, true);
+      notifier.revertEdits();
+      expect(notifier.isModified, false);
+    });
+
+    test('is false after clearSelection', () async {
+      final notifier = container.read(uploadProvider.notifier);
+      await notifier.uploadFromFile(testFile.path, 'text/plain');
+      notifier.applyEdit(Uint8List.fromList('modified content'.codeUnits));
+      notifier.clearSelection();
+      // isModified should rely on _originalFileBytes being null
+      expect(notifier.isModified, false);
     });
   });
 }

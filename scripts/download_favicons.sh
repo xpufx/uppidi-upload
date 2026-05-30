@@ -19,6 +19,7 @@ DOMAINS[tempsh]="temp.sh"
 DOMAINS[frisk]="frisk.page"
 DOMAINS[litterbox]="litterbox.catbox.moe"
 DOMAINS[fileditch]="new.fileditch.com"
+DOMAINS[gofile]="gofile.io"
 
 echo "==> Downloading provider favicons..."
 

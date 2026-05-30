@@ -3,12 +3,14 @@ import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 import 'package:pro_image_editor/pro_image_editor.dart';
 
 import '../core/android_save.dart';
-
 import '../core/format.dart';
 import '../core/interfaces/uploader.dart';
+import '../core/editor_i18n.dart';
+import '../core/logging/log.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
 
@@ -37,7 +39,8 @@ class FilePreview extends StatefulWidget {
 }
 
 class _FilePreviewState extends State<FilePreview> {
-  bool _hasCropped = false;
+  bool _isModified = false;
+  Uint8List? _lastEditedBytes;
   Widget? _cachedImageWidget;
 
   AppLocalizations get _l10n => AppLocalizations.of(context);
@@ -52,7 +55,8 @@ class _FilePreviewState extends State<FilePreview> {
     super.didUpdateWidget(oldWidget);
     if (widget.fileBytes != oldWidget.fileBytes) {
       _cachedImageWidget = null;
-      _hasCropped = false;
+      _isModified = false;
+      _lastEditedBytes = null;
     }
   }
 
@@ -155,6 +159,27 @@ class _FilePreviewState extends State<FilePreview> {
             const Divider(),
             ...warnings,
           ],
+          if (_isModified) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.restore, size: 18),
+                  label: Text(_l10n.revertEdits),
+                  onPressed: () {
+                    widget.notifier.revertEdits();
+                    setState(() => _isModified = false);
+                  },
+                ),
+                const SizedBox(width: 8),
+                FilledButton.icon(
+                  icon: const Icon(Icons.save_outlined, size: 18),
+                  label: Text(_l10n.save),
+                  onPressed: _saveEditedCopy,
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -171,12 +196,12 @@ class _FilePreviewState extends State<FilePreview> {
           top: 4,
           right: 4,
           child: IconButton(
-            icon: Icon(_hasCropped ? Icons.restore : Icons.edit),
-            tooltip: _hasCropped ? _l10n.resetCrop : 'Edit image',
-            onPressed: _hasCropped
+            icon: Icon(_isModified ? Icons.restore : Icons.edit),
+            tooltip: _isModified ? _l10n.revertEdits : _l10n.editImage,
+            onPressed: _isModified
                 ? () {
-                    widget.notifier.resetCrop();
-                    setState(() => _hasCropped = false);
+                    widget.notifier.revertEdits();
+                    setState(() => _isModified = false);
                   }
                 : _openEditor,
             style: IconButton.styleFrom(
@@ -195,6 +220,19 @@ class _FilePreviewState extends State<FilePreview> {
   Future<void> _openEditor() async {
     if (widget.fileBytes == null) return;
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+
+    final decoded = img.decodeImage(widget.fileBytes!);
+    final dims =
+        decoded != null ? '${decoded.width}\u00d7${decoded.height}' : null;
+    final mimeLabel = widget.mimeType ?? 'image/jpeg';
+    final outputMime = _outputMimeType(widget.mimeType);
+    final outputFormat = _outputFormat(widget.mimeType);
+
+    final i18n = buildEditorI18n(l10n);
+    final log = Log('FilePreview');
+    log.debug('editor i18n: cancel="${i18n.cancel}" done="${i18n.done}"');
+
     final edited = await Navigator.push<Uint8List>(
       context,
       MaterialPageRoute(
@@ -204,50 +242,63 @@ class _FilePreviewState extends State<FilePreview> {
             onImageEditingComplete: (bytes) async =>
                 Navigator.pop(context, bytes),
           ),
-          configs: const ProImageEditorConfigs(
+          configs: ProImageEditorConfigs(
             imageGeneration: ImageGenerationConfigs(
-              outputFormat: OutputFormat.jpg,
+              outputFormat: outputFormat,
               jpegQuality: 100,
             ),
             designMode: ImageEditorDesignMode.cupertino,
+            i18n: i18n,
+            mainEditor: MainEditorConfigs(
+              widgets: MainEditorWidgets(
+                wrapBody: (_, __, content) => Stack(
+                  children: [
+                    content,
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: _ImageInfoBadge(
+                        dimensions: dims,
+                        fileSize: formatSize(widget.fileSize),
+                        mimeType: mimeLabel,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
     );
     if (edited == null || !mounted) return;
-    widget.notifier.applyCrop(edited);
-    setState(() => _hasCropped = true);
+    _lastEditedBytes = edited;
+    widget.notifier.applyEdit(edited, outputMimeType: outputMime);
+    setState(() => _isModified = true);
+  }
 
-    if (!mounted) return;
-    final saveResult = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Save a copy?'),
-        content: const Text('Save the edited image to disk'
-            ' in addition to uploading?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('No'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-    if (saveResult != true || !mounted) return;
-    final raw = edited;
+  Future<void> _saveEditedCopy() async {
+    final raw = _lastEditedBytes;
+    if (raw == null || !mounted) return;
+    final baseName = widget.fileName.replaceAll(RegExp(r'\.\w+$'), '');
+    final ext = _outputFormat(widget.mimeType) == OutputFormat.png
+        ? 'png'
+        : _outputFormat(widget.mimeType) == OutputFormat.bmp
+            ? 'bmp'
+            : 'jpg';
     String? savedPath;
     if (Platform.isAndroid) {
-      savedPath = await saveFileOnAndroid(raw, '${widget.fileName}_edited.jpg');
+      savedPath = await saveFileOnAndroid(
+        raw,
+        '$baseName.$ext',
+        mimeType: _outputMimeType(widget.mimeType),
+      );
     } else {
       savedPath = await FilePicker.saveFile(
         dialogTitle: 'Save edited image',
-        fileName: '${widget.fileName}_edited.jpg',
+        fileName: '$baseName.$ext',
         type: FileType.custom,
-        allowedExtensions: ['jpg', 'jpeg', 'png'],
+        allowedExtensions: [ext],
         bytes: raw,
       );
     }
@@ -296,6 +347,61 @@ class _FilePreviewState extends State<FilePreview> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  static OutputFormat _outputFormat(String? mimeType) {
+    return switch (mimeType) {
+      'image/png' => OutputFormat.png,
+      'image/bmp' => OutputFormat.bmp,
+      'image/tiff' || 'image/tif' => OutputFormat.tiff,
+      _ => OutputFormat.jpg,
+    };
+  }
+
+  static String _outputMimeType(String? mimeType) {
+    return switch (mimeType) {
+      'image/png' => 'image/png',
+      'image/bmp' => 'image/bmp',
+      'image/tiff' || 'image/tif' => 'image/tiff',
+      _ => 'image/jpeg',
+    };
+  }
+}
+
+class _ImageInfoBadge extends StatelessWidget {
+  const _ImageInfoBadge({
+    required this.dimensions,
+    required this.fileSize,
+    required this.mimeType,
+  });
+
+  final String? dimensions;
+  final String fileSize;
+  final String mimeType;
+
+  @override
+  Widget build(BuildContext context) {
+    final parts = <String>[
+      if (dimensions != null) dimensions!,
+      fileSize,
+      mimeType.split('/').last.toUpperCase(),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.black54,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        parts.join(' \u00b7 '),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }

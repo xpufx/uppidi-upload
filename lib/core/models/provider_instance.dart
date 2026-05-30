@@ -34,6 +34,9 @@ class ProviderInstance implements BaseUploader {
   bool get supportsWeb => _base.supportsWeb;
 
   @override
+  bool get supportsMessage => _base.supportsMessage;
+
+  @override
   bool get isUrlShareOnly => _urlOnly;
 
   @override

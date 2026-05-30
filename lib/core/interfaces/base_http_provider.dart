@@ -18,6 +18,9 @@ abstract class BaseHttpProvider implements BaseUploader {
   @override
   bool get isUrlShareOnly => false;
 
+  @override
+  bool get supportsMessage => false;
+
   String get baseUrl;
   String get uploadEndpoint;
   String get fileFormFieldName;

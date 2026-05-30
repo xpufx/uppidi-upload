@@ -11,12 +11,14 @@ const _channel = MethodChannel('com.uppidi.uppidi/export_save');
 
 Future<String?> saveFileOnAndroid(
   Uint8List bytes,
-  String fileName,
-) async {
+  String fileName, {
+  String mimeType = 'application/json',
+}) async {
   try {
     final path = await _channel.invokeMethod<String>('saveFile', {
       'bytes': bytes,
       'fileName': fileName,
+      'mimeType': mimeType,
     });
     return path;
   } on MissingPluginException {

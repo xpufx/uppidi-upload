@@ -31,6 +31,8 @@ class TestHttpProvider extends BaseHttpProvider {
 
   @override
   bool get supportsWeb => true;
+  @override
+  bool get supportsMessage => false;
 
   @override
   List<String> get requiredConfigKeys => const ['api_key'];

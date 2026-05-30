@@ -263,7 +263,7 @@ abstract class AppLocalizations {
   /// No description provided for @providersSection.
   ///
   /// In en, this message translates to:
-  /// **'My Providers'**
+  /// **'Providers'**
   String get providersSection;
 
   /// No description provided for @historyClearAll.
@@ -1567,6 +1567,300 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Load channels & users'**
   String get reloadZulipResources;
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// No description provided for @redo.
+  ///
+  /// In en, this message translates to:
+  /// **'Redo'**
+  String get redo;
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// No description provided for @rotate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate'**
+  String get rotate;
+
+  /// No description provided for @flip.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip'**
+  String get flip;
+
+  /// No description provided for @ratio.
+  ///
+  /// In en, this message translates to:
+  /// **'Aspect ratio'**
+  String get ratio;
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// No description provided for @none.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get none;
+
+  /// No description provided for @color.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get color;
+
+  /// No description provided for @opacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Opacity'**
+  String get opacity;
+
+  /// No description provided for @fill.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill'**
+  String get fill;
+
+  /// No description provided for @eraser.
+  ///
+  /// In en, this message translates to:
+  /// **'Eraser'**
+  String get eraser;
+
+  /// No description provided for @lineWidth.
+  ///
+  /// In en, this message translates to:
+  /// **'Line width'**
+  String get lineWidth;
+
+  /// No description provided for @strokeWidth.
+  ///
+  /// In en, this message translates to:
+  /// **'Stroke width'**
+  String get strokeWidth;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @brightness.
+  ///
+  /// In en, this message translates to:
+  /// **'Brightness'**
+  String get brightness;
+
+  /// No description provided for @contrast.
+  ///
+  /// In en, this message translates to:
+  /// **'Contrast'**
+  String get contrast;
+
+  /// No description provided for @saturation.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturation'**
+  String get saturation;
+
+  /// No description provided for @exposure.
+  ///
+  /// In en, this message translates to:
+  /// **'Exposure'**
+  String get exposure;
+
+  /// No description provided for @hue.
+  ///
+  /// In en, this message translates to:
+  /// **'Hue'**
+  String get hue;
+
+  /// No description provided for @temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get temperature;
+
+  /// No description provided for @sharpness.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharpness'**
+  String get sharpness;
+
+  /// No description provided for @fade.
+  ///
+  /// In en, this message translates to:
+  /// **'Fade'**
+  String get fade;
+
+  /// No description provided for @textAlign.
+  ///
+  /// In en, this message translates to:
+  /// **'Text align'**
+  String get textAlign;
+
+  /// No description provided for @fontScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Font size'**
+  String get fontScale;
+
+  /// No description provided for @backgroundMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Background'**
+  String get backgroundMode;
+
+  /// No description provided for @inputHintText.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter text...'**
+  String get inputHintText;
+
+  /// No description provided for @closeEditorWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes?'**
+  String get closeEditorWarningTitle;
+
+  /// No description provided for @closeEditorWarningMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have unsaved changes. Are you sure you want to discard them?'**
+  String get closeEditorWarningMessage;
+
+  /// No description provided for @closeEditorWarningConfirmBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get closeEditorWarningConfirmBtn;
+
+  /// No description provided for @arrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrow'**
+  String get arrow;
+
+  /// No description provided for @line.
+  ///
+  /// In en, this message translates to:
+  /// **'Line'**
+  String get line;
+
+  /// No description provided for @rectangle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rectangle'**
+  String get rectangle;
+
+  /// No description provided for @circle.
+  ///
+  /// In en, this message translates to:
+  /// **'Circle'**
+  String get circle;
+
+  /// No description provided for @moveAndZoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Move & Zoom'**
+  String get moveAndZoom;
+
+  /// No description provided for @freestyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Freestyle'**
+  String get freestyle;
+
+  /// No description provided for @toggleFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle fill'**
+  String get toggleFill;
+
+  /// No description provided for @changeOpacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Change opacity'**
+  String get changeOpacity;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @blurTool.
+  ///
+  /// In en, this message translates to:
+  /// **'Blur'**
+  String get blurTool;
+
+  /// No description provided for @emojiTool.
+  ///
+  /// In en, this message translates to:
+  /// **'Emoji'**
+  String get emojiTool;
+
+  /// No description provided for @filterTool.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filterTool;
+
+  /// No description provided for @paintTool.
+  ///
+  /// In en, this message translates to:
+  /// **'Paint'**
+  String get paintTool;
+
+  /// No description provided for @stickerTool.
+  ///
+  /// In en, this message translates to:
+  /// **'Stickers'**
+  String get stickerTool;
+
+  /// No description provided for @textTool.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get textTool;
+
+  /// No description provided for @tuneTool.
+  ///
+  /// In en, this message translates to:
+  /// **'Tune'**
+  String get tuneTool;
+
+  /// No description provided for @revertEdits.
+  ///
+  /// In en, this message translates to:
+  /// **'Revert edits'**
+  String get revertEdits;
+
+  /// No description provided for @editImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit image'**
+  String get editImage;
 }
 
 class _AppLocalizationsDelegate

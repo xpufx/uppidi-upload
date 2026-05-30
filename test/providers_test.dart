@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uppidi_upload/core/models/upload_request.dart';
+import 'package:uppidi_upload/providers/gofile_provider.dart';
 import 'package:uppidi_upload/providers/tmpfilelink_provider.dart';
 import 'package:uppidi_upload/providers/httpbin_provider.dart';
+import 'package:uppidi_upload/providers/telegram_provider.dart';
 import 'package:uppidi_upload/core/registry.dart';
 
 const _runLiveTests = bool.fromEnvironment('RUN_LIVE_TESTS');
@@ -116,5 +118,37 @@ void main() {
         skip: _runLiveTests
             ? null
             : 'Relies on live external service (httpbin.org)');
+  });
+
+  group('supportsMessage', () {
+    test('default is false for all registry providers', () {
+      for (final provider in ProviderRegistry.all) {
+        final shouldSupport = <String>{
+          'telegram',
+          'zulip',
+          'matterbridge',
+        }.contains(provider.providerId);
+        expect(provider.supportsMessage, shouldSupport,
+            reason:
+                '${provider.providerId} should supportMessage=$shouldSupport');
+      }
+    });
+
+    test('Telegram supports messages', () {
+      final provider = TelegramProvider();
+      expect(provider.supportsMessage, true);
+    });
+  });
+
+  group('GoFileProvider', () {
+    test('has correct metadata', () {
+      final provider = GoFileProvider();
+      expect(provider.providerId, 'gofile');
+      expect(provider.providerName, 'GoFile');
+      expect(provider.supportsWeb, true);
+      expect(provider.supportsMessage, false);
+      expect(provider.metadata.supportsDirectLink, false);
+      expect(provider.metadata.maxFileSizeBytes, isNull);
+    });
   });
 }

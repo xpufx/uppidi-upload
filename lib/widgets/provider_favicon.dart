@@ -26,6 +26,7 @@ class ProviderFavicon extends StatelessWidget {
     if (id.contains('fileditch')) return Icons.cloud_upload;
     if (id.contains('frisk')) return Icons.shield_outlined;
     if (id.contains('telegram')) return Icons.send_outlined;
+    if (id.contains('local')) return Icons.auto_fix_high;
     return Icons.cloud_upload;
   }
 

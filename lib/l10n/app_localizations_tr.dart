@@ -93,7 +93,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get navProviders => 'Sağlayıcılar';
 
   @override
-  String get providersSection => 'Sağlayıcılarım';
+  String get providersSection => 'Sağlayıcılar';
 
   @override
   String get historyClearAll => 'Tümünü temizle';
@@ -838,4 +838,152 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get reloadZulipResources => 'Manage channels & users';
+
+  @override
+  String get undo => 'Geri al';
+
+  @override
+  String get redo => 'Yinele';
+
+  @override
+  String get remove => 'Kaldır';
+
+  @override
+  String get rotate => 'Döndür';
+
+  @override
+  String get flip => 'Çevir';
+
+  @override
+  String get ratio => 'Oran';
+
+  @override
+  String get reset => 'Sıfırla';
+
+  @override
+  String get search => 'Ara';
+
+  @override
+  String get none => 'Hiçbiri';
+
+  @override
+  String get color => 'Renk';
+
+  @override
+  String get opacity => 'Saydamlık';
+
+  @override
+  String get fill => 'Doldur';
+
+  @override
+  String get eraser => 'Silgi';
+
+  @override
+  String get lineWidth => 'Çizgi kalınlığı';
+
+  @override
+  String get strokeWidth => 'Çizgi kalınlığı';
+
+  @override
+  String get edit => 'Düzenle';
+
+  @override
+  String get brightness => 'Parlaklık';
+
+  @override
+  String get contrast => 'Kontrast';
+
+  @override
+  String get saturation => 'Doygunluk';
+
+  @override
+  String get exposure => 'Pozlama';
+
+  @override
+  String get hue => 'Renk tonu';
+
+  @override
+  String get temperature => 'Sıcaklık';
+
+  @override
+  String get sharpness => 'Keskinlik';
+
+  @override
+  String get fade => 'Soldurma';
+
+  @override
+  String get textAlign => 'Hizalama';
+
+  @override
+  String get fontScale => 'Yazı boyutu';
+
+  @override
+  String get backgroundMode => 'Arka plan';
+
+  @override
+  String get inputHintText => 'Metin girin...';
+
+  @override
+  String get closeEditorWarningTitle => 'Değişiklikler atılsın mı?';
+
+  @override
+  String get closeEditorWarningMessage =>
+      'Kaydedilmemiş değişiklikler var. Bunları atmak istediğinize emin misiniz?';
+
+  @override
+  String get closeEditorWarningConfirmBtn => 'At';
+
+  @override
+  String get arrow => 'Ok';
+
+  @override
+  String get line => 'Çizgi';
+
+  @override
+  String get rectangle => 'Dikdörtgen';
+
+  @override
+  String get circle => 'Daire';
+
+  @override
+  String get moveAndZoom => 'Taşı ve Yakınlaştır';
+
+  @override
+  String get freestyle => 'Serbest çizim';
+
+  @override
+  String get toggleFill => 'Doldurmayı aç/kapat';
+
+  @override
+  String get changeOpacity => 'Saydamlığı değiştir';
+
+  @override
+  String get back => 'Geri';
+
+  @override
+  String get blurTool => 'Bulanıklaştır';
+
+  @override
+  String get emojiTool => 'Emoji';
+
+  @override
+  String get filterTool => 'Filtre';
+
+  @override
+  String get paintTool => 'Boyama';
+
+  @override
+  String get stickerTool => 'Çıkartmalar';
+
+  @override
+  String get textTool => 'Yazı';
+
+  @override
+  String get tuneTool => 'Ayarla';
+
+  @override
+  String get revertEdits => 'Düzenlemeleri geri al';
+
+  @override
+  String get editImage => 'Görseli düzenle';
 }

@@ -32,6 +32,11 @@ abstract class BaseUploader {
   /// non-null description appear as addable instance types.
   String? get instanceDescription => null;
 
+  /// Whether this provider supports user-provided messages/notes attached to
+  /// the upload (e.g. Telegram captions, IRC messages, Zulip content).
+  /// When false, the message input is hidden in the upload UI.
+  bool get supportsMessage => false;
+
   ProviderMetadata get metadata;
 
   Future<Dio> createHttpClient(

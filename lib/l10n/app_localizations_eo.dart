@@ -93,7 +93,7 @@ class AppLocalizationsEo extends AppLocalizations {
   String get navProviders => 'Provizantoj';
 
   @override
-  String get providersSection => 'Miaj Provizantoj';
+  String get providersSection => 'Provizantoj';
 
   @override
   String get historyClearAll => 'Forigi ĉion';
@@ -835,4 +835,152 @@ class AppLocalizationsEo extends AppLocalizations {
 
   @override
   String get reloadZulipResources => 'Manage channels & users';
+
+  @override
+  String get undo => 'Malfari';
+
+  @override
+  String get redo => 'Refari';
+
+  @override
+  String get remove => 'Forigi';
+
+  @override
+  String get rotate => 'Rotacii';
+
+  @override
+  String get flip => 'Respeguli';
+
+  @override
+  String get ratio => 'Proporcio';
+
+  @override
+  String get reset => 'Restarigi';
+
+  @override
+  String get search => 'Serĉi';
+
+  @override
+  String get none => 'Neniu';
+
+  @override
+  String get color => 'Koloro';
+
+  @override
+  String get opacity => 'Malmbrilo';
+
+  @override
+  String get fill => 'Plenigi';
+
+  @override
+  String get eraser => 'Viŝilo';
+
+  @override
+  String get lineWidth => 'Linilarĝo';
+
+  @override
+  String get strokeWidth => 'Streklarĝo';
+
+  @override
+  String get edit => 'Redakti';
+
+  @override
+  String get brightness => 'Heleco';
+
+  @override
+  String get contrast => 'Kontrasto';
+
+  @override
+  String get saturation => 'Satureco';
+
+  @override
+  String get exposure => 'Ekspono';
+
+  @override
+  String get hue => 'Nuanco';
+
+  @override
+  String get temperature => 'Temperaturo';
+
+  @override
+  String get sharpness => 'Akreco';
+
+  @override
+  String get fade => 'Forvelki';
+
+  @override
+  String get textAlign => 'Tekstordigo';
+
+  @override
+  String get fontScale => 'Tipara grando';
+
+  @override
+  String get backgroundMode => 'Fono';
+
+  @override
+  String get inputHintText => 'Enigu tekston...';
+
+  @override
+  String get closeEditorWarningTitle => 'Ĉu forigi ŝanĝojn?';
+
+  @override
+  String get closeEditorWarningMessage =>
+      'Vi havas nekonservitajn ŝanĝojn. Ĉu vi certas, ke vi volas forigi ilin?';
+
+  @override
+  String get closeEditorWarningConfirmBtn => 'Forigi';
+
+  @override
+  String get arrow => 'Sago';
+
+  @override
+  String get line => 'Linio';
+
+  @override
+  String get rectangle => 'Ortangulo';
+
+  @override
+  String get circle => 'Rondo';
+
+  @override
+  String get moveAndZoom => 'Movi kaj Zomi';
+
+  @override
+  String get freestyle => 'Liberstila';
+
+  @override
+  String get toggleFill => 'Baskuligi plenigon';
+
+  @override
+  String get changeOpacity => 'Ŝanĝi malmbrilon';
+
+  @override
+  String get back => 'Reen';
+
+  @override
+  String get blurTool => 'Malklarigi';
+
+  @override
+  String get emojiTool => 'Emoĝio';
+
+  @override
+  String get filterTool => 'Filtrilo';
+
+  @override
+  String get paintTool => 'Pentri';
+
+  @override
+  String get stickerTool => 'Glumarkoj';
+
+  @override
+  String get textTool => 'Teksto';
+
+  @override
+  String get tuneTool => 'Agordi';
+
+  @override
+  String get revertEdits => 'Malfari redaktojn';
+
+  @override
+  String get editImage => 'Redakti bildon';
 }

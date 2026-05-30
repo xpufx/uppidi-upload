@@ -174,7 +174,7 @@ if command -v flatpak-builder &>/dev/null; then
 	flatpak install -y --noninteractive --user flathub \
 		org.freedesktop.Platform//24.08 \
 		org.freedesktop.Sdk//24.08 2>/dev/null || true
-	if flatpak-builder --force-clean --repo=repo --default-branch="$VERSION" build-dir com.uppidi.uppidi.yml 2>&1; then
+	if flatpak-builder --disable-rofiles-fuse --force-clean --repo=repo --default-branch="$VERSION" build-dir com.uppidi.uppidi.yml 2>&1; then
 		flatpak build-bundle repo "${ARTIFACTS_DIR}/${FLATPAK_NAME}" com.uppidi.uppidi "$VERSION"
 		ln -sf "$FLATPAK_NAME" "${ARTIFACTS_DIR}/uppidi-upload-latest-linux.flatpak"
 		echo "    ${FLATPAK_NAME}"
@@ -207,28 +207,6 @@ if [ "$DEV" = false ]; then
 	fi
 fi
 
-# ── Feature test checklist ───────────────────────────────────
-echo ""
-echo "==> Test Checklist"
-echo ""
-cat <<'CHECKLIST'
-[ ] Upload: Pick file, preview shows, Upload button works
-[ ] Upload: Speed/progress animation during upload
-[ ] Upload: Retry button appears on failure, preview stays
-[ ] Upload: Cancel clears state, can upload again
-[ ] Share: Share icon opens templated message dialog
-[ ] Share: Info popup shows template variables + examples
-[ ] Providers: Test All + individual test buttons work
-[ ] Providers: Enable/disable toggle, reflects in Upload dropdown
-[ ] History: Records visible, delete + copy + share work
-[ ] Settings: Theme mode (System/Light/Dark) switches correctly
-[ ] Settings: Color presets apply instantly
-[ ] Settings: About card → View Changelog opens dialog
-[ ] Theme: Logo changes between light/dark mode
-[ ] Theme: Navigation buttons have visible colors
-[ ] Localization: Change language, no hardcoded English text
-[ ] Desktop: Drag-and-drop a file onto the upload area
-CHECKLIST
 echo ""
 echo "Happy testing! (${GIT_HASH})"
 

@@ -34,6 +34,8 @@ class MockTestUploader implements BaseUploader {
   @override
   bool get supportsWeb => true;
   @override
+  bool get supportsMessage => false;
+  @override
   bool get isUrlShareOnly => false;
 
   @override

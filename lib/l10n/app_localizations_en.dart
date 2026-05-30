@@ -92,7 +92,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navProviders => 'Providers';
 
   @override
-  String get providersSection => 'My Providers';
+  String get providersSection => 'Providers';
 
   @override
   String get historyClearAll => 'Clear all';
@@ -833,4 +833,152 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reloadZulipResources => 'Load channels & users';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String get redo => 'Redo';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get rotate => 'Rotate';
+
+  @override
+  String get flip => 'Flip';
+
+  @override
+  String get ratio => 'Aspect ratio';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get none => 'None';
+
+  @override
+  String get color => 'Color';
+
+  @override
+  String get opacity => 'Opacity';
+
+  @override
+  String get fill => 'Fill';
+
+  @override
+  String get eraser => 'Eraser';
+
+  @override
+  String get lineWidth => 'Line width';
+
+  @override
+  String get strokeWidth => 'Stroke width';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get brightness => 'Brightness';
+
+  @override
+  String get contrast => 'Contrast';
+
+  @override
+  String get saturation => 'Saturation';
+
+  @override
+  String get exposure => 'Exposure';
+
+  @override
+  String get hue => 'Hue';
+
+  @override
+  String get temperature => 'Temperature';
+
+  @override
+  String get sharpness => 'Sharpness';
+
+  @override
+  String get fade => 'Fade';
+
+  @override
+  String get textAlign => 'Text align';
+
+  @override
+  String get fontScale => 'Font size';
+
+  @override
+  String get backgroundMode => 'Background';
+
+  @override
+  String get inputHintText => 'Enter text...';
+
+  @override
+  String get closeEditorWarningTitle => 'Discard changes?';
+
+  @override
+  String get closeEditorWarningMessage =>
+      'You have unsaved changes. Are you sure you want to discard them?';
+
+  @override
+  String get closeEditorWarningConfirmBtn => 'Discard';
+
+  @override
+  String get arrow => 'Arrow';
+
+  @override
+  String get line => 'Line';
+
+  @override
+  String get rectangle => 'Rectangle';
+
+  @override
+  String get circle => 'Circle';
+
+  @override
+  String get moveAndZoom => 'Move & Zoom';
+
+  @override
+  String get freestyle => 'Freestyle';
+
+  @override
+  String get toggleFill => 'Toggle fill';
+
+  @override
+  String get changeOpacity => 'Change opacity';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get blurTool => 'Blur';
+
+  @override
+  String get emojiTool => 'Emoji';
+
+  @override
+  String get filterTool => 'Filter';
+
+  @override
+  String get paintTool => 'Paint';
+
+  @override
+  String get stickerTool => 'Stickers';
+
+  @override
+  String get textTool => 'Text';
+
+  @override
+  String get tuneTool => 'Tune';
+
+  @override
+  String get revertEdits => 'Revert edits';
+
+  @override
+  String get editImage => 'Edit image';
 }
