@@ -14,6 +14,41 @@ const _editorBg = Color(0xFF161616);
 const _appBarBg = Color(0xFF000000);
 const _bottomBarBg = Color(0xFF000000);
 
+const _checkSize = 12.0;
+const _checkLight = Color(0xFFD9D9D9);
+const _checkDark = Color(0xFFBFBFBF);
+
+class _CheckeredPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint();
+    final cols = (size.width / _checkSize).ceil();
+    final rows = (size.height / _checkSize).ceil();
+    for (var y = 0; y < rows; y++) {
+      for (var x = 0; x < cols; x++) {
+        paint.color = (x + y).isEven ? _checkLight : _checkDark;
+        canvas.drawRect(
+          Rect.fromLTWH(x * _checkSize, y * _checkSize, _checkSize, _checkSize),
+          paint,
+        );
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+Widget checkeredWrapBody(
+    ProImageEditorState editor, Stream<void> stream, Widget content) {
+  return Stack(
+    children: [
+      Positioned.fill(child: CustomPaint(painter: _CheckeredPainter())),
+      content,
+    ],
+  );
+}
+
 Future<Uint8List?> openImageEditor(
   BuildContext context, {
   required Uint8List imageBytes,
@@ -104,6 +139,7 @@ MainEditorConfigs _buildMainEditorConfigs(
         stream: rebuildStream,
         builder: (_) => _buildAppBar(editor, fileName: fileName),
       ),
+      wrapBody: checkeredWrapBody,
     ),
   );
 }

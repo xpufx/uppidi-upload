@@ -7,6 +7,7 @@ import 'package:pro_image_editor/pro_image_editor.dart';
 
 import '../core/android_save.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/image_editor.dart';
 
 enum _ScreenState { picker, editing, preview }
 
@@ -154,6 +155,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               stream: rebuildStream,
               builder: (_) => _buildEditorAppBar(editor),
             ),
+            wrapBody: checkeredWrapBody,
           ),
         ),
         paintEditor: PaintEditorConfigs(
