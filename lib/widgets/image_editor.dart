@@ -8,12 +8,6 @@ import 'package:pro_image_editor/pro_image_editor.dart';
 import '../core/android_save.dart';
 import '../l10n/app_localizations.dart';
 
-const _defaultOutputFormat = OutputFormat.jpg;
-
-const _editorBg = Color(0xFF161616);
-const _appBarBg = Color(0xFF000000);
-const _bottomBarBg = Color(0xFF000000);
-
 const _checkSize = 12.0;
 const _checkLight = Color(0xFFD9D9D9);
 const _checkDark = Color(0xFFBFBFBF);
@@ -47,16 +41,79 @@ class _CheckeredPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-Widget checkeredWrapBody(
-    ProImageEditorState editor, Stream<void> stream, Widget content) {
-  final isDark = Theme.of(editor.context).brightness == Brightness.dark;
+Widget _checkeredStack(BuildContext context, Widget child) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
   return Stack(
     children: [
       Positioned.fill(
         child: CustomPaint(painter: _CheckeredPainter(isDark: isDark)),
       ),
-      content,
+      child,
     ],
+  );
+}
+
+ProImageEditorConfigs _themedConfigs(ThemeData? theme) {
+  final cs = theme?.colorScheme;
+  final fg = cs?.onSurface ?? Colors.white;
+  return ProImageEditorConfigs(
+    theme: theme,
+    imageGeneration: const ImageGenerationConfigs(
+      outputFormat: OutputFormat.jpg,
+      jpegQuality: 100,
+    ),
+    designMode: ImageEditorDesignMode.cupertino,
+    mainEditor: MainEditorConfigs(
+      enableSubEditorPage: true,
+      style: MainEditorStyle(
+        background: Colors.transparent,
+        appBarBackground: cs?.surfaceContainerLow ?? const Color(0xFF000000),
+        appBarColor: fg,
+        bottomBarBackground: cs?.surfaceContainer ?? const Color(0xFF000000),
+        bottomBarColor: cs?.onSurfaceVariant ?? Colors.white,
+      ),
+      widgets: MainEditorWidgets(
+        appBar: (editor, rebuildStream) => ReactiveAppbar(
+          stream: rebuildStream,
+          builder: (_) => _buildAppBar(editor),
+        ),
+      ),
+    ),
+    paintEditor: PaintEditorConfigs(
+      style: PaintEditorStyle(
+        background: Colors.transparent,
+        bottomBarBackground: Colors.transparent,
+        bottomBarActiveItemColor: cs?.primary ?? const Color(0xFF004C9E),
+        bottomBarInactiveItemColor: cs?.onSurfaceVariant ?? Colors.white,
+      ),
+    ),
+    textEditor: TextEditorConfigs(
+      style: TextEditorStyle(
+        background: Colors.transparent,
+        bottomBarBackground: Colors.transparent,
+      ),
+    ),
+    cropRotateEditor: CropRotateEditorConfigs(
+      style: CropRotateEditorStyle(
+        background: Colors.transparent,
+        bottomBarBackground: Colors.transparent,
+      ),
+    ),
+    filterEditor: FilterEditorConfigs(
+      style: FilterEditorStyle(background: Colors.transparent),
+    ),
+    tuneEditor: TuneEditorConfigs(
+      style: TuneEditorStyle(
+        background: Colors.transparent,
+        bottomBarBackground: Colors.transparent,
+      ),
+    ),
+    blurEditor: BlurEditorConfigs(
+      style: BlurEditorStyle(background: Colors.transparent),
+    ),
+    emojiEditor: EmojiEditorConfigs(
+      style: EmojiEditorStyle(backgroundColor: Colors.transparent),
+    ),
   );
 }
 
@@ -64,101 +121,68 @@ Future<Uint8List?> openImageEditor(
   BuildContext context, {
   required Uint8List imageBytes,
   String? fileName,
-  OutputFormat outputFormat = _defaultOutputFormat,
+  OutputFormat outputFormat = OutputFormat.jpg,
   int jpegQuality = 100,
   ThemeData? theme,
   I18n? i18n,
 }) {
-  final cs = theme?.colorScheme;
-  final editorBg = cs?.surface ?? _editorBg;
+  final configs = _themedConfigs(theme).copyWith(
+    imageGeneration: ImageGenerationConfigs(
+      outputFormat: outputFormat,
+      jpegQuality: jpegQuality,
+    ),
+    i18n: i18n ?? const I18n(),
+  );
 
   return Navigator.push<Uint8List>(
     context,
     MaterialPageRoute(
-      builder: (_) => ProImageEditor.memory(
-        imageBytes,
-        callbacks: ProImageEditorCallbacks(
-          onImageEditingComplete: (bytes) async =>
-              Navigator.pop(context, bytes),
-        ),
-        configs: ProImageEditorConfigs(
-          theme: theme,
-          i18n: i18n ?? const I18n(),
-          imageGeneration: ImageGenerationConfigs(
-            outputFormat: outputFormat,
-            jpegQuality: jpegQuality,
+      builder: (_) => _checkeredStack(
+        context,
+        ProImageEditor.memory(
+          imageBytes,
+          callbacks: ProImageEditorCallbacks(
+            onImageEditingComplete: (bytes) async =>
+                Navigator.pop(context, bytes),
           ),
-          designMode: ImageEditorDesignMode.cupertino,
-          mainEditor: _buildMainEditorConfigs(editorBg, cs, fileName),
-          paintEditor: PaintEditorConfigs(
-            style: PaintEditorStyle(
-              background: editorBg,
-              bottomBarActiveItemColor: cs?.primary ?? const Color(0xFF004C9E),
-              bottomBarInactiveItemColor: cs?.onSurfaceVariant ?? Colors.white,
-            ),
-          ),
-          textEditor: TextEditorConfigs(
-            style: TextEditorStyle(
-              background: editorBg,
-              bottomBarBackground: cs?.surfaceContainer ?? _bottomBarBg,
-            ),
-          ),
-          cropRotateEditor: CropRotateEditorConfigs(
-            style: CropRotateEditorStyle(
-              background: editorBg,
-              bottomBarBackground: cs?.surfaceContainer ?? _bottomBarBg,
-            ),
-          ),
-          filterEditor: FilterEditorConfigs(
-            style: FilterEditorStyle(background: editorBg),
-          ),
-          tuneEditor: TuneEditorConfigs(
-            style: TuneEditorStyle(
-              background: editorBg,
-              bottomBarBackground: cs?.surfaceContainer ?? _bottomBarBg,
-            ),
-          ),
-          blurEditor: BlurEditorConfigs(
-            style: BlurEditorStyle(background: editorBg),
-          ),
-          emojiEditor: EmojiEditorConfigs(
-            style: EmojiEditorStyle(backgroundColor: editorBg),
-          ),
+          configs: configs,
         ),
       ),
     ),
   );
 }
 
-MainEditorConfigs _buildMainEditorConfigs(
-  Color editorBg,
-  ColorScheme? cs,
-  String? fileName,
-) {
-  final bottomFg = cs?.onSurfaceVariant ?? Colors.white;
-  return MainEditorConfigs(
-    enableSubEditorPage: true,
-    style: MainEditorStyle(
-      background: Colors.transparent,
-      appBarBackground: cs?.surfaceContainerLow ?? _appBarBg,
-      bottomBarBackground: cs?.surfaceContainer ?? _bottomBarBg,
-      bottomBarColor: bottomFg,
-      appBarColor: cs?.onSurface ?? Colors.white,
-    ),
-    widgets: MainEditorWidgets(
-      appBar: (editor, rebuildStream) => ReactiveAppbar(
-        stream: rebuildStream,
-        builder: (_) => _buildAppBar(editor, fileName: fileName),
-      ),
-      wrapBody: checkeredWrapBody,
-    ),
-  );
-}
-
-AppBar _buildAppBar(
-  ProImageEditorState editor, {
-  String? fileName,
+Widget buildCheckeredEditor({
+  required Uint8List imageBytes,
+  required ProImageEditorCallbacks callbacks,
+  Key? key,
+  ThemeData? theme,
+  OutputFormat outputFormat = OutputFormat.jpg,
+  int jpegQuality = 100,
+  I18n? i18n,
 }) {
+  final configs = _themedConfigs(theme).copyWith(
+    imageGeneration: ImageGenerationConfigs(
+      outputFormat: outputFormat,
+      jpegQuality: jpegQuality,
+    ),
+    i18n: i18n ?? const I18n(),
+  );
+
+  return Builder(
+    builder: (ctx) => _checkeredStack(
+      ctx,
+      ProImageEditor.memory(
+        imageBytes,
+        key: key,
+        callbacks: callbacks,
+        configs: configs,
+      ),
+    ),
+  );
+}
+
+AppBar _buildAppBar(ProImageEditorState editor) {
   final context = editor.context;
   final l10n = AppLocalizations.of(context);
   final isLight = Theme.of(context).brightness == Brightness.light;
@@ -176,7 +200,7 @@ AppBar _buildAppBar(
       IconButton(
         icon: Icon(Icons.save_alt, color: fg),
         tooltip: l10n.saveToFile,
-        onPressed: () => _saveToFile(editor, fileName: fileName),
+        onPressed: () => _saveToFile(editor),
       ),
       IconButton(
         icon: Icon(Icons.undo,

@@ -82,7 +82,15 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   Widget build(BuildContext context) {
     return switch (_state) {
       _ScreenState.picker => _buildPicker(),
-      _ScreenState.editing => _buildEditor(),
+      _ScreenState.editing => buildCheckeredEditor(
+          imageBytes: _originalBytes!,
+          key: ValueKey(_editorKey),
+          theme: Theme.of(context),
+          callbacks: ProImageEditorCallbacks(
+            onImageEditingComplete: _onImageEditingComplete,
+            onCloseEditor: _onCloseEditor,
+          ),
+        ),
       _ScreenState.preview => _buildPreview(),
     };
   }
@@ -117,128 +125,6 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildEditor() {
-    if (_originalBytes == null) return _buildPicker();
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final editorBg = cs.surface;
-    final barFg = cs.onSurface;
-    final bottomFg = cs.onSurfaceVariant;
-
-    return ProImageEditor.memory(
-      _originalBytes!,
-      key: ValueKey(_editorKey),
-      callbacks: ProImageEditorCallbacks(
-        onImageEditingComplete: _onImageEditingComplete,
-        onCloseEditor: _onCloseEditor,
-      ),
-      configs: ProImageEditorConfigs(
-        theme: theme,
-        imageGeneration: const ImageGenerationConfigs(
-          outputFormat: OutputFormat.jpg,
-          jpegQuality: 100,
-        ),
-        designMode: ImageEditorDesignMode.cupertino,
-        mainEditor: MainEditorConfigs(
-          enableSubEditorPage: true,
-          style: MainEditorStyle(
-            background: Colors.transparent,
-            appBarBackground: cs.surfaceContainerLow,
-            appBarColor: barFg,
-            bottomBarBackground: cs.surfaceContainer,
-            bottomBarColor: bottomFg,
-          ),
-          widgets: MainEditorWidgets(
-            appBar: (editor, rebuildStream) => ReactiveAppbar(
-              stream: rebuildStream,
-              builder: (_) => _buildEditorAppBar(editor),
-            ),
-            wrapBody: checkeredWrapBody,
-          ),
-        ),
-        paintEditor: PaintEditorConfigs(
-          style: PaintEditorStyle(
-            background: editorBg,
-            bottomBarActiveItemColor: cs.primary,
-            bottomBarInactiveItemColor: bottomFg,
-          ),
-        ),
-        textEditor: TextEditorConfigs(
-          style: TextEditorStyle(
-            background: editorBg,
-            bottomBarBackground: cs.surfaceContainer,
-          ),
-        ),
-        cropRotateEditor: CropRotateEditorConfigs(
-          style: CropRotateEditorStyle(
-            background: editorBg,
-            bottomBarBackground: cs.surfaceContainer,
-          ),
-        ),
-        filterEditor: FilterEditorConfigs(
-          style: FilterEditorStyle(background: editorBg),
-        ),
-        tuneEditor: TuneEditorConfigs(
-          style: TuneEditorStyle(
-            background: editorBg,
-            bottomBarBackground: cs.surfaceContainer,
-          ),
-        ),
-        blurEditor: BlurEditorConfigs(
-          style: BlurEditorStyle(background: editorBg),
-        ),
-        emojiEditor: EmojiEditorConfigs(
-          style: EmojiEditorStyle(backgroundColor: editorBg),
-        ),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildEditorAppBar(ProImageEditorState editor) {
-    final context = editor.context;
-    final l10n = AppLocalizations.of(context);
-    final isLight = Theme.of(context).brightness == Brightness.light;
-    final fg = isLight ? Colors.black87 : Colors.white;
-    return AppBar(
-      automaticallyImplyLeading: false,
-      foregroundColor: fg,
-      actions: [
-        IconButton(
-          icon: Icon(Icons.close, color: fg),
-          tooltip: l10n.cancel,
-          onPressed: editor.closeEditor,
-        ),
-        const Spacer(),
-        IconButton(
-          icon: Icon(Icons.save_alt, color: fg),
-          tooltip: l10n.saveToFile,
-          onPressed: () => _saveToFileInline(editor),
-        ),
-        IconButton(
-          icon: Icon(Icons.undo,
-              color: editor.canUndo == true ? fg : fg.withAlpha(80)),
-          onPressed: editor.canUndo == true ? editor.undoAction : null,
-        ),
-        IconButton(
-          icon: Icon(Icons.redo,
-              color: editor.canRedo == true ? fg : fg.withAlpha(80)),
-          onPressed: editor.canRedo == true ? editor.redoAction : null,
-        ),
-        IconButton(
-          icon: Icon(Icons.done, color: fg),
-          tooltip: l10n.done,
-          onPressed: editor.doneEditing,
-        ),
-      ],
-    );
-  }
-
-  Future<void> _saveToFileInline(ProImageEditorState editor) async {
-    final bytes = await editor.captureEditorImage();
-    if (bytes.isEmpty) return;
-    await _saveToDisk(bytes);
   }
 
   Widget _buildPreview() {

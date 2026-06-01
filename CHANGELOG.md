@@ -1,5 +1,7 @@
 # Changelog
 
+- fix: nav order → Upload, Image Editor, History, Providers, Settings
+- fix: theme-aware checkered colors (light/dark) + transparent editor bg
 - fix: transparent editor background so checkered wrapBody shows through
 - feat: checkered transparency grid behind editor canvas
 - fix: editor icons visible in light mode + sub-editors stay within tab
@@ -28,5 +30,3 @@
 - fix: flatpak D-Bus secrets, icon sizes, graceful KeyringLocked exit
 - fix: flatpak version branch, macOS/iOS .app wildcard, iOS 14.0 target
 - docs: add rule to never attempt privilege escalation
-- docs: remove web from supported platforms
-- docs: fix 'desktop-first' to 'desktop drag & drop'
