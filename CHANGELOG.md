@@ -1,5 +1,6 @@
 # Changelog
 
+- refactor: global checkered stack above ProImageEditor + all transparent backgrounds
 - fix: nav order → Upload, Image Editor, History, Providers, Settings
 - fix: theme-aware checkered colors (light/dark) + transparent editor bg
 - fix: transparent editor background so checkered wrapBody shows through
@@ -29,4 +30,3 @@
 - fix: flatpak version in flatpak list, add .flatpak-builder to gitignore
 - fix: flatpak D-Bus secrets, icon sizes, graceful KeyringLocked exit
 - fix: flatpak version branch, macOS/iOS .app wildcard, iOS 14.0 target
-- docs: add rule to never attempt privilege escalation

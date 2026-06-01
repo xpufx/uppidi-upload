@@ -94,6 +94,7 @@ ProImageEditorConfigs _themedConfigs(ThemeData? theme) {
       ),
     ),
     cropRotateEditor: CropRotateEditorConfigs(
+      animationDuration: Duration.zero,
       style: CropRotateEditorStyle(
         background: Colors.transparent,
         bottomBarBackground: Colors.transparent,
