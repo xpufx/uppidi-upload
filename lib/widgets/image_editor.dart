@@ -128,7 +128,7 @@ MainEditorConfigs _buildMainEditorConfigs(
   return MainEditorConfigs(
     enableSubEditorPage: true,
     style: MainEditorStyle(
-      background: editorBg,
+      background: Colors.transparent,
       appBarBackground: cs?.surfaceContainerLow ?? _appBarBg,
       bottomBarBackground: cs?.surfaceContainer ?? _bottomBarBg,
       bottomBarColor: bottomFg,

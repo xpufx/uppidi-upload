@@ -144,7 +144,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         mainEditor: MainEditorConfigs(
           enableSubEditorPage: true,
           style: MainEditorStyle(
-            background: editorBg,
+            background: Colors.transparent,
             appBarBackground: cs.surfaceContainerLow,
             appBarColor: barFg,
             bottomBarBackground: cs.surfaceContainer,
