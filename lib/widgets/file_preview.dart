@@ -233,6 +233,10 @@ class _FilePreviewState extends State<FilePreview> {
     final log = Log('FilePreview');
     log.debug('editor i18n: cancel="${i18n.cancel}" done="${i18n.done}"');
 
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final editorBg = cs.surface;
+
     final edited = await Navigator.push<Uint8List>(
       context,
       MaterialPageRoute(
@@ -243,6 +247,7 @@ class _FilePreviewState extends State<FilePreview> {
                 Navigator.pop(context, bytes),
           ),
           configs: ProImageEditorConfigs(
+            theme: theme,
             imageGeneration: ImageGenerationConfigs(
               outputFormat: outputFormat,
               jpegQuality: 100,
@@ -250,6 +255,11 @@ class _FilePreviewState extends State<FilePreview> {
             designMode: ImageEditorDesignMode.cupertino,
             i18n: i18n,
             mainEditor: MainEditorConfigs(
+              style: MainEditorStyle(
+                background: editorBg,
+                appBarBackground: cs.surfaceContainerLow,
+                bottomBarBackground: cs.surfaceContainer,
+              ),
               widgets: MainEditorWidgets(
                 wrapBody: (_, __, content) => Stack(
                   children: [
@@ -266,6 +276,27 @@ class _FilePreviewState extends State<FilePreview> {
                   ],
                 ),
               ),
+            ),
+            paintEditor: PaintEditorConfigs(
+              style: PaintEditorStyle(background: editorBg),
+            ),
+            textEditor: TextEditorConfigs(
+              style: TextEditorStyle(background: editorBg),
+            ),
+            cropRotateEditor: CropRotateEditorConfigs(
+              style: CropRotateEditorStyle(background: editorBg),
+            ),
+            filterEditor: FilterEditorConfigs(
+              style: FilterEditorStyle(background: editorBg),
+            ),
+            tuneEditor: TuneEditorConfigs(
+              style: TuneEditorStyle(background: editorBg),
+            ),
+            blurEditor: BlurEditorConfigs(
+              style: BlurEditorStyle(background: editorBg),
+            ),
+            emojiEditor: EmojiEditorConfigs(
+              style: EmojiEditorStyle(backgroundColor: editorBg),
             ),
           ),
         ),
