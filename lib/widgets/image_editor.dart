@@ -97,37 +97,35 @@ AppBar _buildAppBar(
 }) {
   final context = editor.context;
   final l10n = AppLocalizations.of(context);
+  final cs = Theme.of(context).colorScheme;
+  final fg = cs.onSurface;
   return AppBar(
     automaticallyImplyLeading: false,
-    foregroundColor: Colors.white,
+    foregroundColor: fg,
     actions: [
       IconButton(
-        icon: const Icon(Icons.close),
+        icon: Icon(Icons.close, color: fg),
         tooltip: l10n.cancel,
         onPressed: editor.closeEditor,
       ),
       const Spacer(),
       IconButton(
-        icon: const Icon(Icons.save_alt),
+        icon: Icon(Icons.save_alt, color: fg),
         tooltip: l10n.saveToFile,
         onPressed: () => _saveToFile(editor, fileName: fileName),
       ),
       IconButton(
         icon: Icon(Icons.undo,
-            color: editor.canUndo == true
-                ? Colors.white
-                : Colors.white.withAlpha(80)),
+            color: editor.canUndo == true ? fg : fg.withAlpha(80)),
         onPressed: editor.canUndo == true ? editor.undoAction : null,
       ),
       IconButton(
         icon: Icon(Icons.redo,
-            color: editor.canRedo == true
-                ? Colors.white
-                : Colors.white.withAlpha(80)),
+            color: editor.canRedo == true ? fg : fg.withAlpha(80)),
         onPressed: editor.canRedo == true ? editor.redoAction : null,
       ),
       IconButton(
-        icon: const Icon(Icons.done),
+        icon: Icon(Icons.done, color: fg),
         tooltip: l10n.done,
         onPressed: editor.doneEditing,
       ),
