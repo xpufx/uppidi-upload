@@ -222,6 +222,7 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
       _NavTab.history => const _ScreenLookup(screen: AppScreen.history),
       _NavTab.providers => const _ScreenLookup(screen: AppScreen.providers),
       _NavTab.settings => const _ScreenLookup(screen: AppScreen.settings),
+      _NavTab.imageEditor => const _ScreenLookup(screen: AppScreen.imageEditor),
     };
 
     if (!devProviders) return screen;
@@ -267,7 +268,7 @@ class _ScreenLookup extends StatelessWidget {
   }
 }
 
-enum _NavTab { upload, history, providers, settings }
+enum _NavTab { upload, history, providers, settings, imageEditor }
 
 extension on _NavTab {
   String label(AppLocalizations l10n) => switch (this) {
@@ -275,6 +276,7 @@ extension on _NavTab {
         _NavTab.history => l10n.history,
         _NavTab.providers => l10n.navProviders,
         _NavTab.settings => l10n.settings,
+        _NavTab.imageEditor => l10n.navImageEditor,
       };
 
   IconData get icon => switch (this) {
@@ -282,5 +284,6 @@ extension on _NavTab {
         _NavTab.history => Icons.history,
         _NavTab.providers => Icons.dns,
         _NavTab.settings => Icons.settings,
+        _NavTab.imageEditor => Icons.edit,
       };
 }

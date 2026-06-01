@@ -970,4 +970,25 @@ class AppLocalizationsTlh extends AppLocalizations {
 
   @override
   String get editImage => 'qab choH';
+
+  @override
+  String get navImageEditor => 'Image Editor';
+
+  @override
+  String get saveToFile => 'DochDaq yIqel';
+
+  @override
+  String get imageSaved => 'qab yIqel';
+
+  @override
+  String get selectImageToEdit => 'choHmeH qab yIghoS';
+
+  @override
+  String get saveEditedImage => 'choH qab yIqel';
+
+  @override
+  String get editAgain => 'qa\'choH';
+
+  @override
+  String get openNewImage => 'qab chu\' yIpoQ';
 }

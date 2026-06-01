@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'history_screen.dart';
+import 'image_editor_screen.dart';
 import 'settings_screen.dart';
 import 'test_screen.dart';
 import 'upload_screen.dart';
@@ -10,7 +11,7 @@ import 'upload_screen.dart';
 /// Each concrete ShellStrategy interprets these screens according to its
 /// own paradigm (tabs switch to the screen, modals open it as a dialog,
 /// etc.). Screens are never aware of which strategy is active.
-enum AppScreen { upload, history, providers, settings }
+enum AppScreen { upload, history, providers, settings, imageEditor }
 
 /// Signature for building a screen widget.
 typedef ScreenBuilder = Widget Function();
@@ -44,6 +45,7 @@ class ScreenRegistry {
       AppScreen.history => const HistoryScreen(),
       AppScreen.providers => const TestScreen(),
       AppScreen.settings => const SettingsScreen(),
+      AppScreen.imageEditor => const ImageEditorScreen(),
     };
   }
 }

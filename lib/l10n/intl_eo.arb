@@ -297,5 +297,13 @@
   "tuneTool": "Agordi",
 
   "revertEdits": "Malfari redaktojn",
-  "editImage": "Redakti bildon"
+  "editImage": "Redakti bildon",
+
+  "navImageEditor": "Image Editor",
+  "saveToFile": "Konservi al dosiero",
+  "imageSaved": "Bildo konservita",
+  "selectImageToEdit": "Elektu bildon por redakti",
+  "saveEditedImage": "Konservi redaktitan bildon",
+  "editAgain": "Redakti denove",
+  "openNewImage": "Malfermi novan bildon"
 }

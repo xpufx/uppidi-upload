@@ -48,6 +48,10 @@ git_hash() {
 
 VER="$(app_version)"
 HASH="$(git_hash)"
+DEST_DIR="${OVERRIDE_ARTIFACTS_DIR:-${PROJECT_DIR}/.caddy-artifacts}"
+mkdir -p "$DEST_DIR"
+FILENAME="uppidi-upload-${VER}-${HASH}-x86_64.AppImage"
+LINK="${DEST_DIR}/uppidi-upload-latest-x86_64.AppImage"
 
 echo ""
 echo -e "${BOLD}═══ Uppidi AppImage Build ═══${NC}"
@@ -128,7 +132,7 @@ find "$APPDIR" -maxdepth 2 -not -path '*/flutter_assets/*' -not -path '*/share/i
 echo ""
 echo -e "${BOLD}Step 3: Building AppImage...${NC}"
 
-OUTPUT="${PROJECT_DIR}/uppidi-upload-${VER}-${HASH}-x86_64.AppImage"
+OUTPUT="${DEST_DIR}/${FILENAME}"
 SFS="${PROJECT_DIR}/.tmp.squashfs"
 
 # Create SquashFS filesystem (write to temp, then prepend runtime)
@@ -146,20 +150,9 @@ fi
 pass "AppImage built: $(ls -lh "$OUTPUT" | awk '{print $5}')"
 echo "  $OUTPUT"
 
-# ── Step 4: Deploy to .caddy-artifacts/ ────────────────────────
+# ── Step 4: Update latest symlink ──────────────────────────────
 echo ""
-echo -e "${BOLD}Step 4: Deploying to .caddy-artifacts/...${NC}"
-
-DEST_DIR="${OVERRIDE_ARTIFACTS_DIR:-${PROJECT_DIR}/.caddy-artifacts}"
-mkdir -p "$DEST_DIR"
-
-FILENAME="uppidi-upload-${VER}-${HASH}-x86_64.AppImage"
-DEST="${DEST_DIR}/${FILENAME}"
-LINK="${DEST_DIR}/uppidi-upload-latest-x86_64.AppImage"
-
-cp "$OUTPUT" "$DEST"
-pass "deployed: ${FILENAME} ($(du -h "$DEST" | cut -f1))"
-
+echo -e "${BOLD}Step 4: Updating latest symlink...${NC}"
 ln -sf "$FILENAME" "$LINK"
 pass "updated:  ${LINK} → ${FILENAME}"
 
@@ -168,7 +161,6 @@ echo ""
 echo -e "${GREEN}${BOLD}Done.${NC}"
 echo ""
 echo "  AppImage:    $OUTPUT"
-echo "  Deployed:    $DEST"
 echo "  Latest:      $LINK"
 echo "  To run:      $OUTPUT"
 echo "  To register: $OUTPUT --register-app"

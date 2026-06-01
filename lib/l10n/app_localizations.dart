@@ -1861,6 +1861,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit image'**
   String get editImage;
+
+  /// No description provided for @navImageEditor.
+  ///
+  /// In en, this message translates to:
+  /// **'Image Editor'**
+  String get navImageEditor;
+
+  /// No description provided for @saveToFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to file'**
+  String get saveToFile;
+
+  /// No description provided for @imageSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Image saved'**
+  String get imageSaved;
+
+  /// No description provided for @selectImageToEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an image to edit'**
+  String get selectImageToEdit;
+
+  /// No description provided for @saveEditedImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Save edited image'**
+  String get saveEditedImage;
+
+  /// No description provided for @editAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit again'**
+  String get editAgain;
+
+  /// No description provided for @openNewImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Open new image'**
+  String get openNewImage;
 }
 
 class _AppLocalizationsDelegate

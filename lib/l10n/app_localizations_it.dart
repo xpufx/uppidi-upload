@@ -985,4 +985,25 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get editImage => 'Modifica immagine';
+
+  @override
+  String get navImageEditor => 'Image Editor';
+
+  @override
+  String get saveToFile => 'Salva su file';
+
+  @override
+  String get imageSaved => 'Immagine salvata';
+
+  @override
+  String get selectImageToEdit => 'Seleziona un\'immagine da modificare';
+
+  @override
+  String get saveEditedImage => 'Salva immagine modificata';
+
+  @override
+  String get editAgain => 'Modifica di nuovo';
+
+  @override
+  String get openNewImage => 'Apri nuova immagine';
 }

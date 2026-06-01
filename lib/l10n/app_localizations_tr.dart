@@ -986,4 +986,25 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get editImage => 'Görseli düzenle';
+
+  @override
+  String get navImageEditor => 'Image Editor';
+
+  @override
+  String get saveToFile => 'Dosyaya kaydet';
+
+  @override
+  String get imageSaved => 'Görsel kaydedildi';
+
+  @override
+  String get selectImageToEdit => 'Düzenlemek için bir görsel seçin';
+
+  @override
+  String get saveEditedImage => 'Düzenlenmiş görseli kaydet';
+
+  @override
+  String get editAgain => 'Tekrar düzenle';
+
+  @override
+  String get openNewImage => 'Yeni görsel aç';
 }

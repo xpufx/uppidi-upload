@@ -1,18 +1,14 @@
-import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:image/image.dart' as img;
 import 'package:pro_image_editor/pro_image_editor.dart';
 
-import '../core/android_save.dart';
 import '../core/format.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/editor_i18n.dart';
-import '../core/logging/log.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/upload_provider.dart';
+import 'image_editor.dart';
 
 /// Previews a selected file (image or document) with edit controls for
 /// images (opens the full image editor). Used inside the upload screen.
@@ -40,7 +36,6 @@ class FilePreview extends StatefulWidget {
 
 class _FilePreviewState extends State<FilePreview> {
   bool _isModified = false;
-  Uint8List? _lastEditedBytes;
   Widget? _cachedImageWidget;
 
   AppLocalizations get _l10n => AppLocalizations.of(context);
@@ -56,7 +51,6 @@ class _FilePreviewState extends State<FilePreview> {
     if (widget.fileBytes != oldWidget.fileBytes) {
       _cachedImageWidget = null;
       _isModified = false;
-      _lastEditedBytes = null;
     }
   }
 
@@ -159,27 +153,6 @@ class _FilePreviewState extends State<FilePreview> {
             const Divider(),
             ...warnings,
           ],
-          if (_isModified) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.restore, size: 18),
-                  label: Text(_l10n.revertEdits),
-                  onPressed: () {
-                    widget.notifier.revertEdits();
-                    setState(() => _isModified = false);
-                  },
-                ),
-                const SizedBox(width: 8),
-                FilledButton.icon(
-                  icon: const Icon(Icons.save_outlined, size: 18),
-                  label: Text(_l10n.save),
-                  onPressed: _saveEditedCopy,
-                ),
-              ],
-            ),
-          ],
         ],
       ),
     );
@@ -222,122 +195,22 @@ class _FilePreviewState extends State<FilePreview> {
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);
 
-    final decoded = img.decodeImage(widget.fileBytes!);
-    final dims =
-        decoded != null ? '${decoded.width}\u00d7${decoded.height}' : null;
-    final mimeLabel = widget.mimeType ?? 'image/jpeg';
     final outputMime = _outputMimeType(widget.mimeType);
     final outputFormat = _outputFormat(widget.mimeType);
 
     final i18n = buildEditorI18n(l10n);
-    final log = Log('FilePreview');
-    log.debug('editor i18n: cancel="${i18n.cancel}" done="${i18n.done}"');
 
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final editorBg = cs.surface;
-
-    final edited = await Navigator.push<Uint8List>(
+    final edited = await openImageEditor(
       context,
-      MaterialPageRoute(
-        builder: (_) => ProImageEditor.memory(
-          widget.fileBytes!,
-          callbacks: ProImageEditorCallbacks(
-            onImageEditingComplete: (bytes) async =>
-                Navigator.pop(context, bytes),
-          ),
-          configs: ProImageEditorConfigs(
-            theme: theme,
-            imageGeneration: ImageGenerationConfigs(
-              outputFormat: outputFormat,
-              jpegQuality: 100,
-            ),
-            designMode: ImageEditorDesignMode.cupertino,
-            i18n: i18n,
-            mainEditor: MainEditorConfigs(
-              style: MainEditorStyle(
-                background: editorBg,
-                appBarBackground: cs.surfaceContainerLow,
-                bottomBarBackground: cs.surfaceContainer,
-              ),
-              widgets: MainEditorWidgets(
-                wrapBody: (_, __, content) => Stack(
-                  children: [
-                    content,
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: _ImageInfoBadge(
-                        dimensions: dims,
-                        fileSize: formatSize(widget.fileSize),
-                        mimeType: mimeLabel,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            paintEditor: PaintEditorConfigs(
-              style: PaintEditorStyle(background: editorBg),
-            ),
-            textEditor: TextEditorConfigs(
-              style: TextEditorStyle(background: editorBg),
-            ),
-            cropRotateEditor: CropRotateEditorConfigs(
-              style: CropRotateEditorStyle(background: editorBg),
-            ),
-            filterEditor: FilterEditorConfigs(
-              style: FilterEditorStyle(background: editorBg),
-            ),
-            tuneEditor: TuneEditorConfigs(
-              style: TuneEditorStyle(background: editorBg),
-            ),
-            blurEditor: BlurEditorConfigs(
-              style: BlurEditorStyle(background: editorBg),
-            ),
-            emojiEditor: EmojiEditorConfigs(
-              style: EmojiEditorStyle(backgroundColor: editorBg),
-            ),
-          ),
-        ),
-      ),
+      imageBytes: widget.fileBytes!,
+      fileName: widget.fileName,
+      outputFormat: outputFormat,
+      theme: Theme.of(context),
+      i18n: i18n,
     );
     if (edited == null || !mounted) return;
-    _lastEditedBytes = edited;
     widget.notifier.applyEdit(edited, outputMimeType: outputMime);
     setState(() => _isModified = true);
-  }
-
-  Future<void> _saveEditedCopy() async {
-    final raw = _lastEditedBytes;
-    if (raw == null || !mounted) return;
-    final baseName = widget.fileName.replaceAll(RegExp(r'\.\w+$'), '');
-    final ext = _outputFormat(widget.mimeType) == OutputFormat.png
-        ? 'png'
-        : _outputFormat(widget.mimeType) == OutputFormat.bmp
-            ? 'bmp'
-            : 'jpg';
-    String? savedPath;
-    if (Platform.isAndroid) {
-      savedPath = await saveFileOnAndroid(
-        raw,
-        '$baseName.$ext',
-        mimeType: _outputMimeType(widget.mimeType),
-      );
-    } else {
-      savedPath = await FilePicker.saveFile(
-        dialogTitle: 'Save edited image',
-        fileName: '$baseName.$ext',
-        type: FileType.custom,
-        allowedExtensions: [ext],
-        bytes: raw,
-      );
-    }
-    if (savedPath != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Saved: $savedPath')),
-      );
-    }
   }
 
   List<Widget> _buildWarnings() {
@@ -392,48 +265,16 @@ class _FilePreviewState extends State<FilePreview> {
   }
 
   static String _outputMimeType(String? mimeType) {
-    return switch (mimeType) {
-      'image/png' => 'image/png',
-      'image/bmp' => 'image/bmp',
-      'image/tiff' || 'image/tif' => 'image/tiff',
-      _ => 'image/jpeg',
-    };
-  }
-}
-
-class _ImageInfoBadge extends StatelessWidget {
-  const _ImageInfoBadge({
-    required this.dimensions,
-    required this.fileSize,
-    required this.mimeType,
-  });
-
-  final String? dimensions;
-  final String fileSize;
-  final String mimeType;
-
-  @override
-  Widget build(BuildContext context) {
-    final parts = <String>[
-      if (dimensions != null) dimensions!,
-      fileSize,
-      mimeType.split('/').last.toUpperCase(),
-    ];
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.black54,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        parts.join(' \u00b7 '),
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
+    switch (mimeType) {
+      case 'image/png':
+        return 'image/png';
+      case 'image/bmp':
+        return 'image/bmp';
+      case 'image/tiff':
+      case 'image/tif':
+        return 'image/tiff';
+      default:
+        return 'image/jpeg';
+    }
   }
 }

@@ -297,5 +297,13 @@
   "tuneTool": "Regola",
 
   "revertEdits": "Annulla modifiche",
-  "editImage": "Modifica immagine"
+  "editImage": "Modifica immagine",
+
+  "navImageEditor": "Image Editor",
+  "saveToFile": "Salva su file",
+  "imageSaved": "Immagine salvata",
+  "selectImageToEdit": "Seleziona un'immagine da modificare",
+  "saveEditedImage": "Salva immagine modificata",
+  "editAgain": "Modifica di nuovo",
+  "openNewImage": "Apri nuova immagine"
 }

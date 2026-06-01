@@ -298,5 +298,13 @@
   "tuneTool": "QoQ",
 
   "revertEdits": "choH QIt",
-  "editImage": "qab choH"
+  "editImage": "qab choH",
+
+  "navImageEditor": "Image Editor",
+  "saveToFile": "DochDaq yIqel",
+  "imageSaved": "qab yIqel",
+  "selectImageToEdit": "choHmeH qab yIghoS",
+  "saveEditedImage": "choH qab yIqel",
+  "editAgain": "qa'choH",
+  "openNewImage": "qab chu' yIpoQ"
 }

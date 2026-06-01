@@ -311,5 +311,13 @@
   "tuneTool": "Tune",
 
   "revertEdits": "Revert edits",
-  "editImage": "Edit image"
+  "editImage": "Edit image",
+
+  "navImageEditor": "Image Editor",
+  "saveToFile": "Save to file",
+  "imageSaved": "Image saved",
+  "selectImageToEdit": "Select an image to edit",
+  "saveEditedImage": "Save edited image",
+  "editAgain": "Edit again",
+  "openNewImage": "Open new image"
 }

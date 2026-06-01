@@ -297,5 +297,13 @@
   "tuneTool": "Ayarla",
 
   "revertEdits": "Düzenlemeleri geri al",
-  "editImage": "Görseli düzenle"
+  "editImage": "Görseli düzenle",
+
+  "navImageEditor": "Image Editor",
+  "saveToFile": "Dosyaya kaydet",
+  "imageSaved": "Görsel kaydedildi",
+  "selectImageToEdit": "Düzenlemek için bir görsel seçin",
+  "saveEditedImage": "Düzenlenmiş görseli kaydet",
+  "editAgain": "Tekrar düzenle",
+  "openNewImage": "Yeni görsel aç"
 }

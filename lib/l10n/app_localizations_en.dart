@@ -981,4 +981,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editImage => 'Edit image';
+
+  @override
+  String get navImageEditor => 'Image Editor';
+
+  @override
+  String get saveToFile => 'Save to file';
+
+  @override
+  String get imageSaved => 'Image saved';
+
+  @override
+  String get selectImageToEdit => 'Select an image to edit';
+
+  @override
+  String get saveEditedImage => 'Save edited image';
+
+  @override
+  String get editAgain => 'Edit again';
+
+  @override
+  String get openNewImage => 'Open new image';
 }

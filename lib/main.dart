@@ -13,6 +13,7 @@ import 'core/share_handler.dart';
 import 'core/theme_provider.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/history_screen.dart';
+import 'screens/image_editor_screen.dart';
 import 'screens/modal_nav_strategy.dart';
 import 'screens/settings_screen.dart';
 import 'screens/shell_strategy.dart';
@@ -73,6 +74,10 @@ void _registerScreens() {
   ScreenRegistry.register(AppScreen.history, () => const HistoryScreen());
   ScreenRegistry.register(AppScreen.providers, () => const TestScreen());
   ScreenRegistry.register(AppScreen.settings, () => const SettingsScreen());
+  ScreenRegistry.register(
+    AppScreen.imageEditor,
+    () => const ImageEditorScreen(),
+  );
 }
 
 class UppidiApp extends ConsumerStatefulWidget {

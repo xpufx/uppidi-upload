@@ -983,4 +983,25 @@ class AppLocalizationsEo extends AppLocalizations {
 
   @override
   String get editImage => 'Redakti bildon';
+
+  @override
+  String get navImageEditor => 'Image Editor';
+
+  @override
+  String get saveToFile => 'Konservi al dosiero';
+
+  @override
+  String get imageSaved => 'Bildo konservita';
+
+  @override
+  String get selectImageToEdit => 'Elektu bildon por redakti';
+
+  @override
+  String get saveEditedImage => 'Konservi redaktitan bildon';
+
+  @override
+  String get editAgain => 'Redakti denove';
+
+  @override
+  String get openNewImage => 'Malfermi novan bildon';
 }

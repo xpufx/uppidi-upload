@@ -46,6 +46,11 @@ class _ModalDashboard extends StatelessWidget {
             onPressed: () => _showScreen(context, AppScreen.providers),
           ),
           IconButton(
+            icon: const Icon(Icons.edit),
+            tooltip: l10n.navImageEditor,
+            onPressed: () => _showScreen(context, AppScreen.imageEditor),
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             tooltip: l10n.settings,
             onPressed: () => _showScreen(context, AppScreen.settings),
@@ -103,6 +108,7 @@ void _showScreen(BuildContext context, AppScreen screen) {
   final title = switch (screen) {
     AppScreen.history => l10n.history,
     AppScreen.providers => l10n.navProviders,
+    AppScreen.imageEditor => l10n.navImageEditor,
     AppScreen.settings => l10n.settings,
     AppScreen.upload =>
       throw StateError('Upload screen is never shown as modal'),
