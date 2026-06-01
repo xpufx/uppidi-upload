@@ -1,5 +1,7 @@
 # Changelog
 
+- feat: APK signing with release keystore + CI setup
+- fix: solid background for sub-editors (crop/paint/text/etc) to avoid double-image ghosting; only main editor canvas has transparent/checkered bg
 - fix: disable crop animation (Duration.zero) to eliminate double-image ghosting
 - refactor: global checkered stack above ProImageEditor + all transparent backgrounds
 - fix: nav order → Upload, Image Editor, History, Providers, Settings
@@ -28,5 +30,3 @@
 - minor README change
 - minor README change
 - fix: macos/ios ci packaging — use find instead of ls, add error handling
-- fix: flatpak version in flatpak list, add .flatpak-builder to gitignore
-- fix: flatpak D-Bus secrets, icon sizes, graceful KeyringLocked exit

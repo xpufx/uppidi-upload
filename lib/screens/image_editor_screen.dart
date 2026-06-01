@@ -24,6 +24,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   Uint8List? _editedBytes;
   String? _fileName;
   int _editorKey = 0;
+  bool _isSaved = true;
 
   AppLocalizations get _l10n => AppLocalizations.of(context);
 
@@ -42,6 +43,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       _originalBytes = bytes;
       _fileName = result.files.first.name;
       _editedBytes = null;
+      _isSaved = true;
       _editorKey++;
       _state = _ScreenState.editing;
     });
@@ -49,6 +51,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
 
   Future<void> _onImageEditingComplete(Uint8List bytes) async {
     _editedBytes = bytes;
+    _isSaved = false;
     setState(() => _state = _ScreenState.preview);
   }
 
@@ -72,27 +75,75 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       );
     }
     if (savedPath != null && mounted) {
+      _isSaved = true;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_l10n.imageSaved)),
       );
     }
   }
 
+  Future<bool> _confirmDiscard() async {
+    if (_isSaved) return true;
+    if (!mounted) return true;
+
+    final action = await showDialog<_DiscardAction>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Unsaved changes'),
+        content:
+            const Text('You have unsaved edits. What would you like to do?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, _DiscardAction.cancel),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, _DiscardAction.discard),
+            child: const Text('Discard'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, _DiscardAction.save),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (action == null || action == _DiscardAction.cancel) return false;
+
+    if (action == _DiscardAction.save && _editedBytes != null) {
+      await _saveToDisk(_editedBytes!);
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return switch (_state) {
-      _ScreenState.picker => _buildPicker(),
-      _ScreenState.editing => buildCheckeredEditor(
-          imageBytes: _originalBytes!,
-          key: ValueKey(_editorKey),
-          theme: Theme.of(context),
-          callbacks: ProImageEditorCallbacks(
-            onImageEditingComplete: _onImageEditingComplete,
-            onCloseEditor: _onCloseEditor,
+    return PopScope(
+      canPop: _isSaved,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final navigator = Navigator.of(context);
+        final shouldPop = await _confirmDiscard();
+        if (shouldPop && mounted) {
+          navigator.pop();
+        }
+      },
+      child: switch (_state) {
+        _ScreenState.picker => _buildPicker(),
+        _ScreenState.editing => buildCheckeredEditor(
+            imageBytes: _originalBytes!,
+            key: ValueKey(_editorKey),
+            theme: Theme.of(context),
+            callbacks: ProImageEditorCallbacks(
+              onImageEditingComplete: _onImageEditingComplete,
+              onCloseEditor: _onCloseEditor,
+            ),
           ),
-        ),
-      _ScreenState.preview => _buildPreview(),
-    };
+        _ScreenState.preview => _buildPreview(),
+      },
+    );
   }
 
   Widget _buildPicker() {
@@ -163,12 +214,17 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             ),
             const SizedBox(height: 8),
             TextButton.icon(
-              onPressed: () => setState(() {
-                _originalBytes = null;
-                _editedBytes = null;
-                _fileName = null;
-                _state = _ScreenState.picker;
-              }),
+              onPressed: () async {
+                if (!await _confirmDiscard()) return;
+                if (!mounted) return;
+                setState(() {
+                  _originalBytes = null;
+                  _editedBytes = null;
+                  _fileName = null;
+                  _isSaved = true;
+                  _state = _ScreenState.picker;
+                });
+              },
               icon: const Icon(Icons.image),
               label: Text(_l10n.openNewImage),
             ),
@@ -178,3 +234,5 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     );
   }
 }
+
+enum _DiscardAction { save, discard, cancel }
