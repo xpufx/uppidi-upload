@@ -81,7 +81,7 @@ ProImageEditorConfigs _themedConfigs(ThemeData? theme) {
     ),
     paintEditor: PaintEditorConfigs(
       style: PaintEditorStyle(
-        background: Colors.transparent,
+        background: cs?.surface ?? const Color(0xFF161616),
         bottomBarBackground: Colors.transparent,
         bottomBarActiveItemColor: cs?.primary ?? const Color(0xFF004C9E),
         bottomBarInactiveItemColor: cs?.onSurfaceVariant ?? Colors.white,
@@ -89,31 +89,37 @@ ProImageEditorConfigs _themedConfigs(ThemeData? theme) {
     ),
     textEditor: TextEditorConfigs(
       style: TextEditorStyle(
-        background: Colors.transparent,
+        background: cs?.surface ?? const Color(0xFF161616),
         bottomBarBackground: Colors.transparent,
       ),
     ),
     cropRotateEditor: CropRotateEditorConfigs(
       animationDuration: Duration.zero,
       style: CropRotateEditorStyle(
-        background: Colors.transparent,
+        background: cs?.surface ?? const Color(0xFF161616),
         bottomBarBackground: Colors.transparent,
       ),
     ),
     filterEditor: FilterEditorConfigs(
-      style: FilterEditorStyle(background: Colors.transparent),
+      style: FilterEditorStyle(
+        background: cs?.surface ?? const Color(0xFF161616),
+      ),
     ),
     tuneEditor: TuneEditorConfigs(
       style: TuneEditorStyle(
-        background: Colors.transparent,
+        background: cs?.surface ?? const Color(0xFF161616),
         bottomBarBackground: Colors.transparent,
       ),
     ),
     blurEditor: BlurEditorConfigs(
-      style: BlurEditorStyle(background: Colors.transparent),
+      style: BlurEditorStyle(
+        background: cs?.surface ?? const Color(0xFF161616),
+      ),
     ),
     emojiEditor: EmojiEditorConfigs(
-      style: EmojiEditorStyle(backgroundColor: Colors.transparent),
+      style: EmojiEditorStyle(
+        backgroundColor: cs?.surface ?? const Color(0xFF161616),
+      ),
     ),
   );
 }
