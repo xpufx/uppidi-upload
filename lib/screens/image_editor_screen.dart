@@ -123,6 +123,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final editorBg = cs.surface;
+    final barFg = cs.onSurface;
+    final bottomFg = cs.onSurfaceVariant;
 
     return ProImageEditor.memory(
       _originalBytes!,
@@ -139,10 +141,13 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         ),
         designMode: ImageEditorDesignMode.cupertino,
         mainEditor: MainEditorConfigs(
+          enableSubEditorPage: true,
           style: MainEditorStyle(
             background: editorBg,
             appBarBackground: cs.surfaceContainerLow,
+            appBarColor: barFg,
             bottomBarBackground: cs.surfaceContainer,
+            bottomBarColor: bottomFg,
           ),
           widgets: MainEditorWidgets(
             appBar: (editor, rebuildStream) => ReactiveAppbar(
@@ -152,19 +157,32 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
           ),
         ),
         paintEditor: PaintEditorConfigs(
-          style: PaintEditorStyle(background: editorBg),
+          style: PaintEditorStyle(
+            background: editorBg,
+            bottomBarActiveItemColor: cs.primary,
+            bottomBarInactiveItemColor: bottomFg,
+          ),
         ),
         textEditor: TextEditorConfigs(
-          style: TextEditorStyle(background: editorBg),
+          style: TextEditorStyle(
+            background: editorBg,
+            bottomBarBackground: cs.surfaceContainer,
+          ),
         ),
         cropRotateEditor: CropRotateEditorConfigs(
-          style: CropRotateEditorStyle(background: editorBg),
+          style: CropRotateEditorStyle(
+            background: editorBg,
+            bottomBarBackground: cs.surfaceContainer,
+          ),
         ),
         filterEditor: FilterEditorConfigs(
           style: FilterEditorStyle(background: editorBg),
         ),
         tuneEditor: TuneEditorConfigs(
-          style: TuneEditorStyle(background: editorBg),
+          style: TuneEditorStyle(
+            background: editorBg,
+            bottomBarBackground: cs.surfaceContainer,
+          ),
         ),
         blurEditor: BlurEditorConfigs(
           style: BlurEditorStyle(background: editorBg),
@@ -179,7 +197,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   PreferredSizeWidget _buildEditorAppBar(ProImageEditorState editor) {
     final context = editor.context;
     final l10n = AppLocalizations.of(context);
-    final fg = Theme.of(context).colorScheme.onSurface;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final fg = isLight ? Colors.black87 : Colors.white;
     return AppBar(
       automaticallyImplyLeading: false,
       foregroundColor: fg,

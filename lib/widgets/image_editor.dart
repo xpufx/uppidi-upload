@@ -45,19 +45,32 @@ Future<Uint8List?> openImageEditor(
           designMode: ImageEditorDesignMode.cupertino,
           mainEditor: _buildMainEditorConfigs(editorBg, cs, fileName),
           paintEditor: PaintEditorConfigs(
-            style: PaintEditorStyle(background: editorBg),
+            style: PaintEditorStyle(
+              background: editorBg,
+              bottomBarActiveItemColor: cs?.primary ?? const Color(0xFF004C9E),
+              bottomBarInactiveItemColor: cs?.onSurfaceVariant ?? Colors.white,
+            ),
           ),
           textEditor: TextEditorConfigs(
-            style: TextEditorStyle(background: editorBg),
+            style: TextEditorStyle(
+              background: editorBg,
+              bottomBarBackground: cs?.surfaceContainer ?? _bottomBarBg,
+            ),
           ),
           cropRotateEditor: CropRotateEditorConfigs(
-            style: CropRotateEditorStyle(background: editorBg),
+            style: CropRotateEditorStyle(
+              background: editorBg,
+              bottomBarBackground: cs?.surfaceContainer ?? _bottomBarBg,
+            ),
           ),
           filterEditor: FilterEditorConfigs(
             style: FilterEditorStyle(background: editorBg),
           ),
           tuneEditor: TuneEditorConfigs(
-            style: TuneEditorStyle(background: editorBg),
+            style: TuneEditorStyle(
+              background: editorBg,
+              bottomBarBackground: cs?.surfaceContainer ?? _bottomBarBg,
+            ),
           ),
           blurEditor: BlurEditorConfigs(
             style: BlurEditorStyle(background: editorBg),
@@ -76,11 +89,15 @@ MainEditorConfigs _buildMainEditorConfigs(
   ColorScheme? cs,
   String? fileName,
 ) {
+  final bottomFg = cs?.onSurfaceVariant ?? Colors.white;
   return MainEditorConfigs(
+    enableSubEditorPage: true,
     style: MainEditorStyle(
       background: editorBg,
       appBarBackground: cs?.surfaceContainerLow ?? _appBarBg,
       bottomBarBackground: cs?.surfaceContainer ?? _bottomBarBg,
+      bottomBarColor: bottomFg,
+      appBarColor: cs?.onSurface ?? Colors.white,
     ),
     widgets: MainEditorWidgets(
       appBar: (editor, rebuildStream) => ReactiveAppbar(
@@ -97,8 +114,8 @@ AppBar _buildAppBar(
 }) {
   final context = editor.context;
   final l10n = AppLocalizations.of(context);
-  final cs = Theme.of(context).colorScheme;
-  final fg = cs.onSurface;
+  final isLight = Theme.of(context).brightness == Brightness.light;
+  final fg = isLight ? Colors.black87 : Colors.white;
   return AppBar(
     automaticallyImplyLeading: false,
     foregroundColor: fg,
