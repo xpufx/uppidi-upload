@@ -65,6 +65,20 @@ jobs:
       - name: Sync version
         run: |
           sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${{ needs.version.outputs.version }}';/" lib/core/version.dart
+      - name: Set up Android signing
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > android/upload-keystore.jks
+          cat > android/key.properties <<EOF
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=upload-keystore.jks
+          EOF
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
       - run: |
           flutter build apk --release --split-per-abi \
             --dart-define=GIT_HASH=${{ needs.version.outputs.hash }} \

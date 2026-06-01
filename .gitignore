@@ -71,3 +71,8 @@ scripts/env_check.sh
 
 # Design docs
 docs/designdocs/
+
+# Android signing
+/android/key.properties
+/android/*.keystore
+/android/*.jks
