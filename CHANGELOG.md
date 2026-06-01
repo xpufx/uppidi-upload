@@ -1,5 +1,13 @@
 # Changelog
 
+- fix: transparent editor background so checkered wrapBody shows through
+- feat: checkered transparency grid behind editor canvas
+- fix: editor icons visible in light mode + sub-editors stay within tab
+- fix: inline editor in Image Editor tab (keeps nav visible) + light-mode icon colors
+- feat: add Image Editor navigation tab with standalone editor screen
+- fix: pro_image_editor background follows app theme (seed color + light/dark)
+- fix: typed GoFileConfig for GoFileProvider, passes check_wide_config
+- feat: add GoFile provider, fix check_bare_strings, Android json ext, Flatpak, LocalProvider save, isModified+supportsMessage
 - feat: add Local (Image Editor) provider + save-a-copy after editing
 - feat: remove duplicate Choose File, add paste button, switch to Cupertino editor design
 - feat: embed pro_image_editor, remove quality selector, drop ImageCropOverlay
@@ -22,11 +30,3 @@
 - docs: add rule to never attempt privilege escalation
 - docs: remove web from supported platforms
 - docs: fix 'desktop-first' to 'desktop drag & drop'
-- docs: update README for v1.4.0, fix flatpak library bundling
-- fix: macOS build artifact name is Runner.app
-- ci: add libsecret-1-dev dep, fix macOS app name
-- ci: add manual macOS/iOS build workflow
-- chore: bump to 1.4.0
-- fix: detect MIME type from extension when drag-drop provides null mimeType
-- fix: restore hover overlay, gate DropTarget on !kIsWeb, hide paste on web
-- feat: desktop drag-drop + clipboard paste support
