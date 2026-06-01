@@ -219,10 +219,10 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
     final l10n = AppLocalizations.of(context);
     final screen = switch (_selected) {
       _NavTab.upload => const _ScreenLookup(screen: AppScreen.upload),
+      _NavTab.imageEditor => const _ScreenLookup(screen: AppScreen.imageEditor),
       _NavTab.history => const _ScreenLookup(screen: AppScreen.history),
       _NavTab.providers => const _ScreenLookup(screen: AppScreen.providers),
       _NavTab.settings => const _ScreenLookup(screen: AppScreen.settings),
-      _NavTab.imageEditor => const _ScreenLookup(screen: AppScreen.imageEditor),
     };
 
     if (!devProviders) return screen;
@@ -268,22 +268,22 @@ class _ScreenLookup extends StatelessWidget {
   }
 }
 
-enum _NavTab { upload, history, providers, settings, imageEditor }
+enum _NavTab { upload, imageEditor, history, providers, settings }
 
 extension on _NavTab {
   String label(AppLocalizations l10n) => switch (this) {
         _NavTab.upload => l10n.upload,
+        _NavTab.imageEditor => l10n.navImageEditor,
         _NavTab.history => l10n.history,
         _NavTab.providers => l10n.navProviders,
         _NavTab.settings => l10n.settings,
-        _NavTab.imageEditor => l10n.navImageEditor,
       };
 
   IconData get icon => switch (this) {
         _NavTab.upload => Icons.cloud_upload,
+        _NavTab.imageEditor => Icons.edit,
         _NavTab.history => Icons.history,
         _NavTab.providers => Icons.dns,
         _NavTab.settings => Icons.settings,
-        _NavTab.imageEditor => Icons.edit,
       };
 }
