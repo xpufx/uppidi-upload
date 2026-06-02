@@ -1,5 +1,8 @@
 # Changelog
 
+- chore: bump to 1.5.0
+- chore: stop tracking AGENTS.md in git
+- chore: update AGENTS.md
 - fix: tab switch dialog now matches same Save/Discard/Cancel with working save callback
 - fix: skip network connectivity test for Local provider (saves to disk, no HTTP)
 - fix: intercept tab switches when unsaved edits exist (via canSwitchTabProvider)
@@ -27,6 +30,3 @@
 - build: worktree-aware artifact paths, AppImage --artifacts-dir flag
 - Merge branch 'opencode/gentle-cabin'
 - redesign upload screen: card layout, quality chips, progress overlay, theme badges
-- feat: v2 structured export/import, extract provider_storage_service
-- fix: clean Hive test directory via Directory.deleteSync in tearDownAll
-- ci: split linux into build + 3 packaging jobs, add flatpak to build_and_serve.sh
