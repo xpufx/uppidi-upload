@@ -76,3 +76,4 @@ docs/designdocs/
 /android/key.properties
 /android/*.keystore
 /android/*.jks
+/AGENTS.md
