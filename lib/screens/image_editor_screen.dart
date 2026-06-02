@@ -54,7 +54,9 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
   Future<void> _onImageEditingComplete(Uint8List bytes) async {
     _editedBytes = bytes;
     _isSaved = false;
-    ref.read(canSwitchTabProvider.notifier).set(false);
+    ref
+        .read(canSwitchTabProvider.notifier)
+        .block(onSave: () => _saveToDisk(_editedBytes!));
     setState(() => _state = _ScreenState.preview);
   }
 
@@ -78,7 +80,7 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
       );
     }
     if (savedPath != null && mounted) {
-      ref.read(canSwitchTabProvider.notifier).set(true);
+      ref.read(canSwitchTabProvider.notifier).allow();
       _isSaved = true;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_l10n.imageSaved)),
@@ -118,13 +120,13 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
       await _saveToDisk(_editedBytes!);
     }
 
-    ref.read(canSwitchTabProvider.notifier).set(true);
+    ref.read(canSwitchTabProvider.notifier).allow();
     return true;
   }
 
   @override
   void dispose() {
-    ref.read(canSwitchTabProvider.notifier).set(true);
+    ref.read(canSwitchTabProvider.notifier).allow();
     super.dispose();
   }
 
@@ -227,7 +229,7 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
               onPressed: () async {
                 if (!await _confirmDiscard()) return;
                 if (!mounted) return;
-                ref.read(canSwitchTabProvider.notifier).set(true);
+                ref.read(canSwitchTabProvider.notifier).allow();
                 setState(() {
                   _originalBytes = null;
                   _editedBytes = null;

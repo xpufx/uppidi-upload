@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: skip network connectivity test for Local provider (saves to disk, no HTTP)
 - fix: intercept tab switches when unsaved edits exist (via canSwitchTabProvider)
 - fix: remove duplicate android{} block that was overriding release signing with debug key
 - refine: Image Editor tab icon pencil -> palette
@@ -29,4 +30,3 @@
 - fix: clean Hive test directory via Directory.deleteSync in tearDownAll
 - ci: split linux into build + 3 packaging jobs, add flatpak to build_and_serve.sh
 - docs: strengthen scope guard to require full diff inspection
-- docs: add scope guard rule to AGENTS.md

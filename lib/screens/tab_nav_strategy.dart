@@ -218,15 +218,16 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
   void _onTapTab(int i, AppLocalizations l10n) {
     final tab = _NavTab.values[i];
     if (tab == _selected) return;
-    if (!ref.read(canSwitchTabProvider)) {
-      _showUnsavedWarning(context, l10n, tab);
+    final state = ref.read(canSwitchTabProvider);
+    if (!state.canSwitch) {
+      _showUnsavedWarning(context, l10n, tab, state.onSave);
       return;
     }
     setState(() => _selected = tab);
   }
 
-  void _showUnsavedWarning(
-      BuildContext context, AppLocalizations l10n, _NavTab tab) async {
+  void _showUnsavedWarning(BuildContext context, AppLocalizations l10n,
+      _NavTab tab, Future<void> Function()? onSave) async {
     final action = await showDialog<_DiscardTabAction>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -238,16 +239,23 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
             child: Text(l10n.cancel),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(ctx, _DiscardTabAction.leave),
+            onPressed: () => Navigator.pop(ctx, _DiscardTabAction.discard),
             child: Text(l10n.discard),
           ),
+          if (onSave != null)
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, _DiscardTabAction.save),
+              child: Text(l10n.save),
+            ),
         ],
       ),
     );
-    if (action == _DiscardTabAction.leave) {
-      ref.read(canSwitchTabProvider.notifier).set(true);
-      setState(() => _selected = tab);
+    if (action == _DiscardTabAction.cancel) return;
+    if (action == _DiscardTabAction.save && onSave != null) {
+      await onSave();
     }
+    ref.read(canSwitchTabProvider.notifier).allow();
+    setState(() => _selected = tab);
   }
 
   Widget _buildBody() {
@@ -303,7 +311,7 @@ class _ScreenLookup extends StatelessWidget {
   }
 }
 
-enum _DiscardTabAction { cancel, leave }
+enum _DiscardTabAction { save, discard, cancel }
 
 enum _NavTab { upload, imageEditor, history, providers, settings }
 

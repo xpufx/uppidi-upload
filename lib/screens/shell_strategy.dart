@@ -8,15 +8,24 @@ import 'test_screen.dart';
 import 'upload_screen.dart';
 
 /// Provider for screens to block tab switching (e.g. unsaved edits).
-final canSwitchTabProvider = NotifierProvider<CanSwitchTabNotifier, bool>(
+final canSwitchTabProvider =
+    NotifierProvider<CanSwitchTabNotifier, CanSwitchTabState>(
   CanSwitchTabNotifier.new,
 );
 
-class CanSwitchTabNotifier extends Notifier<bool> {
-  @override
-  bool build() => true;
+class CanSwitchTabState {
+  final bool canSwitch;
+  final Future<void> Function()? onSave;
+  const CanSwitchTabState({this.canSwitch = true, this.onSave});
+}
 
-  void set(bool value) => state = value;
+class CanSwitchTabNotifier extends Notifier<CanSwitchTabState> {
+  @override
+  CanSwitchTabState build() => const CanSwitchTabState();
+
+  void block({Future<void> Function()? onSave}) =>
+      state = CanSwitchTabState(canSwitch: false, onSave: onSave);
+  void allow() => state = const CanSwitchTabState();
 }
 
 /// Screens available in the app navigation.
