@@ -281,7 +281,7 @@ extension on _NavTab {
 
   IconData get icon => switch (this) {
         _NavTab.upload => Icons.cloud_upload,
-        _NavTab.imageEditor => Icons.edit,
+        _NavTab.imageEditor => Icons.palette,
         _NavTab.history => Icons.history,
         _NavTab.providers => Icons.dns,
         _NavTab.settings => Icons.settings,

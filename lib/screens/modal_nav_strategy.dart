@@ -36,7 +36,7 @@ class _ModalDashboard extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
+            icon: const Icon(Icons.palette),
             tooltip: l10n.navImageEditor,
             onPressed: () => _showScreen(context, AppScreen.imageEditor),
           ),
