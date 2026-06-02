@@ -1007,4 +1007,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get openNewImage => 'Yeni görsel aç';
+
+  @override
+  String get unsavedChangesTitle => 'Kaydedilmemiş değişiklikler';
+
+  @override
+  String get unsavedChangesMessage =>
+      'Kaydedilmemiş düzenlemeleriniz var. Ne yapmak istersiniz?';
+
+  @override
+  String get discard => 'At';
 }

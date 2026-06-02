@@ -1,5 +1,7 @@
 # Changelog
 
+- refine: Image Editor tab icon pencil -> palette
+- feat: unsaved-changes warning when leaving image editor without saving
 - feat: APK signing with release keystore + CI setup
 - fix: solid background for sub-editors (crop/paint/text/etc) to avoid double-image ghosting; only main editor canvas has transparent/checkered bg
 - fix: disable crop animation (Duration.zero) to eliminate double-image ghosting
@@ -28,5 +30,3 @@
 - docs: add scope guard rule to AGENTS.md
 - fix: address code review findings (#3, #5, #6, #7)
 - minor README change
-- minor README change
-- fix: macos/ios ci packaging — use find instead of ls, add error handling

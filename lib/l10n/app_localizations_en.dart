@@ -1002,4 +1002,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openNewImage => 'Open new image';
+
+  @override
+  String get unsavedChangesTitle => 'Unsaved changes';
+
+  @override
+  String get unsavedChangesMessage =>
+      'You have unsaved edits. What would you like to do?';
+
+  @override
+  String get discard => 'Discard';
 }

@@ -305,5 +305,8 @@
   "selectImageToEdit": "Düzenlemek için bir görsel seçin",
   "saveEditedImage": "Düzenlenmiş görseli kaydet",
   "editAgain": "Tekrar düzenle",
-  "openNewImage": "Yeni görsel aç"
+  "openNewImage": "Yeni görsel aç",
+  "unsavedChangesTitle": "Kaydedilmemiş değişiklikler",
+  "unsavedChangesMessage": "Kaydedilmemiş düzenlemeleriniz var. Ne yapmak istersiniz?",
+  "discard": "At"
 }

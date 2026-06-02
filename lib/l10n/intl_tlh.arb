@@ -306,5 +306,8 @@
   "selectImageToEdit": "choHmeH qab yIghoS",
   "saveEditedImage": "choH qab yIqel",
   "editAgain": "qa'choH",
-  "openNewImage": "qab chu' yIpoQ"
+  "openNewImage": "qab chu' yIpoQ",
+  "unsavedChangesTitle": "QIt qab",
+  "unsavedChangesMessage": "QIt qab. nuq?",
+  "discard": "QIt"
 }

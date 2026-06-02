@@ -1006,4 +1006,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get openNewImage => 'Apri nuova immagine';
+
+  @override
+  String get unsavedChangesTitle => 'Modifiche non salvate';
+
+  @override
+  String get unsavedChangesMessage =>
+      'Hai modifiche non salvate. Cosa vuoi fare?';
+
+  @override
+  String get discard => 'Scarta';
 }

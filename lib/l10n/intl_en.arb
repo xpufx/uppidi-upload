@@ -319,5 +319,8 @@
   "selectImageToEdit": "Select an image to edit",
   "saveEditedImage": "Save edited image",
   "editAgain": "Edit again",
-  "openNewImage": "Open new image"
+  "openNewImage": "Open new image",
+  "unsavedChangesTitle": "Unsaved changes",
+  "unsavedChangesMessage": "You have unsaved edits. What would you like to do?",
+  "discard": "Discard"
 }

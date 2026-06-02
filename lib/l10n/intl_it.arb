@@ -305,5 +305,8 @@
   "selectImageToEdit": "Seleziona un'immagine da modificare",
   "saveEditedImage": "Salva immagine modificata",
   "editAgain": "Modifica di nuovo",
-  "openNewImage": "Apri nuova immagine"
+  "openNewImage": "Apri nuova immagine",
+  "unsavedChangesTitle": "Modifiche non salvate",
+  "unsavedChangesMessage": "Hai modifiche non salvate. Cosa vuoi fare?",
+  "discard": "Scarta"
 }

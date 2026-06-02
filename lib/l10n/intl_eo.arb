@@ -305,5 +305,8 @@
   "selectImageToEdit": "Elektu bildon por redakti",
   "saveEditedImage": "Konservi redaktitan bildon",
   "editAgain": "Redakti denove",
-  "openNewImage": "Malfermi novan bildon"
+  "openNewImage": "Malfermi novan bildon",
+  "unsavedChangesTitle": "Nekonservitaj ŝanĝoj",
+  "unsavedChangesMessage": "Vi havas nekonservitajn redaktojn. Kion vi volas fari?",
+  "discard": "Forĵeti"
 }

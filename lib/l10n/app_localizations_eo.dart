@@ -1004,4 +1004,14 @@ class AppLocalizationsEo extends AppLocalizations {
 
   @override
   String get openNewImage => 'Malfermi novan bildon';
+
+  @override
+  String get unsavedChangesTitle => 'Nekonservitaj ŝanĝoj';
+
+  @override
+  String get unsavedChangesMessage =>
+      'Vi havas nekonservitajn redaktojn. Kion vi volas fari?';
+
+  @override
+  String get discard => 'Forĵeti';
 }

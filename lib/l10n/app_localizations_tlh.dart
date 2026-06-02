@@ -991,4 +991,13 @@ class AppLocalizationsTlh extends AppLocalizations {
 
   @override
   String get openNewImage => 'qab chu\' yIpoQ';
+
+  @override
+  String get unsavedChangesTitle => 'QIt qab';
+
+  @override
+  String get unsavedChangesMessage => 'QIt qab. nuq?';
+
+  @override
+  String get discard => 'QIt';
 }

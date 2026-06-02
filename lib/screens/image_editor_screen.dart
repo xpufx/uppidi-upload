@@ -89,21 +89,20 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     final action = await showDialog<_DiscardAction>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Unsaved changes'),
-        content:
-            const Text('You have unsaved edits. What would you like to do?'),
+        title: Text(_l10n.unsavedChangesTitle),
+        content: Text(_l10n.unsavedChangesMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, _DiscardAction.cancel),
-            child: const Text('Cancel'),
+            child: Text(_l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, _DiscardAction.discard),
-            child: const Text('Discard'),
+            child: Text(_l10n.discard),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, _DiscardAction.save),
-            child: const Text('Save'),
+            child: Text(_l10n.save),
           ),
         ],
       ),
