@@ -1,5 +1,6 @@
 # Changelog
 
+- fix: intercept tab switches when unsaved edits exist (via canSwitchTabProvider)
 - fix: remove duplicate android{} block that was overriding release signing with debug key
 - refine: Image Editor tab icon pencil -> palette
 - feat: unsaved-changes warning when leaving image editor without saving
@@ -29,4 +30,3 @@
 - ci: split linux into build + 3 packaging jobs, add flatpak to build_and_serve.sh
 - docs: strengthen scope guard to require full diff inspection
 - docs: add scope guard rule to AGENTS.md
-- fix: address code review findings (#3, #5, #6, #7)

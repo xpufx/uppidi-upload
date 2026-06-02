@@ -421,6 +421,19 @@ void _setResult(WidgetRef ref, String id, _TestResult r) {
 
 Future<void> _runTest(
     WidgetRef ref, BaseUploader p, String connectionFailed) async {
+  if (p.providerId == 'local') {
+    _setResult(
+      ref,
+      p.providerId,
+      _TestResult(
+        providerId: p.providerId,
+        providerName: p.providerName,
+        online: true,
+        latencyMs: 0,
+      ),
+    );
+    return;
+  }
   final latency = await checkProviderConnectivity(p, ref: ref);
   if (latency != null) {
     _setResult(
