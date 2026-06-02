@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'history_screen.dart';
 import 'image_editor_screen.dart';
 import 'settings_screen.dart';
 import 'test_screen.dart';
 import 'upload_screen.dart';
+
+/// Provider for screens to block tab switching (e.g. unsaved edits).
+final canSwitchTabProvider = NotifierProvider<CanSwitchTabNotifier, bool>(
+  CanSwitchTabNotifier.new,
+);
+
+class CanSwitchTabNotifier extends Notifier<bool> {
+  @override
+  bool build() => true;
+
+  void set(bool value) => state = value;
+}
 
 /// Screens available in the app navigation.
 ///

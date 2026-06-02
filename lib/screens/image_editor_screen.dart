@@ -3,22 +3,24 @@ import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 
 import '../core/android_save.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/image_editor.dart';
+import 'shell_strategy.dart';
 
 enum _ScreenState { picker, editing, preview }
 
-class ImageEditorScreen extends StatefulWidget {
+class ImageEditorScreen extends ConsumerStatefulWidget {
   const ImageEditorScreen({super.key});
 
   @override
-  State<ImageEditorScreen> createState() => _ImageEditorScreenState();
+  ConsumerState<ImageEditorScreen> createState() => _ImageEditorScreenState();
 }
 
-class _ImageEditorScreenState extends State<ImageEditorScreen> {
+class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
   _ScreenState _state = _ScreenState.picker;
   Uint8List? _originalBytes;
   Uint8List? _editedBytes;
@@ -52,6 +54,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   Future<void> _onImageEditingComplete(Uint8List bytes) async {
     _editedBytes = bytes;
     _isSaved = false;
+    ref.read(canSwitchTabProvider.notifier).set(false);
     setState(() => _state = _ScreenState.preview);
   }
 
@@ -75,6 +78,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       );
     }
     if (savedPath != null && mounted) {
+      ref.read(canSwitchTabProvider.notifier).set(true);
       _isSaved = true;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_l10n.imageSaved)),
@@ -114,7 +118,14 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       await _saveToDisk(_editedBytes!);
     }
 
+    ref.read(canSwitchTabProvider.notifier).set(true);
     return true;
+  }
+
+  @override
+  void dispose() {
+    ref.read(canSwitchTabProvider.notifier).set(true);
+    super.dispose();
   }
 
   @override
@@ -216,6 +227,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               onPressed: () async {
                 if (!await _confirmDiscard()) return;
                 if (!mounted) return;
+                ref.read(canSwitchTabProvider.notifier).set(true);
                 setState(() {
                   _originalBytes = null;
                   _editedBytes = null;

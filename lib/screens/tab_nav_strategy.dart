@@ -12,6 +12,7 @@ import '../l10n/app_localizations.dart';
 import 'shell_strategy.dart';
 
 /// Tab-based navigation strategy — implements ShellStrategy.
+
 ///
 /// Preserves the existing bottom/left/right navigation logic.
 /// Selected when shellType setting is 'tabs' (the default).
@@ -82,7 +83,7 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
         padding: const EdgeInsets.only(bottom: 4),
         child: BottomNavigationBar(
           currentIndex: _selected.index,
-          onTap: (i) => setState(() => _selected = _NavTab.values[i]),
+          onTap: (i) => _onTapTab(i, l10n),
           type: BottomNavigationBarType.fixed,
           selectedItemColor: Theme.of(context).colorScheme.primary,
           unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -141,8 +142,7 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
         Expanded(
           child: NavigationRail(
             selectedIndex: _selected.index,
-            onDestinationSelected: (i) =>
-                setState(() => _selected = _NavTab.values[i]),
+            onDestinationSelected: (i) => _onTapTab(i, l10n),
             labelType: NavigationRailLabelType.all,
             selectedIconTheme: IconThemeData(
               color: Theme.of(context).colorScheme.primary,
@@ -215,6 +215,41 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
     return maxWidth;
   }
 
+  void _onTapTab(int i, AppLocalizations l10n) {
+    final tab = _NavTab.values[i];
+    if (tab == _selected) return;
+    if (!ref.read(canSwitchTabProvider)) {
+      _showUnsavedWarning(context, l10n, tab);
+      return;
+    }
+    setState(() => _selected = tab);
+  }
+
+  void _showUnsavedWarning(
+      BuildContext context, AppLocalizations l10n, _NavTab tab) async {
+    final action = await showDialog<_DiscardTabAction>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.unsavedChangesTitle),
+        content: Text(l10n.unsavedChangesMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, _DiscardTabAction.cancel),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, _DiscardTabAction.leave),
+            child: Text(l10n.discard),
+          ),
+        ],
+      ),
+    );
+    if (action == _DiscardTabAction.leave) {
+      ref.read(canSwitchTabProvider.notifier).set(true);
+      setState(() => _selected = tab);
+    }
+  }
+
   Widget _buildBody() {
     final l10n = AppLocalizations.of(context);
     final screen = switch (_selected) {
@@ -267,6 +302,8 @@ class _ScreenLookup extends StatelessWidget {
     return ScreenRegistry.build(screen);
   }
 }
+
+enum _DiscardTabAction { cancel, leave }
 
 enum _NavTab { upload, imageEditor, history, providers, settings }
 
