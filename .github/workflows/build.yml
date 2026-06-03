@@ -1,9 +1,6 @@
 name: Build
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
       version:
@@ -12,6 +9,11 @@ on:
         type: string
       dev:
         description: 'Dev build (DEV_PROVIDERS enabled)'
+        required: false
+        type: boolean
+        default: false
+      release:
+        description: 'Create GitHub release with tag'
         required: false
         type: boolean
         default: false
@@ -249,7 +251,7 @@ jobs:
           path: uppidi-upload-${{ needs.version.outputs.version }}-${{ needs.version.outputs.hash }}-linux.flatpak
 
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.event.inputs.release == 'true'
     needs: [version, android, linux-tarball, linux-appimage, linux-flatpak, windows]
     runs-on: ubuntu-latest
     permissions:
@@ -260,16 +262,23 @@ jobs:
           fetch-depth: 0
       - name: Download all artifacts
         uses: actions/download-artifact@v8
+      - name: Create tag
+        run: |
+          TAG="v${{ needs.version.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"
       - name: Create draft release
         run: |
-          gh release create ${{ github.ref_name }} \
+          gh release create "v${{ needs.version.outputs.version }}" \
             --draft \
             --generate-notes || true
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Upload release assets
         run: |
-          gh release upload ${{ github.ref_name }} \
+          gh release upload "v${{ needs.version.outputs.version }}" \
             $(find . -type f -name 'uppidi-upload-*.*') \
             --clobber
         env:
