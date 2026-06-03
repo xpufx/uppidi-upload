@@ -267,8 +267,8 @@ jobs:
           TAG="v${{ needs.version.outputs.version }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "$TAG"
-          git push origin "$TAG"
+          git tag "$TAG" 2>/dev/null || echo "Tag $TAG already exists"
+          git push origin "$TAG" 2>/dev/null || echo "Tag $TAG already on remote"
       - name: Create draft release
         run: |
           gh release create "v${{ needs.version.outputs.version }}" \
