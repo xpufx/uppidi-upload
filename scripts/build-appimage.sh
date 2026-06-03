@@ -98,6 +98,8 @@ mkdir -p "$APPDIR"
 
 # Copy bundle contents.
 cp -rp "$BUNDLE"/* "$APPDIR/"
+# GHA artifacts strip the executable bit — ensure the binary runs.
+chmod +x "$APPDIR/uppidi" 2>/dev/null || true
 pass "Bundle contents copied to AppDir"
 
 # Add required AppImage metadata files.
