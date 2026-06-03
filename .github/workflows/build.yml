@@ -157,7 +157,8 @@ jobs:
           APPIMAGE_EXTRACT_AND_RUN: 1
         run: |
           bash scripts/build-appimage.sh --no-flutter-build \
-            --hash=${{ needs.version.outputs.hash }}
+            --hash=${{ needs.version.outputs.hash }} \
+            --artifacts-dir=${{ github.workspace }}
       - name: Upload AppImage
         if: ${{ inputs.dev != true }}
         uses: actions/upload-artifact@v7
