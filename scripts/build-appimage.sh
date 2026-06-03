@@ -48,7 +48,7 @@ git_hash() {
 
 VER="$(app_version)"
 HASH="$(git_hash)"
-DEST_DIR="${OVERRIDE_ARTIFACTS_DIR:-${PROJECT_DIR}/.caddy-artifacts}"
+DEST_DIR="${OVERRIDE_ARTIFACTS_DIR:-${PROJECT_DIR}}"
 mkdir -p "$DEST_DIR"
 FILENAME="uppidi-upload-${VER}-${HASH}-x86_64.AppImage"
 LINK="${DEST_DIR}/uppidi-upload-latest-x86_64.AppImage"
