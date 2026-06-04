@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
@@ -6,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 
-import '../core/android_save.dart';
+import '../core/save_file.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/image_editor.dart';
 import 'shell_strategy.dart';
@@ -67,18 +66,12 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
 
   Future<void> _saveToDisk(Uint8List bytes) async {
     final name = _fileName?.replaceAll(RegExp(r'\.\w+$'), '') ?? 'image';
-    String? savedPath;
-    if (Platform.isAndroid) {
-      savedPath = await saveFileOnAndroid(bytes, '${name}_edited.jpg');
-    } else {
-      savedPath = await FilePicker.saveFile(
-        dialogTitle: _l10n.saveEditedImage,
-        fileName: '${name}_edited.jpg',
-        type: FileType.custom,
-        allowedExtensions: ['jpg', 'jpeg', 'png'],
-        bytes: bytes,
-      );
-    }
+    final savedPath = await saveFileCrossPlatform(
+      bytes,
+      '${name}_edited.jpg',
+      dialogTitle: _l10n.saveEditedImage,
+      allowedExtensions: ['jpg', 'jpeg', 'png'],
+    );
     if (savedPath != null && mounted) {
       ref.read(canSwitchTabProvider.notifier).allow();
       _isSaved = true;

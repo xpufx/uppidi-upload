@@ -9,7 +9,6 @@ import '../core/logging/log.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
-import '../core/platform/insecure_adapter.dart';
 
 /// Zulip server upload provider.
 ///
@@ -97,24 +96,14 @@ class ZulipProvider extends BaseHttpProvider {
 
     final basicAuth = 'Basic ${base64Encode(utf8.encode('$email:$apiKey'))}';
 
-    final dio = Dio(BaseOptions(
-      baseUrl: base,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 60),
-      headers: {
-        'Authorization': basicAuth,
-      },
-      validateStatus: (_) => true,
-    ));
-
-    if (allowInsecureConn) {
-      configureInsecureConn(dio);
-    }
-
-    if (proxyUrl != null && proxyUrl.isNotEmpty) {
-      configureProxy(dio, proxyUrl);
-    }
-
+    final dio = await super.createHttpClient(
+      config,
+      allowInsecureConn: allowInsecureConn,
+      proxyUrl: proxyUrl,
+    );
+    dio.options.baseUrl = base;
+    dio.options.receiveTimeout = const Duration(seconds: 60);
+    dio.options.headers = {'Authorization': basicAuth};
     return dio;
   }
 
@@ -227,15 +216,7 @@ class ZulipProvider extends BaseHttpProvider {
       // Upload succeeded regardless of message post outcome
       return result;
     } catch (e, stackTrace) {
-      _log.error('Upload failed: $e', error: e, stackTrace: stackTrace);
-      final statusCode = e is DioException ? e.response?.statusCode : null;
-      return UploadResult(
-        success: false,
-        errorMessage: mapException(e),
-        rawError: e.toString(),
-        statusCode: statusCode,
-        stackTrace: stackTrace.toString(),
-      );
+      return uploadError(e, stackTrace);
     }
   }
 

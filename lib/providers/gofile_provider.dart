@@ -132,15 +132,7 @@ class GoFileProvider extends BaseHttpProvider {
 
       return parseResponse(response);
     } catch (e, stackTrace) {
-      _log.error('Upload failed: $e', error: e, stackTrace: stackTrace);
-      final statusCode = e is DioException ? e.response?.statusCode : null;
-      return UploadResult(
-        success: false,
-        errorMessage: mapException(e),
-        rawError: e.toString(),
-        statusCode: statusCode,
-        stackTrace: stackTrace.toString(),
-      );
+      return uploadError(e, stackTrace);
     }
   }
 

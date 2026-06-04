@@ -7,7 +7,6 @@ import '../core/logging/log.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
-import '../core/platform/insecure_adapter.dart';
 
 /// Telegram Bot API provider.
 ///
@@ -84,25 +83,16 @@ class TelegramProvider extends BaseHttpProvider {
     String? proxyUrl,
   }) async {
     final token = config['bot_token'] ?? '';
-    final apiBase = token.isNotEmpty
+    final dio = await super.createHttpClient(
+      config,
+      allowInsecureConn: allowInsecureConn,
+      proxyUrl: proxyUrl,
+    );
+    dio.options.baseUrl = token.isNotEmpty
         ? 'https://api.telegram.org/bot$token'
         : 'https://api.telegram.org';
-
-    final dio = Dio(BaseOptions(
-      baseUrl: apiBase,
-      connectTimeout: const Duration(seconds: 60),
-      receiveTimeout: const Duration(seconds: 120),
-      validateStatus: (_) => true,
-    ));
-
-    if (allowInsecureConn) {
-      configureInsecureConn(dio);
-    }
-
-    if (proxyUrl != null && proxyUrl.isNotEmpty) {
-      configureProxy(dio, proxyUrl);
-    }
-
+    dio.options.connectTimeout = const Duration(seconds: 60);
+    dio.options.receiveTimeout = const Duration(seconds: 120);
     return dio;
   }
 
@@ -167,15 +157,7 @@ class TelegramProvider extends BaseHttpProvider {
 
       return parseResponse(response);
     } catch (e, stackTrace) {
-      _log.error('Upload failed: $e', error: e, stackTrace: stackTrace);
-      final statusCode = e is DioException ? e.response?.statusCode : null;
-      return UploadResult(
-        success: false,
-        errorMessage: mapException(e),
-        rawError: e.toString(),
-        statusCode: statusCode,
-        stackTrace: stackTrace.toString(),
-      );
+      return uploadError(e, stackTrace);
     }
   }
 

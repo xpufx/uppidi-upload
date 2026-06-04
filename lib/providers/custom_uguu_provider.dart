@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
-import '../core/platform/insecure_adapter.dart';
 import '../core/logging/log.dart';
 
 /// Uguu-compatible upload provider for user-configured instances.
@@ -70,18 +69,12 @@ class CustomUguuProvider extends BaseHttpProvider {
     if (serverUrl.endsWith('/')) {
       serverUrl = serverUrl.substring(0, serverUrl.length - 1);
     }
-    final dio = Dio(BaseOptions(
-      baseUrl: serverUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 60),
-      validateStatus: (_) => true,
-    ));
-    if (allowInsecureConn) {
-      configureInsecureConn(dio);
-    }
-    if (proxyUrl != null && proxyUrl.isNotEmpty) {
-      configureProxy(dio, proxyUrl);
-    }
+    final dio = await super.createHttpClient(
+      config,
+      allowInsecureConn: allowInsecureConn,
+      proxyUrl: proxyUrl,
+    );
+    dio.options.baseUrl = serverUrl;
     return dio;
   }
 

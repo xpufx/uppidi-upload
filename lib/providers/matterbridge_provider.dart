@@ -10,7 +10,6 @@ import '../core/logging/log.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
-import '../core/platform/insecure_adapter.dart';
 
 /// Matterbridge API provider.
 ///
@@ -85,21 +84,14 @@ class MatterbridgeProvider extends BaseHttpProvider {
   }) async {
     final url = (config['mb_url']?.trim() ?? '').replaceAll(RegExp(r'/$'), '');
     final token = config['mb_token']?.trim() ?? '';
-
-    final dio = Dio(BaseOptions(
-      baseUrl: url,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 60),
-      headers: {'Authorization': 'Bearer $token'},
-      validateStatus: (_) => true,
-    ));
-
-    if (allowInsecureConn) {
-      configureInsecureConn(dio);
-    }
-    if (proxyUrl != null && proxyUrl.isNotEmpty) {
-      configureProxy(dio, proxyUrl);
-    }
+    final dio = await super.createHttpClient(
+      config,
+      allowInsecureConn: allowInsecureConn,
+      proxyUrl: proxyUrl,
+    );
+    dio.options.baseUrl = url;
+    dio.options.receiveTimeout = const Duration(seconds: 60);
+    dio.options.headers = {'Authorization': 'Bearer $token'};
     return dio;
   }
 

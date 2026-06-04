@@ -13,12 +13,12 @@ import 'package:uppidi_upload/screens/upload_screen.dart';
 import 'package:uppidi_upload/screens/test_screen.dart';
 import 'package:uppidi_upload/screens/settings_screen.dart';
 import 'package:uppidi_upload/providers/upload_provider.dart';
-import 'package:uppidi_upload/core/interfaces/uploader.dart';
 import 'package:uppidi_upload/core/models/provider_metadata.dart';
 import 'package:uppidi_upload/core/models/upload_result.dart';
-import 'package:uppidi_upload/core/models/upload_request.dart';
 import 'package:uppidi_upload/l10n/app_localizations.dart';
 import 'package:uppidi_upload/core/settings_service.dart';
+
+import 'helpers/mock_uploader.dart';
 
 /// Mock UploadNotifier to control initial state
 class MockUploadNotifier extends UploadNotifier {
@@ -37,77 +37,6 @@ class MockUploadNotifier extends UploadNotifier {
   Future<void> uploadSelected() async {
     uploadSelectedCalled = true;
     await super.uploadSelected();
-  }
-}
-
-/// Mock uploader for testing
-class MockUploader implements BaseUploader {
-  final String id;
-  final String name;
-  final bool isImageProvider;
-  final Duration? uploadDelay;
-
-  MockUploader({
-    this.id = 'mock_provider',
-    this.name = 'Mock Provider',
-    this.isImageProvider = false,
-    this.uploadDelay,
-  });
-
-  @override
-  String get providerId => id;
-
-  @override
-  String get providerName => name;
-
-  @override
-  bool get supportsWeb => true;
-  @override
-  bool get supportsMessage => false;
-  @override
-  bool get isUrlShareOnly => false;
-
-  @override
-  List<String> get requiredConfigKeys => [];
-
-  @override
-  Map<String, String> get configLabels => {};
-
-  @override
-  List<String> get optionalConfigKeys => const [];
-
-  @override
-  String? get proxyUrl => null;
-
-  @override
-  String? get instanceDescription => null;
-  @override
-  List<String> get optionalTextConfigKeys => const [];
-
-  @override
-  ProviderMetadata get metadata => ProviderMetadata(
-        allowedMimeTypes: isImageProvider ? {'image/*'} : null,
-      );
-
-  @override
-  Future<Dio> createHttpClient(
-    Map<String, String> config, {
-    bool allowInsecureConn = false,
-    String? proxyUrl,
-  }) async =>
-      Dio();
-
-  @override
-  Future<UploadResult> upload(
-    FileUploadRequest request, {
-    UploadProgressCallback? onProgress,
-    CancelToken? cancelToken,
-    Map<String, String> config = const {},
-  }) async {
-    if (uploadDelay != null) {
-      await Future.delayed(uploadDelay!);
-    }
-    return UploadResult(success: true);
   }
 }
 
@@ -130,7 +59,7 @@ void main() {
 
   group('Upload Screen Widget Tests', () {
     testWidgets('1. Renders provider dropdown', (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
 
       await tester.pumpWidget(
         ProviderScope(
@@ -156,7 +85,7 @@ void main() {
     });
 
     testWidgets('2. Shows pick button when idle', (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
 
       await tester.pumpWidget(
         ProviderScope(
@@ -186,7 +115,7 @@ void main() {
   group('FileSelected State Tests', () {
     testWidgets('Upload button and Clear button visible when file selected',
         (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
 
       await tester.pumpWidget(
         ProviderScope(
@@ -225,7 +154,7 @@ void main() {
 
     testWidgets('File preview visible when file selected',
         (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
 
       await tester.pumpWidget(
         ProviderScope(
@@ -264,7 +193,7 @@ void main() {
     testWidgets(
         'Progress bar, speed label, cancel button visible during upload',
         (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
       final cancelToken = CancelToken();
 
       await tester.pumpWidget(
@@ -315,7 +244,7 @@ void main() {
   group('Completed State Tests - Success', () {
     testWidgets('URL text, share icon, copy icon, open icon visible on success',
         (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
       const testUrl = 'https://example.com/test.pdf';
 
       await tester.pumpWidget(
@@ -368,7 +297,7 @@ void main() {
     testWidgets(
         'Error text, retry button, cancel button, debug icon visible on failure',
         (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
       const errorMessage = 'Upload failed: Connection timeout';
 
       await tester.pumpWidget(
@@ -423,8 +352,12 @@ void main() {
     testWidgets(
         'Provider dropdown changes but preview stays when provider changes',
         (WidgetTester tester) async {
-      final mockUploader1 = MockUploader(id: 'provider1', name: 'Provider 1');
-      final mockUploader2 = MockUploader(id: 'provider2', name: 'Provider 2');
+      final mockUploader1 = MockBaseUploader()
+        ..providerId = 'provider1'
+        ..providerName = 'Provider 1';
+      final mockUploader2 = MockBaseUploader()
+        ..providerId = 'provider2'
+        ..providerName = 'Provider 2';
       final mockUploaders = [mockUploader1, mockUploader2];
 
       // Create a state with file selected
@@ -548,7 +481,8 @@ void main() {
   group('Tap Interaction Tests', () {
     testWidgets('1. Tap quality selector changes value to Medium (1)',
         (WidgetTester tester) async {
-      final imageUploader = MockUploader(isImageProvider: true);
+      final imageUploader = MockBaseUploader()
+        ..metadata = ProviderMetadata(allowedMimeTypes: {'image/*'});
       final notifier = MockUploadNotifier(
         initialTestState: UploadFileSelected(
           fileName: 'test.png',
@@ -579,7 +513,7 @@ void main() {
 
     testWidgets('2. Tap Upload button calls uploadSelected()',
         (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
       final notifier = MockUploadNotifier(
         initialTestState: UploadFileSelected(
           fileName: 'test.pdf',
@@ -627,7 +561,7 @@ void main() {
 
     testWidgets('3. Tap Clear button returns to UploadIdle',
         (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
       final notifier = MockUploadNotifier(
         initialTestState: UploadFileSelected(
           fileName: 'test.pdf',
@@ -673,7 +607,7 @@ void main() {
 
     testWidgets('4. Tap Cancel during upload returns to UploadIdle',
         (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
       final cancelToken = CancelToken();
       final notifier = MockUploadNotifier(
         initialTestState: UploadInProgress(
@@ -724,7 +658,7 @@ void main() {
 
     testWidgets('5. Tap Retry on failure calls uploadSelected()',
         (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
       final notifier = MockUploadNotifier(
         initialTestState: UploadCompleted(
           lastResult: UploadResult(success: false, errorMessage: 'Test error'),
@@ -774,7 +708,7 @@ void main() {
 
     testWidgets('6. Tap Debug icon shows error dialog',
         (WidgetTester tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
       const errorMessage = 'Test upload error';
 
       await tester.pumpWidget(
@@ -839,7 +773,8 @@ void main() {
     }
 
     testWidgets('Crop icon visible when image file selected', (tester) async {
-      final imageUploader = MockUploader(isImageProvider: true);
+      final imageUploader = MockBaseUploader()
+        ..metadata = ProviderMetadata(allowedMimeTypes: {'image/*'});
       final notifier = MockUploadNotifier(
         initialTestState: UploadFileSelected(
           fileName: 'test.png',
@@ -872,7 +807,7 @@ void main() {
     });
 
     testWidgets('Crop icon NOT visible for non-image files', (tester) async {
-      final mockUploaders = [MockUploader()];
+      final mockUploaders = [MockBaseUploader()];
       final notifier = MockUploadNotifier(
         initialTestState: UploadFileSelected(
           fileName: 'test.pdf',

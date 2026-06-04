@@ -6,10 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:uppidi_upload/core/interfaces/uploader.dart';
 import 'package:uppidi_upload/core/models/upload_result.dart';
-import 'package:uppidi_upload/core/models/upload_request.dart';
-import 'package:uppidi_upload/core/models/provider_metadata.dart';
 import 'package:uppidi_upload/core/models/upload_record.dart';
 import 'package:uppidi_upload/core/registry.dart';
 import 'package:uppidi_upload/core/settings_service.dart';
@@ -17,96 +14,9 @@ import 'package:uppidi_upload/core/history_service.dart';
 import 'package:uppidi_upload/providers/telegram_provider.dart';
 import 'package:uppidi_upload/providers/upload_provider.dart';
 
+import 'helpers/mock_uploader.dart';
+
 // Mock classes
-class MockBaseUploader implements BaseUploader {
-  Future<UploadResult> Function(FileUploadRequest,
-      {UploadProgressCallback? onProgress,
-      CancelToken? cancelToken,
-      Map<String, String> config})? uploadCallback;
-  final ProviderMetadata _metadata;
-  final String _providerId;
-  final String _providerName;
-  final List<String> _requiredConfigKeys;
-  final Map<String, String> _configLabels;
-  final bool _supportsWeb;
-  bool _uploadCalled = false;
-  bool get uploadCalled => _uploadCalled;
-  void resetUploadCalled() => _uploadCalled = false;
-
-  MockBaseUploader({
-    this.uploadCallback,
-    ProviderMetadata? metadata,
-    String providerId = 'mock_provider',
-    String providerName = 'Mock Provider',
-    List<String> requiredConfigKeys = const [],
-    Map<String, String> configLabels = const {},
-    bool supportsWeb = false,
-  })  : _metadata = metadata ??
-            const ProviderMetadata(maxFileSizeBytes: 10 * 1024 * 1024),
-        _providerId = providerId,
-        _providerName = providerName,
-        _requiredConfigKeys = requiredConfigKeys,
-        _configLabels = configLabels,
-        _supportsWeb = supportsWeb;
-
-  @override
-  String get providerId => _providerId;
-
-  @override
-  String get providerName => _providerName;
-
-  @override
-  bool get supportsWeb => _supportsWeb;
-  @override
-  bool get supportsMessage => false;
-  @override
-  bool get isUrlShareOnly => false;
-
-  @override
-  List<String> get requiredConfigKeys => _requiredConfigKeys;
-
-  @override
-  Map<String, String> get configLabels => _configLabels;
-
-  @override
-  List<String> get optionalConfigKeys => const [];
-
-  @override
-  String? get proxyUrl => null;
-
-  @override
-  String? get instanceDescription => null;
-  @override
-  List<String> get optionalTextConfigKeys => const [];
-
-  @override
-  ProviderMetadata get metadata => _metadata;
-
-  @override
-  Future<Dio> createHttpClient(Map<String, String> config,
-      {bool allowInsecureConn = false, String? proxyUrl}) async {
-    return Dio();
-  }
-
-  @override
-  Future<UploadResult> upload(
-    FileUploadRequest request, {
-    UploadProgressCallback? onProgress,
-    CancelToken? cancelToken,
-    Map<String, String> config = const {},
-  }) async {
-    _uploadCalled = true;
-    if (uploadCallback != null) {
-      return uploadCallback!(request,
-          onProgress: onProgress, cancelToken: cancelToken, config: config);
-    }
-    return UploadResult(
-        success: true,
-        url: 'https://mock.url/${request.fileName}',
-        completedAt: DateTime.now());
-  }
-}
-
 class MockSettingsService implements SettingsService {
   @override
   Future<Map<String, String>> loadProviderConfig(
@@ -231,8 +141,12 @@ void main() {
     mockSettings = MockSettingsService();
     mockHistory = MockHistoryService();
     mockUploaders = [
-      MockBaseUploader(providerId: 'mock_0', providerName: 'Mock Provider 0'),
-      MockBaseUploader(providerId: 'mock_1', providerName: 'Mock Provider 1'),
+      MockBaseUploader()
+        ..providerId = 'mock_0'
+        ..providerName = 'Mock Provider 0',
+      MockBaseUploader()
+        ..providerId = 'mock_1'
+        ..providerName = 'Mock Provider 1',
     ];
     // Reset upload tracking
     for (final uploader in mockUploaders) {

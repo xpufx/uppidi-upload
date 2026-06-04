@@ -13,11 +13,11 @@ import 'package:uppidi_upload/screens/test_screen.dart';
 import 'package:uppidi_upload/core/interfaces/uploader.dart';
 import 'package:uppidi_upload/core/models/provider_instance.dart';
 import 'package:uppidi_upload/core/models/provider_metadata.dart';
-import 'package:uppidi_upload/core/models/upload_request.dart';
-import 'package:uppidi_upload/core/models/upload_result.dart';
 import 'package:uppidi_upload/core/registry.dart';
 import 'package:uppidi_upload/core/settings_service.dart';
 import 'package:uppidi_upload/l10n/app_localizations.dart';
+
+import 'helpers/mock_uploader.dart';
 
 /// A mock Dio adapter that returns a successful response without network I/O.
 class _MockSuccessAdapter implements HttpClientAdapter {
@@ -32,66 +32,6 @@ class _MockSuccessAdapter implements HttpClientAdapter {
 
   @override
   void close({bool force = false}) {}
-}
-
-/// A mock uploader that uses [_MockSuccessAdapter], so connectivity checks
-/// always succeed fast.
-class _MockConnectivityUploader implements BaseUploader {
-  @override
-  String get providerId => 'mock_success';
-
-  @override
-  String get providerName => 'Mock Success';
-
-  @override
-  bool get supportsWeb => true;
-  @override
-  bool get supportsMessage => false;
-
-  @override
-  bool get isUrlShareOnly => false;
-
-  @override
-  List<String> get requiredConfigKeys => const [];
-
-  @override
-  Map<String, String> get configLabels => const {};
-
-  @override
-  List<String> get optionalConfigKeys => const [];
-
-  @override
-  String? get proxyUrl => null;
-
-  @override
-  String? get instanceDescription => null;
-
-  @override
-  List<String> get optionalTextConfigKeys => const [];
-
-  @override
-  ProviderMetadata get metadata => ProviderMetadata();
-
-  @override
-  Future<Dio> createHttpClient(
-    Map<String, String> config, {
-    bool allowInsecureConn = false,
-    String? proxyUrl,
-  }) async {
-    final dio = Dio();
-    dio.httpClientAdapter = _MockSuccessAdapter();
-    return dio;
-  }
-
-  @override
-  Future<UploadResult> upload(
-    FileUploadRequest request, {
-    UploadProgressCallback? onProgress,
-    CancelToken? cancelToken,
-    Map<String, String> config = const {},
-  }) async {
-    return UploadResult(success: true);
-  }
 }
 
 void main() {
@@ -181,7 +121,13 @@ void main() {
 
     setUp(() {
       saved = List.of(ProviderRegistry.all);
-      ProviderRegistry.all = [_MockConnectivityUploader()];
+      ProviderRegistry.all = [
+        MockBaseUploader()
+          ..providerId = 'mock_success'
+          ..providerName = 'Mock Success'
+          ..createHttpClientOverride =
+              () => Dio()..httpClientAdapter = _MockSuccessAdapter(),
+      ];
     });
 
     tearDown(() {

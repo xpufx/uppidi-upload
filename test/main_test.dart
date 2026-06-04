@@ -4,68 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:uppidi_upload/l10n/app_localizations.dart';
 import 'package:uppidi_upload/providers/upload_provider.dart';
-import 'package:uppidi_upload/core/interfaces/uploader.dart';
 import 'package:uppidi_upload/core/models/upload_result.dart';
-import 'package:uppidi_upload/core/models/upload_request.dart';
-import 'package:dio/dio.dart';
-import 'package:uppidi_upload/core/models/provider_metadata.dart';
 
-// Mock uploader for testing
-class MockNavUploader implements BaseUploader {
-  @override
-  String get providerId => 'mock';
-
-  @override
-  String get providerName => 'Mock Provider';
-
-  @override
-  bool get supportsWeb => true;
-  @override
-  bool get supportsMessage => false;
-  @override
-  bool get isUrlShareOnly => false;
-
-  @override
-  List<String> get requiredConfigKeys => [];
-
-  @override
-  Map<String, String> get configLabels => {};
-
-  @override
-  List<String> get optionalConfigKeys => const [];
-
-  @override
-  String? get proxyUrl => null;
-
-  @override
-  String? get instanceDescription => null;
-  @override
-  List<String> get optionalTextConfigKeys => const [];
-
-  @override
-  ProviderMetadata get metadata => ProviderMetadata();
-
-  @override
-  Future<Dio> createHttpClient(
-    Map<String, String> config, {
-    bool allowInsecureConn = false,
-    String? proxyUrl,
-  }) async =>
-      Dio();
-
-  @override
-  Future<UploadResult> upload(
-    FileUploadRequest request, {
-    UploadProgressCallback? onProgress,
-    CancelToken? cancelToken,
-    Map<String, String> config = const {},
-  }) async =>
-      UploadResult(success: true);
-}
+import 'helpers/mock_uploader.dart';
 
 // Mock upload notifier
 class MockNavUploadNotifier extends UploadNotifier {
-  MockNavUploadNotifier() : super(providers: [MockNavUploader()]);
+  MockNavUploadNotifier() : super(providers: [MockBaseUploader()]);
 }
 
 void main() {

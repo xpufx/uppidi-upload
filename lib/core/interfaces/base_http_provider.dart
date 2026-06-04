@@ -130,17 +130,29 @@ abstract class BaseHttpProvider implements BaseUploader {
 
       return parseResponse(response);
     } catch (e, stackTrace) {
-      _log.error('Upload failed: $e', error: e, stackTrace: stackTrace);
-      // statusCode is only available for DioExceptions (which have associated HTTP responses); non-Dio exceptions have no HTTP status code, so default to null
-      final statusCode = e is DioException ? e.response?.statusCode : null;
-      return UploadResult(
-        success: false,
-        errorMessage: mapException(e),
-        rawError: e.toString(),
-        statusCode: statusCode,
-        stackTrace: stackTrace.toString(),
-      );
+      return uploadError(e, stackTrace);
     }
+  }
+
+  UploadResult uploadError(Object e, StackTrace stackTrace) {
+    _log.error('Upload failed: $e', error: e, stackTrace: stackTrace);
+    final statusCode = e is DioException ? e.response?.statusCode : null;
+    return UploadResult(
+      success: false,
+      errorMessage: mapException(e),
+      rawError: e.toString(),
+      statusCode: statusCode,
+      stackTrace: stackTrace.toString(),
+    );
+  }
+
+  UploadResult unhandledError(Response response) {
+    _log.warn('Unhandled error (returning genericError)');
+    return UploadResult(
+      success: false,
+      errorMessage: 'genericError',
+      statusCode: response.statusCode,
+    );
   }
 
   MultipartFile _buildStreamFile(FileUploadRequest request) {

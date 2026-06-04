@@ -1,13 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'android_save.dart';
 import 'config_provider.dart';
+import 'save_file.dart';
 import 'logging/log.dart';
 import 'models/provider_instance.dart';
 import 'provider_storage_service.dart';
@@ -72,32 +71,18 @@ Future<String?> exportConfig({WidgetRef? ref}) async {
 
   final jsonBytes = utf8.encode(jsonString);
 
-  if (Platform.isAndroid) {
-    return saveFileOnAndroid(
-      Uint8List.fromList(jsonBytes),
-      'uppidi-export.json',
-      mimeType: 'application/json',
-    );
+  final outputFile = await saveFileCrossPlatform(
+    Uint8List.fromList(jsonBytes),
+    'uppidi-export.json',
+    dialogTitle: 'Export config',
+    allowedExtensions: ['json'],
+  );
+  if (outputFile == null) {
+    _log.info('Export cancelled by user');
+    return null;
   }
-
-  try {
-    final outputFile = await FilePicker.saveFile(
-      dialogTitle: 'Export config',
-      fileName: 'uppidi-export.json',
-      type: FileType.custom,
-      allowedExtensions: ['json'],
-      bytes: Uint8List.fromList(jsonBytes),
-    );
-    if (outputFile == null) {
-      _log.info('Export cancelled by user');
-      return null;
-    }
-    _log.info('Export saved to: $outputFile');
-    return outputFile;
-  } catch (e) {
-    _log.error('File picker save failed: $e', error: e);
-    rethrow;
-  }
+  _log.info('Export saved to: $outputFile');
+  return outputFile;
 }
 
 /// Imports provider config and app settings from a user-selected JSON file

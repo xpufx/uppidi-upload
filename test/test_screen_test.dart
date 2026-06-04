@@ -1,82 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
 
 import 'package:uppidi_upload/screens/test_screen.dart';
-import 'package:uppidi_upload/core/interfaces/uploader.dart';
 import 'package:uppidi_upload/core/models/provider_metadata.dart';
-import 'package:uppidi_upload/core/models/upload_result.dart';
-import 'package:uppidi_upload/core/models/upload_request.dart';
 import 'package:uppidi_upload/core/registry.dart';
 import 'package:uppidi_upload/l10n/app_localizations.dart';
 import 'package:uppidi_upload/core/settings_service.dart';
 import 'package:hive/hive.dart';
-
-/// Mock uploader for testing
-class MockTestUploader implements BaseUploader {
-  final String id;
-  final String name;
-  final bool isImageProvider;
-
-  MockTestUploader({
-    this.id = 'mock_provider',
-    this.name = 'Mock Provider',
-    this.isImageProvider = false,
-  });
-
-  @override
-  String get providerId => id;
-
-  @override
-  String get providerName => name;
-
-  @override
-  bool get supportsWeb => true;
-  @override
-  bool get supportsMessage => false;
-  @override
-  bool get isUrlShareOnly => false;
-
-  @override
-  List<String> get requiredConfigKeys => [];
-
-  @override
-  Map<String, String> get configLabels => {};
-
-  @override
-  List<String> get optionalConfigKeys => const [];
-
-  @override
-  String? get proxyUrl => null;
-
-  @override
-  String? get instanceDescription => null;
-  @override
-  List<String> get optionalTextConfigKeys => const [];
-
-  @override
-  ProviderMetadata get metadata => ProviderMetadata(
-        allowedMimeTypes: isImageProvider ? {'image/*'} : null,
-      );
-
-  @override
-  Future<Dio> createHttpClient(
-    Map<String, String> config, {
-    bool allowInsecureConn = false,
-    String? proxyUrl,
-  }) async =>
-      Dio();
-
-  @override
-  Future<UploadResult> upload(
-    FileUploadRequest request, {
-    UploadProgressCallback? onProgress,
-    CancelToken? cancelToken,
-    Map<String, String> config = const {},
-  }) async =>
-      UploadResult(success: true);
-}
 
 void main() {
   late AppLocalizations l10n;

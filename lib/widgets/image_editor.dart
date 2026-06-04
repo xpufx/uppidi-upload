@@ -1,11 +1,9 @@
-import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 
-import '../core/android_save.dart';
+import '../core/save_file.dart';
 import '../l10n/app_localizations.dart';
 
 const _checkSize = 12.0;
@@ -238,19 +236,12 @@ Future<void> _saveToFile(
   final bytes = await editor.captureEditorImage();
   if (bytes.isEmpty) return;
 
-  String? savedPath;
-  if (Platform.isAndroid) {
-    savedPath =
-        await saveFileOnAndroid(bytes, '${fileName ?? 'image'}_edited.jpg');
-  } else {
-    savedPath = await FilePicker.saveFile(
-      dialogTitle: l10n.saveEditedImage,
-      fileName: '${fileName ?? 'image'}_edited.jpg',
-      type: FileType.custom,
-      allowedExtensions: ['jpg', 'jpeg', 'png'],
-      bytes: bytes,
-    );
-  }
+  final savedPath = await saveFileCrossPlatform(
+    bytes,
+    '${fileName ?? 'image'}_edited.jpg',
+    dialogTitle: l10n.saveEditedImage,
+    allowedExtensions: ['jpg', 'jpeg', 'png'],
+  );
   if (savedPath != null && context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.imageSaved)),

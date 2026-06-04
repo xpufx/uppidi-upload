@@ -1,14 +1,12 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:file_picker/file_picker.dart';
 
-import '../core/android_save.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
+import '../core/save_file.dart';
 
 /// Saves the file locally instead of uploading to a remote service.
 class LocalProvider implements BaseUploader {
@@ -59,23 +57,14 @@ class LocalProvider implements BaseUploader {
     try {
       final raw = await request.dataStream.first;
       final bytes = Uint8List.fromList(raw);
-      String? savedPath;
 
-      if (Platform.isAndroid) {
-        savedPath = await saveFileOnAndroid(
-          bytes,
-          request.fileName,
-          mimeType: request.mimeType ?? 'image/jpeg',
-        );
-      } else {
-        savedPath = await FilePicker.saveFile(
-          dialogTitle: 'Save image',
-          fileName: request.fileName,
-          type: FileType.custom,
-          allowedExtensions: ['jpg', 'jpeg', 'png'],
-          bytes: bytes,
-        );
-      }
+      final savedPath = await saveFileCrossPlatform(
+        bytes,
+        request.fileName,
+        dialogTitle: 'Save image',
+        allowedExtensions: ['jpg', 'jpeg', 'png'],
+        mimeType: request.mimeType,
+      );
 
       if (savedPath == null) {
         return UploadResult(
