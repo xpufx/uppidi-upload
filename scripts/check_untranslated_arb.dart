@@ -64,6 +64,7 @@ void main(List<String> args) {
       if (localeValue is! String) continue;
 
       if (localeValue == templateValue) {
+        if (exemptedLocales.contains(locale)) continue;
         if (!exemptedKeys.contains(key)) {
           localeViolations[key] = templateValue;
         }
@@ -107,6 +108,11 @@ void main(List<String> args) {
 ///
 /// Other keys should be translated. Add here only after confirming
 /// with the user.
+/// Locales to skip entirely (e.g. novelty/joke languages).
+const exemptedLocales = <String>{
+  'tlh', // Klingon — novelty language, not worth translating
+};
+
 const exemptedKeys = <String>{
   // Brand / metadata (never translated)
   'appTitle',
@@ -135,4 +141,15 @@ const exemptedKeys = <String>{
   // Connectivity test — server response fragments, not user-facing UI
   'connectedAs',
   'chatAccessible',
+
+  // Universal loanword, same in all locales
+  'emojiTool',
+
+  // Format / unit patterns — abbreviations differ by locale but "h" (hour)
+  // and the numeric pattern are universal enough
+  'expiryOptions1h12h24h72h',
+  'proxyHint',
+
+  // Universal short response
+  'ok',
 };

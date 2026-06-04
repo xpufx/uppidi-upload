@@ -214,7 +214,7 @@ class AppLocalizationsEo extends AppLocalizations {
   String get lastUsed => 'Lasta uzo';
 
   @override
-  String get proxyHint => 'socks5://host:port';
+  String get proxyHint => 'socks5://gastigo:haveno';
 
   @override
   String get dropFileToUpload => 'Demetu dosieron por alŝuti';
@@ -684,10 +684,10 @@ class AppLocalizationsEo extends AppLocalizations {
   String get fillRequiredFields => 'Plenigu la devigajn kampojn unue';
 
   @override
-  String get debugResponse => 'Debug response';
+  String get debugResponse => 'Sensaliga respondo';
 
   @override
-  String get done => 'Done';
+  String get done => 'Farita';
 
   @override
   String get configLabelServerUrl => 'Server URL';
@@ -705,25 +705,25 @@ class AppLocalizationsEo extends AppLocalizations {
   String get configInstanceNameHelper => 'A label to identify this instance';
 
   @override
-  String get currentlyUnavailable => 'Currently unavailable';
+  String get currentlyUnavailable => 'Nuntempe ne havebla';
 
   @override
-  String get cropImage => 'Crop';
+  String get cropImage => 'Tondi';
 
   @override
-  String get builtInProviders => 'Built-in';
+  String get builtInProviders => 'Enkonstruitaj';
 
   @override
-  String get testStepReachable => 'Reachable';
+  String get testStepReachable => 'Atingebla';
 
   @override
-  String get testStepNotProvided => 'Not provided';
+  String get testStepNotProvided => 'Ne provizita';
 
   @override
-  String get testStepNotFound => 'Not found';
+  String get testStepNotFound => 'Ne trovita';
 
   @override
-  String get testStepInvalid => 'Invalid';
+  String get testStepInvalid => 'Nevalida';
 
   @override
   String connectedAs(Object username) {
@@ -745,83 +745,83 @@ class AppLocalizationsEo extends AppLocalizations {
   String get configLabelDirectMessage => 'Direct message';
 
   @override
-  String get matterbridgeSend => 'Send via Matterbridge';
+  String get matterbridgeSend => 'Sendi per Matterbridge';
 
   @override
-  String get matterbridgeNotConfigured => 'Matterbridge not fully configured';
+  String get matterbridgeNotConfigured => 'Matterbridge ne plene agordita';
 
   @override
   String matterbridgeSent(Object gateway) {
-    return 'Sent to $gateway';
+    return 'Sendita al $gateway';
   }
 
   @override
   String matterbridgeError(Object code) {
-    return 'Matterbridge error: $code';
+    return 'Matterbridge eraro: $code';
   }
 
   @override
   String matterbridgeFailed(Object error) {
-    return 'Failed: $error';
+    return 'Malsukcesis: $error';
   }
 
   @override
   String messageVariables(Object vars) {
-    return 'Variables: $vars';
+    return 'Variabloj: $vars';
   }
 
   @override
-  String get pasteFromClipboard => 'Paste from clipboard';
+  String get pasteFromClipboard => 'Alglui el tondujo';
 
   @override
-  String get clipboardEmpty => 'No image found in clipboard';
+  String get clipboardEmpty => 'Neniu bildo trovita en tondujo';
 
   @override
-  String get exportImportTitle => 'Export / Import';
+  String get exportImportTitle => 'Eksporti / Importi';
 
   @override
   String get exportImportDescription =>
-      'Export your provider credentials and app settings to a JSON file for backup or transfer. Import merges all data — existing settings and provider config will be replaced.';
+      'Eksportu viajn provizantajn akreditaĵojn kaj aplikaĵajn agordojn al JSON-dosiero por sekurkopio aŭ transigo. Importo kunigas ĉiujn datumojn — ekzistantaj agordoj kaj provizanta agordo estos anstataŭigitaj.';
 
   @override
-  String get exportConfigTitle => 'Export config';
+  String get exportConfigTitle => 'Eksporti agordon';
 
   @override
   String get exportConfigWarning =>
-      'This file will contain API keys, tokens, passwords, and app settings. Keep it safe — anyone with this file can access your accounts.';
+      'Ĉi tiu dosiero enhavos API-ŝlosilojn, ĵetonojn, pasvortojn kaj aplikaĵajn agordojn. Tenu ĝin sekura — iu ajn kun ĉi tiu dosiero povas aliri viajn kontojn.';
 
   @override
-  String get importConfigTitle => 'Import config';
+  String get importConfigTitle => 'Importi agordon';
 
   @override
   String get importConfigWarning =>
-      'This will REPLACE all current provider credentials and settings with the data from the imported file. This cannot be undone.';
+      'Ĉi tio ANSTATAŪIGOS ĉiujn nunajn provizantajn akreditaĵojn kaj agordojn per la datumoj de la importita dosiero. Ĉi tio ne povas esti malfarita.';
 
   @override
-  String get exportAction => 'Export';
+  String get exportAction => 'Eksporti';
 
   @override
-  String get importAction => 'Import';
+  String get importAction => 'Importi';
 
   @override
   String exportedTo(Object path) {
-    return 'Exported to: $path';
+    return 'Eksportita al: $path';
   }
 
   @override
-  String get exportFailed => 'Export failed';
+  String get exportFailed => 'Eksporto malsukcesis';
 
   @override
-  String get importFailed => 'Import failed';
+  String get importFailed => 'Importo malsukcesis';
 
   @override
-  String get apkDownloaded => 'APK downloaded';
+  String get apkDownloaded => 'APK elŝutita';
 
   @override
-  String get installNow => 'Install Now';
+  String get installNow => 'Instali Nun';
 
   @override
-  String get downloadComplete => 'Download complete';
+  String get downloadComplete => 'Elŝuto kompleta';
 
   @override
   String secondsAgo(Object seconds) {
@@ -985,7 +985,7 @@ class AppLocalizationsEo extends AppLocalizations {
   String get editImage => 'Redakti bildon';
 
   @override
-  String get navImageEditor => 'Image Editor';
+  String get navImageEditor => 'Bilda Redaktilo';
 
   @override
   String get saveToFile => 'Konservi al dosiero';

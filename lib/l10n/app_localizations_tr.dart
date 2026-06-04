@@ -177,13 +177,13 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get navTest => 'Test';
+  String get navTest => 'Sınama';
 
   @override
   String get testAll => 'Hepsini Test Et';
 
   @override
-  String get testProvider => 'Test';
+  String get testProvider => 'Sınama';
 
   @override
   String get noProvidersAvailable => 'Sağlayıcı yok';
@@ -329,7 +329,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get iconLegendTitle => 'Sağlayıcı Simgeleri';
 
   @override
-  String get iconLegendTest => 'Test';
+  String get iconLegendTest => 'Sınama';
 
   @override
   String get iconLegendFiles => 'Dosyalar';
@@ -687,10 +687,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get fillRequiredFields => 'Önce gerekli alanları doldurun';
 
   @override
-  String get debugResponse => 'Debug response';
+  String get debugResponse => 'Hata ayıklama yanıtı';
 
   @override
-  String get done => 'Done';
+  String get done => 'Tamam';
 
   @override
   String get configLabelServerUrl => 'Server URL';
@@ -708,25 +708,25 @@ class AppLocalizationsTr extends AppLocalizations {
   String get configInstanceNameHelper => 'A label to identify this instance';
 
   @override
-  String get currentlyUnavailable => 'Currently unavailable';
+  String get currentlyUnavailable => 'Şu an kullanılamıyor';
 
   @override
-  String get cropImage => 'Crop';
+  String get cropImage => 'Kırp';
 
   @override
-  String get builtInProviders => 'Built-in';
+  String get builtInProviders => 'Yerleşik';
 
   @override
-  String get testStepReachable => 'Reachable';
+  String get testStepReachable => 'Ulaşılabilir';
 
   @override
-  String get testStepNotProvided => 'Not provided';
+  String get testStepNotProvided => 'Sağlanmamış';
 
   @override
-  String get testStepNotFound => 'Not found';
+  String get testStepNotFound => 'Bulunamadı';
 
   @override
-  String get testStepInvalid => 'Invalid';
+  String get testStepInvalid => 'Geçersiz';
 
   @override
   String connectedAs(Object username) {
@@ -748,92 +748,92 @@ class AppLocalizationsTr extends AppLocalizations {
   String get configLabelDirectMessage => 'Direct message';
 
   @override
-  String get matterbridgeSend => 'Send via Matterbridge';
+  String get matterbridgeSend => 'Matterbridge ile gönder';
 
   @override
-  String get matterbridgeNotConfigured => 'Matterbridge not fully configured';
+  String get matterbridgeNotConfigured => 'Matterbridge tam yapılandırılmamış';
 
   @override
   String matterbridgeSent(Object gateway) {
-    return 'Sent to $gateway';
+    return '$gateway adresine gönderildi';
   }
 
   @override
   String matterbridgeError(Object code) {
-    return 'Matterbridge error: $code';
+    return 'Matterbridge hatası: $code';
   }
 
   @override
   String matterbridgeFailed(Object error) {
-    return 'Failed: $error';
+    return 'Başarısız: $error';
   }
 
   @override
   String messageVariables(Object vars) {
-    return 'Variables: $vars';
+    return 'Değişkenler: $vars';
   }
 
   @override
-  String get pasteFromClipboard => 'Paste from clipboard';
+  String get pasteFromClipboard => 'Panodan yapıştır';
 
   @override
-  String get clipboardEmpty => 'No image found in clipboard';
+  String get clipboardEmpty => 'Panoda resim bulunamadı';
 
   @override
-  String get exportImportTitle => 'Export / Import';
+  String get exportImportTitle => 'Dışa Aktar / İçe Aktar';
 
   @override
   String get exportImportDescription =>
-      'Export your provider credentials and app settings to a JSON file for backup or transfer. Import merges all data — existing settings and provider config will be replaced.';
+      'Sağlayıcı kimlik bilgilerinizi ve uygulama ayarlarınızı yedekleme veya aktarma için bir JSON dosyasına dışa aktarın. İçe aktarma tüm verileri birleştirir — mevcut ayarlar ve sağlayıcı yapılandırması değiştirilecektir.';
 
   @override
-  String get exportConfigTitle => 'Export config';
+  String get exportConfigTitle => 'Yapılandırmayı dışa aktar';
 
   @override
   String get exportConfigWarning =>
-      'This file will contain API keys, tokens, passwords, and app settings. Keep it safe — anyone with this file can access your accounts.';
+      'Bu dosya API anahtarları, token\'lar, parolalar ve uygulama ayarları içerecektir. Güvende tutun — bu dosyaya erişen herkes hesaplarınıza erişebilir.';
 
   @override
-  String get importConfigTitle => 'Import config';
+  String get importConfigTitle => 'Yapılandırmayı içe aktar';
 
   @override
   String get importConfigWarning =>
-      'This will REPLACE all current provider credentials and settings with the data from the imported file. This cannot be undone.';
+      'Bu, tüm mevcut sağlayıcı kimlik bilgilerini ve ayarlarını içe aktarılan dosyadaki verilerle DEĞİŞTİRECEKTİR. Bu geri alınamaz.';
 
   @override
-  String get exportAction => 'Export';
+  String get exportAction => 'Dışa Aktar';
 
   @override
-  String get importAction => 'Import';
+  String get importAction => 'İçe Aktar';
 
   @override
   String exportedTo(Object path) {
-    return 'Exported to: $path';
+    return '$path yoluna dışa aktarıldı';
   }
 
   @override
-  String get exportFailed => 'Export failed';
+  String get exportFailed => 'Dışa aktarma başarısız';
 
   @override
-  String get importFailed => 'Import failed';
+  String get importFailed => 'İçe aktarma başarısız';
 
   @override
-  String get apkDownloaded => 'APK downloaded';
+  String get apkDownloaded => 'APK indirildi';
 
   @override
-  String get installNow => 'Install Now';
+  String get installNow => 'Şimdi Kur';
 
   @override
-  String get downloadComplete => 'Download complete';
+  String get downloadComplete => 'İndirme tamamlandı';
 
   @override
   String secondsAgo(Object seconds) {
-    return '${seconds}s ago';
+    return '${seconds}sn önce';
   }
 
   @override
   String minutesAgo(Object minutes) {
-    return '${minutes}m ago';
+    return '${minutes}dk önce';
   }
 
   @override
@@ -988,7 +988,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get editImage => 'Görseli düzenle';
 
   @override
-  String get navImageEditor => 'Image Editor';
+  String get navImageEditor => 'Görsel Düzenleyici';
 
   @override
   String get saveToFile => 'Dosyaya kaydet';

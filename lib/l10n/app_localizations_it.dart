@@ -177,7 +177,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get navTest => 'Test';
+  String get navTest => 'Prova';
 
   @override
   String get testAll => 'Testa Tutti';
@@ -195,7 +195,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get viewChangelog => 'Vedi Changelog';
 
   @override
-  String get changelogTitle => 'Changelog';
+  String get changelogTitle => 'Novità';
 
   @override
   String get changeLogo => 'Cambia Logo';
@@ -329,7 +329,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get iconLegendTitle => 'Icone Provider';
 
   @override
-  String get iconLegendTest => 'Test';
+  String get iconLegendTest => 'Prova';
 
   @override
   String get iconLegendFiles => 'File';
@@ -686,10 +686,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get fillRequiredFields => 'Compila prima i campi obbligatori';
 
   @override
-  String get debugResponse => 'Debug response';
+  String get debugResponse => 'Risposta di debug';
 
   @override
-  String get done => 'Done';
+  String get done => 'Fatto';
 
   @override
   String get configLabelServerUrl => 'Server URL';
@@ -707,25 +707,25 @@ class AppLocalizationsIt extends AppLocalizations {
   String get configInstanceNameHelper => 'A label to identify this instance';
 
   @override
-  String get currentlyUnavailable => 'Currently unavailable';
+  String get currentlyUnavailable => 'Non disponibile';
 
   @override
-  String get cropImage => 'Crop';
+  String get cropImage => 'Ritaglia';
 
   @override
-  String get builtInProviders => 'Built-in';
+  String get builtInProviders => 'Integrati';
 
   @override
-  String get testStepReachable => 'Reachable';
+  String get testStepReachable => 'Raggiungibile';
 
   @override
-  String get testStepNotProvided => 'Not provided';
+  String get testStepNotProvided => 'Non fornito';
 
   @override
-  String get testStepNotFound => 'Not found';
+  String get testStepNotFound => 'Non trovato';
 
   @override
-  String get testStepInvalid => 'Invalid';
+  String get testStepInvalid => 'Non valido';
 
   @override
   String connectedAs(Object username) {
@@ -747,96 +747,97 @@ class AppLocalizationsIt extends AppLocalizations {
   String get configLabelDirectMessage => 'Direct message';
 
   @override
-  String get matterbridgeSend => 'Send via Matterbridge';
+  String get matterbridgeSend => 'Invia tramite Matterbridge';
 
   @override
-  String get matterbridgeNotConfigured => 'Matterbridge not fully configured';
+  String get matterbridgeNotConfigured =>
+      'Matterbridge non configurato completamente';
 
   @override
   String matterbridgeSent(Object gateway) {
-    return 'Sent to $gateway';
+    return 'Inviato a $gateway';
   }
 
   @override
   String matterbridgeError(Object code) {
-    return 'Matterbridge error: $code';
+    return 'Errore Matterbridge: $code';
   }
 
   @override
   String matterbridgeFailed(Object error) {
-    return 'Failed: $error';
+    return 'Fallito: $error';
   }
 
   @override
   String messageVariables(Object vars) {
-    return 'Variables: $vars';
+    return 'Variabili: $vars';
   }
 
   @override
-  String get pasteFromClipboard => 'Paste from clipboard';
+  String get pasteFromClipboard => 'Incolla dagli appunti';
 
   @override
-  String get clipboardEmpty => 'No image found in clipboard';
+  String get clipboardEmpty => 'Nessuna immagine trovata negli appunti';
 
   @override
-  String get exportImportTitle => 'Export / Import';
+  String get exportImportTitle => 'Esporta / Importa';
 
   @override
   String get exportImportDescription =>
-      'Export your provider credentials and app settings to a JSON file for backup or transfer. Import merges all data — existing settings and provider config will be replaced.';
+      'Esporta le credenziali del provider e le impostazioni dell\'app in un file JSON per backup o trasferimento. L\'importazione unisce tutti i dati — le impostazioni e la configurazione del provider esistenti verranno sostituite.';
 
   @override
-  String get exportConfigTitle => 'Export config';
+  String get exportConfigTitle => 'Esporta configurazione';
 
   @override
   String get exportConfigWarning =>
-      'This file will contain API keys, tokens, passwords, and app settings. Keep it safe — anyone with this file can access your accounts.';
+      'Questo file conterrà chiavi API, token, password e impostazioni dell\'app. Tienilo al sicuro — chiunque abbia accesso a questo file può accedere ai tuoi account.';
 
   @override
-  String get importConfigTitle => 'Import config';
+  String get importConfigTitle => 'Importa configurazione';
 
   @override
   String get importConfigWarning =>
-      'This will REPLACE all current provider credentials and settings with the data from the imported file. This cannot be undone.';
+      'Questo SOSTITUIRÀ tutte le credenziali e le impostazioni attuali con i dati del file importato. Questa operazione non può essere annullata.';
 
   @override
-  String get exportAction => 'Export';
+  String get exportAction => 'Esporta';
 
   @override
-  String get importAction => 'Import';
+  String get importAction => 'Importa';
 
   @override
   String exportedTo(Object path) {
-    return 'Exported to: $path';
+    return 'Esportato in: $path';
   }
 
   @override
-  String get exportFailed => 'Export failed';
+  String get exportFailed => 'Esportazione fallita';
 
   @override
-  String get importFailed => 'Import failed';
+  String get importFailed => 'Importazione fallita';
 
   @override
-  String get apkDownloaded => 'APK downloaded';
+  String get apkDownloaded => 'APK scaricato';
 
   @override
-  String get installNow => 'Install Now';
+  String get installNow => 'Installa Ora';
 
   @override
-  String get downloadComplete => 'Download complete';
+  String get downloadComplete => 'Download completato';
 
   @override
   String secondsAgo(Object seconds) {
-    return '${seconds}s ago';
+    return '${seconds}s fa';
   }
 
   @override
   String minutesAgo(Object minutes) {
-    return '${minutes}m ago';
+    return '${minutes}m fa';
   }
 
   @override
-  String get reloadZulipResources => 'Manage channels & users';
+  String get reloadZulipResources => 'Gestisci canali e utenti';
 
   @override
   String get undo => 'Indietro';
@@ -987,7 +988,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get editImage => 'Modifica immagine';
 
   @override
-  String get navImageEditor => 'Image Editor';
+  String get navImageEditor => 'Editor Immagini';
 
   @override
   String get saveToFile => 'Salva su file';
