@@ -51,8 +51,8 @@ fi
 echo "==> Checking for wide config types..."
 dart run scripts/check_wide_config.dart 2>&1 || true
 
-# ── Localization check (gen-l10n reports untranslated keys) ─
-echo "==> Checking for untranslated localization keys..."
+# ── Localization checks ─
+echo "==> 1/2 Checking for missing localization keys..."
 GEN_OUTPUT=$(flutter gen-l10n 2>&1 || true)
 if echo "$GEN_OUTPUT" | grep -qi "untranslated\|not translated\|missing\|warning"; then
 	echo "❌ Untranslated localization keys found:"
@@ -61,6 +61,13 @@ if echo "$GEN_OUTPUT" | grep -qi "untranslated\|not translated\|missing\|warning
 	exit 1
 fi
 echo "   ✅ All localization keys translated across all locales"
+
+# 2. Check that translations are not identical to English
+echo "==> 2/2 Checking for untranslated values (same as English)..."
+if ! dart run scripts/check_untranslated_arb.dart 2>&1; then
+	exit 1
+fi
+echo "   ✅ All translations differ from English"
 
 # ── Capture git hash BEFORE changelog commit ─────────────────
 # This ensures artifact filenames match the tag/release commit.
