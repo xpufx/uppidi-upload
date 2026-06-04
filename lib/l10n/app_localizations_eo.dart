@@ -1014,4 +1014,20 @@ class AppLocalizationsEo extends AppLocalizations {
 
   @override
   String get discard => 'Forĵeti';
+
+  @override
+  String get shareMessage => 'Mesaĝon kunhavigi';
+
+  @override
+  String get shareMessageDescription =>
+      'Implicitaj mesaĝaj ŝablonoj por ĉiuj provizantoj. Anstataŭigita per-alŝuto sur la alŝuta ekrano.';
+
+  @override
+  String get messageTemplate => 'Mesaĝa ŝablono';
+
+  @override
+  String get messageTemplateSaved => 'Mesaĝa ŝablono konservita';
+
+  @override
+  String get messageLabel => 'Mesaĝo';
 }

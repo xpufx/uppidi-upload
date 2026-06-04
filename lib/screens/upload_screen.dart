@@ -915,7 +915,7 @@ class _FileSelectedBottomBarState
           TextFormField(
             controller: _msgController,
             decoration: InputDecoration(
-              labelText: 'Message',
+              labelText: l10n.messageLabel,
               border: const OutlineInputBorder(),
               isDense: true,
               helperText: l10n.messageVariables('{url} {filename} {filesize}'),

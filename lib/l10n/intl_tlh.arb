@@ -309,5 +309,11 @@
   "openNewImage": "qab chu' yIpoQ",
   "unsavedChangesTitle": "QIt qab",
   "unsavedChangesMessage": "QIt qab. nuq?",
-  "discard": "QIt"
+  "discard": "QIt",
+
+  "shareMessage": "Share message",
+  "shareMessageDescription": "Default message template for all providers. Overridden per-upload on the upload screen.",
+  "messageTemplate": "Message template",
+  "messageTemplateSaved": "Message template saved",
+  "messageLabel": "Message"
 }

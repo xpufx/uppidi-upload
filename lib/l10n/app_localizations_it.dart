@@ -1017,4 +1017,20 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get discard => 'Scarta';
+
+  @override
+  String get shareMessage => 'Condividi messaggio';
+
+  @override
+  String get shareMessageDescription =>
+      'Template messaggio predefinito per tutti i provider. Sostituibile per ogni singolo caricamento.';
+
+  @override
+  String get messageTemplate => 'Template messaggio';
+
+  @override
+  String get messageTemplateSaved => 'Template messaggio salvato';
+
+  @override
+  String get messageLabel => 'Messaggio';
 }

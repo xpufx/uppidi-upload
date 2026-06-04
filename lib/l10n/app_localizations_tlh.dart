@@ -1000,4 +1000,20 @@ class AppLocalizationsTlh extends AppLocalizations {
 
   @override
   String get discard => 'QIt';
+
+  @override
+  String get shareMessage => 'Share message';
+
+  @override
+  String get shareMessageDescription =>
+      'Default message template for all providers. Overridden per-upload on the upload screen.';
+
+  @override
+  String get messageTemplate => 'Message template';
+
+  @override
+  String get messageTemplateSaved => 'Message template saved';
+
+  @override
+  String get messageLabel => 'Message';
 }

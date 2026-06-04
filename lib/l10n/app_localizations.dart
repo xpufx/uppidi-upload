@@ -1921,6 +1921,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Discard'**
   String get discard;
+
+  /// No description provided for @shareMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Share message'**
+  String get shareMessage;
+
+  /// No description provided for @shareMessageDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Default message template for all providers. Overridden per-upload on the upload screen.'**
+  String get shareMessageDescription;
+
+  /// No description provided for @messageTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Message template'**
+  String get messageTemplate;
+
+  /// No description provided for @messageTemplateSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Message template saved'**
+  String get messageTemplateSaved;
+
+  /// No description provided for @messageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get messageLabel;
 }
 
 class _AppLocalizationsDelegate

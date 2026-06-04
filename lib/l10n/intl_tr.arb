@@ -308,5 +308,11 @@
   "openNewImage": "Yeni görsel aç",
   "unsavedChangesTitle": "Kaydedilmemiş değişiklikler",
   "unsavedChangesMessage": "Kaydedilmemiş düzenlemeleriniz var. Ne yapmak istersiniz?",
-  "discard": "At"
+  "discard": "At",
+
+  "shareMessage": "İletiyi paylaş",
+  "shareMessageDescription": "Tüm sağlayıcılar için varsayılan mesaj şablonu. Yükleme ekranında her yükleme için geçersiz kılınabilir.",
+  "messageTemplate": "Mesaj şablonu",
+  "messageTemplateSaved": "Mesaj şablonu kaydedildi",
+  "messageLabel": "Mesaj"
 }

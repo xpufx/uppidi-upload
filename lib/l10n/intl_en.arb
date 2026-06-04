@@ -322,5 +322,11 @@
   "openNewImage": "Open new image",
   "unsavedChangesTitle": "Unsaved changes",
   "unsavedChangesMessage": "You have unsaved edits. What would you like to do?",
-  "discard": "Discard"
+  "discard": "Discard",
+
+  "shareMessage": "Share message",
+  "shareMessageDescription": "Default message template for all providers. Overridden per-upload on the upload screen.",
+  "messageTemplate": "Message template",
+  "messageTemplateSaved": "Message template saved",
+  "messageLabel": "Message"
 }

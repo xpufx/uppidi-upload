@@ -308,5 +308,11 @@
   "openNewImage": "Malfermi novan bildon",
   "unsavedChangesTitle": "Nekonservitaj ŝanĝoj",
   "unsavedChangesMessage": "Vi havas nekonservitajn redaktojn. Kion vi volas fari?",
-  "discard": "Forĵeti"
+  "discard": "Forĵeti",
+
+  "shareMessage": "Mesaĝon kunhavigi",
+  "shareMessageDescription": "Implicitaj mesaĝaj ŝablonoj por ĉiuj provizantoj. Anstataŭigita per-alŝuto sur la alŝuta ekrano.",
+  "messageTemplate": "Mesaĝa ŝablono",
+  "messageTemplateSaved": "Mesaĝa ŝablono konservita",
+  "messageLabel": "Mesaĝo"
 }

@@ -308,5 +308,11 @@
   "openNewImage": "Apri nuova immagine",
   "unsavedChangesTitle": "Modifiche non salvate",
   "unsavedChangesMessage": "Hai modifiche non salvate. Cosa vuoi fare?",
-  "discard": "Scarta"
+  "discard": "Scarta",
+
+  "shareMessage": "Condividi messaggio",
+  "shareMessageDescription": "Template messaggio predefinito per tutti i provider. Sostituibile per ogni singolo caricamento.",
+  "messageTemplate": "Template messaggio",
+  "messageTemplateSaved": "Template messaggio salvato",
+  "messageLabel": "Messaggio"
 }

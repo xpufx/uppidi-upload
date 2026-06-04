@@ -1017,4 +1017,20 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get discard => 'At';
+
+  @override
+  String get shareMessage => 'İletiyi paylaş';
+
+  @override
+  String get shareMessageDescription =>
+      'Tüm sağlayıcılar için varsayılan mesaj şablonu. Yükleme ekranında her yükleme için geçersiz kılınabilir.';
+
+  @override
+  String get messageTemplate => 'Mesaj şablonu';
+
+  @override
+  String get messageTemplateSaved => 'Mesaj şablonu kaydedildi';
+
+  @override
+  String get messageLabel => 'Mesaj';
 }

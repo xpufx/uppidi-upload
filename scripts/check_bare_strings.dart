@@ -29,8 +29,6 @@ void main(List<String> args) {
     );
     final visitor = _BareStringVisitor(file.path, result.lineInfo);
     result.unit.visitChildren(visitor);
-    // visitor.violations stores 2 entries per violation (file+line, value)
-    // so we divide by 2 for the count
     for (final v in visitor.violations) {
       stdout.writeln(v);
     }
@@ -57,6 +55,7 @@ class _BareStringVisitor extends RecursiveAstVisitor<void> {
   // MaterialApp, which can't use AppLocalizations (constructor param).
   static const _uiParams = {
     'label',
+    'labelText',
     'hintText',
     'tooltip',
     'subtitle',
@@ -155,6 +154,8 @@ class _BareStringVisitor extends RecursiveAstVisitor<void> {
       return true;
     }
     if (RegExp(r'^[\d.]+$').hasMatch(s)) return true;
+    // Language self-names in locale selector
+    if (_allowedLanguageNames.contains(s)) return true;
     if (RegExp(r'^[a-z][a-zA-Z0-9]+$').hasMatch(s)) return true;
     if (_startsWithFlag(s)) return true;
     return false;
@@ -163,8 +164,17 @@ class _BareStringVisitor extends RecursiveAstVisitor<void> {
   bool _startsWithFlag(String s) {
     if (s.isEmpty) return false;
     final first = s.runes.first;
-    // Regional indicator symbols (flag emojis): U+1F1E6–U+1F1FF
     if (first >= 0x1F1E6 && first <= 0x1F1FF) return true;
     return false;
   }
 }
+
+/// Language self-names that are shown in the locale selector.
+/// These are always displayed in their own language, not translated.
+const _allowedLanguageNames = <String>{
+  'English',
+  'Esperanto',
+  'Italiano',
+  'Türkçe',
+  'Klingon (tlhIngan)',
+};

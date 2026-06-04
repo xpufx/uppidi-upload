@@ -1092,13 +1092,12 @@ class _MessageTemplateCard extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Share message',
+              Text(l10n.shareMessage,
                   style: theme.textTheme.titleSmall
                       ?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               Text(
-                'Default message template for all providers. '
-                'Overridden per-upload on the upload screen.',
+                l10n.shareMessageDescription,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -1107,7 +1106,7 @@ class _MessageTemplateCard extends ConsumerWidget {
               TextFormField(
                 controller: controller,
                 decoration: InputDecoration(
-                  labelText: 'Message template',
+                  labelText: l10n.messageTemplate,
                   border: const OutlineInputBorder(),
                   isDense: true,
                   helperText:
@@ -1131,7 +1130,7 @@ class _MessageTemplateCard extends ConsumerWidget {
                     ref.invalidate(globalMessageTemplateProvider);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Message template saved')),
+                        SnackBar(content: Text(l10n.messageTemplateSaved)),
                       );
                     }
                   },
