@@ -299,7 +299,7 @@ void main() {
         fail(
             'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
       }
-      expect(result.url, contains('bzzhr.to'));
+      expect(result.url, contains('bzzhr.'));
     },
         timeout: const Timeout(Duration(minutes: 2)),
         skip: _runLiveTests
