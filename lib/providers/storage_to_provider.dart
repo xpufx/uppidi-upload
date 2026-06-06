@@ -127,13 +127,20 @@ class StorageToProvider extends BaseHttpProvider {
 
       // Step 2: Upload bytes to presigned URL
       _log.info('put: PUT $uploadUrl');
-      await dio.put(
+      final putResponse = await dio.put(
         uploadUrl,
         data: request.dataStream,
         options: Options(headers: putHeaders),
         onSendProgress: onProgress,
         cancelToken: cancelToken,
       );
+      if (putResponse.statusCode != 200) {
+        return UploadResult(
+          success: false,
+          errorMessage: 'Upload to storage failed (${putResponse.statusCode})',
+          statusCode: putResponse.statusCode,
+        );
+      }
 
       // Step 3: Confirm
       final confirmBody = <String, dynamic>{
