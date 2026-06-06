@@ -3,17 +3,17 @@
 ## What this is
 
 Static marketing site for [Uppidi Upload](https://github.com/xpufx/uppidi-upload), a cross-platform file uploader
-(Flutter/Dart, GPLv3). Sibling repo at `~/code/uppidi` (local clone).
+(Flutter/Dart, GPLv3). Part of the uppidi-upload repository under `site/`.
 
 ## Key source of truth
 
-The **uppidi source repo** (`~/code/uppidi`) has the canonical logo, screenshots, provider favicons, and BUILDING.md
+The **uppidi source repo** (`..`) has the canonical logo, screenshots, provider favicons, and `BUILDING.md`
 content. Copy assets from there, do not recreate them.
 
 - Logo: `assets/logo-light.png`, `assets/logo-dark.png` (500×500 PNG)
 - Provider favicons: `assets/favicons/*.png`
 - Screenshots: `docs/screenshots/*.jpg`
-- Changelog / feature text: `README.md`, `CHANGELOG.md`, `docs/USER_MANUAL.md`
+- Changelog / feature text: `../README.md`, `../CHANGELOG.md`, `../docs/USER_MANUAL.md`
 
 ## Live site
 
@@ -27,6 +27,13 @@ Test via Caddy dev server first.
 
 The site is served via Caddy at `http://10.20.30.24:81/`. Provide direct URLs (e.g.
 `http://10.20.30.24:81/index.html`) when you want the user to click and view a page.
+
+## Git history
+
+The site was merged into this repo on 2026-06-06 via `git subtree add`.
+Commits from the standalone repo have paths prefixed with `site/`.
+Use `git log --follow site/<file>` to see pre-merge history (up to the merge commit).
+After the merge commit, `git log site/<file>` works normally.
 
 ## Design constraints
 
@@ -51,7 +58,7 @@ The site is served via Caddy at `http://10.20.30.24:81/`. Provide direct URLs (e
 Base URL for downloads: `https://github.com/xpufx/uppidi-upload/releases/tag/v{version}`
 Latest release API: `https://api.github.com/repos/xpufx/uppidi-upload/releases/latest`
 
-**Version must be synced manually** — check `~/code/uppidi/pubspec.yaml` for current version string.
+**Version must be synced manually** — check `../pubspec.yaml` for current version string.
 
 ## Supported providers (19)
 
@@ -92,16 +99,16 @@ assets/
 ├── logo-light.png
 ├── logo-dark.png
 ├── favicon.ico
-├── screenshots/    (copied from ~/code/uppidi/docs/screenshots/)
-└── provider-icons/ (copied from ~/code/uppidi/assets/favicons/)
+├── screenshots/    (copied from `../docs/screenshots/`)
+└── provider-icons/ (copied from `../assets/favicons/`)
 ```
 
 ## Content copy to extract from uppidi repo
 
-- Feature descriptions → `README.md`, `docs/USER_MANUAL.md`
-- Screenshots → copy `docs/screenshots/*.jpg`
-- Provider info → `lib/core/registry.dart` (provider registry), `lib/providers/*.dart` (metadata)
-- Build instructions → `BUILDING.md`
-- Changelog → `CHANGELOG.md`
+- Feature descriptions → `../README.md`, `../docs/USER_MANUAL.md`
+- Screenshots → copy `../docs/screenshots/*.jpg`
+- Provider info → `../lib/core/registry.dart` (provider registry), `../lib/providers/*.dart` (metadata)
+- Build instructions → `../BUILDING.md`
+- Changelog → `../CHANGELOG.md`
 
-**Caution:** `docs/USER_MANUAL.md` previously contained references to "Immich" (a provider that was never implemented) and overblown platform claims (iOS, macOS). Both have been corrected. Always cross-check provider lists against `lib/core/registry.dart` rather than prose docs.
+**Caution:** `../docs/USER_MANUAL.md` previously contained references to "Immich" (a provider that was never implemented) and overblown platform claims (iOS, macOS). Both have been corrected. Always cross-check provider lists against `../lib/core/registry.dart` rather than prose docs.
