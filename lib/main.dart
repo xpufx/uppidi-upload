@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_skill/flutter_skill.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/models/upload_record.dart';
@@ -43,6 +45,7 @@ class _UserLangDelegate extends LocalizationsDelegate<AppLocalizations> {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (kDebugMode) FlutterSkillBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(UploadRecordAdapter());
   _registerScreens();

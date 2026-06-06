@@ -27,6 +27,7 @@ dependencies:
   pro_image_editor: ^12.4.5
   desktop_drop: ^0.7.1
   pasteboard: ^0.5.0
+  flutter_skill: ^0.9.36
 
 dev_dependencies:
   flutter_test:
