@@ -88,7 +88,7 @@ class BzzhrProvider extends BaseHttpProvider {
         if (id != null) {
           return UploadResult(
             success: true,
-            url: 'https://bzzhr.to/$id',
+            url: 'https://bzzhr.co/$id',
             statusCode: response.statusCode,
           );
         }
