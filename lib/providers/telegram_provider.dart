@@ -81,12 +81,14 @@ class TelegramProvider extends BaseHttpProvider {
     Map<String, String> config, {
     bool allowInsecureConn = false,
     String? proxyUrl,
+    String? userAgent,
   }) async {
     final token = config['bot_token'] ?? '';
     final dio = await super.createHttpClient(
       config,
       allowInsecureConn: allowInsecureConn,
       proxyUrl: proxyUrl,
+      userAgent: userAgent,
     );
     dio.options.baseUrl = token.isNotEmpty
         ? 'https://api.telegram.org/bot$token'
@@ -124,12 +126,16 @@ class TelegramProvider extends BaseHttpProvider {
           config is Map<String, String> ? config : <String, String>{};
       final allowInsecure = rawConfig['_allow_insecure_conn'] == 'true';
       final proxyUrl = rawConfig['_proxy_url'];
+      final userAgent = rawConfig['_user_agent'];
       final cleanConfig = Map<String, String>.from(rawConfig)
         ..remove('_allow_insecure_conn')
         ..remove('_proxy_url')
+        ..remove('_user_agent')
         ..remove('send_as_photo');
       final dio = await createHttpClient(cleanConfig,
-          allowInsecureConn: allowInsecure, proxyUrl: proxyUrl);
+          allowInsecureConn: allowInsecure,
+          proxyUrl: proxyUrl,
+          userAgent: userAgent);
 
       final fields = buildFormFields(cleanConfig);
       if (cfg.messageText != null && cfg.messageText!.isNotEmpty) {

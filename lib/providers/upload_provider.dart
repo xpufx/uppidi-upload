@@ -551,6 +551,11 @@ class UploadNotifier extends Notifier<UploadState> {
         config['_proxy_url'] = proxyUrl;
       }
 
+      final userAgent = await settingsService.getUserAgent();
+      if (userAgent != null && userAgent.isNotEmpty) {
+        config['_user_agent'] = userAgent;
+      }
+
       // Pass user-selected expiry (providers with configurableExpiry
       // capability will pick it up via buildFormFields).
       config['_expiry'] = _selectedExpiry;

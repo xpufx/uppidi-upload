@@ -218,6 +218,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get proxyHint => 'socks5://sunucu:port';
 
   @override
+  String get userAgent => 'User-Agent';
+
+  @override
+  String get userAgentHint => 'Yükleme istekleri için özel User-Agent başlığı';
+
+  @override
   String get dropFileToUpload => 'Yüklemek için dosyayı bırak';
 
   @override
@@ -1023,7 +1029,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get shareMessageDescription =>
-      'Tüm sağlayıcılar için varsayılan mesaj şablonu. Yükleme ekranında her yükleme için geçersiz kılınabilir.';
+      'Varsayılan ileti şablonu. Yükleme ekranında her dosya için özelleştirilebilir.';
 
   @override
   String get messageTemplate => 'Mesaj şablonu';

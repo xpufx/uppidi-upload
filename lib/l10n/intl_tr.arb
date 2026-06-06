@@ -63,6 +63,8 @@
   "defaultForSharing": "Paylaşım için varsayılan",
   "lastUsed": "Son kullanılan",
   "proxyHint": "socks5://sunucu:port",
+  "userAgent": "User-Agent",
+  "userAgentHint": "Yükleme istekleri için özel User-Agent başlığı",
   "dropFileToUpload": "Yüklemek için dosyayı bırak",
   "retry": "Tekrar Dene",
   "chooseFile": "Dosya Seç",
@@ -311,7 +313,7 @@
   "discard": "At",
 
   "shareMessage": "İletiyi paylaş",
-  "shareMessageDescription": "Tüm sağlayıcılar için varsayılan mesaj şablonu. Yükleme ekranında her yükleme için geçersiz kılınabilir.",
+  "shareMessageDescription": "Varsayılan ileti şablonu. Yükleme ekranında her dosya için özelleştirilebilir.",
   "messageTemplate": "Mesaj şablonu",
   "messageTemplateSaved": "Mesaj şablonu kaydedildi",
   "messageLabel": "Mesaj"

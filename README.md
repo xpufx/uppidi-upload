@@ -46,7 +46,7 @@ Uppidi Upload is an open source, cross-platform application for uploading media 
 - Android phones and tablets
 - Linux desktops (tarball, AppImage, Flatpak)
 - Windows
-- macOS (soon)
+- macOS
 
 On mobile, upload from your gallery or any file picker. On desktop, drag files from your file manager onto the window, paste from clipboard, or use the file picker. Share files to Uppidi from other apps.
 
@@ -90,7 +90,7 @@ Uppidi keeps a record of your recent uploads — file name, service used, expiry
 
 ## Language Support
 
-English, Italian, Turkish, Esperanto, and Klingon. Additional languages can be added via ARB files in `lib/l10n/`.
+English, Turkish, Italian, Esperanto, and Klingon.
 
 ## Privacy
 

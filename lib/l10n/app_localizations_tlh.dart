@@ -211,6 +211,12 @@ class AppLocalizationsTlh extends AppLocalizations {
   String get proxyHint => 'socks5://raS:QIr';
 
   @override
+  String get userAgent => 'loDnI\' \'ay\'';
+
+  @override
+  String get userAgentHint => 'loDnI\' \'ay\' Daj Ha\'ra\'meH Qang';
+
+  @override
   String get dropFileToUpload => 'Doch yI\'ura\' Ha\'ra\'meH';
 
   @override

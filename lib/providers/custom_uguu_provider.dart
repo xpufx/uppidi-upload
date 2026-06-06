@@ -64,6 +64,7 @@ class CustomUguuProvider extends BaseHttpProvider {
     Map<String, String> config, {
     bool allowInsecureConn = false,
     String? proxyUrl,
+    String? userAgent,
   }) async {
     var serverUrl = (config['server_url'] ?? '').trim();
     if (serverUrl.endsWith('/')) {
@@ -73,6 +74,7 @@ class CustomUguuProvider extends BaseHttpProvider {
       config,
       allowInsecureConn: allowInsecureConn,
       proxyUrl: proxyUrl,
+      userAgent: userAgent,
     );
     dio.options.baseUrl = serverUrl;
     return dio;

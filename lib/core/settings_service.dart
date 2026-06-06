@@ -132,6 +132,7 @@ class SettingsService {
 
   static const insecureConnKey = 'global.allow_insecure_conn';
   static const proxyUrlKey = 'global.proxy_url';
+  static const userAgentKey = 'global.user_agent';
   static const localeKey = 'global.locale';
   static const defaultShareProviderKey = 'global.default_share_provider';
   static const themeModeKey = 'global.theme_mode';
@@ -154,6 +155,8 @@ class SettingsService {
   }
 
   Future<String?> getProxyUrl() => get(proxyUrlKey);
+
+  Future<String?> getUserAgent() => get(userAgentKey);
 
   Future<ThemeMode> getThemeMode() async {
     final val = await get(themeModeKey);

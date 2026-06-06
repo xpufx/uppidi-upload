@@ -217,6 +217,12 @@ class AppLocalizationsEo extends AppLocalizations {
   String get proxyHint => 'socks5://gastigo:haveno';
 
   @override
+  String get userAgent => 'Uzanto-Aganto';
+
+  @override
+  String get userAgentHint => 'Propra Uzanto-Aganto por alŝutaj petoj';
+
+  @override
   String get dropFileToUpload => 'Demetu dosieron por alŝuti';
 
   @override

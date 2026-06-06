@@ -6,6 +6,7 @@ import 'models/provider_metadata.dart';
 import 'provider_storage_service.dart';
 import 'settings_service.dart';
 import '../providers/catbox_provider.dart';
+import '../providers/filebin_provider.dart';
 import '../providers/fileditch_provider.dart';
 import '../providers/gofile_provider.dart';
 import '../providers/local_provider.dart';
@@ -20,6 +21,9 @@ import '../providers/tmpfilelink_provider.dart';
 import '../providers/uguu_provider.dart';
 import '../providers/zulip_provider.dart';
 import '../providers/custom_uguu_provider.dart';
+import '../providers/filester_provider.dart';
+import '../providers/storage_to_provider.dart';
+import '../providers/bzzhr_provider.dart';
 
 const bool devProviders = bool.fromEnvironment('DEV_PROVIDERS');
 
@@ -35,6 +39,10 @@ final List<BaseUploader> _baseTypes = [
   HttpBinProvider(),
   LocalProvider(),
   FileDitchProvider(),
+  FilebinProvider(),
+  FilesterProvider(),
+  StorageToProvider(),
+  BzzhrProvider(),
   GoFileProvider(),
   FriskProvider(),
   UguuProvider(name: 'uguu.se', url: 'https://uguu.se'),

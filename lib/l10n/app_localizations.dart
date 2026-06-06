@@ -488,6 +488,18 @@ abstract class AppLocalizations {
   /// **'socks5://host:port'**
   String get proxyHint;
 
+  /// No description provided for @userAgent.
+  ///
+  /// In en, this message translates to:
+  /// **'User-Agent'**
+  String get userAgent;
+
+  /// No description provided for @userAgentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom User-Agent header for upload requests'**
+  String get userAgentHint;
+
   /// No description provided for @dropFileToUpload.
   ///
   /// In en, this message translates to:

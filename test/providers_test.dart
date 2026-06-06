@@ -5,6 +5,11 @@ import 'package:uppidi_upload/providers/gofile_provider.dart';
 import 'package:uppidi_upload/providers/tmpfilelink_provider.dart';
 import 'package:uppidi_upload/providers/httpbin_provider.dart';
 import 'package:uppidi_upload/providers/telegram_provider.dart';
+import 'package:uppidi_upload/providers/filester_provider.dart';
+import 'package:uppidi_upload/providers/pixeldrain_provider.dart';
+import 'package:uppidi_upload/providers/filebin_provider.dart';
+import 'package:uppidi_upload/providers/storage_to_provider.dart';
+import 'package:uppidi_upload/providers/bzzhr_provider.dart';
 import 'package:uppidi_upload/core/registry.dart';
 
 const _runLiveTests = bool.fromEnvironment('RUN_LIVE_TESTS');
@@ -150,5 +155,155 @@ void main() {
       expect(provider.metadata.supportsDirectLink, false);
       expect(provider.metadata.maxFileSizeBytes, isNull);
     });
+  });
+
+  group('FilesterProvider', () {
+    late FilesterProvider provider;
+
+    setUp(() {
+      provider = FilesterProvider();
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello filester'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('filester.me'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _runLiveTests
+            ? null
+            : 'Relies on live external service (filester.me)');
+  });
+
+  group('PixeldrainProvider', () {
+    late PixeldrainProvider provider;
+
+    setUp(() {
+      provider = PixeldrainProvider();
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello pixeldrain'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('pixeldrain.com'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _runLiveTests
+            ? null
+            : 'Relies on live external service (pixeldrain.com)');
+  });
+
+  group('FilebinProvider', () {
+    late FilebinProvider provider;
+
+    setUp(() {
+      provider = FilebinProvider();
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello filebin'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('filebin.net'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _runLiveTests
+            ? null
+            : 'Relies on live external service (filebin.net)');
+  });
+
+  group('StorageToProvider', () {
+    late StorageToProvider provider;
+
+    setUp(() {
+      provider = StorageToProvider();
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello storage.to'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('storage.to'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _runLiveTests
+            ? null
+            : 'Relies on live external service (storage.to)');
+  });
+
+  group('BzzhrProvider', () {
+    late BzzhrProvider provider;
+
+    setUp(() {
+      provider = BzzhrProvider();
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello bzzhr'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('bzzhr.to'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _runLiveTests
+            ? null
+            : 'Relies on live external service (bzzhr.to)');
   });
 }

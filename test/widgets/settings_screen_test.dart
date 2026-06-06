@@ -18,6 +18,9 @@ class MockSettingsService implements SettingsService {
   Future<String?> getProxyUrl() async => _store[SettingsService.proxyUrlKey];
 
   @override
+  Future<String?> getUserAgent() async => _store[SettingsService.userAgentKey];
+
+  @override
   Future<bool> isDebugLoggingEnabled() async =>
       _store[SettingsService.debugLoggingKey] == 'true';
 
@@ -196,7 +199,7 @@ void main() {
       await tester.pumpWidget(buildTestApp(mockSettings: mockSettings));
       await tester.pumpAndSettle();
 
-      expect(find.byType(TextField), findsOneWidget);
+      expect(find.widgetWithText(TextField, l10n.proxyUrl), findsOneWidget);
       expect(find.text(l10n.proxyHint), findsOneWidget);
     });
 
@@ -207,7 +210,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // The text field should contain the saved proxy URL
-      final textField = tester.widget<TextField>(find.byType(TextField));
+      final textField = tester.widget<TextField>(
+        find.widgetWithText(TextField, l10n.proxyUrl),
+      );
       expect(textField.controller?.text, 'http://proxy:8080');
     });
 
@@ -217,7 +222,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Type a proxy URL
-      await tester.enterText(find.byType(TextField), 'http://new-proxy:3128');
+      await tester.enterText(
+        find.widgetWithText(TextField, l10n.proxyUrl),
+        'http://new-proxy:3128',
+      );
       // Advance past the debounce timer (500ms)
       await tester.pump(const Duration(milliseconds: 600));
 
@@ -233,7 +241,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Clear the text field
-      await tester.enterText(find.byType(TextField), '');
+      await tester.enterText(
+        find.widgetWithText(TextField, l10n.proxyUrl),
+        '',
+      );
       await tester.pump(const Duration(milliseconds: 600));
 
       // Verify the value was removed

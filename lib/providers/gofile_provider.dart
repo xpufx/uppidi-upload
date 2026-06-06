@@ -59,12 +59,16 @@ class GoFileProvider extends BaseHttpProvider {
       final rawConfig = gofileConfig.data;
       final allowInsecure = rawConfig['_allow_insecure_conn'] == 'true';
       final proxyUrlValue = rawConfig['_proxy_url'];
+      final userAgent = rawConfig['_user_agent'];
       final cleanConfig = Map<String, String>.from(rawConfig)
         ..remove('_allow_insecure_conn')
-        ..remove('_proxy_url');
+        ..remove('_proxy_url')
+        ..remove('_user_agent');
 
       final dio = await createHttpClient(cleanConfig,
-          allowInsecureConn: allowInsecure, proxyUrl: proxyUrlValue);
+          allowInsecureConn: allowInsecure,
+          proxyUrl: proxyUrlValue,
+          userAgent: userAgent);
 
       final serverResponse = await dio.get('/servers');
 

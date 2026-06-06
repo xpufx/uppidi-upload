@@ -9,6 +9,7 @@ import '../core/logging/log.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
+import '../core/version.dart';
 
 /// Zulip server upload provider.
 ///
@@ -85,6 +86,7 @@ class ZulipProvider extends BaseHttpProvider {
     Map<String, String> config, {
     bool allowInsecureConn = false,
     String? proxyUrl,
+    String? userAgent,
   }) async {
     final serverUrl = config['zulip_url']?.trim() ?? '';
     final email = config['zulip_email']?.trim() ?? '';
@@ -100,10 +102,14 @@ class ZulipProvider extends BaseHttpProvider {
       config,
       allowInsecureConn: allowInsecureConn,
       proxyUrl: proxyUrl,
+      userAgent: userAgent,
     );
     dio.options.baseUrl = base;
     dio.options.receiveTimeout = const Duration(seconds: 60);
-    dio.options.headers = {'Authorization': basicAuth};
+    dio.options.headers = {
+      'Authorization': basicAuth,
+      'User-Agent': userAgent ?? 'uppidi-upload/$appVersion',
+    };
     return dio;
   }
 
@@ -124,12 +130,16 @@ class ZulipProvider extends BaseHttpProvider {
           (config is Map<String, String> ? config : <String, String>{});
       final allowInsecure = rawConfig['_allow_insecure_conn'] == 'true';
       final proxyUrl = rawConfig['_proxy_url'];
+      final userAgent = rawConfig['_user_agent'];
       final cleanConfig = Map<String, String>.from(rawConfig)
         ..remove('_allow_insecure_conn')
         ..remove('_proxy_url')
+        ..remove('_user_agent')
         ..remove('send_as_photo');
       final dio = await createHttpClient(cleanConfig,
-          allowInsecureConn: allowInsecure, proxyUrl: proxyUrl);
+          allowInsecureConn: allowInsecure,
+          proxyUrl: proxyUrl,
+          userAgent: userAgent);
 
       final fields = buildFormFields(cleanConfig);
       fields[fileFormFieldName] = MultipartFile.fromStream(

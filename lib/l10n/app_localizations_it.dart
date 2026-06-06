@@ -218,6 +218,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get proxyHint => 'socks5://host:porta';
 
   @override
+  String get userAgent => 'User-Agent';
+
+  @override
+  String get userAgentHint =>
+      'Intestazione User-Agent personalizzata per le richieste di caricamento';
+
+  @override
   String get dropFileToUpload => 'Trascina file per caricare';
 
   @override

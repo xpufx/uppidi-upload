@@ -8,7 +8,7 @@ import '../models/provider_metadata.dart';
 import '../models/upload_request.dart';
 import '../models/upload_result.dart';
 import '../platform/insecure_adapter.dart';
-import '../settings_service.dart';
+import '../version.dart';
 
 import 'uploader.dart';
 
@@ -44,12 +44,16 @@ abstract class BaseHttpProvider implements BaseUploader {
     Map<String, String> config, {
     bool allowInsecureConn = false,
     String? proxyUrl,
+    String? userAgent,
   }) async {
     // Async keyword retained to allow subclasses to override with async operations if needed
     final dio = Dio(BaseOptions(
       baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
+      headers: {
+        'User-Agent': userAgent ?? 'uppidi-upload/$appVersion',
+      },
       // Accept all HTTP status codes — let each provider's parseResponse
       // handle errors. Dio's default throws on non-2xx, which discards
       // the response body (and with it, the provider's error details).
@@ -87,30 +91,18 @@ abstract class BaseHttpProvider implements BaseUploader {
     try {
       final allowInsecure = config['_allow_insecure_conn'] == 'true';
       final proxyUrl = config['_proxy_url'];
+      final userAgent = config['_user_agent'];
       final cleanConfig = Map<String, String>.from(config)
         ..remove('_allow_insecure_conn')
-        ..remove('_proxy_url');
+        ..remove('_proxy_url')
+        ..remove('_user_agent');
       final dio = await createHttpClient(cleanConfig,
-          allowInsecureConn: allowInsecure, proxyUrl: proxyUrl);
+          allowInsecureConn: allowInsecure,
+          proxyUrl: proxyUrl,
+          userAgent: userAgent);
 
       final fields = buildFormFields(cleanConfig);
       fields[fileFormFieldName] = _buildStreamFile(request);
-
-      // Opt-in debug logging: log request details if enabled
-      final settings = SettingsService();
-      final debugLogging = await settings.isDebugLoggingEnabled();
-      if (debugLogging) {
-        _log.info('=== DEBUG UPLOAD REQUEST ===');
-        _log.info('Provider: $providerId');
-        _log.info('URL: $baseUrl$uploadEndpoint');
-        _log.info(
-            'File: ${request.fileName} (${request.sizeInBytes} bytes, ${request.mimeType})');
-        _log.info('Form fields: $fields');
-        _log.info('Additional form fields: $additionalFormFields');
-        _log.info('Proxy: $proxyUrl');
-        _log.info('Allow insecure: $allowInsecure');
-        _log.info('=============================');
-      }
 
       final response = await dio.post(
         uploadEndpoint,
@@ -118,15 +110,6 @@ abstract class BaseHttpProvider implements BaseUploader {
         onSendProgress: onProgress,
         cancelToken: cancelToken,
       );
-
-      // Log response if debug enabled
-      if (debugLogging) {
-        _log.info('=== DEBUG UPLOAD RESPONSE ===');
-        _log.info('Status: ${response.statusCode}');
-        _log.info('Headers: ${response.headers}');
-        _log.info('Data: ${response.data}');
-        _log.info('=============================');
-      }
 
       return parseResponse(response);
     } catch (e, stackTrace) {
@@ -177,6 +160,13 @@ abstract class BaseHttpProvider implements BaseUploader {
       return 'fileSystemError';
     }
     if (e is DioException) {
+      final statusCode = e.response?.statusCode;
+      if (statusCode == 403 || statusCode == 406 || statusCode == 429) {
+        _log.warn(
+          'HTTP $statusCode — possible User-Agent rejection. '
+          'Try setting a custom User-Agent in provider settings.',
+        );
+      }
       return switch (e.type) {
         DioExceptionType.cancel => 'uploadCancelled',
         DioExceptionType.connectionTimeout ||

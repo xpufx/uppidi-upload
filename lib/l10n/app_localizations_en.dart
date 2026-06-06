@@ -216,6 +216,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get proxyHint => 'socks5://host:port';
 
   @override
+  String get userAgent => 'User-Agent';
+
+  @override
+  String get userAgentHint => 'Custom User-Agent header for upload requests';
+
+  @override
   String get dropFileToUpload => 'Drop file to upload';
 
   @override

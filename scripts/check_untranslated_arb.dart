@@ -41,8 +41,8 @@ void main(List<String> args) {
     exit(1);
   }
 
-  final templateData = jsonDecode(templateFile.readAsStringSync())
-      as Map<String, dynamic>;
+  final templateData =
+      jsonDecode(templateFile.readAsStringSync()) as Map<String, dynamic>;
 
   int totalViolations = 0;
 
@@ -129,6 +129,7 @@ const exemptedKeys = <String>{
 
   // Config field labels — field names / identifiers, not UI text
   'proxyUrl',
+  'userAgent',
   'configLabelServerUrl',
   'configLabelEmail',
   'configLabelApiKey',

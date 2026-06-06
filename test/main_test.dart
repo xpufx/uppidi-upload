@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:uppidi_upload/l10n/app_localizations.dart';
 import 'package:uppidi_upload/providers/upload_provider.dart';
-import 'package:uppidi_upload/core/models/upload_result.dart';
 
 import 'helpers/mock_uploader.dart';
 

@@ -63,6 +63,8 @@
   "defaultForSharing": "Defaŭlta por kunhavigo",
   "lastUsed": "Lasta uzo",
   "proxyHint": "socks5://gastigo:haveno",
+  "userAgent": "Uzanto-Aganto",
+  "userAgentHint": "Propra Uzanto-Aganto por alŝutaj petoj",
   "dropFileToUpload": "Demetu dosieron por alŝuti",
   "retry": "Reprovi",
   "chooseFile": "Elekti Dosieron",

@@ -1,5 +1,20 @@
 # Changelog
 
+- fix: add missing ARB keys for share message + fix check_bare_strings.dart
+- feat: translate all ARB locales + check for untranslated values in CI
+- feat: add check_untranslated_arb.dart — catches ARB values identical to English
+- fix: auto-detect MIME type from filename on Android save (use .jpg → image/jpeg instead of hardcoded application/json)
+- fix: restore executable bit on uppidi binary lost by GHA artifact roundtrip
+- fix: handle existing tag in release workflow step
+- ci: clarify release input description
+- ci: manual trigger only (workflow_dispatch); release via input flag
+- build-appimage: default output to .build/ (gitignored scratch dir)
+- fix: default build-appimage.sh output to project root, not .caddy-artifacts
+- ci: pass artifacts-dir to build-appimage.sh
+- ci: use env context for signing condition
+- bump version to 1.5.1
+- ci: skip signing setup when secrets not configured
+- fix: graceful fallback to debug key in CI when key.properties is missing
 - chore: bump to 1.5.0
 - chore: stop tracking AGENTS.md in git
 - chore: update AGENTS.md
@@ -15,18 +30,3 @@
 - refactor: global checkered stack above ProImageEditor + all transparent backgrounds
 - fix: nav order → Upload, Image Editor, History, Providers, Settings
 - fix: theme-aware checkered colors (light/dark) + transparent editor bg
-- fix: transparent editor background so checkered wrapBody shows through
-- feat: checkered transparency grid behind editor canvas
-- fix: editor icons visible in light mode + sub-editors stay within tab
-- fix: inline editor in Image Editor tab (keeps nav visible) + light-mode icon colors
-- feat: add Image Editor navigation tab with standalone editor screen
-- fix: pro_image_editor background follows app theme (seed color + light/dark)
-- fix: typed GoFileConfig for GoFileProvider, passes check_wide_config
-- feat: add GoFile provider, fix check_bare_strings, Android json ext, Flatpak, LocalProvider save, isModified+supportsMessage
-- feat: add Local (Image Editor) provider + save-a-copy after editing
-- feat: remove duplicate Choose File, add paste button, switch to Cupertino editor design
-- feat: embed pro_image_editor, remove quality selector, drop ImageCropOverlay
-- Merge remote-tracking branch 'origin/opencode/gentle-cabin'
-- build: worktree-aware artifact paths, AppImage --artifacts-dir flag
-- Merge branch 'opencode/gentle-cabin'
-- redesign upload screen: card layout, quality chips, progress overlay, theme badges

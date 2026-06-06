@@ -30,6 +30,9 @@ class MockSettingsService implements SettingsService {
   Future<String?> getProxyUrl() async => null;
 
   @override
+  Future<String?> getUserAgent() async => null;
+
+  @override
   Future<String?> get(String key) async => null;
 
   @override

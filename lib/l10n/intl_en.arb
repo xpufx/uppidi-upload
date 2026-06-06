@@ -63,6 +63,8 @@
   "defaultForSharing": "Default for sharing",
   "lastUsed": "Last used",
   "proxyHint": "socks5://host:port",
+  "userAgent": "User-Agent",
+  "userAgentHint": "Custom User-Agent header for upload requests",
   "dropFileToUpload": "Drop file to upload",
   "retry": "Retry",
   "chooseFile": "Choose File",

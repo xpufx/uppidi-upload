@@ -10,6 +10,7 @@ import '../core/logging/log.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
+import '../core/version.dart';
 
 /// Matterbridge API provider.
 ///
@@ -81,6 +82,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
     Map<String, String> config, {
     bool allowInsecureConn = false,
     String? proxyUrl,
+    String? userAgent,
   }) async {
     final url = (config['mb_url']?.trim() ?? '').replaceAll(RegExp(r'/$'), '');
     final token = config['mb_token']?.trim() ?? '';
@@ -88,10 +90,14 @@ class MatterbridgeProvider extends BaseHttpProvider {
       config,
       allowInsecureConn: allowInsecureConn,
       proxyUrl: proxyUrl,
+      userAgent: userAgent,
     );
     dio.options.baseUrl = url;
     dio.options.receiveTimeout = const Duration(seconds: 60);
-    dio.options.headers = {'Authorization': 'Bearer $token'};
+    dio.options.headers = {
+      'Authorization': 'Bearer $token',
+      'User-Agent': userAgent ?? 'uppidi-upload/$appVersion',
+    };
     return dio;
   }
 

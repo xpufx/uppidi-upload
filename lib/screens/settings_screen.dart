@@ -32,6 +32,11 @@ final proxyUrlProvider = FutureProvider<String?>((ref) async {
   return svc.getProxyUrl();
 });
 
+final userAgentProvider = FutureProvider<String?>((ref) async {
+  final svc = ref.read(settingsServiceProvider);
+  return svc.getUserAgent();
+});
+
 final _defaultShareProviderProvider = FutureProvider<String?>((ref) async {
   final svc = ref.read(settingsServiceProvider);
   return await svc.get(SettingsService.defaultShareProviderKey);
@@ -347,11 +352,14 @@ class _GlobalToggles extends ConsumerStatefulWidget {
 class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
   late TextEditingController _proxyController;
   Timer? _proxyDebounce;
+  late TextEditingController _userAgentController;
+  Timer? _userAgentDebounce;
 
   @override
   void initState() {
     super.initState();
     _proxyController = TextEditingController();
+    _userAgentController = TextEditingController();
     Future.microtask(_load);
     Future.microtask(() => ref.read(versionCheckProvider.notifier).check());
   }
@@ -360,12 +368,16 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
   void dispose() {
     _proxyDebounce?.cancel();
     _proxyController.dispose();
+    _userAgentDebounce?.cancel();
+    _userAgentController.dispose();
     super.dispose();
   }
 
   Future<void> _load() async {
     final proxy = await ref.read(proxyUrlProvider.future);
     _proxyController.text = proxy ?? '';
+    final userAgent = await ref.read(userAgentProvider.future);
+    _userAgentController.text = userAgent ?? '';
   }
 
   @override
@@ -553,6 +565,28 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
                 svc.set(SettingsService.proxyUrlKey, v);
               }
               ref.invalidate(proxyUrlProvider);
+            });
+          },
+        ),
+        const SizedBox(height: 16),
+        // Custom User-Agent
+        TextField(
+          controller: _userAgentController,
+          decoration: InputDecoration(
+            labelText: l10n.userAgent,
+            hintText: l10n.userAgentHint,
+            border: const OutlineInputBorder(),
+            isDense: true,
+          ),
+          onChanged: (v) {
+            _userAgentDebounce?.cancel();
+            _userAgentDebounce = Timer(const Duration(milliseconds: 500), () {
+              if (v.isEmpty) {
+                svc.remove(SettingsService.userAgentKey);
+              } else {
+                svc.set(SettingsService.userAgentKey, v);
+              }
+              ref.invalidate(userAgentProvider);
             });
           },
         ),

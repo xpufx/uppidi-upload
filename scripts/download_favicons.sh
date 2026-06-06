@@ -20,6 +20,10 @@ DOMAINS[frisk]="frisk.page"
 DOMAINS[litterbox]="litterbox.catbox.moe"
 DOMAINS[fileditch]="new.fileditch.com"
 DOMAINS[gofile]="gofile.io"
+DOMAINS[filebin]="filebin.net"
+DOMAINS[filester]="filester.me"
+DOMAINS[storage_to]="storage.to"
+DOMAINS[bzzhr]="bzzhr.to"
 
 echo "==> Downloading provider favicons..."
 
