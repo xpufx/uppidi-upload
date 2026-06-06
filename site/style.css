@@ -1,0 +1,153 @@
+/* ── Navigation ── */
+nav {
+  text-align: center;
+  padding: 0.5em 0;
+  border-bottom: 1px solid var(--border, #ccc);
+}
+nav a {
+  display: inline-block;
+  padding: 0.4em 0.8em;
+  text-decoration: none;
+}
+nav a:hover {
+  text-decoration: underline;
+}
+nav a:last-child {
+  float: right;
+}
+
+/* ── Header ── */
+picture {
+  display: block;
+  text-align: center;
+}
+header p:last-of-type {
+  text-align: center;
+}
+
+/* ── Screenshot carousel ── */
+input[name="scr"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+figure {
+  display: none;
+  margin: 0;
+  padding: 1em;
+  background: var(--background-alt);
+  border-radius: 8px;
+  animation: fade 0.3s ease;
+}
+@keyframes fade {
+  from { opacity: 0.3; }
+  to   { opacity: 1; }
+}
+input#scr1:checked ~ div figure#s1,
+input#scr2:checked ~ div figure#s2,
+input#scr3:checked ~ div figure#s3 {
+  display: flex;
+  gap: 1em;
+  align-items: flex-start;
+}
+figure > div {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+figure img {
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+figcaption {
+  text-align: center;
+  font-style: italic;
+  font-size: 0.9em;
+  margin-top: 0.5em;
+  opacity: 0.8;
+}
+
+/* ── Carousel arrows ── */
+section div:first-of-type {
+  position: relative;
+}
+label[id^="p"], label[id^="n"] {
+  display: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2.5em;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  color: var(--text-muted, #999);
+  z-index: 1;
+  padding: 0.3em;
+  transition: color 0.2s;
+}
+label[id^="p"]:hover, label[id^="n"]:hover {
+  color: var(--text-main, #333);
+}
+label[id^="p"] { left: 0.1em; }
+label[id^="n"] { right: 0.1em; }
+input#scr1:checked ~ div label#p1,
+input#scr1:checked ~ div label#n1,
+input#scr2:checked ~ div label#p2,
+input#scr2:checked ~ div label#n2,
+input#scr3:checked ~ div label#p3,
+input#scr3:checked ~ div label#n3 {
+  display: block;
+}
+
+/* ── Carousel dots ── */
+section div:last-of-type {
+  text-align: center;
+  margin-top: 0.5em;
+}
+section div:last-of-type label {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--border, #ccc);
+  margin: 0 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+input#scr1:checked ~ div:last-of-type label[for="scr1"],
+input#scr2:checked ~ div:last-of-type label[for="scr2"],
+input#scr3:checked ~ div:last-of-type label[for="scr3"] {
+  background: var(--text-main, #333);
+}
+
+/* ── Provider table ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  text-align: left;
+  padding: 0.5em 0.6em;
+}
+th img, td img {
+  vertical-align: middle;
+  margin-right: 0.3em;
+}
+td[data-status]::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 0.3em;
+}
+td[data-status="live"]::before  { background: #22c55e; }
+td[data-status="down"]::before  { background: #ef4444; }
+td[data-status="warn"]::before  { background: #eab308; }

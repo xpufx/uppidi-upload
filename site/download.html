@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download &mdash; Uppidi Upload</title>
+  <meta name="description" content="Download Uppidi Upload for Android, Linux, or Windows.">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="download.html">Download</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="https://github.com/xpufx/uppidi-upload">
+        <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-label="GitHub">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        <img src="https://img.shields.io/github/v/release/xpufx/uppidi-upload?style=flat&label=&color=2ea44f" alt="Latest release" style="vertical-align:middle;margin-left:4px;">
+      </a>
+    </nav>
+    <h1>Download Uppidi Upload</h1>
+    <p>Uppidi Upload is an open source, cross-platform application for uploading media and files to public and private providers. Upload images, videos, and other files from your phone, tablet, or desktop and share the URL anywhere, including IRC (backed by a public provider of your choice for the file itself). All pre-built binaries are available from <a href="https://github.com/xpufx/uppidi-upload/releases">GitHub Releases</a>.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Android</h2>
+      <p>Download the APK for your device architecture. Most modern phones use <strong>arm64-v8a</strong>.</p>
+      <ul>
+        <li>
+          <a href="https://github.com/xpufx/uppidi-upload/releases/latest">arm64-v8a</a>
+          &mdash; 64-bit ARM (most phones &amp; tablets)
+        </li>
+        <li>
+          <a href="https://github.com/xpufx/uppidi-upload/releases/latest">armeabi-v7a</a>
+          &mdash; 32-bit ARM (older devices)
+        </li>
+        <li>
+          <a href="https://github.com/xpufx/uppidi-upload/releases/latest">x86_64</a>
+          &mdash; x86 devices (emulators, Chromebooks)
+        </li>
+      </ul>
+      <p>After downloading, open the APK file on your device to install. You may need to enable <em>Install from unknown sources</em> in your device settings.</p>
+    </section>
+
+    <section>
+      <h2>Linux</h2>
+      <h3>AppImage (recommended)</h3>
+      <p>Download the <a href="https://github.com/xpufx/uppidi-upload/releases/latest">AppImage</a>, make it executable, and run:</p>
+      <pre><code>chmod +x uppidi-upload-*.appimage
+./uppidi-upload-*.appimage</code></pre>
+
+      <h3>tar.gz archive</h3>
+      <p>Download the <a href="https://github.com/xpufx/uppidi-upload/releases/latest">tar.gz archive</a>, extract, and run the binary:</p>
+      <pre><code>tar xzf uppidi-upload-*-linux.tar.gz
+./uppidi-upload</code></pre>
+
+      <h3>Flatpak</h3>
+      <p>Download the <a href="https://github.com/xpufx/uppidi-upload/releases/latest">Flatpak</a> from the latest release and install:</p>
+      <pre><code>flatpak install --user uppidi-upload-*-linux.flatpak
+flatpak run com.uppidi.UppidiUpload</code></pre>
+    </section>
+
+    <section>
+      <h2>Windows</h2>
+      <p>Download the <a href="https://github.com/xpufx/uppidi-upload/releases/latest">Windows zip archive</a> from the latest release, extract it, and run <code>uppidi_upload.exe</code>.</p>
+      <p>Windows builds are produced by a <a href="https://github.com/xpufx/uppidi-upload/actions/workflows/build-windows.yml">GitHub Actions workflow</a> and attached as build artifacts to the workflow run.</p>
+    </section>
+
+    <section>
+      <h2>Build from Source</h2>
+      <p>You can build Uppidi yourself if you prefer. See the full build instructions in the repository:</p>
+      <ol>
+        <li>Clone the repo: <code>git clone https://github.com/xpufx/uppidi-upload.git</code></li>
+        <li>Install Flutter SDK &gt;= 3.16.0</li>
+        <li>Run <code>flutter pub get</code></li>
+        <li>Build for your target:
+          <ul>
+            <li><code>flutter build apk --release --target-platform android-arm64</code> &mdash; Android</li>
+            <li><code>flutter build linux --release</code> &mdash; Linux (tar.gz + Flatpak via CI)</li>
+            <li><code>flutter build windows --release</code> &mdash; Windows</li>
+          </ul>
+        </li>
+      </ol>
+      <p>Detailed build instructions and prerequisite information are available in <a href="https://github.com/xpufx/uppidi-upload/blob/main/BUILDING.md">BUILDING.md</a>.</p>
+    </section>
+
+    <section>
+      <h2>User Manual</h2>
+      <p>Read the <a href="https://github.com/xpufx/uppidi-upload/blob/main/docs/USER_MANUAL.md">full user manual</a> for detailed instructions on uploading files, managing providers, using upload history, and customizing settings.</p>
+    </section>
+
+    <section>
+      <h2>System Requirements</h2>
+      <ul>
+        <li><strong>Android:</strong> Android 5.0 (API 21) or later</li>
+        <li><strong>Linux:</strong> GTK 3 runtime, any modern distribution</li>
+        <li><strong>Windows:</strong> Windows 10 or later</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <hr>
+    <p><strong>Other Projects</strong></p>
+    <p>
+      <a href="https://overkill.uppidi.com" style="display:inline-flex;align-items:center;gap:12px;text-decoration:none;">
+        <img src="assets/reddit-comments-overkill-web.png" alt="" width="48" height="52" style="border-radius:6px;flex-shrink:0;">
+        <span style="text-align:left;">
+          <span style="display:block;font-weight:600;">Reddit Comments Overkill</span>
+          <span style="display:block;font-size:0.85em;opacity:0.8;">A browser userscript that deletes all your Reddit comments</span>
+        </span>
+      </a>
+    </p>
+    <hr>
+    <p>
+      <a href="https://github.com/xpufx/uppidi-upload">GitHub</a>
+      &middot;
+      <a href="index.html">Home</a>
+      &middot;
+      <a href="privacy.html">Privacy</a>
+    </p>
+    <p>Released under the <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GNU General Public License v3</a>.</p>
+  </footer>
+</body>
+</html>

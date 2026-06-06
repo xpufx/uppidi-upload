@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uppidi Upload</title>
+  <meta name="description" content="Upload images, videos, and files to 19 hosting services from Android, Linux, or Windows. Built-in image editor with crop, paint, text, and filters.">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+  <link rel="stylesheet" href="style.css?v=16">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="download.html">Download</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="https://github.com/xpufx/uppidi-upload">
+        <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-label="GitHub">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        <img src="https://img.shields.io/github/v/release/xpufx/uppidi-upload?style=flat&label=&color=2ea44f" alt="Latest release" style="vertical-align:middle;margin-left:4px;">
+      </a>
+    </nav>
+    <picture>
+      <source srcset="assets/logo-dark.png" media="(prefers-color-scheme: dark)">
+      <img src="assets/logo-light.png" alt="Uppidi Upload logo" width="200" height="200">
+    </picture>
+    <h1>Uppidi Upload</h1>
+    <p>Uppidi Upload is an open source, cross-platform application for uploading media and files to public and private providers. Upload images, videos, and other files from your phone, tablet, or desktop and share the URL anywhere, including IRC (backed by a public provider of your choice for the file itself). Built-in image editor lets you crop, paint, add text, apply filters, emoji, blur, and pixelate before uploading or saving locally.</p>
+    <p><a href="download.html" role="button">Download Now ⬇</a></p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Features</h2>
+      <ul>
+        <li><strong>19 hosting providers</strong> — Catbox, FileDitch, Frisk, Litterbox, Uguu.se, TmpFile.link, FreeImage.host, TempSH, GoFile, Filebin.net, Filester.me, Storage.to, Bzzhr.to, HttpBin.org (test), plus your own Telegram Bot, Zulip, CustomUguu, Matterbridge, and Local (Image Editor)</li>
+        <li><strong>Your own infrastructure</strong> — configure and authenticate with private servers: Telegram Bot, Zulip, self-hosted Uguu, and Matterbridge for IRC/Discord/Matrix/Slack relay</li>
+        <li><strong>Built-in image editor</strong> — a full editing tab with crop, paint, text, filters, emoji, blur, and pixelate on a checkered canvas. Save locally or upload to any provider. Also functions as a standalone image editor</li>
+        <li><strong>Desktop-first experience</strong> — drag files from your file manager, paste images from clipboard, real hover overlay feedback</li>
+        <li><strong>Message templates</strong> — set a global template in Settings ({url}, {filename}, {filesize}) and edit per upload</li>
+        <li><strong>History → IRC pipeline</strong> — re-share any past upload to a Matterbridge gateway from the history screen</li>
+        <li><strong>Streaming uploads</strong> — handles large files without consuming excessive memory</li>
+        <li><strong>My Providers dialog</strong> — manage custom instances and credentials for private services</li>
+        <li><strong>Provider health checks</strong> — test connectivity and enable/disable providers</li>
+        <li><strong>Settings backup</strong> — structured export and import of all app settings</li>
+        <li><strong>Dark &amp; light theme</strong> — system-following theme with customizable seed colors</li>
+        <li><strong>Multi-language</strong> — English, Turkish, Italian, Esperanto, and Klingon (we do not discriminate against the Alien or the Woke)</li>
+        <li><strong>Cross-platform</strong> — Android, Linux (tar.gz, AppImage, Flatpak), and Windows</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Screenshots</h2>
+
+      <input type="radio" name="scr" id="scr1" checked>
+      <input type="radio" name="scr" id="scr2">
+      <input type="radio" name="scr" id="scr3">
+
+      <div>
+        <figure id="s1">
+          <div>
+            <img src="assets/screenshots/main-screen-light.jpg" alt="Main screen (light mode)" loading="lazy">
+            <figcaption>Main screen &mdash; light</figcaption>
+          </div>
+          <div>
+            <img src="assets/screenshots/main-screen-dark.jpg" alt="Main screen (dark mode)" loading="lazy">
+            <figcaption>Main screen &mdash; dark</figcaption>
+          </div>
+        </figure>
+        <figure id="s2">
+          <div>
+            <img src="assets/screenshots/upload-screen-light.jpg" alt="Upload screen (light mode)" loading="lazy">
+            <figcaption>Upload screen &mdash; light</figcaption>
+          </div>
+          <div>
+            <img src="assets/screenshots/upload-screen-dark.jpg" alt="Upload screen (dark mode)" loading="lazy">
+            <figcaption>Upload screen &mdash; dark</figcaption>
+          </div>
+        </figure>
+        <figure id="s3">
+          <div>
+            <img src="assets/screenshots/settings-screen-light.jpg" alt="Settings screen (light mode)" loading="lazy">
+            <figcaption>Settings screen &mdash; light</figcaption>
+          </div>
+          <div>
+            <img src="assets/screenshots/settings-screen-dark.jpg" alt="Settings screen (dark mode)" loading="lazy">
+            <figcaption>Settings screen &mdash; dark</figcaption>
+          </div>
+        </figure>
+
+        <label id="p1" for="scr3">‹</label>
+        <label id="n1" for="scr2">›</label>
+        <label id="p2" for="scr1">‹</label>
+        <label id="n2" for="scr3">›</label>
+        <label id="p3" for="scr2">‹</label>
+        <label id="n3" for="scr1">›</label>
+      </div>
+
+      <div>
+        <label for="scr1"></label>
+        <label for="scr2"></label>
+        <label for="scr3"></label>
+      </div>
+    </section>
+
+    <section>
+      <h2>Supported Hosting Providers</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th>📦 Max Size</th>
+            <th>⏱ Expiry</th>
+            <th>Status</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><img src="assets/provider-icons/catbox.png" alt="" width="14" height="14"> Catbox.moe</td>
+            <td>200 MB</td>
+            <td>—</td>
+            <td data-status="live">Live</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/fileditch.png" alt="" width="14" height="14"> FileDitch</td>
+            <td>100 GB</td>
+            <td>Indefinite</td>
+            <td data-status="live">Live</td>
+            <td>Inactive &gt;30d may delete</td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/frisk.png" alt="" width="14" height="14"> Frisk</td>
+            <td>2 GB</td>
+            <td>~1 day</td>
+            <td data-status="live">Live</td>
+            <td>Extendable on re-upload</td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/litterbox.png" alt="" width="14" height="14"> Litterbox</td>
+            <td>1 GB</td>
+            <td>1h / 12h / 24h / 72h</td>
+            <td data-status="live">Live</td>
+            <td>Temporary/expiring files</td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/uguu_uguu_se.png" alt="" width="14" height="14"> Uguu.se</td>
+            <td>128 MB</td>
+            <td>3 hours</td>
+            <td data-status="live">Live</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/tmpfilelink.png" alt="" width="14" height="14"> TmpFile.link</td>
+            <td>100 MB</td>
+            <td>7 days</td>
+            <td data-status="live">Live</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/freeimage_freeimage_host.png" alt="" width="14" height="14"> FreeImage.host</td>
+            <td>64 MB</td>
+            <td>—</td>
+            <td data-status="live">Live</td>
+            <td>Images only</td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/tempsh.png" alt="" width="14" height="14"> TempSH</td>
+            <td>4 GB</td>
+            <td>3 days</td>
+            <td data-status="live">Live</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/httpbin.png" alt="" width="14" height="14"> HttpBin.org</td>
+            <td>—</td>
+            <td>—</td>
+            <td data-status="live">Live</td>
+            <td>Test service</td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/telegram.png" alt="" width="14" height="14"> Telegram Bot</td>
+            <td>—</td>
+            <td>—</td>
+            <td data-status="live">Live</td>
+            <td>Your own bot, files or images with captions</td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/zulip.png" alt="" width="14" height="14"> Zulip</td>
+            <td>—</td>
+            <td>—</td>
+            <td data-status="live">Live</td>
+            <td>Channels and direct messages</td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/custom_uguu.png" alt="" width="14" height="14"> CustomUguu</td>
+            <td>—</td>
+            <td>—</td>
+            <td data-status="live">Live</td>
+            <td>Self-hosted Uguu-compatible endpoint</td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/matterbridge.gif" alt="" width="14" height="14"> Matterbridge</td>
+            <td>—</td>
+            <td>—</td>
+            <td data-status="live">Live</td>
+            <td>Relay to IRC, Discord, Matrix, Slack, Telegram</td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/gofile.png" alt="" width="14" height="14"> GoFile</td>
+            <td>Unlimited</td>
+            <td>10 days without download</td>
+            <td data-status="live">Live</td>
+            <td>Anonymous file hosting</td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/filebin.png" alt="" width="14" height="14"> Filebin.net</td>
+            <td>150 MB</td>
+            <td>6 months</td>
+            <td data-status="live">Live</td>
+            <td>Pastebin-style bins</td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/filester.png" alt="" width="14" height="14"> Filester.me</td>
+            <td>100 GB</td>
+            <td>30 days</td>
+            <td data-status="live">Live</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/storage_to.png" alt="" width="14" height="14"> Storage.to</td>
+            <td>—</td>
+            <td>—</td>
+            <td data-status="live">Live</td>
+            <td>Cloud storage, presigned uploads</td>
+          </tr>
+          <tr>
+            <td><img src="assets/provider-icons/bzzhr.png" alt="" width="14" height="14"> Bzzhr.to</td>
+            <td>—</td>
+            <td>~4 days</td>
+            <td data-status="live">Live</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>💾 Local (Image Editor)</td>
+            <td>Device storage</td>
+            <td>—</td>
+            <td data-status="live">Live</td>
+            <td>Save edited images to device</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Platforms</h2>
+      <ul>
+        <li><strong>Android</strong> &mdash; phones and tablets (arm64-v8a, armeabi-v7a, x86_64)</li>
+        <li><strong>Linux</strong> &mdash; desktop (tar.gz, AppImage, Flatpak)</li>
+        <li><strong>Windows</strong> &mdash; desktop (zip)</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <hr>
+    <p><strong>Other Projects</strong></p>
+    <p>
+      <a href="https://overkill.uppidi.com" style="display:inline-flex;align-items:center;gap:12px;text-decoration:none;">
+        <img src="assets/reddit-comments-overkill-web.png" alt="" width="48" height="52" style="border-radius:6px;flex-shrink:0;">
+        <span style="text-align:left;">
+          <span style="display:block;font-weight:600;">Reddit Comments Overkill</span>
+          <span style="display:block;font-size:0.85em;opacity:0.8;">A browser userscript that deletes all your Reddit comments</span>
+        </span>
+      </a>
+    </p>
+    <hr>
+    <p>
+      <a href="https://github.com/xpufx/uppidi-upload">GitHub</a>
+      &middot;
+      <a href="download.html">Download</a>
+      &middot;
+      <a href="privacy.html">Privacy</a>
+    </p>
+    <p>Released under the <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GNU General Public License v3</a>.</p>
+  </footer>
+</body>
+</html>
