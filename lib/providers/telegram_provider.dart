@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'telegram_config.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/interfaces/uploader.dart';
-import '../core/logging/log.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
@@ -17,7 +16,6 @@ import '../core/models/upload_result.dart';
 /// The chat ID can be obtained by messaging the bot and checking
 /// `https://api.telegram.org/bot<token>/getUpdates`.
 class TelegramProvider extends BaseHttpProvider {
-  late final Log _log = Log(runtimeType.toString());
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
         maxFileSizeBytes: 50 * 1024 * 1024, // 50 MB
@@ -45,9 +43,6 @@ class TelegramProvider extends BaseHttpProvider {
   String get fileFormFieldName => 'document';
 
   @override
-  bool get supportsWeb => false;
-
-  @override
   bool get supportsMessage => true;
 
   @override
@@ -69,9 +64,6 @@ class TelegramProvider extends BaseHttpProvider {
         'chat_id': 'Chat ID',
         'send_as_photo': 'Send images as photos',
       };
-
-  @override
-  String? get proxyUrl => null;
 
   @override
   Map<String, String> get additionalFormFields => const {};
@@ -122,26 +114,16 @@ class TelegramProvider extends BaseHttpProvider {
     final fieldName = sendAsPhoto ? 'photo' : 'document';
 
     try {
-      final rawConfig =
-          config is Map<String, String> ? config : <String, String>{};
-      final allowInsecure = rawConfig['_allow_insecure_conn'] == 'true';
-      final proxyUrl = rawConfig['_proxy_url'];
-      final userAgent = rawConfig['_user_agent'];
-      final cleanConfig = Map<String, String>.from(rawConfig)
-        ..remove('_allow_insecure_conn')
-        ..remove('_proxy_url')
-        ..remove('_user_agent')
-        ..remove('send_as_photo');
-      final dio = await createHttpClient(cleanConfig,
-          allowInsecureConn: allowInsecure,
-          proxyUrl: proxyUrl,
-          userAgent: userAgent);
+      final prepared = await prepareRequest(config);
+      final dio = prepared.dio;
+      final cleanConfig = prepared.cleanedConfig;
+      cleanConfig.remove('send_as_photo');
 
       final fields = buildFormFields(cleanConfig);
       if (cfg.messageText != null && cfg.messageText!.isNotEmpty) {
         fields['caption'] = cfg.messageText;
       }
-      _log.info(
+      log.info(
           'Uploading ${request.fileName} → $endpoint as $fieldName (image=$isImage, sendAsPhoto=$sendAsPhoto)');
 
       final file = MultipartFile.fromStream(

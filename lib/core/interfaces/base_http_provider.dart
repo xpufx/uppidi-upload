@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -13,13 +14,25 @@ import '../version.dart';
 import 'uploader.dart';
 
 abstract class BaseHttpProvider implements BaseUploader {
-  late final Log _log = Log(runtimeType.toString());
+  late final Log log = Log(runtimeType.toString());
 
   @override
   bool get isUrlShareOnly => false;
 
   @override
   bool get supportsMessage => false;
+
+  @override
+  bool get supportsWeb => false;
+
+  @override
+  List<String> get requiredConfigKeys => [];
+
+  @override
+  Map<String, String> get configLabels => const {};
+
+  @override
+  String? get proxyUrl => null;
 
   String get baseUrl;
   String get uploadEndpoint;
@@ -135,7 +148,7 @@ abstract class BaseHttpProvider implements BaseUploader {
   }
 
   UploadResult uploadError(Object e, StackTrace stackTrace) {
-    _log.error('Upload failed: $e', error: e, stackTrace: stackTrace);
+    log.error('Upload failed: $e', error: e, stackTrace: stackTrace);
     final statusCode = e is DioException ? e.response?.statusCode : null;
     return UploadResult(
       success: false,
@@ -147,12 +160,26 @@ abstract class BaseHttpProvider implements BaseUploader {
   }
 
   UploadResult unhandledError(Response response) {
-    _log.warn('Unhandled error (returning genericError)');
+    log.warn('Unhandled error (returning genericError)');
     return UploadResult(
       success: false,
       errorMessage: 'genericError',
       statusCode: response.statusCode,
     );
+  }
+
+  /// Safely parses JSON from a Dio response, handling both String and Map bodies.
+  Map<String, dynamic>? parseJsonResponse(Response response) {
+    final body = response.data;
+    if (body is String) {
+      try {
+        final decoded = jsonDecode(body);
+        if (decoded is Map) return Map<String, dynamic>.from(decoded);
+      } catch (_) {}
+    } else if (body is Map) {
+      return Map<String, dynamic>.from(body);
+    }
+    return null;
   }
 
   MultipartFile _buildStreamFile(FileUploadRequest request) {
@@ -173,13 +200,13 @@ abstract class BaseHttpProvider implements BaseUploader {
       return 'invalidMimeType';
     }
     if (e is FileSystemException) {
-      _log.error('File system error: ${e.message}', error: e);
+      log.error('File system error: ${e.message}', error: e);
       return 'fileSystemError';
     }
     if (e is DioException) {
       final statusCode = e.response?.statusCode;
       if (statusCode == 403 || statusCode == 406 || statusCode == 429) {
-        _log.warn(
+        log.warn(
           'HTTP $statusCode — possible User-Agent rejection. '
           'Try setting a custom User-Agent in provider settings.',
         );

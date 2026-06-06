@@ -6,7 +6,6 @@ import 'matterbridge_config.dart';
 import '../core/format.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/interfaces/uploader.dart';
-import '../core/logging/log.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
@@ -18,8 +17,6 @@ import '../core/version.dart';
 /// Matterbridge API. Each gateway (IRC channel, Discord server, etc.) is a
 /// separate `ProviderInstance` with its own protocol capability.
 class MatterbridgeProvider extends BaseHttpProvider {
-  late final Log _log = Log(runtimeType.toString());
-
   @override
   String get providerId => 'matterbridge';
 
@@ -36,9 +33,6 @@ class MatterbridgeProvider extends BaseHttpProvider {
 
   @override
   String get fileFormFieldName => 'file';
-
-  @override
-  bool get supportsWeb => false;
 
   @override
   bool get supportsMessage => true;
@@ -63,9 +57,6 @@ class MatterbridgeProvider extends BaseHttpProvider {
         'mb_gateway': 'Gateway',
         'paired_provider': 'Upload via',
       };
-
-  @override
-  String? get proxyUrl => null;
 
   @override
   Map<String, String> get additionalFormFields => const {};
@@ -154,7 +145,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
         };
       }
 
-      _log.info(
+      log.info(
           'Matterbridge: gateway=$gateway url=${preUrl.isNotEmpty ? "paired" : "direct"}');
 
       final response = await dio.post(
@@ -165,7 +156,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
       );
       dio.close();
 
-      _log.info('Matterbridge response: ${response.statusCode}');
+      log.info('Matterbridge response: ${response.statusCode}');
       if (response.statusCode == 200) {
         return UploadResult(
           success: true,
@@ -183,7 +174,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
         completedAt: DateTime.now(),
       );
     } catch (e, st) {
-      _log.error('Matterbridge upload failed: $e', error: e, stackTrace: st);
+      log.error('Matterbridge upload failed: $e', error: e, stackTrace: st);
       return UploadResult(
         success: false,
         errorMessage: mapException(e),

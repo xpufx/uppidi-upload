@@ -13,18 +13,6 @@ class BzzhrProvider extends BaseHttpProvider {
   String get providerName => 'Bzzhr.to';
 
   @override
-  bool get supportsWeb => false;
-
-  @override
-  List<String> get requiredConfigKeys => [];
-
-  @override
-  Map<String, String> get configLabels => {};
-
-  @override
-  String? get proxyUrl => null;
-
-  @override
   String get baseUrl => 'https://w.bzzhr.co';
 
   @override

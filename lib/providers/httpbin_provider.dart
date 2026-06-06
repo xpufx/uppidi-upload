@@ -2,10 +2,8 @@ import 'package:dio/dio.dart';
 
 import '../core/interfaces/base_http_provider.dart';
 import '../core/models/upload_result.dart';
-import '../core/logging/log.dart';
 
 class HttpBinProvider extends BaseHttpProvider {
-  late final Log _log = Log(runtimeType.toString());
   @override
   String get providerId => 'httpbin';
 
@@ -14,15 +12,6 @@ class HttpBinProvider extends BaseHttpProvider {
 
   @override
   bool get supportsWeb => true;
-
-  @override
-  List<String> get requiredConfigKeys => [];
-
-  @override
-  Map<String, String> get configLabels => {};
-
-  @override
-  String? get proxyUrl => null;
 
   @override
   String get baseUrl => 'https://httpbin.org';
@@ -45,7 +34,7 @@ class HttpBinProvider extends BaseHttpProvider {
       );
     }
 
-    _log.warn(
+    log.warn(
         'Unexpected response: status=${response.statusCode}, data=${response.data}');
     return UploadResult(
       success: false,

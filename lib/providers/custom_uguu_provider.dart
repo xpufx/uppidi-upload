@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_result.dart';
-import '../core/logging/log.dart';
 
 /// Uguu-compatible upload provider for user-configured instances.
 ///
@@ -11,7 +10,6 @@ import '../core/logging/log.dart';
 /// to `/upload.php`, file field `files[]`, returns JSON with `"file"` key).
 /// Users add their own server URL via the instance config dialog.
 class CustomUguuProvider extends BaseHttpProvider {
-  late final Log _log = Log(runtimeType.toString());
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
         maxFileSizeBytes: 128 * 1024 * 1024,
@@ -36,9 +34,6 @@ class CustomUguuProvider extends BaseHttpProvider {
   String get fileFormFieldName => 'files[]';
 
   @override
-  bool get supportsWeb => false;
-
-  @override
   List<String> get requiredConfigKeys => ['server_url'];
 
   @override
@@ -52,9 +47,6 @@ class CustomUguuProvider extends BaseHttpProvider {
   Map<String, String> get configLabels => const {
         'server_url': 'Server URL',
       };
-
-  @override
-  String? get proxyUrl => null;
 
   @override
   Map<String, String> get additionalFormFields => const {};
@@ -89,7 +81,7 @@ class CustomUguuProvider extends BaseHttpProvider {
   UploadResult parseResponse(Response response) {
     try {
       if (response.data is! Map) {
-        _log.warn('Unhandled error (returning genericError)');
+        log.warn('Unhandled error (returning genericError)');
         return UploadResult(
           success: false,
           errorMessage: 'genericError',
@@ -100,7 +92,7 @@ class CustomUguuProvider extends BaseHttpProvider {
       final data = response.data as Map<String, dynamic>;
       final fileUrl = (data['file'] as String?) ?? (data['url'] as String?);
       if (fileUrl == null || fileUrl.isEmpty) {
-        _log.warn('Unhandled error (returning genericError)');
+        log.warn('Unhandled error (returning genericError)');
         return UploadResult(
           success: false,
           errorMessage: 'genericError',
@@ -114,7 +106,7 @@ class CustomUguuProvider extends BaseHttpProvider {
         statusCode: response.statusCode,
       );
     } catch (e) {
-      _log.warn('Unhandled error (returning genericError)');
+      log.warn('Unhandled error (returning genericError)');
       return UploadResult(
         success: false,
         errorMessage: 'genericError',

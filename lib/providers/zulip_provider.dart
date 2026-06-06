@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'zulip_config.dart';
 import '../core/interfaces/base_http_provider.dart';
 import '../core/interfaces/uploader.dart';
-import '../core/logging/log.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
@@ -18,8 +17,6 @@ import '../core/version.dart';
 ///
 /// Configuration is per-instance so a user can have multiple Zulip orgs.
 class ZulipProvider extends BaseHttpProvider {
-  late final Log _log = Log(runtimeType.toString());
-
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
         maxFileSizeBytes: 25 * 1024 * 1024, // 25 MB typical default
@@ -42,9 +39,6 @@ class ZulipProvider extends BaseHttpProvider {
 
   @override
   String get fileFormFieldName => 'filename';
-
-  @override
-  bool get supportsWeb => false;
 
   @override
   bool get supportsMessage => true;
@@ -74,9 +68,6 @@ class ZulipProvider extends BaseHttpProvider {
         'zulip_recipient': 'Recipient',
         'zulip_direct_message': 'Direct message',
       };
-
-  @override
-  String? get proxyUrl => null;
 
   @override
   Map<String, String> get additionalFormFields => const {};
@@ -126,20 +117,9 @@ class ZulipProvider extends BaseHttpProvider {
     _lastServerUrl = cfg.serverUrl.replaceAll(RegExp(r'/$'), '');
 
     try {
-      final rawConfig =
-          (config is Map<String, String> ? config : <String, String>{});
-      final allowInsecure = rawConfig['_allow_insecure_conn'] == 'true';
-      final proxyUrl = rawConfig['_proxy_url'];
-      final userAgent = rawConfig['_user_agent'];
-      final cleanConfig = Map<String, String>.from(rawConfig)
-        ..remove('_allow_insecure_conn')
-        ..remove('_proxy_url')
-        ..remove('_user_agent')
-        ..remove('send_as_photo');
-      final dio = await createHttpClient(cleanConfig,
-          allowInsecureConn: allowInsecure,
-          proxyUrl: proxyUrl,
-          userAgent: userAgent);
+      final prepared = await prepareRequest(config);
+      final dio = prepared.dio;
+      final cleanConfig = prepared.cleanedConfig;
 
       final fields = buildFormFields(cleanConfig);
       fields[fileFormFieldName] = MultipartFile.fromStream(
@@ -162,8 +142,10 @@ class ZulipProvider extends BaseHttpProvider {
       if (!result.success) return result;
 
       // Resolve message content from config
-      var messageContent = rawConfig['message_text'] ?? '';
-      _log.info('Zulip message_content="$messageContent" url="${result.url}"');
+      final originalConfig =
+          config is Map<String, String> ? config : <String, String>{};
+      var messageContent = originalConfig['message_text'] ?? '';
+      log.info('Zulip message_content="$messageContent" url="${result.url}"');
       if (result.url != null) {
         if (messageContent.isEmpty) {
           messageContent = result.url!;
@@ -195,12 +177,12 @@ class ZulipProvider extends BaseHttpProvider {
             final body = msgResponse.data is Map
                 ? (msgResponse.data as Map)['msg'] as String?
                 : null;
-            _log.info('Posted to channel: ${cfg.channel} (${body ?? "ok"})');
+            log.info('Posted to channel: ${cfg.channel} (${body ?? "ok"})');
           } else {
-            _log.warn('Failed to post to channel: ${msgResponse.statusCode}');
+            log.warn('Failed to post to channel: ${msgResponse.statusCode}');
           }
         } catch (e) {
-          _log.warn('Failed to post to channel: $e');
+          log.warn('Failed to post to channel: $e');
         }
       } else if (cfg.recipient.isNotEmpty) {
         try {
@@ -214,12 +196,12 @@ class ZulipProvider extends BaseHttpProvider {
             data: FormData.fromMap(msgData),
           );
           if (msgResponse.statusCode == 200) {
-            _log.info('Sent DM to user ${cfg.recipient}');
+            log.info('Sent DM to user ${cfg.recipient}');
           } else {
-            _log.warn('Failed to send DM: ${msgResponse.statusCode}');
+            log.warn('Failed to send DM: ${msgResponse.statusCode}');
           }
         } catch (e) {
-          _log.warn('Failed to send DM: $e');
+          log.warn('Failed to send DM: $e');
         }
       }
 

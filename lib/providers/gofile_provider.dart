@@ -6,12 +6,9 @@ import '../core/models/provider_metadata.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
 import '../core/platform/insecure_adapter.dart';
-import '../core/logging/log.dart';
 import 'gofile_config.dart';
 
 class GoFileProvider extends BaseHttpProvider {
-  late final Log _log = Log(runtimeType.toString());
-
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
         maxFileSizeBytes: null,
@@ -27,15 +24,6 @@ class GoFileProvider extends BaseHttpProvider {
 
   @override
   bool get supportsWeb => true;
-
-  @override
-  List<String> get requiredConfigKeys => [];
-
-  @override
-  Map<String, String> get configLabels => {};
-
-  @override
-  String? get proxyUrl => null;
 
   @override
   String get baseUrl => 'https://api.gofile.io';
@@ -56,19 +44,10 @@ class GoFileProvider extends BaseHttpProvider {
     try {
       final gofileConfig =
           config is GoFileConfig ? config : const GoFileConfig();
-      final rawConfig = gofileConfig.data;
-      final allowInsecure = rawConfig['_allow_insecure_conn'] == 'true';
-      final proxyUrlValue = rawConfig['_proxy_url'];
-      final userAgent = rawConfig['_user_agent'];
-      final cleanConfig = Map<String, String>.from(rawConfig)
-        ..remove('_allow_insecure_conn')
-        ..remove('_proxy_url')
-        ..remove('_user_agent');
-
-      final dio = await createHttpClient(cleanConfig,
-          allowInsecureConn: allowInsecure,
-          proxyUrl: proxyUrlValue,
-          userAgent: userAgent);
+      final prepared = await prepareRequest(gofileConfig.data);
+      final dio = prepared.dio;
+      final allowInsecure = prepared.allowInsecure;
+      final proxyUrlValue = prepared.proxyUrl;
 
       final serverResponse = await dio.get('/servers');
 
@@ -157,7 +136,7 @@ class GoFileProvider extends BaseHttpProvider {
       }
     }
 
-    _log.warn('Unhandled error (returning genericError)');
+    log.warn('Unhandled error (returning genericError)');
     return UploadResult(
       success: false,
       errorMessage: 'genericError',

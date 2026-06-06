@@ -1,34 +1,19 @@
 import 'dart:convert';
-import 'dart:math';
+import 'dart:math' hide log;
 
 import 'package:dio/dio.dart';
 
 import '../core/interfaces/base_http_provider.dart';
 import '../core/interfaces/uploader.dart';
-import '../core/logging/log.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
 
 class StorageToProvider extends BaseHttpProvider {
-  late final Log _log = Log(runtimeType.toString());
-
   @override
   String get providerId => 'storage_to';
 
   @override
   String get providerName => 'Storage.to';
-
-  @override
-  bool get supportsWeb => false;
-
-  @override
-  List<String> get requiredConfigKeys => [];
-
-  @override
-  Map<String, String> get configLabels => {};
-
-  @override
-  String? get proxyUrl => null;
 
   @override
   String get baseUrl => 'https://storage.to';
@@ -56,7 +41,7 @@ class StorageToProvider extends BaseHttpProvider {
       final visitorToken = _randomToken();
 
       // Step 1: Init
-      _log.info('init: POST /api/upload/init');
+      log.info('init: POST /api/upload/init');
       final initResponse = await dio.post(
         '/api/upload/init',
         data: {
@@ -71,7 +56,7 @@ class StorageToProvider extends BaseHttpProvider {
       );
 
       final initData = initResponse.data;
-      _log.info('init response: ${_trim(jsonEncode(initData))}');
+      log.info('init response: ${_trim(jsonEncode(initData))}');
       if (initData is! Map || initData['success'] != true) {
         final msg = initData is Map
             ? initData['error']?.toString() ?? initData.toString()
@@ -114,7 +99,7 @@ class StorageToProvider extends BaseHttpProvider {
       }
 
       // Step 2: Upload bytes to presigned URL
-      _log.info('put: PUT $uploadUrl');
+      log.info('put: PUT $uploadUrl');
       final putResponse = await dio.put(
         uploadUrl,
         data: request.dataStream,
@@ -140,7 +125,7 @@ class StorageToProvider extends BaseHttpProvider {
       if (ownerToken != null) {
         confirmBody['owner_token'] = ownerToken;
       }
-      _log.info('confirm: POST /api/upload/confirm $confirmBody');
+      log.info('confirm: POST /api/upload/confirm $confirmBody');
       final confirmResponse = await dio.post(
         '/api/upload/confirm',
         data: confirmBody,
@@ -151,7 +136,7 @@ class StorageToProvider extends BaseHttpProvider {
       );
 
       final confirmData = confirmResponse.data;
-      _log.info('confirm response: ${_trim(jsonEncode(confirmData))}');
+      log.info('confirm response: ${_trim(jsonEncode(confirmData))}');
       if (confirmData is Map &&
           confirmData['success'] == true &&
           confirmData['file'] is Map) {

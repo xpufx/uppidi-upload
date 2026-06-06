@@ -11,18 +11,6 @@ class FilesterProvider extends BaseHttpProvider {
   String get providerName => 'Filester.me';
 
   @override
-  bool get supportsWeb => false;
-
-  @override
-  List<String> get requiredConfigKeys => [];
-
-  @override
-  Map<String, String> get configLabels => {};
-
-  @override
-  String? get proxyUrl => null;
-
-  @override
   String get baseUrl => 'https://u1.filester.me';
 
   @override
