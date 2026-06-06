@@ -35,6 +35,11 @@ sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${VER
 git add "$VERSION_FILE" 2>/dev/null
 echo "   ✅ Version synced"
 
+# ── Website reminder ─────────────────────────────────────────
+# On production releases: update site/index.html, site/download.html
+# (provider table, features, platforms, download links) to match
+# the new version before building.
+
 # ── Bare string check (no Text('...') without l10n.*) ──────
 echo "==> Checking for bare UI strings..."
 if ! dart run scripts/check_bare_strings.dart 2>&1; then
