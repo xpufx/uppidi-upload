@@ -89,17 +89,9 @@ abstract class BaseHttpProvider implements BaseUploader {
     Map<String, String> config = const {},
   }) async {
     try {
-      final allowInsecure = config['_allow_insecure_conn'] == 'true';
-      final proxyUrl = config['_proxy_url'];
-      final userAgent = config['_user_agent'];
-      final cleanConfig = Map<String, String>.from(config)
-        ..remove('_allow_insecure_conn')
-        ..remove('_proxy_url')
-        ..remove('_user_agent');
-      final dio = await createHttpClient(cleanConfig,
-          allowInsecureConn: allowInsecure,
-          proxyUrl: proxyUrl,
-          userAgent: userAgent);
+      final prepared = await prepareRequest(config);
+      final dio = prepared.dio;
+      final cleanConfig = prepared.cleanedConfig;
 
       final fields = buildFormFields(cleanConfig);
       fields[fileFormFieldName] = _buildStreamFile(request);
@@ -115,6 +107,31 @@ abstract class BaseHttpProvider implements BaseUploader {
     } catch (e, stackTrace) {
       return uploadError(e, stackTrace);
     }
+  }
+
+  /// Extracts config, strips internal keys, creates HTTP client.
+  /// Providers with no custom config keys pass [Object?] directly.
+  Future<PreparedRequest> prepareRequest(Object? config) async {
+    final rawConfig =
+        config is Map<String, String> ? config : <String, String>{};
+    final allowInsecure = rawConfig['_allow_insecure_conn'] == 'true';
+    final proxyUrl = rawConfig['_proxy_url'];
+    final userAgent = rawConfig['_user_agent'];
+    final cleanConfig = Map<String, String>.from(rawConfig)
+      ..remove('_allow_insecure_conn')
+      ..remove('_proxy_url')
+      ..remove('_user_agent');
+    final dio = await createHttpClient(cleanConfig,
+        allowInsecureConn: allowInsecure,
+        proxyUrl: proxyUrl,
+        userAgent: userAgent);
+    return PreparedRequest(
+      dio: dio,
+      cleanedConfig: cleanConfig,
+      allowInsecure: allowInsecure,
+      proxyUrl: proxyUrl,
+      userAgent: userAgent,
+    );
   }
 
   UploadResult uploadError(Object e, StackTrace stackTrace) {
@@ -179,6 +196,22 @@ abstract class BaseHttpProvider implements BaseUploader {
     }
     return 'genericError';
   }
+}
+
+class PreparedRequest {
+  final Dio dio;
+  final Map<String, String> cleanedConfig;
+  final bool allowInsecure;
+  final String? proxyUrl;
+  final String? userAgent;
+
+  const PreparedRequest({
+    required this.dio,
+    required this.cleanedConfig,
+    required this.allowInsecure,
+    this.proxyUrl,
+    this.userAgent,
+  });
 }
 
 /// Apply proxy configuration to a Dio instance.

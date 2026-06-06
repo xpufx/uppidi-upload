@@ -6,7 +6,6 @@ import '../core/interfaces/base_http_provider.dart';
 import '../core/interfaces/uploader.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
-import 'filebin_config.dart';
 
 class FilebinProvider extends BaseHttpProvider {
   @override
@@ -47,19 +46,8 @@ class FilebinProvider extends BaseHttpProvider {
     Object? config,
   }) async {
     try {
-      final cfg = config is FilebinConfig ? config : const FilebinConfig();
-      final rawConfig = cfg.data;
-      final allowInsecure = rawConfig['_allow_insecure_conn'] == 'true';
-      final proxyUrl = rawConfig['_proxy_url'];
-      final userAgent = rawConfig['_user_agent'];
-      final cleanConfig = Map<String, String>.from(rawConfig)
-        ..remove('_allow_insecure_conn')
-        ..remove('_proxy_url')
-        ..remove('_user_agent');
-      final dio = await createHttpClient(cleanConfig,
-          allowInsecureConn: allowInsecure,
-          proxyUrl: proxyUrl,
-          userAgent: userAgent);
+      final prepared = await prepareRequest(config);
+      final dio = prepared.dio;
 
       final bin = _randomBin();
       final url = '/$bin/${request.fileName}';

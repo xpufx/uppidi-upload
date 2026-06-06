@@ -8,7 +8,6 @@ import '../core/interfaces/uploader.dart';
 import '../core/logging/log.dart';
 import '../core/models/upload_request.dart';
 import '../core/models/upload_result.dart';
-import 'storage_to_config.dart';
 
 class StorageToProvider extends BaseHttpProvider {
   late final Log _log = Log(runtimeType.toString());
@@ -51,19 +50,8 @@ class StorageToProvider extends BaseHttpProvider {
     Object? config,
   }) async {
     try {
-      final cfg = config is StorageToConfig ? config : const StorageToConfig();
-      final rawConfig = cfg.data;
-      final allowInsecure = rawConfig['_allow_insecure_conn'] == 'true';
-      final proxyUrl = rawConfig['_proxy_url'];
-      final userAgent = rawConfig['_user_agent'];
-      final cleanConfig = Map<String, String>.from(rawConfig)
-        ..remove('_allow_insecure_conn')
-        ..remove('_proxy_url')
-        ..remove('_user_agent');
-      final dio = await createHttpClient(cleanConfig,
-          allowInsecureConn: allowInsecure,
-          proxyUrl: proxyUrl,
-          userAgent: userAgent);
+      final prepared = await prepareRequest(config);
+      final dio = prepared.dio;
 
       final visitorToken = _randomToken();
 
