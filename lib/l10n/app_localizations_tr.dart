@@ -766,6 +766,21 @@ class AppLocalizationsTr extends AppLocalizations {
   String get configLabelRecipient => 'Alıcı';
 
   @override
+  String get providerDescTelegram =>
+      'Telegram Bot API — herhangi bir sohbete dosya gönder';
+
+  @override
+  String get providerDescZulip => 'Zulip — Zulip sunucunuza dosya yükleyin';
+
+  @override
+  String get providerDescMatterbridge =>
+      'Matterbridge — köprülü ağ geçitlerine dosya aktarın';
+
+  @override
+  String get providerDescCustomUguu =>
+      'Uguu uyumlu — kendi sunucunuza yükleyin';
+
+  @override
   String get matterbridgeSend => 'Matterbridge ile gönder';
 
   @override

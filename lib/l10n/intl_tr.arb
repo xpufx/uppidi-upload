@@ -225,6 +225,11 @@
   "configLabelUploadVia": "Yükleme yoluyla",
   "configLabelRecipient": "Alıcı",
 
+  "providerDescTelegram": "Telegram Bot API — herhangi bir sohbete dosya gönder",
+  "providerDescZulip": "Zulip — Zulip sunucunuza dosya yükleyin",
+  "providerDescMatterbridge": "Matterbridge — köprülü ağ geçitlerine dosya aktarın",
+  "providerDescCustomUguu": "Uguu uyumlu — kendi sunucunuza yükleyin",
+
   "exportImportTitle": "Dışa Aktar / İçe Aktar",
   "exportImportDescription": "Sağlayıcı kimlik bilgilerinizi ve uygulama ayarlarınızı yedekleme veya aktarma için bir JSON dosyasına dışa aktarın. İçe aktarma tüm verileri birleştirir — mevcut ayarlar ve sağlayıcı yapılandırması değiştirilecektir.",
   "exportConfigTitle": "Yapılandırmayı dışa aktar",

@@ -225,6 +225,11 @@
   "configLabelUploadVia": "Carica tramite",
   "configLabelRecipient": "Destinatario",
 
+  "providerDescTelegram": "Telegram Bot API — invia file a qualsiasi chat",
+  "providerDescZulip": "Zulip — carica file sul tuo server Zulip",
+  "providerDescMatterbridge": "Matterbridge — inoltra file a gateway collegati",
+  "providerDescCustomUguu": "Compatibile Uguu — carica sul tuo server",
+
   "exportImportTitle": "Esporta / Importa",
   "exportImportDescription": "Esporta le credenziali del provider e le impostazioni dell'app in un file JSON per backup o trasferimento. L'importazione unisce tutti i dati — le impostazioni e la configurazione del provider esistenti verranno sostituite.",
   "exportConfigTitle": "Esporta configurazione",

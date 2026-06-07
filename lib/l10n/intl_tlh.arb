@@ -226,6 +226,11 @@
   "configLabelUploadVia": "Daq HIv",
   "configLabelRecipient": "ngevwI'",
 
+  "providerDescTelegram": "Telegram Bot API — ngeH lIy pagh",
+  "providerDescZulip": "Zulip — ngeH lIy Zulip ra'",
+  "providerDescMatterbridge": "Matterbridge — ngeH lIj ngevwI'",
+  "providerDescCustomUguu": "Uguu-QaQ — ngeH lIj Duj",
+
   "exportImportTitle": "Export / Import",
   "exportImportDescription": "Export your provider credentials and app settings to a JSON file for backup or transfer. Import merges all data — existing settings and provider config will be replaced.",
   "exportConfigTitle": "Export config",

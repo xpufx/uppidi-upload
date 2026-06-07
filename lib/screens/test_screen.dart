@@ -209,10 +209,10 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                             .map((t) => ListTile(
                                   dense: true,
                                   title: Text(t.providerName),
-                                  subtitle: t.instanceDescription != null
-                                      ? Text(t.instanceDescription!,
-                                          style: const TextStyle(fontSize: 12))
-                                      : null,
+                                  subtitle: Text(
+                                      resolveProviderDescription(
+                                          l10n, t.providerId),
+                                      style: const TextStyle(fontSize: 12)),
                                   onTap: () => Navigator.pop(ctx, t),
                                 ))
                             .toList(),

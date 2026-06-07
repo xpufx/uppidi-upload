@@ -761,6 +761,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get configLabelRecipient => 'Recipient';
 
   @override
+  String get providerDescTelegram =>
+      'Telegram Bot API — send files to any chat';
+
+  @override
+  String get providerDescZulip => 'Zulip — upload files to your Zulip server';
+
+  @override
+  String get providerDescMatterbridge =>
+      'Matterbridge — relay files to bridged gateways';
+
+  @override
+  String get providerDescCustomUguu =>
+      'Uguu-compatible — upload to your own server';
+
+  @override
   String get matterbridgeSend => 'Send via Matterbridge';
 
   @override

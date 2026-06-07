@@ -225,6 +225,11 @@
   "configLabelUploadVia": "Alŝuti per",
   "configLabelRecipient": "Ricevanto",
 
+  "providerDescTelegram": "Telegram Bot API — sendi dosierojn al iu babilejo",
+  "providerDescZulip": "Zulip — alŝuti dosierojn al via Zulip-servilo",
+  "providerDescMatterbridge": "Matterbridge — plusendi dosierojn al pontaj pordegoj",
+  "providerDescCustomUguu": "Uguu-kongrua — alŝuti al via propra servilo",
+
   "exportImportTitle": "Eksporti / Importi",
   "exportImportDescription": "Eksportu viajn provizantajn akreditaĵojn kaj aplikaĵajn agordojn al JSON-dosiero por sekurkopio aŭ transigo. Importo kunigas ĉiujn datumojn — ekzistantaj agordoj kaj provizanta agordo estos anstataŭigitaj.",
   "exportConfigTitle": "Eksporti agordon",

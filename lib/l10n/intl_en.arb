@@ -238,6 +238,11 @@
   "configLabelUploadVia": "Upload via",
   "configLabelRecipient": "Recipient",
 
+  "providerDescTelegram": "Telegram Bot API — send files to any chat",
+  "providerDescZulip": "Zulip — upload files to your Zulip server",
+  "providerDescMatterbridge": "Matterbridge — relay files to bridged gateways",
+  "providerDescCustomUguu": "Uguu-compatible — upload to your own server",
+
   "matterbridgeSend": "Send via Matterbridge",
   "matterbridgeNotConfigured": "Matterbridge not fully configured",
   "matterbridgeSent": "Sent to {gateway}",

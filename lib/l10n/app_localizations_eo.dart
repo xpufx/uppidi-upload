@@ -763,6 +763,22 @@ class AppLocalizationsEo extends AppLocalizations {
   String get configLabelRecipient => 'Ricevanto';
 
   @override
+  String get providerDescTelegram =>
+      'Telegram Bot API — sendi dosierojn al iu babilejo';
+
+  @override
+  String get providerDescZulip =>
+      'Zulip — alŝuti dosierojn al via Zulip-servilo';
+
+  @override
+  String get providerDescMatterbridge =>
+      'Matterbridge — plusendi dosierojn al pontaj pordegoj';
+
+  @override
+  String get providerDescCustomUguu =>
+      'Uguu-kongrua — alŝuti al via propra servilo';
+
+  @override
   String get matterbridgeSend => 'Sendi per Matterbridge';
 
   @override

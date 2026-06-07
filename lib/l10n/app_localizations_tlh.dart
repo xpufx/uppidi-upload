@@ -750,6 +750,18 @@ class AppLocalizationsTlh extends AppLocalizations {
   String get configLabelRecipient => 'ngevwI\'';
 
   @override
+  String get providerDescTelegram => 'Telegram Bot API — ngeH lIy pagh';
+
+  @override
+  String get providerDescZulip => 'Zulip — ngeH lIy Zulip ra\'';
+
+  @override
+  String get providerDescMatterbridge => 'Matterbridge — ngeH lIj ngevwI\'';
+
+  @override
+  String get providerDescCustomUguu => 'Uguu-QaQ — ngeH lIj Duj';
+
+  @override
   String get matterbridgeSend => 'Send via Matterbridge';
 
   @override

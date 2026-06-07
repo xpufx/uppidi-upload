@@ -1454,6 +1454,30 @@ abstract class AppLocalizations {
   /// **'Recipient'**
   String get configLabelRecipient;
 
+  /// No description provided for @providerDescTelegram.
+  ///
+  /// In en, this message translates to:
+  /// **'Telegram Bot API — send files to any chat'**
+  String get providerDescTelegram;
+
+  /// No description provided for @providerDescZulip.
+  ///
+  /// In en, this message translates to:
+  /// **'Zulip — upload files to your Zulip server'**
+  String get providerDescZulip;
+
+  /// No description provided for @providerDescMatterbridge.
+  ///
+  /// In en, this message translates to:
+  /// **'Matterbridge — relay files to bridged gateways'**
+  String get providerDescMatterbridge;
+
+  /// No description provided for @providerDescCustomUguu.
+  ///
+  /// In en, this message translates to:
+  /// **'Uguu-compatible — upload to your own server'**
+  String get providerDescCustomUguu;
+
   /// No description provided for @matterbridgeSend.
   ///
   /// In en, this message translates to:

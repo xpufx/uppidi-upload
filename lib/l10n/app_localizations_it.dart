@@ -766,6 +766,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get configLabelRecipient => 'Destinatario';
 
   @override
+  String get providerDescTelegram =>
+      'Telegram Bot API — invia file a qualsiasi chat';
+
+  @override
+  String get providerDescZulip => 'Zulip — carica file sul tuo server Zulip';
+
+  @override
+  String get providerDescMatterbridge =>
+      'Matterbridge — inoltra file a gateway collegati';
+
+  @override
+  String get providerDescCustomUguu =>
+      'Compatibile Uguu — carica sul tuo server';
+
+  @override
   String get matterbridgeSend => 'Invia tramite Matterbridge';
 
   @override

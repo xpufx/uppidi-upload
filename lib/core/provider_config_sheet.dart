@@ -36,6 +36,17 @@ class _TestStep {
   const _TestStep(this.label, this.ok, this.detail, {this.rawResponse});
 }
 
+/// Resolves a provider description to a localized string.
+String resolveProviderDescription(AppLocalizations l10n, String providerId) {
+  return switch (providerId) {
+    'telegram' => l10n.providerDescTelegram,
+    'zulip' => l10n.providerDescZulip,
+    'matterbridge' => l10n.providerDescMatterbridge,
+    'custom_uguu' => l10n.providerDescCustomUguu,
+    _ => '',
+  };
+}
+
 /// Resolves a config field label to a localized string.
 String _resolveCfgLabel(AppLocalizations l10n, String raw) {
   return switch (raw) {
@@ -172,10 +183,9 @@ class _InstanceListDialogState extends ConsumerState<_InstanceListDialog> {
               .map((t) => ListTile(
                     dense: true,
                     title: Text(t.providerName),
-                    subtitle: t.instanceDescription != null
-                        ? Text(t.instanceDescription!,
-                            style: const TextStyle(fontSize: 12))
-                        : null,
+                    subtitle: Text(
+                        resolveProviderDescription(l10n, t.providerId),
+                        style: const TextStyle(fontSize: 12)),
                     onTap: () => Navigator.pop(ctx, t),
                   ))
               .toList(),
