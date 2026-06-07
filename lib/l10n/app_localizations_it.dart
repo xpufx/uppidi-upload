@@ -699,19 +699,20 @@ class AppLocalizationsIt extends AppLocalizations {
   String get done => 'Fatto';
 
   @override
-  String get configLabelServerUrl => 'Server URL';
+  String get configLabelServerUrl => 'URL del server';
 
   @override
   String get configLabelEmail => 'Email';
 
   @override
-  String get configLabelApiKey => 'API Key';
+  String get configLabelApiKey => 'Chiave API';
 
   @override
-  String get configLabelInstanceName => 'Name';
+  String get configLabelInstanceName => 'Nome';
 
   @override
-  String get configInstanceNameHelper => 'A label to identify this instance';
+  String get configInstanceNameHelper =>
+      'Un\'etichetta per identificare questa istanza';
 
   @override
   String get currentlyUnavailable => 'Non disponibile';
@@ -736,22 +737,22 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String connectedAs(Object username) {
-    return 'Connected as @$username';
+    return 'Connesso come @$username';
   }
 
   @override
   String chatAccessible(Object title) {
-    return 'Chat \"$title\" accessible';
+    return 'Chat \"$title\" accessibile';
   }
 
   @override
-  String get configLabelChannel => 'Channel';
+  String get configLabelChannel => 'Canale';
 
   @override
-  String get configLabelTopic => 'Topic';
+  String get configLabelTopic => 'Argomento';
 
   @override
-  String get configLabelDirectMessage => 'Direct message';
+  String get configLabelDirectMessage => 'Messaggio diretto';
 
   @override
   String get configLabelApiToken => 'Token API';

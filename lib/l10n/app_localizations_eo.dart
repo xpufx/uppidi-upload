@@ -696,19 +696,20 @@ class AppLocalizationsEo extends AppLocalizations {
   String get done => 'Farita';
 
   @override
-  String get configLabelServerUrl => 'Server URL';
+  String get configLabelServerUrl => 'URL de servilo';
 
   @override
-  String get configLabelEmail => 'Email';
+  String get configLabelEmail => 'Retpoŝto';
 
   @override
-  String get configLabelApiKey => 'API Key';
+  String get configLabelApiKey => 'API-ŝlosilo';
 
   @override
-  String get configLabelInstanceName => 'Name';
+  String get configLabelInstanceName => 'Nomo';
 
   @override
-  String get configInstanceNameHelper => 'A label to identify this instance';
+  String get configInstanceNameHelper =>
+      'Etikedo por identigi ĉi tiun ekzemplon';
 
   @override
   String get currentlyUnavailable => 'Nuntempe ne havebla';
@@ -733,19 +734,19 @@ class AppLocalizationsEo extends AppLocalizations {
 
   @override
   String connectedAs(Object username) {
-    return 'Connected as @$username';
+    return 'Konektita kiel @$username';
   }
 
   @override
   String chatAccessible(Object title) {
-    return 'Chat \"$title\" accessible';
+    return 'Babilejo \"$title\" alirebla';
   }
 
   @override
-  String get configLabelChannel => 'Channel';
+  String get configLabelChannel => 'Kanalo';
 
   @override
-  String get configLabelTopic => 'Topic';
+  String get configLabelTopic => 'Temo';
 
   @override
   String get configLabelDirectMessage => 'Rekta mesaĝo';
@@ -868,7 +869,7 @@ class AppLocalizationsEo extends AppLocalizations {
   }
 
   @override
-  String get reloadZulipResources => 'Manage channels & users';
+  String get reloadZulipResources => 'Administri kanalojn kaj uzantojn';
 
   @override
   String get undo => 'Malfari';

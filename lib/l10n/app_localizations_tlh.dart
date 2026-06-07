@@ -686,16 +686,17 @@ class AppLocalizationsTlh extends AppLocalizations {
   String get configLabelServerUrl => 'Server URL';
 
   @override
-  String get configLabelEmail => 'Email';
+  String get configLabelEmail => 'ngeHmeH HeH';
 
   @override
-  String get configLabelApiKey => 'API Key';
+  String get configLabelApiKey => 'API poHmoH';
 
   @override
-  String get configLabelInstanceName => 'Name';
+  String get configLabelInstanceName => 'pong';
 
   @override
-  String get configInstanceNameHelper => 'A label to identify this instance';
+  String get configInstanceNameHelper =>
+      'tIq \'oH QaHwI\' \'e\' wISovmeH cha\'';
 
   @override
   String get currentlyUnavailable => 'Currently unavailable';
@@ -720,19 +721,19 @@ class AppLocalizationsTlh extends AppLocalizations {
 
   @override
   String connectedAs(Object username) {
-    return 'Connected as @$username';
+    return '@$username \'oH';
   }
 
   @override
   String chatAccessible(Object title) {
-    return 'Chat \"$title\" accessible';
+    return '\"$title\" Qum';
   }
 
   @override
-  String get configLabelChannel => 'Channel';
+  String get configLabelChannel => 'Qum';
 
   @override
-  String get configLabelTopic => 'Topic';
+  String get configLabelTopic => 'mu\'mey';
 
   @override
   String get configLabelDirectMessage => 'ngeD mI\'';
@@ -851,7 +852,7 @@ class AppLocalizationsTlh extends AppLocalizations {
   }
 
   @override
-  String get reloadZulipResources => 'Manage channels & users';
+  String get reloadZulipResources => 'Qum\'mey lo\'laH';
 
   @override
   String get undo => 'lI\' QIt';
