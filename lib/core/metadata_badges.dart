@@ -54,7 +54,7 @@ Widget metadataBadges(ProviderMetadata meta, BuildContext context) {
   }
 
   if (chips.isEmpty) return const SizedBox.shrink();
-  return Row(mainAxisSize: MainAxisSize.min, children: chips);
+  return Wrap(spacing: 4, runSpacing: 2, children: chips);
 }
 
 Widget _buildBadge(String? label, {IconData? icon, required ThemeData theme}) {

@@ -115,6 +115,7 @@ class _UppidiAppState extends ConsumerState<UppidiApp> {
 
     return MaterialApp(
       title: 'Uppidi Upload',
+      debugShowCheckedModeBanner: false,
       locale: localeCode == 'tlh' || localeCode == 'eo'
           ? const Locale('en')
           : Locale(localeCode),
