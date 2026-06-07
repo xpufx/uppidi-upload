@@ -1,14 +1,117 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 
 import '../core/save_file.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/image_editor.dart';
 import 'shell_strategy.dart';
+
+/// Persists edited image data across tab switches so the user never loses
+/// work — even if they bypass the unsaved-changes guard (e.g. desktop).
+class ImageEditorData {
+  final Uint8List originalBytes;
+  final Uint8List? editedBytes;
+  final String fileName;
+
+  const ImageEditorData({
+    required this.originalBytes,
+    this.editedBytes,
+    required this.fileName,
+  });
+}
+
+class ImageEditorDataNotifier extends Notifier<ImageEditorData?> {
+  @override
+  ImageEditorData? build() => null;
+
+  void set(ImageEditorData? data) => state = data;
+}
+
+final imageEditorDataProvider =
+    NotifierProvider<ImageEditorDataNotifier, ImageEditorData?>(
+  ImageEditorDataNotifier.new,
+);
+
+// ── Disk persistence ───────────────────────────────────────────────────────
+
+Future<Directory> get _editorTempDir async {
+  final dir = await getTemporaryDirectory();
+  final editorDir = Directory('${dir.path}/uppidi_editor');
+  if (!await editorDir.exists()) {
+    await editorDir.create(recursive: true);
+  }
+  return editorDir;
+}
+
+Future<void> persistEditorToDisk(
+  String fileName,
+  Uint8List original,
+  Uint8List? edited,
+) async {
+  final dir = await _editorTempDir;
+  await File('${dir.path}/original.dat').writeAsBytes(original);
+  if (edited != null) {
+    await File('${dir.path}/edited.dat').writeAsBytes(edited);
+  } else {
+    final f = File('${dir.path}/edited.dat');
+    if (await f.exists()) await f.delete();
+  }
+  await File('${dir.path}/meta.json').writeAsString(jsonEncode({
+    'fileName': fileName,
+    'hasEdited': edited != null,
+  }));
+}
+
+Future<ImageEditorData?> loadEditorFromDisk() async {
+  try {
+    final dir = await _editorTempDir;
+    final metaFile = File('${dir.path}/meta.json');
+    if (!await metaFile.exists()) return null;
+
+    final meta = jsonDecode(await metaFile.readAsString()) as Map;
+    final fileName = meta['fileName'] as String;
+    final hasEdited = meta['hasEdited'] as bool;
+
+    final originalFile = File('${dir.path}/original.dat');
+    if (!await originalFile.exists()) return null;
+    final original = await originalFile.readAsBytes();
+
+    Uint8List? edited;
+    if (hasEdited) {
+      final editedFile = File('${dir.path}/edited.dat');
+      if (await editedFile.exists()) {
+        edited = await editedFile.readAsBytes();
+      }
+    }
+
+    return ImageEditorData(
+      originalBytes: original,
+      editedBytes: edited,
+      fileName: fileName,
+    );
+  } catch (_) {
+    return null;
+  }
+}
+
+Future<void> clearEditorDisk() async {
+  try {
+    final dir = await _editorTempDir;
+    for (final f in ['meta.json', 'original.dat', 'edited.dat']) {
+      final file = File('${dir.path}/$f');
+      if (await file.exists()) await file.delete();
+    }
+  } catch (_) {}
+}
+
+// ── Screen ─────────────────────────────────────────────────────────────────
 
 enum _ScreenState { picker, editing, preview }
 
@@ -26,6 +129,60 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
   String? _fileName;
   int _editorKey = 0;
   bool _isSaved = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _restoreFromProvider();
+    if (_originalBytes == null) _loadPersistedFromDisk();
+  }
+
+  void _restoreFromProvider() {
+    final data = ref.read(imageEditorDataProvider);
+    if (data != null) {
+      _originalBytes = data.originalBytes;
+      _editedBytes = data.editedBytes;
+      _fileName = data.fileName;
+      _isSaved = data.editedBytes == null;
+      _state =
+          _editedBytes != null ? _ScreenState.preview : _ScreenState.editing;
+      if (!_isSaved) {
+        ref.read(canSwitchTabProvider.notifier).block(
+              onSave: () => _saveToDisk(_editedBytes!),
+            );
+      }
+    }
+  }
+
+  Future<void> _loadPersistedFromDisk() async {
+    final data = await loadEditorFromDisk();
+    if (data != null && mounted) {
+      ref.read(imageEditorDataProvider.notifier).set(data);
+      _restoreFromProvider();
+    }
+  }
+
+  void _persistState() {
+    if (_originalBytes == null || _fileName == null) {
+      ref.read(imageEditorDataProvider.notifier).set(null);
+      return;
+    }
+    ref.read(imageEditorDataProvider.notifier).set(ImageEditorData(
+          originalBytes: _originalBytes!,
+          editedBytes: _editedBytes,
+          fileName: _fileName!,
+        ));
+  }
+
+  void _persistToDisk() {
+    if (_originalBytes == null || _fileName == null) return;
+    persistEditorToDisk(_fileName!, _originalBytes!, _editedBytes);
+  }
+
+  void _clearAllPersisted() {
+    ref.read(imageEditorDataProvider.notifier).set(null);
+    clearEditorDisk();
+  }
 
   AppLocalizations get _l10n => AppLocalizations.of(context);
 
@@ -48,6 +205,8 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
       _editorKey++;
       _state = _ScreenState.editing;
     });
+    _persistToDisk();
+    _persistState();
   }
 
   Future<void> _onImageEditingComplete(Uint8List bytes) async {
@@ -57,6 +216,8 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
         .read(canSwitchTabProvider.notifier)
         .block(onSave: () => _saveToDisk(_editedBytes!));
     setState(() => _state = _ScreenState.preview);
+    _persistToDisk();
+    _persistState();
   }
 
   void _onCloseEditor(EditorMode mode) {
@@ -73,6 +234,7 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
       allowedExtensions: ['jpg', 'jpeg', 'png'],
     );
     if (savedPath != null && mounted) {
+      _clearAllPersisted();
       ref.read(canSwitchTabProvider.notifier).allow();
       _isSaved = true;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -113,12 +275,15 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
       await _saveToDisk(_editedBytes!);
     }
 
+    _clearAllPersisted();
     ref.read(canSwitchTabProvider.notifier).allow();
     return true;
   }
 
   @override
   void dispose() {
+    _persistState();
+    _persistToDisk();
     ref.read(canSwitchTabProvider.notifier).allow();
     super.dispose();
   }
@@ -222,6 +387,7 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
               onPressed: () async {
                 if (!await _confirmDiscard()) return;
                 if (!mounted) return;
+                _clearAllPersisted();
                 ref.read(canSwitchTabProvider.notifier).allow();
                 setState(() {
                   _originalBytes = null;
