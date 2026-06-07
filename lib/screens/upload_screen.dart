@@ -86,7 +86,10 @@ class _UploadScreenState extends ConsumerState<UploadScreen>
         Theme.of(context).colorScheme.primary.withValues(alpha: 0.7);
 
     ref.listen(uploadProvider, (prev, next) {
-      if (prev.runtimeType != next.runtimeType) _restartStagger();
+      if (prev.runtimeType != next.runtimeType) {
+        if (prev is UploadInProgress && next is UploadCompleted) return;
+        _restartStagger();
+      }
     });
 
     final scrollBody = Padding(
