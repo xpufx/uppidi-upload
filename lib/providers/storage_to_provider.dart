@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math' hide log;
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 
@@ -86,6 +87,7 @@ class StorageToProvider extends BaseHttpProvider {
       // Forward any required headers from the init response (e.g. S3 Host)
       final putHeaders = <String, String>{
         'Content-Type': request.mimeType ?? 'application/octet-stream',
+        'Content-Length': request.sizeInBytes.toString(),
       };
       final initHeaders = initData['headers'];
       if (initHeaders is Map) {
@@ -99,10 +101,18 @@ class StorageToProvider extends BaseHttpProvider {
       }
 
       // Step 2: Upload bytes to presigned URL
+      // R2 presigned URLs require Content-Length; collect stream to bytes.
       log.info('put: PUT $uploadUrl');
+      final chunks = await request.dataStream.toList();
+      final bytes = Uint8List(request.sizeInBytes);
+      var offset = 0;
+      for (final chunk in chunks) {
+        bytes.setRange(offset, offset + chunk.length, chunk);
+        offset += chunk.length;
+      }
       final putResponse = await dio.put(
         uploadUrl,
-        data: request.dataStream,
+        data: bytes,
         options: Options(headers: putHeaders),
         onSendProgress: onProgress,
         cancelToken: cancelToken,
