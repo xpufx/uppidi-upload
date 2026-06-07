@@ -9,125 +9,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uppidi_upload/core/models/upload_result.dart';
 import 'package:uppidi_upload/core/models/upload_record.dart';
 import 'package:uppidi_upload/core/registry.dart';
-import 'package:uppidi_upload/core/settings_service.dart';
 import 'package:uppidi_upload/core/history_service.dart';
+import 'package:uppidi_upload/core/settings_service.dart';
 import 'package:uppidi_upload/providers/telegram_provider.dart';
 import 'package:uppidi_upload/providers/upload_provider.dart';
 
 import 'helpers/mock_uploader.dart';
-
-// Mock classes
-class MockSettingsService implements SettingsService {
-  @override
-  Future<Map<String, String>> loadProviderConfig(
-          String providerId, List<String> requiredKeys) async =>
-      {};
-
-  @override
-  Future<bool> isInsecureConnAllowed() async => false;
-
-  @override
-  Future<String?> getProxyUrl() async => null;
-
-  @override
-  Future<String?> getUserAgent() async => null;
-
-  @override
-  Future<String?> get(String key) async => null;
-
-  @override
-  Future<void> set(String key, String value) async {}
-
-  @override
-  Future<void> remove(String key) async {}
-
-  @override
-  Future<bool> containsKey(String key) async => false;
-
-  @override
-  Future<Map<String, String>> readAll() async => {};
-
-  @override
-  String providerKey(String providerId, String configKey) =>
-      '$providerId.$configKey';
-
-  @override
-  Future<ThemeMode> getThemeMode() async => ThemeMode.system;
-
-  @override
-  Future<Color> getSeedColor() async => const Color(0xFF6750A4);
-
-  @override
-  Future<Set<String>> getDisabledProviders() async => {};
-
-  @override
-  Future<void> setDisabledProviders(Set<String> ids) async {}
-
-  @override
-  Future<bool> isDebugLoggingEnabled() async => false;
-
-  @override
-  Future<void> setDebugLoggingEnabled(bool enabled) async {}
-
-  @override
-  Future<Set<String>> getInsecureMutedProviders() async => {};
-
-  @override
-  Future<void> muteInsecureWarning(String providerId) async {}
-
-  @override
-  Future<bool> isInsecureWarningMuted(String providerId) async => false;
-
-  @override
-  Future<String> getNavigationLayout() async => 'bottom';
-
-  @override
-  Future<void> setNavigationLayout(String layout) async {}
-
-  @override
-  Future<String> getShellType() async => 'tabs';
-
-  @override
-  Future<void> setShellType(String type) async {}
-}
-
-class MockHistoryService implements HistoryService {
-  final List<UploadRecord> records = [];
-  final Map<int, UploadRecord> _storage = {};
-
-  @override
-  Future<void> add(UploadRecord record) async {
-    records.add(record);
-    _storage[_storage.length] = record;
-  }
-
-  @override
-  Future<List<HistoryRecord>> getAll() async {
-    return _storage.entries
-        .map((e) => HistoryRecord(key: e.key, record: e.value))
-        .toList();
-  }
-
-  @override
-  Future<int> count() async => records.length;
-
-  @override
-  Future<void> delete(int key) async {
-    final record = _storage.remove(key);
-    if (record != null) records.remove(record);
-  }
-
-  @override
-  Future<void> clearAll() async {
-    _storage.clear();
-    records.clear();
-  }
-
-  @override
-  Future<void> close() async {}
-}
-
-// End mock classes
+import 'helpers/mock_settings.dart';
+import 'helpers/mock_history.dart';
 
 void main() {
   late Directory tempDir;

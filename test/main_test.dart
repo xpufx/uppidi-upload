@@ -2,179 +2,92 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:uppidi_upload/core/history_service.dart';
+import 'package:uppidi_upload/core/registry.dart';
+import 'package:uppidi_upload/core/settings_service.dart';
 import 'package:uppidi_upload/l10n/app_localizations.dart';
 import 'package:uppidi_upload/providers/upload_provider.dart';
+import 'package:uppidi_upload/screens/tab_nav_strategy.dart';
 
 import 'helpers/mock_uploader.dart';
+import 'helpers/mock_settings.dart';
+import 'helpers/mock_history.dart';
 
-// Mock upload notifier
-class MockNavUploadNotifier extends UploadNotifier {
-  MockNavUploadNotifier() : super(providers: [MockBaseUploader()]);
+Widget buildTabNav() {
+  final mockUploaders = [MockBaseUploader()];
+  return ProviderScope(
+    overrides: [
+      settingsServiceProvider.overrideWith((ref) => MockSettingsService()),
+      historyServiceProvider.overrideWith((ref) => MockHistoryService()),
+      enabledProvidersProvider.overrideWith((ref) => mockUploaders),
+      uploadProvider.overrideWith(
+        () => UploadNotifier(providers: mockUploaders),
+      ),
+    ],
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: const TabNavStrategy(),
+    ),
+  );
 }
 
 void main() {
-  group('Navigation UI Tests', () {
-    testWidgets('Bottom navigation bar shows all 4 tabs',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            uploadProvider.overrideWith(MockNavUploadNotifier.new),
-          ],
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(
-              body: const Center(child: Text('Test')),
-              bottomNavigationBar: BottomNavigationBar(
-                currentIndex: 0,
-                onTap: (_) {},
-                type: BottomNavigationBarType.fixed,
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.cloud_upload),
-                    label: 'Upload',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.history),
-                    label: 'History',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.dns),
-                    label: 'Providers',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.settings),
-                    label: 'Settings',
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
+  late AppLocalizations l10n;
 
+  setUpAll(() async {
+    l10n = await AppLocalizations.delegate.load(const Locale('en'));
+  });
+
+  group('TabNavStrategy', () {
+    testWidgets('renders bottom nav with 5 tabs', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(buildTabNav());
       await tester.pumpAndSettle();
 
-      // All 4 navigation items should be present
-      expect(find.byIcon(Icons.cloud_upload), findsOneWidget);
-      expect(find.byIcon(Icons.history), findsOneWidget);
-      expect(find.byIcon(Icons.dns), findsOneWidget);
-      expect(find.byIcon(Icons.settings), findsOneWidget);
+      final navBar = tester.widget<BottomNavigationBar>(
+        find.byType(BottomNavigationBar),
+      );
+      expect(navBar.items.length, 5);
     });
 
-    testWidgets('NavigationRail shows all 4 destinations on wide screen',
-        (WidgetTester tester) async {
-      await tester.binding.setSurfaceSize(const Size(800, 600));
+    testWidgets('starts on Upload tab (index 0)', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            uploadProvider.overrideWith(MockNavUploadNotifier.new),
-          ],
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(
-              body: Row(
-                children: [
-                  NavigationRail(
-                    selectedIndex: 0,
-                    onDestinationSelected: (_) {},
-                    destinations: const [
-                      NavigationRailDestination(
-                        icon: Icon(Icons.cloud_upload),
-                        label: Text('Upload'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.history),
-                        label: Text('History'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.dns),
-                        label: Text('Providers'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.settings),
-                        label: Text('Settings'),
-                      ),
-                    ],
-                  ),
-                  const Expanded(child: Center(child: Text('Content'))),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
+      await tester.pumpWidget(buildTabNav());
       await tester.pumpAndSettle();
 
-      // NavigationRail should be present
-      expect(find.byType(NavigationRail), findsOneWidget);
-
-      // All 4 destinations should be present
-      expect(find.byIcon(Icons.cloud_upload), findsOneWidget);
-      expect(find.byIcon(Icons.history), findsOneWidget);
-      expect(find.byIcon(Icons.dns), findsOneWidget);
-      expect(find.byIcon(Icons.settings), findsOneWidget);
-
-      // Reset surface size
-      await tester.binding.setSurfaceSize(null);
+      final navBar = tester.widget<BottomNavigationBar>(
+        find.byType(BottomNavigationBar),
+      );
+      expect(navBar.currentIndex, 0);
     });
 
-    testWidgets('BottomNavigationBar switches to narrow layout',
-        (WidgetTester tester) async {
-      await tester.binding.setSurfaceSize(const Size(400, 800));
+    testWidgets('tapping tabs switches correctly', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            uploadProvider.overrideWith(MockNavUploadNotifier.new),
-          ],
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(
-              body: const Center(child: Text('Test')),
-              bottomNavigationBar: BottomNavigationBar(
-                currentIndex: 0,
-                onTap: (_) {},
-                type: BottomNavigationBarType.fixed,
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.cloud_upload),
-                    label: 'Upload',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.history),
-                    label: 'History',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.dns),
-                    label: 'Providers',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.settings),
-                    label: 'Settings',
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
+      await tester.pumpWidget(buildTabNav());
       await tester.pumpAndSettle();
 
-      // BottomNavigationBar should be present
-      expect(find.byType(BottomNavigationBar), findsOneWidget);
+      await tester.tap(find.text(l10n.history));
+      await tester.pumpAndSettle();
 
-      // NavigationRail should NOT be present
-      expect(find.byType(NavigationRail), findsNothing);
+      var navBar = tester.widget<BottomNavigationBar>(
+        find.byType(BottomNavigationBar),
+      );
+      expect(navBar.currentIndex, 2);
 
-      // Reset surface size
-      await tester.binding.setSurfaceSize(null);
+      await tester.tap(find.text(l10n.settings));
+      await tester.pumpAndSettle();
+
+      navBar = tester.widget<BottomNavigationBar>(
+        find.byType(BottomNavigationBar),
+      );
+      expect(navBar.currentIndex, 4);
     });
   });
 }

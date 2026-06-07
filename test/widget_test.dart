@@ -5,6 +5,8 @@ import 'package:uppidi_upload/core/settings_service.dart';
 import 'package:uppidi_upload/main.dart';
 import 'package:uppidi_upload/screens/tab_nav_strategy.dart';
 
+import 'helpers/mock_settings.dart';
+
 void main() {
   setUpAll(() async {
     Hive.init('.hive_test_widget');
@@ -19,8 +21,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          settingsServiceProvider
-              .overrideWith((ref) => InMemorySettingsService()),
+          settingsServiceProvider.overrideWith((ref) => MockSettingsService()),
         ],
         child: const UppidiApp(),
       ),
@@ -29,29 +30,4 @@ void main() {
     // Default shell type is 'tabs' — renders TabNavStrategy
     expect(find.byType(TabNavStrategy), findsOneWidget);
   });
-}
-
-class InMemorySettingsService extends SettingsService {
-  final Map<String, String> _store = {};
-
-  @override
-  Future<String?> get(String key) async => _store[key];
-
-  @override
-  Future<void> set(String key, String value) async => _store[key] = value;
-
-  @override
-  Future<void> remove(String key) async => _store.remove(key);
-
-  @override
-  Future<bool> containsKey(String key) async => _store.containsKey(key);
-
-  @override
-  Future<Map<String, String>> readAll() async => Map.from(_store);
-
-  @override
-  Future<String> getShellType() async => 'tabs';
-
-  @override
-  Future<void> setShellType(String type) async {}
 }
