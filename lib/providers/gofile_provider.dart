@@ -53,29 +53,17 @@ class GoFileProvider extends BaseHttpProvider {
 
       if (serverResponse.statusCode != 200 ||
           serverResponse.data is! Map<String, dynamic>) {
-        return UploadResult(
-          success: false,
-          errorMessage: 'genericError',
-          statusCode: serverResponse.statusCode,
-        );
+        return unhandledError(serverResponse);
       }
 
       final serverData = serverResponse.data as Map<String, dynamic>;
       if (serverData['status'] != 'ok') {
-        return UploadResult(
-          success: false,
-          errorMessage: 'genericError',
-          statusCode: serverResponse.statusCode,
-        );
+        return unhandledError(serverResponse);
       }
 
       final servers = serverData['data']['servers'] as List;
       if (servers.isEmpty) {
-        return UploadResult(
-          success: false,
-          errorMessage: 'genericError',
-          statusCode: serverResponse.statusCode,
-        );
+        return unhandledError(serverResponse);
       }
 
       final serverName = servers[0]['name'] as String;
@@ -136,11 +124,6 @@ class GoFileProvider extends BaseHttpProvider {
       }
     }
 
-    log.warn('Unhandled error (returning genericError)');
-    return UploadResult(
-      success: false,
-      errorMessage: 'genericError',
-      statusCode: response.statusCode,
-    );
+    return unhandledError(response);
   }
 }

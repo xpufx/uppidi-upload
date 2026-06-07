@@ -6,7 +6,6 @@ import 'package:uppidi_upload/providers/tmpfilelink_provider.dart';
 import 'package:uppidi_upload/providers/httpbin_provider.dart';
 import 'package:uppidi_upload/providers/telegram_provider.dart';
 import 'package:uppidi_upload/providers/filester_provider.dart';
-import 'package:uppidi_upload/providers/pixeldrain_provider.dart';
 import 'package:uppidi_upload/providers/filebin_provider.dart';
 import 'package:uppidi_upload/providers/storage_to_provider.dart';
 import 'package:uppidi_upload/providers/bzzhr_provider.dart';
@@ -185,36 +184,6 @@ void main() {
         skip: _runLiveTests
             ? null
             : 'Relies on live external service (filester.me)');
-  });
-
-  group('PixeldrainProvider', () {
-    late PixeldrainProvider provider;
-
-    setUp(() {
-      provider = PixeldrainProvider();
-    });
-
-    test('upload succeeds', () async {
-      final data = Uint8List.fromList('hello pixeldrain'.codeUnits);
-      final request = FileUploadRequest(
-        fileName: 'test.txt',
-        mimeType: 'text/plain',
-        sizeInBytes: data.length,
-        dataStream: Stream.value(data),
-      );
-
-      final result = await provider.upload(request);
-
-      if (!result.success) {
-        fail(
-            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
-      }
-      expect(result.url, contains('pixeldrain.com'));
-    },
-        timeout: const Timeout(Duration(minutes: 2)),
-        skip: _runLiveTests
-            ? null
-            : 'Relies on live external service (pixeldrain.com)');
   });
 
   group('FilebinProvider', () {

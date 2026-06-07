@@ -107,7 +107,7 @@ abstract class BaseHttpProvider implements BaseUploader {
       final cleanConfig = prepared.cleanedConfig;
 
       final fields = buildFormFields(cleanConfig);
-      fields[fileFormFieldName] = _buildStreamFile(request);
+      fields[fileFormFieldName] = buildStreamFile(request);
 
       final response = await dio.post(
         uploadEndpoint,
@@ -182,7 +182,7 @@ abstract class BaseHttpProvider implements BaseUploader {
     return null;
   }
 
-  MultipartFile _buildStreamFile(FileUploadRequest request) {
+  MultipartFile buildStreamFile(FileUploadRequest request) {
     return MultipartFile.fromStream(
       () => request.dataStream,
       request.sizeInBytes,

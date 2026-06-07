@@ -119,13 +119,13 @@ class MatterbridgeProvider extends BaseHttpProvider {
     }
 
     try {
-      final dio = Dio(BaseOptions(
-        baseUrl: cfg.serverUrl,
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 60),
-        headers: {'Authorization': 'Bearer ${cfg.token}'},
-        validateStatus: (_) => true,
-      ));
+      final rawConfig = <String, String>{
+        'mb_url': cfg.serverUrl,
+        'mb_token': cfg.token,
+        if (config is Map<String, String>) ...config,
+      };
+      final prepared = await prepareRequest(rawConfig);
+      final dio = prepared.dio;
 
       final body = <String, dynamic>{
         'text': message,

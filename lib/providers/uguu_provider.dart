@@ -68,11 +68,6 @@ class UguuProvider extends BaseHttpProvider {
       }
     }
 
-    log.warn('Unhandled error (returning genericError)');
-    return UploadResult(
-      success: false,
-      errorMessage: 'genericError',
-      statusCode: response.statusCode,
-    );
+    return unhandledError(response);
   }
 }

@@ -126,15 +126,7 @@ class TelegramProvider extends BaseHttpProvider {
       log.info(
           'Uploading ${request.fileName} → $endpoint as $fieldName (image=$isImage, sendAsPhoto=$sendAsPhoto)');
 
-      final file = MultipartFile.fromStream(
-        () => request.dataStream,
-        request.sizeInBytes,
-        filename: request.fileName,
-        contentType: request.mimeType != null
-            ? DioMediaType.parse(request.mimeType!)
-            : null,
-      );
-      fields[fieldName] = file;
+      fields[fieldName] = buildStreamFile(request);
 
       final response = await dio.post(
         endpoint,

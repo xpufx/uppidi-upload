@@ -77,3 +77,4 @@ docs/designdocs/
 /android/*.keystore
 /android/*.jks
 /AGENTS.md
+.hive_test*
