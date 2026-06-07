@@ -250,7 +250,7 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
         ],
       ),
     );
-    if (action == _DiscardTabAction.cancel) return;
+    if (action == null || action == _DiscardTabAction.cancel) return;
     if (action == _DiscardTabAction.save && onSave != null) {
       await onSave();
     }
