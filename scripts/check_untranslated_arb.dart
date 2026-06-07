@@ -138,6 +138,7 @@ const exemptedKeys = <String>{
   'configLabelChannel',
   'configLabelTopic',
   'configLabelDirectMessage',
+  'configLabelGateway',
 
   // Connectivity test — server response fragments, not user-facing UI
   'connectedAs',
