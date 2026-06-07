@@ -748,7 +748,19 @@ class AppLocalizationsEo extends AppLocalizations {
   String get configLabelTopic => 'Topic';
 
   @override
-  String get configLabelDirectMessage => 'Direct message';
+  String get configLabelDirectMessage => 'Rekta mesaĝo';
+
+  @override
+  String get configLabelApiToken => 'API-ĵetono';
+
+  @override
+  String get configLabelGateway => 'Pordego';
+
+  @override
+  String get configLabelUploadVia => 'Alŝuti per';
+
+  @override
+  String get configLabelRecipient => 'Ricevanto';
 
   @override
   String get matterbridgeSend => 'Sendi per Matterbridge';

@@ -233,6 +233,10 @@
   "configLabelTopic": "Topic",
 
   "configLabelDirectMessage": "Direct message",
+  "configLabelApiToken": "API Token",
+  "configLabelGateway": "Gateway",
+  "configLabelUploadVia": "Upload via",
+  "configLabelRecipient": "Recipient",
 
   "matterbridgeSend": "Send via Matterbridge",
   "matterbridgeNotConfigured": "Matterbridge not fully configured",

@@ -48,6 +48,10 @@ String _resolveCfgLabel(AppLocalizations l10n, String raw) {
     'Channel' => l10n.configLabelChannel,
     'Topic' => l10n.configLabelTopic,
     'Direct message' => l10n.configLabelDirectMessage,
+    'API Token' => l10n.configLabelApiToken,
+    'Gateway' => l10n.configLabelGateway,
+    'Upload via' => l10n.configLabelUploadVia,
+    'Recipient' => l10n.configLabelRecipient,
     _ => raw,
   };
 }

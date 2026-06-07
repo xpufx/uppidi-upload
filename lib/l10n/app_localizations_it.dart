@@ -754,6 +754,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get configLabelDirectMessage => 'Direct message';
 
   @override
+  String get configLabelApiToken => 'Token API';
+
+  @override
+  String get configLabelGateway => 'Gateway';
+
+  @override
+  String get configLabelUploadVia => 'Carica tramite';
+
+  @override
+  String get configLabelRecipient => 'Destinatario';
+
+  @override
   String get matterbridgeSend => 'Invia tramite Matterbridge';
 
   @override

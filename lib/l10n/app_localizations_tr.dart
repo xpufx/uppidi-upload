@@ -699,19 +699,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get done => 'Tamam';
 
   @override
-  String get configLabelServerUrl => 'Server URL';
+  String get configLabelServerUrl => 'Sunucu Adresi';
 
   @override
-  String get configLabelEmail => 'Email';
+  String get configLabelEmail => 'E-posta';
 
   @override
-  String get configLabelApiKey => 'API Key';
+  String get configLabelApiKey => 'API Anahtarı';
 
   @override
-  String get configLabelInstanceName => 'Name';
+  String get configLabelInstanceName => 'İsim';
 
   @override
-  String get configInstanceNameHelper => 'A label to identify this instance';
+  String get configInstanceNameHelper => 'Bu örneği tanımlayan bir etiket';
 
   @override
   String get currentlyUnavailable => 'Şu an kullanılamıyor';
@@ -736,22 +736,34 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String connectedAs(Object username) {
-    return 'Connected as @$username';
+    return '@$username olarak bağlanıldı';
   }
 
   @override
   String chatAccessible(Object title) {
-    return 'Chat \"$title\" accessible';
+    return '\"$title\" sohbetine erişilebilir';
   }
 
   @override
-  String get configLabelChannel => 'Channel';
+  String get configLabelChannel => 'Kanal';
 
   @override
-  String get configLabelTopic => 'Topic';
+  String get configLabelTopic => 'Konu';
 
   @override
-  String get configLabelDirectMessage => 'Direct message';
+  String get configLabelDirectMessage => 'Direkt mesaj';
+
+  @override
+  String get configLabelApiToken => 'API Tokeni';
+
+  @override
+  String get configLabelGateway => 'Geçit';
+
+  @override
+  String get configLabelUploadVia => 'Yükleme yoluyla';
+
+  @override
+  String get configLabelRecipient => 'Alıcı';
 
   @override
   String get matterbridgeSend => 'Matterbridge ile gönder';
@@ -843,7 +855,7 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get reloadZulipResources => 'Manage channels & users';
+  String get reloadZulipResources => 'Kanalları ve kullanıcıları yönet';
 
   @override
   String get undo => 'Geri al';

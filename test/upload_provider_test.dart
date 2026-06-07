@@ -2,12 +2,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:uppidi_upload/core/models/upload_result.dart';
-import 'package:uppidi_upload/core/models/upload_record.dart';
 import 'package:uppidi_upload/core/registry.dart';
 import 'package:uppidi_upload/core/history_service.dart';
 import 'package:uppidi_upload/core/settings_service.dart';

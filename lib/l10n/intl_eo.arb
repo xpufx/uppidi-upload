@@ -219,7 +219,11 @@
   "chatAccessible": "Chat \"{title}\" accessible",
   "configLabelChannel": "Channel",
   "configLabelTopic": "Topic",
-  "configLabelDirectMessage": "Direct message",
+  "configLabelDirectMessage": "Rekta mesaĝo",
+  "configLabelApiToken": "API-ĵetono",
+  "configLabelGateway": "Pordego",
+  "configLabelUploadVia": "Alŝuti per",
+  "configLabelRecipient": "Ricevanto",
 
   "exportImportTitle": "Eksporti / Importi",
   "exportImportDescription": "Eksportu viajn provizantajn akreditaĵojn kaj aplikaĵajn agordojn al JSON-dosiero por sekurkopio aŭ transigo. Importo kunigas ĉiujn datumojn — ekzistantaj agordoj kaj provizanta agordo estos anstataŭigitaj.",

@@ -220,6 +220,10 @@
   "configLabelChannel": "Channel",
   "configLabelTopic": "Topic",
   "configLabelDirectMessage": "Direct message",
+  "configLabelApiToken": "Token API",
+  "configLabelGateway": "Gateway",
+  "configLabelUploadVia": "Carica tramite",
+  "configLabelRecipient": "Destinatario",
 
   "exportImportTitle": "Esporta / Importa",
   "exportImportDescription": "Esporta le credenziali del provider e le impostazioni dell'app in un file JSON per backup o trasferimento. L'importazione unisce tutti i dati — le impostazioni e la configurazione del provider esistenti verranno sostituite.",

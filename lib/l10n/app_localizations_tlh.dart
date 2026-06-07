@@ -735,7 +735,19 @@ class AppLocalizationsTlh extends AppLocalizations {
   String get configLabelTopic => 'Topic';
 
   @override
-  String get configLabelDirectMessage => 'Direct message';
+  String get configLabelDirectMessage => 'ngeD mI\'';
+
+  @override
+  String get configLabelApiToken => 'API token';
+
+  @override
+  String get configLabelGateway => 'meQ';
+
+  @override
+  String get configLabelUploadVia => 'Daq HIv';
+
+  @override
+  String get configLabelRecipient => 'ngevwI\'';
 
   @override
   String get matterbridgeSend => 'Send via Matterbridge';

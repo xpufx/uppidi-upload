@@ -1430,6 +1430,30 @@ abstract class AppLocalizations {
   /// **'Direct message'**
   String get configLabelDirectMessage;
 
+  /// No description provided for @configLabelApiToken.
+  ///
+  /// In en, this message translates to:
+  /// **'API Token'**
+  String get configLabelApiToken;
+
+  /// No description provided for @configLabelGateway.
+  ///
+  /// In en, this message translates to:
+  /// **'Gateway'**
+  String get configLabelGateway;
+
+  /// No description provided for @configLabelUploadVia.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload via'**
+  String get configLabelUploadVia;
+
+  /// No description provided for @configLabelRecipient.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipient'**
+  String get configLabelRecipient;
+
   /// No description provided for @matterbridgeSend.
   ///
   /// In en, this message translates to:
