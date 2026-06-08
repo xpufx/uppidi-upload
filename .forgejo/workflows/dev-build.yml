@@ -33,10 +33,8 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Git safe.directory for hostedtoolcache
-        run: |
-          find /opt/hostedtoolcache -name '.git' -type d -maxdepth 4 2>/dev/null \
-            | xargs -I{} git config --global --add safe.directory "{}/.."
+      - name: Git safe.directory (ephemeral CI container, no security concern)
+        run: git config --global --add safe.directory '*'
 
       - run: flutter pub get
 
