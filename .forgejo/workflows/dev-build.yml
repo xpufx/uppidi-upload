@@ -25,8 +25,8 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Install jq (subosito/flutter-action requires it)
-        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends jq
+      - name: Install jq + unzip
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends jq unzip
 
       - uses: subosito/flutter-action@v2
         with:
@@ -42,13 +42,12 @@ jobs:
         run: |
           curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
             -o /tmp/cmdline-tools.zip
-          unzip -q /tmp/cmdline-tools.zip -d /opt/android-sdk
+          unzip -q /tmp/cmdline-tools.zip -d /tmp/android-sdk
           mkdir -p /opt/android-sdk/cmdline-tools/latest
-          mv /opt/android-sdk/cmdline-tools/* /opt/android-sdk/cmdline-tools/latest/ 2>/dev/null || true
+          mv /tmp/android-sdk/cmdline-tools/* /opt/android-sdk/cmdline-tools/latest/
           yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk \
-            "platforms;android-34" "build-tools;34.0.0" "platform-tools" >/dev/null 2>&1 || true
-          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk \
-            --licenses >/dev/null 2>&1 || true
+            "platforms;android-34" "build-tools;34.0.0" "platform-tools" 2>&1
+          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk --licenses 2>&1
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
 
