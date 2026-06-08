@@ -34,7 +34,7 @@ jobs:
 
       - name: Install Flutter
         run: |
-          git clone --depth 1 https://github.com/flutter/flutter.git /opt/flutter
+          git clone --depth 100 https://github.com/flutter/flutter.git /opt/flutter
           git config --global --add safe.directory /opt/flutter
           flutter config --no-analytics
 
