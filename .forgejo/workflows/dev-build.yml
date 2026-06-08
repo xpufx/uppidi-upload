@@ -33,8 +33,26 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Git safe.directory (ephemeral CI container, no security concern)
-        run: git config --global --add safe.directory '*'
+      - name: Git safe.directory for Flutter SDK
+        run: |
+          d=$(find /opt/hostedtoolcache/flutter -name '.git' -type d -maxdepth 3 2>/dev/null | head -1)
+          [ -n "$d" ] && git config --global --add safe.directory "${d%/.git}"
+
+      - name: Set up Android signing
+        if: env.KEYSTORE_BASE64 != ''
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > android/upload-keystore.jks
+          cat > android/key.properties <<EOF
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=upload-keystore.jks
+          EOF
 
       - run: flutter pub get
 
