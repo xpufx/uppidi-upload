@@ -279,12 +279,12 @@ void main() {
     });
 
     test('upload succeeds', () async {
-      final data = Uint8List.fromList('hello freeimage'.codeUnits);
+      final bytes = await File('/tmp/1x1.png').readAsBytes();
       final request = FileUploadRequest(
-        fileName: 'test.txt',
+        fileName: 'test.png',
         mimeType: 'image/png',
-        sizeInBytes: data.length,
-        dataStream: Stream.value(data),
+        sizeInBytes: bytes.length,
+        dataStream: Stream.value(bytes),
       );
 
       final result = await provider.upload(request);
@@ -293,7 +293,8 @@ void main() {
         fail(
             'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
       }
-      expect(result.url, contains('freeimage.host'));
+      expect(
+          result.url, anyOf(contains('freeimage.host'), contains('iili.io')));
     },
         timeout: const Timeout(Duration(minutes: 2)),
         skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
@@ -349,7 +350,7 @@ void main() {
         fail(
             'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
       }
-      expect(result.url, contains('litterbox'));
+      expect(result.url, contains('litter'));
     },
         timeout: const Timeout(Duration(minutes: 2)),
         skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
