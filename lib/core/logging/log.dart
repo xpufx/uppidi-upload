@@ -124,8 +124,6 @@ final class Log {
     if (!_enabled) return;
     if (_minLevel.index > level.index) return;
 
-    dev.log(message, name: tag, level: level.index * 250);
-
     final entry = LogEntry(
       timestamp: DateTime.now(),
       level: level,
@@ -133,6 +131,9 @@ final class Log {
       message: message,
       error: error,
     );
+
+    dev.log(message, name: tag, level: level.index * 250);
+    stderr.writeln(entry.formatted);
 
     _buffer.add(entry);
     if (_buffer.length > _maxBufferEntries) {
