@@ -1,9 +1,3 @@
-# Forgejo dev CI — manually triggered via workflow_dispatch.
-# Pushes APKs + latest.txt to the `builds` branch.
-#
-# For signed APKs, add these secrets in repo settings → Actions → Secrets:
-#   KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_PASSWORD, KEY_ALIAS
-
 name: Dev Build (Forgejo)
 
 on:
@@ -17,9 +11,15 @@ on:
 permissions:
   contents: write
 
+env:
+  ANDROID_HOME: /opt/android-sdk
+  ANDROID_SDK_ROOT: /opt/android-sdk
+
 jobs:
   build:
     runs-on: debian-bookworm
+    env:
+      PATH: /opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/cmdline-tools/latest/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
     steps:
       - uses: actions/checkout@v4
@@ -30,17 +30,13 @@ jobs:
         run: |
           apt-get update -qq
           apt-get install -y -qq --no-install-recommends \
-            openjdk-17-jdk-headless curl ca-certificates unzip xz-utils git
+            openjdk-17-jdk-headless curl ca-certificates unzip git
 
       - name: Install Flutter
         run: |
-          curl -sSL https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.44.0-stable.tar.xz \
-            -o /tmp/flutter.tar.xz
-          tar -xf /tmp/flutter.tar.xz -C /opt/
-          ln -sf /opt/flutter/bin/flutter /usr/local/bin/flutter
-          ln -sf /opt/flutter/bin/dart /usr/local/bin/dart
+          git clone --depth 1 https://github.com/flutter/flutter.git /opt/flutter
+          rm -rf /opt/flutter/.git
           flutter config --no-analytics
-          flutter precache
 
       - name: Set up Android SDK
         run: |
@@ -49,15 +45,9 @@ jobs:
           unzip -q /tmp/cmdline-tools.zip -d /opt/android-sdk
           mkdir -p /opt/android-sdk/cmdline-tools/latest
           mv /opt/android-sdk/cmdline-tools/* /opt/android-sdk/cmdline-tools/latest/ 2>/dev/null || true
-          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk \
+          yes | sdkmanager --sdk_root=$ANDROID_HOME \
             "platforms;android-34" "build-tools;34.0.0" "platform-tools" >/dev/null 2>&1 || true
-          echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
-          ln -sf /opt/android-sdk/platform-tools/adb /usr/local/bin/adb 2>/dev/null || true
-
-      - name: Accept Android licenses
-        run: |
-          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk --licenses >/dev/null 2>&1 || true
+          yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses >/dev/null 2>&1 || true
 
       - name: Install deps
         run: flutter pub get
@@ -97,8 +87,7 @@ jobs:
             --build-number=$(date +%y%j%H%M) \
             --build-name=${{ steps.resolve.outputs.version }} \
             --dart-define=GIT_HASH=${{ steps.resolve.outputs.hash }} \
-            --dart-define=DEV_PROVIDERS=true \
-            --dart-define=CDN_URL=https://forge.mrs.aager.de/xpufx/uppidi/raw/branch/builds
+            --dart-define=DEV_PROVIDERS=true
 
       - name: Collect artifacts
         run: |
