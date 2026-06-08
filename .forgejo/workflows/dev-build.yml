@@ -14,94 +14,53 @@ permissions:
 env:
   ANDROID_HOME: /opt/android-sdk
   ANDROID_SDK_ROOT: /opt/android-sdk
+  PATH: /opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:/opt/hostedtoolcache/flutter/stable-3.44.0-x64/bin:/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 jobs:
   build:
-    runs-on: debian-bookworm
-    env:
-      PATH: /opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/cmdline-tools/latest/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install system deps
-        run: |
-          apt-get update -qq
-          apt-get install -y -qq --no-install-recommends \
-            openjdk-17-jdk-headless curl ca-certificates unzip git
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: 17
 
-      - name: Install Flutter
-        run: |
-          git clone --depth 100 https://github.com/flutter/flutter.git /opt/flutter
-          git config --global --add safe.directory /opt/flutter
-          flutter config --no-analytics
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
 
-      - name: Set up Android SDK
+      - name: Version
+        id: ver
         run: |
-          curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
-            -o /tmp/cmdline-tools.zip
-          unzip -q /tmp/cmdline-tools.zip -d /opt/android-sdk
-          mkdir -p /opt/android-sdk/cmdline-tools/latest
-          mv /opt/android-sdk/cmdline-tools/* /opt/android-sdk/cmdline-tools/latest/ 2>/dev/null || true
-          yes | sdkmanager --sdk_root=$ANDROID_HOME \
-            "platforms;android-34" "build-tools;34.0.0" "platform-tools" >/dev/null 2>&1 || true
-          yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses >/dev/null 2>&1 || true
-
-      - name: Install deps
-        run: flutter pub get
-
-      - name: Resolve version
-        id: resolve
-        run: |
-          ver="${{ inputs.version }}"
-          [ -z "$ver" ] && ver=$(grep '^version:' pubspec.yaml | sed 's/version: *//')
-          hash=$(git rev-parse --short HEAD)
-          echo "version=$ver" >> $GITHUB_OUTPUT
-          echo "hash=$hash" >> $GITHUB_OUTPUT
-
-      - name: Sync version
-        run: |
-          sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${{ steps.resolve.outputs.version }}';/" lib/core/version.dart
-
-      - name: Set up Android signing
-        if: env.KEYSTORE_BASE64 != ''
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-        run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > android/upload-keystore.jks
-          cat > android/key.properties <<EOF
-          storePassword=$KEYSTORE_PASSWORD
-          keyPassword=$KEY_PASSWORD
-          keyAlias=$KEY_ALIAS
-          storeFile=upload-keystore.jks
-          EOF
+          v="${{ inputs.version }}"
+          [ -z "$v" ] && v=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
+          echo "ver=$v" >> $GITHUB_OUTPUT
+          echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Build Android APKs
         run: |
           flutter build apk --release --split-per-abi \
             --build-number=$(date +%y%j%H%M) \
-            --build-name=${{ steps.resolve.outputs.version }} \
-            --dart-define=GIT_HASH=${{ steps.resolve.outputs.hash }} \
+            --build-name=${{ steps.ver.outputs.ver }} \
+            --dart-define=GIT_HASH=${{ steps.ver.outputs.hash }} \
             --dart-define=DEV_PROVIDERS=true
 
-      - name: Collect artifacts
+      - name: Stage artifacts
         run: |
-          V=${{ steps.resolve.outputs.version }}
-          H=${{ steps.resolve.outputs.hash }}
-          mkdir -p deploy
-          echo "$H" > deploy/latest.txt
+          mkdir -p /tmp/deploy
+          echo "${{ steps.ver.outputs.hash }}" > /tmp/deploy/latest.txt
           for apk in build/app/outputs/flutter-apk/app-*-release.apk; do
             [ -f "$apk" ] || continue
             abi=$(basename "$apk" | sed 's/^app-//; s/-release\.apk$//')
-            cp "$apk" "deploy/uppidi-upload-${V}-${H}-android-${abi}.apk"
-            cp "$apk" "deploy/uppidi-upload-latest-android-${abi}.apk"
+            cp "$apk" "/tmp/deploy/uppidi-upload-${{ steps.ver.outputs.ver }}-${{ steps.ver.outputs.hash }}-android-${abi}.apk"
+            cp "$apk" "/tmp/deploy/uppidi-upload-latest-android-${abi}.apk"
           done
-          ls -lh deploy/
 
       - name: Push to builds branch
         run: |
@@ -109,7 +68,7 @@ jobs:
           git config user.email "ci@forge.mrs.aager.de"
           git checkout --orphan build-artifacts-${GITHUB_RUN_ID}
           git rm -rf . >/dev/null 2>&1 || true
-          cp -r deploy/* .
+          cp -r /tmp/deploy/* .
           git add .
-          git commit -m "dev build ${{ steps.resolve.outputs.version }} (${{ steps.resolve.outputs.hash }})"
+          git commit -m "dev build ${{ steps.ver.outputs.ver }} (${{ steps.ver.outputs.hash }})"
           git push origin HEAD:refs/heads/builds --force
