@@ -12,6 +12,7 @@ import '../core/config_provider.dart';
 import '../core/format.dart';
 import '../core/insecure_upload_warning.dart';
 import '../core/interfaces/uploader.dart';
+import '../core/logging/log.dart';
 import '../core/models/provider_instance.dart';
 import '../core/models/provider_metadata.dart';
 import '../core/provider_config_sheet.dart';
@@ -38,6 +39,7 @@ class _UploadScreenState extends ConsumerState<UploadScreen>
   late final Animation<double> _providerCardAnim;
   late final Animation<double> _infoCardAnim;
   late final Animation<double> _contentAnim;
+  final _log = Log('UploadScreen');
 
   @override
   void initState() {
@@ -91,6 +93,9 @@ class _UploadScreenState extends ConsumerState<UploadScreen>
         _restartStagger();
       }
     });
+
+    _log.debug(
+        'build: state=${uploadState.runtimeType} provider=${provider?.providerId}');
 
     final scrollBody = Padding(
       padding: const EdgeInsets.all(16),
@@ -161,6 +166,7 @@ class _UploadScreenState extends ConsumerState<UploadScreen>
                         key: const ValueKey('idle'),
                         onPick: notifier.pickAndUpload,
                         onPaste: () async {
+                          _log.debug('paste triggered');
                           final img = await Pasteboard.image;
                           if (img != null) {
                             notifier.uploadFromBytes(img, 'clipboard.png',
@@ -300,6 +306,7 @@ class _UploadScreenState extends ConsumerState<UploadScreen>
         onDragDone: (details) {
           setState(() => _isHovering = false);
           final file = details.files.first;
+          _log.info('drop: ${file.path} (${file.mimeType})');
           notifier.uploadFromFile(file.path, file.mimeType);
         },
         child: Container(

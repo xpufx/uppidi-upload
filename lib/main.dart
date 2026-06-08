@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -52,6 +53,7 @@ void main() async {
   await Hive.openBox<String>('settings');
   final savedLogging =
       Hive.box<String>('settings').get(SettingsService.debugLoggingKey);
+  Log.setEnabled(savedLogging == 'true');
   Log.enableFileLogging(savedLogging == 'true');
   _registerScreens();
   try {
@@ -69,7 +71,15 @@ void main() async {
     }
     exit(1);
   }
-  runApp(const ProviderScope(child: UppidiApp()));
+  runZonedGuarded(
+    () => runApp(
+      ProviderScope(
+        observers: [TracingObserver()],
+        child: const UppidiApp(),
+      ),
+    ),
+    (e, s) => Log('App').error('Uncaught: $e', error: e, stackTrace: s),
+  );
 }
 
 /// Registers all app screens in ScreenRegistry.
@@ -145,6 +155,7 @@ class _UppidiAppState extends ConsumerState<UppidiApp> {
         Locale('it'),
         Locale('tr'),
       ],
+      navigatorObservers: [RouteTracer()],
       home: switch (shellType) {
         'modals' => const ModalNavStrategy(),
         _ => const TabNavStrategy(),

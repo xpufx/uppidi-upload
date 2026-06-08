@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart' as pp;
 
 enum LogLevel { debug, info, warn, error }
@@ -34,7 +36,12 @@ final class Log {
 
   static File? _logFile;
   static bool _fileLoggingEnabled = false;
+  static bool _enabled = false;
   static final List<LogEntry> _buffer = [];
+
+  /// Enables or disables all logging. When disabled, no entries are
+  /// written to the buffer or file.
+  static void setEnabled(bool v) => _enabled = v;
 
   /// Max entries kept in the in-memory buffer (for instant display).
   /// The file log has no cap — it captures the full session.
@@ -114,6 +121,7 @@ final class Log {
   }
 
   void _log(LogLevel level, String message, {Object? error}) {
+    if (!_enabled) return;
     if (_minLevel.index > level.index) return;
 
     dev.log(message, name: tag, level: level.index * 250);
@@ -159,8 +167,51 @@ final class Log {
 
   void error(String message, {Object? error, StackTrace? stackTrace}) {
     _log(LogLevel.error, message, error: error);
-    // stackTrace intentionally unused here; _log writes structured entries
-    // to the in-memory buffer and file. If full traceback is needed, callers
-    // should include it in the message string.
+    if (stackTrace != null) {
+      _log(LogLevel.error, stackTrace.toString());
+    }
+  }
+}
+
+/// Traces all Riverpod provider state changes. One line captures every
+/// state machine transition, settings change, and config update.
+base class TracingObserver extends ProviderObserver {
+  static final _log = Log('Tracing');
+
+  @override
+  void didUpdateProvider(
+    ProviderObserverContext context,
+    Object? previousValue,
+    Object? newValue,
+  ) {
+    final name =
+        context.provider.name ?? context.provider.runtimeType.toString();
+    _log.debug('$name: $newValue');
+  }
+
+  @override
+  void providerDidFail(
+    ProviderObserverContext context,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    final name =
+        context.provider.name ?? context.provider.runtimeType.toString();
+    _log.error('$name failed: $error', error: error, stackTrace: stackTrace);
+  }
+}
+
+/// Traces all Navigator route changes (screen enter/leave).
+class RouteTracer extends NavigatorObserver {
+  static final _log = Log('Route');
+
+  @override
+  void didPush(Route route, Route? previousRoute) {
+    _log.info('→ ${route.settings.name ?? route.runtimeType}');
+  }
+
+  @override
+  void didPop(Route route, Route? previousRoute) {
+    _log.info('← ${route.settings.name ?? route.runtimeType}');
   }
 }
