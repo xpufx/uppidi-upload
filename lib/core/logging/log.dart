@@ -179,6 +179,12 @@ final class Log {
 base class TracingObserver extends ProviderObserver {
   static final _log = Log('Tracing');
 
+  /// Provider name substrings to skip entirely (noisy tickers).
+  static const _skip = ['AgeTick', 'VersionCheck'];
+
+  /// Provider name substrings whose values should be redacted.
+  static const _secret = ['provider_config', 'ProviderConfig'];
+
   @override
   void didUpdateProvider(
     ProviderObserverContext context,
@@ -187,6 +193,15 @@ base class TracingObserver extends ProviderObserver {
   ) {
     final name =
         context.provider.name ?? context.provider.runtimeType.toString();
+    for (final s in _skip) {
+      if (name.contains(s)) return;
+    }
+    for (final s in _secret) {
+      if (name.contains(s)) {
+        _log.debug('$name: <redacted>');
+        return;
+      }
+    }
     _log.debug('$name: $newValue');
   }
 

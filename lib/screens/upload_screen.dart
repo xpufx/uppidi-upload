@@ -40,6 +40,7 @@ class _UploadScreenState extends ConsumerState<UploadScreen>
   late final Animation<double> _infoCardAnim;
   late final Animation<double> _contentAnim;
   final _log = Log('UploadScreen');
+  Type? _lastStateType;
 
   @override
   void initState() {
@@ -94,8 +95,11 @@ class _UploadScreenState extends ConsumerState<UploadScreen>
       }
     });
 
-    _log.debug(
-        'build: state=${uploadState.runtimeType} provider=${provider?.providerId}');
+    if (uploadState.runtimeType != _lastStateType) {
+      _log.debug(
+          'state: ${uploadState.runtimeType} provider=${provider?.providerId}');
+      _lastStateType = uploadState.runtimeType;
+    }
 
     final scrollBody = Padding(
       padding: const EdgeInsets.all(16),
