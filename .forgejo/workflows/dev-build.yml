@@ -1,0 +1,117 @@
+# Forgejo dev CI — dormant until manually triggered via workflow_dispatch.
+#
+# To enable signed Android APKs, add these secrets in Forgejo repo settings:
+#   Settings → Actions → Secrets → Add:
+#   - KEYSTORE_BASE64  (base64 of android/upload-keystore.jks)
+#   - KEYSTORE_PASSWORD
+#   - KEY_PASSWORD
+#   - KEY_ALIAS  (currently "upload")
+#
+# Without secrets: APKs are unsigned (installable via adb/sideload).
+
+name: Dev Build (Forgejo)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Override version. Blank = from pubspec.yaml'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: debian
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version
+        id: resolve
+        run: |
+          ver="${{ inputs.version }}"
+          [ -z "$ver" ] && ver=$(grep '^version:' pubspec.yaml | sed 's/version: *//')
+          hash=$(git rev-parse --short HEAD)
+          echo "version=$ver" >> $GITHUB_OUTPUT
+          echo "hash=$hash" >> $GITHUB_OUTPUT
+
+      - name: Sync version
+        run: |
+          sed -i "s/const String appVersion = '[0-9.+]*';/const String appVersion = '${{ steps.resolve.outputs.version }}';/" lib/core/version.dart
+
+      - name: Set up Android signing
+        if: env.KEYSTORE_BASE64 != ''
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > android/upload-keystore.jks
+          cat > android/key.properties <<EOF
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=upload-keystore.jks
+          EOF
+
+      - name: Build Android APKs
+        run: |
+          flutter build apk --release --split-per-abi \
+            --build-number=$(date +%y%j%H%M) \
+            --build-name=${{ steps.resolve.outputs.version }} \
+            --dart-define=GIT_HASH=${{ steps.resolve.outputs.hash }} \
+            --dart-define=DEV_PROVIDERS=true \
+            --dart-define=CDN_URL=https://forge.mrs.aager.de/xpufx/uppidi/raw/branch/builds
+
+      - name: Build Linux
+        run: |
+          flutter build linux --release \
+            --dart-define=GIT_HASH=${{ steps.resolve.outputs.hash }} \
+            --dart-define=DEV_PROVIDERS=true \
+            --dart-define=CDN_URL=https://forge.mrs.aager.de/xpufx/uppidi/raw/branch/builds
+
+      - name: Package Linux tarball
+        run: |
+          tar -czf \
+            uppidi-upload-${{ steps.resolve.outputs.version }}-${{ steps.resolve.outputs.hash }}-linux.tar.gz \
+            -C build/linux/x64/release/bundle .
+
+      - name: Build AppImage
+        run: |
+          bash scripts/build-appimage.sh --no-flutter-build \
+            --hash=${{ steps.resolve.outputs.hash }} \
+            --artifacts-dir=${{ github.workspace }}
+
+      - name: Collect artifacts
+        run: |
+          V=${{ steps.resolve.outputs.version }}
+          H=${{ steps.resolve.outputs.hash }}
+          mkdir -p deploy
+          echo "$H" > deploy/latest.txt
+          for apk in build/app/outputs/flutter-apk/app-*-release.apk; do
+            [ -f "$apk" ] || continue
+            abi=$(basename "$apk" | sed 's/^app-//; s/-release\.apk$//')
+            cp "$apk" "deploy/uppidi-upload-${V}-${H}-android-${abi}.apk"
+            cp "$apk" "deploy/uppidi-upload-latest-android-${abi}.apk"
+          done
+          cp uppidi-upload-*-linux.tar.gz deploy/uppidi-upload-latest-linux.tar.gz 2>/dev/null || true
+          mv uppidi-upload-*linux.tar.gz deploy/ 2>/dev/null || true
+          mv uppidi-upload-*.AppImage deploy/uppidi-upload-latest-x86_64.AppImage 2>/dev/null || true
+          ls -lh deploy/
+
+      - name: Push to builds branch
+        run: |
+          git config user.name "uppidi-ci"
+          git config user.email "ci@forge.mrs.aager.de"
+          git checkout --orphan build-artifacts-${GITHUB_RUN_ID}
+          git rm -rf . >/dev/null 2>&1 || true
+          cp -r deploy/* .
+          git add .
+          git commit -m "dev build ${{ steps.resolve.outputs.version }} (${{ steps.resolve.outputs.hash }})"
+          git push origin HEAD:refs/heads/builds --force
