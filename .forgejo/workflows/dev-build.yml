@@ -77,9 +77,9 @@ jobs:
           echo "ver=$v" >> $GITHUB_OUTPUT
           echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Build Android APKs
+      - name: Build Android APK
         run: |
-          flutter build apk --release --split-per-abi \
+          flutter build apk --release \
             --build-number=$(date +%y%j%H%M) \
             --build-name=${{ steps.ver.outputs.ver }} \
             --dart-define=GIT_HASH=${{ steps.ver.outputs.hash }} \
@@ -89,11 +89,9 @@ jobs:
         run: |
           mkdir -p /tmp/deploy
           echo "${{ steps.ver.outputs.hash }}" > /tmp/deploy/latest.txt
-          for apk in build/app/outputs/flutter-apk/app-*-release.apk; do
-            [ -f "$apk" ] || continue
-            abi=$(basename "$apk" | sed 's/^app-//; s/-release\.apk$//')
-            cp "$apk" "/tmp/deploy/uppidi-upload-latest-android-${abi}.apk"
-          done
+          cp build/app/outputs/flutter-apk/app-release.apk \
+            /tmp/deploy/uppidi-upload-latest.apk 2>/dev/null || true
+          ls -lh /tmp/deploy/
 
       - name: Push to builds branch
         run: |
