@@ -38,6 +38,20 @@ jobs:
           d=$(find /opt/hostedtoolcache/flutter -name '.git' -type d -maxdepth 3 2>/dev/null | head -1)
           [ -n "$d" ] && git config --global --add safe.directory "${d%/.git}"
 
+      - name: Set up Android SDK
+        run: |
+          curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
+            -o /tmp/cmdline-tools.zip
+          unzip -q /tmp/cmdline-tools.zip -d /opt/android-sdk
+          mkdir -p /opt/android-sdk/cmdline-tools/latest
+          mv /opt/android-sdk/cmdline-tools/* /opt/android-sdk/cmdline-tools/latest/ 2>/dev/null || true
+          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk \
+            "platforms;android-34" "build-tools;34.0.0" "platform-tools" >/dev/null 2>&1 || true
+          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk \
+            --licenses >/dev/null 2>&1 || true
+          echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
+
       - name: Set up Android signing
         if: env.KEYSTORE_BASE64 != ''
         env:
