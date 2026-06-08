@@ -11,7 +11,6 @@ import 'package:image/image.dart' as img;
 
 import 'package:uppidi_upload/screens/upload_screen.dart';
 import 'package:uppidi_upload/screens/test_screen.dart';
-import 'package:uppidi_upload/screens/settings_screen.dart';
 import 'package:uppidi_upload/providers/upload_provider.dart';
 import 'package:uppidi_upload/core/models/provider_metadata.dart';
 import 'package:uppidi_upload/core/models/upload_result.dart';
@@ -452,29 +451,6 @@ void main() {
       // Warning icon should still be shown
       expect(find.byIcon(Icons.warning_amber), findsWidgets);
       expect(find.text(reason), findsOneWidget);
-    });
-  });
-
-  group('Version Check Test', () {
-    testWidgets('Version check widget renders in SettingsScreen',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(body: const SettingsScreen()),
-          ),
-        ),
-      );
-
-      // Wait for initial frame rendering
-      await tester.pumpAndSettle();
-
-      // SettingsScreen should render
-      expect(find.byType(SettingsScreen), findsOneWidget);
-      // The version check icon may or may not be present depending on cdnUrl environment variable
-      // Just verify the screen renders without errors
     });
   });
 

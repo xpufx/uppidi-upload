@@ -90,9 +90,21 @@ class _UploadScreenState extends ConsumerState<UploadScreen>
     ref.listen(uploadProvider, (prev, next) {
       if (prev.runtimeType != next.runtimeType) {
         if (prev is UploadInProgress && next is UploadCompleted) {
-          _log.info(
-              'upload ${next.isSuccess ? "succeeded" : "failed"}: ${next.fileName}');
-          return;
+          if (next.isSuccess) {
+            _log.info('upload completed: ${next.lastResult.url}');
+          } else {
+            _log.warn('upload failed: ${next.errorMessage}');
+          }
+        }
+        if (next is UploadIdle) {
+          if (prev is UploadInProgress) {
+            _log.info('upload cancelled');
+          } else if (prev is UploadCompleted) {
+            _log.info('selection cleared');
+          }
+        }
+        if (prev is UploadIdle && next is UploadFileSelected) {
+          _log.debug('file selected: ${next.fileName}');
         }
         _restartStagger();
       }

@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uppidi_upload/core/models/upload_request.dart';
+import 'package:uppidi_upload/providers/custom_uguu_provider.dart';
 import 'package:uppidi_upload/providers/gofile_provider.dart';
 import 'package:uppidi_upload/providers/tmpfilelink_provider.dart';
 import 'package:uppidi_upload/providers/httpbin_provider.dart';
@@ -11,7 +13,7 @@ import 'package:uppidi_upload/providers/storage_to_provider.dart';
 import 'package:uppidi_upload/providers/bzzhr_provider.dart';
 import 'package:uppidi_upload/core/registry.dart';
 
-const _runLiveTests = bool.fromEnvironment('RUN_LIVE_TESTS');
+final _skipLive = Platform.environment.containsKey('SKIP_LIVE_TESTS');
 
 void main() {
   group('ProviderRegistry', () {
@@ -43,10 +45,8 @@ void main() {
     });
 
     test('upload success - small text file', () async {
-      // Create a small test file in memory
       final testData = Uint8List.fromList('Hello, test!'.codeUnits);
       final stream = Stream.value(testData);
-
       final request = FileUploadRequest(
         fileName: 'test.txt',
         mimeType: 'text/plain',
@@ -63,14 +63,11 @@ void main() {
       expect(result.statusCode, 200);
     },
         timeout: const Timeout(Duration(minutes: 2)),
-        skip: _runLiveTests
-            ? null
-            : 'Relies on live external service (tmpfile.link)');
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
 
     test('upload returns download link in response', () async {
       final testData = Uint8List.fromList('Test content'.codeUnits);
       final stream = Stream.value(testData);
-
       final request = FileUploadRequest(
         fileName: 'test_upload.txt',
         mimeType: 'text/plain',
@@ -84,9 +81,7 @@ void main() {
       expect(result.url, startsWith('https://'));
     },
         timeout: const Timeout(Duration(minutes: 2)),
-        skip: _runLiveTests
-            ? null
-            : 'Relies on live external service (tmpfile.link)');
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
   });
 
   group('HttpBinProvider', () {
@@ -104,7 +99,6 @@ void main() {
     test('upload success - echo response', () async {
       final testData = Uint8List.fromList('Hello httpbin!'.codeUnits);
       final stream = Stream.value(testData);
-
       final request = FileUploadRequest(
         fileName: 'test.txt',
         mimeType: 'text/plain',
@@ -114,14 +108,11 @@ void main() {
 
       final result = await provider.upload(request);
 
-      // httpbin returns the URL in a different format
       expect(result.statusCode, 200);
       expect(result.success, true);
     },
         timeout: const Timeout(Duration(minutes: 2)),
-        skip: _runLiveTests
-            ? null
-            : 'Relies on live external service (httpbin.org)');
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
   });
 
   group('supportsMessage', () {
@@ -181,9 +172,7 @@ void main() {
       expect(result.url, contains('filester.me'));
     },
         timeout: const Timeout(Duration(minutes: 2)),
-        skip: _runLiveTests
-            ? null
-            : 'Relies on live external service (filester.me)');
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
   });
 
   group('FilebinProvider', () {
@@ -211,9 +200,7 @@ void main() {
       expect(result.url, contains('filebin.net'));
     },
         timeout: const Timeout(Duration(minutes: 2)),
-        skip: _runLiveTests
-            ? null
-            : 'Relies on live external service (filebin.net)');
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
   });
 
   group('StorageToProvider', () {
@@ -241,9 +228,7 @@ void main() {
       expect(result.url, contains('storage.to'));
     },
         timeout: const Timeout(Duration(minutes: 2)),
-        skip: _runLiveTests
-            ? null
-            : 'Relies on live external service (storage.to)');
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
   });
 
   group('BzzhrProvider', () {
@@ -271,8 +256,44 @@ void main() {
       expect(result.url, contains('bzzhr.'));
     },
         timeout: const Timeout(Duration(minutes: 2)),
-        skip: _runLiveTests
-            ? null
-            : 'Relies on live external service (bzzhr.to)');
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
+  });
+
+  group('CustomUguuProvider', () {
+    late CustomUguuProvider provider;
+
+    setUp(() {
+      provider = CustomUguuProvider();
+    });
+
+    test('has correct metadata', () {
+      expect(provider.providerId, 'custom_uguu');
+      expect(provider.providerName, 'Uguu-like');
+      expect(provider.requiredConfigKeys, ['server_url']);
+    });
+
+    test('upload succeeds against own instance', () async {
+      final data = Uint8List.fromList('custom uguu test'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(
+        request,
+        config: {'server_url': 'https://uguufiles.milan.xpufx.com'},
+      );
+
+      if (!result.success) {
+        fail(
+            'Custom Uguu upload failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, startsWith('https://uguufiles.milan.xpufx.com'));
+      expect(result.statusCode, 200);
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
   });
 }

@@ -10,6 +10,7 @@ import 'package:flutter_skill/flutter_skill.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/logging/log.dart';
+import 'core/logging/observers.dart';
 import 'core/models/upload_record.dart';
 import 'core/registry.dart';
 import 'core/settings_service.dart';
@@ -53,7 +54,6 @@ void main() async {
   await Hive.openBox<String>('settings');
   final savedLogging =
       Hive.box<String>('settings').get(SettingsService.debugLoggingKey);
-  Log.setEnabled(savedLogging == 'true');
   Log.enableFileLogging(savedLogging == 'true');
   _registerScreens();
   try {
@@ -106,6 +106,8 @@ class UppidiApp extends ConsumerStatefulWidget {
 }
 
 class _UppidiAppState extends ConsumerState<UppidiApp> {
+  late final RouteTracer _routeTracer = RouteTracer();
+
   @override
   void initState() {
     super.initState();
@@ -155,7 +157,7 @@ class _UppidiAppState extends ConsumerState<UppidiApp> {
         Locale('it'),
         Locale('tr'),
       ],
-      navigatorObservers: [routeTracer],
+      navigatorObservers: [_routeTracer],
       home: switch (shellType) {
         'modals' => const ModalNavStrategy(),
         _ => const TabNavStrategy(),

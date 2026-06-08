@@ -55,6 +55,11 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
 
   Future<void> _onImageEditingComplete(Uint8List bytes) async {
     _editorLog.info('Edit complete: ${bytes.length} bytes');
+    // Remove pro_image_editor from tree first so its loading overlay
+    // doesn't block the save dialog.
+    setState(() {
+      _state = _ScreenState.picker;
+    });
     final action = await showDialog<_SaveAction>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -74,26 +79,31 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
     );
     if (!mounted) return;
 
+    if (action == null) {
+      _editorLog.info('Save dialog dismissed (barrier tap)');
+      setState(() {
+        _originalBytes = null;
+        _fileName = null;
+      });
+      return;
+    }
+
     if (action == _SaveAction.save) {
       _editorLog.info('User chose Save');
       final saved = await _saveToDisk(bytes);
       if (saved && mounted) {
-        _editorLog.info('Saved to file');
+        _editorLog.info('Save dialog completed — file saved');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(_l10n.imageSaved)),
         );
       } else {
-        _editorLog.info('Save cancelled by user');
+        _editorLog.info('Save dialog cancelled by user');
       }
     } else {
       _editorLog.info('User chose Discard');
-    }
-
-    if (mounted) {
       setState(() {
         _originalBytes = null;
         _fileName = null;
-        _state = _ScreenState.picker;
       });
     }
   }
@@ -109,12 +119,14 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
 
   Future<bool> _saveToDisk(Uint8List bytes) async {
     final name = _fileName?.replaceAll(RegExp(r'\.\w+$'), '') ?? 'image';
+    _editorLog.info('Opening save dialog for $name');
     final savedPath = await saveFileCrossPlatform(
       bytes,
       '${name}_edited.jpg',
       dialogTitle: _l10n.saveEditedImage,
       allowedExtensions: ['jpg', 'jpeg', 'png'],
     );
+    _editorLog.info('Save dialog returned: ${savedPath ?? "null (cancelled)"}');
     return savedPath != null;
   }
 

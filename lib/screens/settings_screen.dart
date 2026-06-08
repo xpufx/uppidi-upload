@@ -620,7 +620,6 @@ class _GlobalTogglesState extends ConsumerState<_GlobalToggles> {
               value: ref.watch(debugLoggingProvider).asData?.value ?? false,
               onChanged: (v) async {
                 await svc.setDebugLoggingEnabled(v);
-                Log.setEnabled(v);
                 Log.enableFileLogging(v);
                 ref.invalidate(debugLoggingProvider);
                 if (context.mounted) {

@@ -1,32 +1,32 @@
 # Changelog
 
-- fix: add missing ARB keys for share message + fix check_bare_strings.dart
-- feat: translate all ARB locales + check for untranslated values in CI
-- feat: add check_untranslated_arb.dart — catches ARB values identical to English
-- fix: auto-detect MIME type from filename on Android save (use .jpg → image/jpeg instead of hardcoded application/json)
-- fix: restore executable bit on uppidi binary lost by GHA artifact roundtrip
-- fix: handle existing tag in release workflow step
-- ci: clarify release input description
-- ci: manual trigger only (workflow_dispatch); release via input flag
-- build-appimage: default output to .build/ (gitignored scratch dir)
-- fix: default build-appimage.sh output to project root, not .caddy-artifacts
-- ci: pass artifacts-dir to build-appimage.sh
-- ci: use env context for signing condition
-- bump version to 1.5.1
-- ci: skip signing setup when secrets not configured
-- fix: graceful fallback to debug key in CI when key.properties is missing
-- chore: bump to 1.5.0
-- chore: stop tracking AGENTS.md in git
-- chore: update AGENTS.md
-- fix: tab switch dialog now matches same Save/Discard/Cancel with working save callback
-- fix: skip network connectivity test for Local provider (saves to disk, no HTTP)
-- fix: intercept tab switches when unsaved edits exist (via canSwitchTabProvider)
-- fix: remove duplicate android{} block that was overriding release signing with debug key
-- refine: Image Editor tab icon pencil -> palette
-- feat: unsaved-changes warning when leaving image editor without saving
-- feat: APK signing with release keystore + CI setup
-- fix: solid background for sub-editors (crop/paint/text/etc) to avoid double-image ghosting; only main editor canvas has transparent/checkered bg
-- fix: disable crop animation (Duration.zero) to eliminate double-image ghosting
-- refactor: global checkered stack above ProImageEditor + all transparent backgrounds
-- fix: nav order → Upload, Image Editor, History, Providers, Settings
-- fix: theme-aware checkered colors (light/dark) + transparent editor bg
+- fix: RouteTracer singleton, progress noise filter, debug-only stderr, upload result log
+- feat: add Forgejo dev CI workflow (dormant)
+- fix: filter noisy tickers, redact secrets in TracingObserver, dedupe UploadScreen build log
+- fix: also write log traces to stderr for terminal visibility in release builds
+- feat: add app-level tracing — ProviderObserver, NavigatorObserver, zone error capture, master gate
+- feat: add logging to image editor flow (pick, edit, save, discard, close)
+- fix: cupertino crash on Linux — use material dialogs on non-Apple platforms
+- fix: restore debug logging state on app restart
+- simplify: ask save/discard right after edit, no preview/persistence/guards
+- fix: use documents dir for editor persistence, add setState after restore
+- feat: persist edited image across tab switches and app restarts
+- chore: add configLabelGateway to exempted untranslated keys
+- fix: translate remaining English config labels in IT, EO, TLH locales
+- fix: localize provider descriptions in Add Provider type picker
+- fix: Storage.to 411 — collect stream to bytes for presigned PUT
+- fix: translate Add Provider modal labels, add missing config keys
+- refactor: consolidate test mocks, rewrite main_test for real TabNavStrategy
+- fix: handle barrier dismiss in unsaved-changes dialog
+- chore: cleanup dead code, refactor providers to base patterns
+- Revert "docs: session summary 2026-06-06"
+- docs: session summary 2026-06-06
+- fix: smooth upload state transition — skip stagger reset on InProgress→Completed
+- fix: remove debug ribbon, fix metadata badges overflow on Providers tab
+- feat: add flutter_skill E2E testing binding (debug mode)
+- chore: add website update reminder to build script
+- docs: add website responsibility to scope guard
+- bump css cache buster
+- Add GitHub Actions Pages deployment workflow for site/
+- Create CNAME
+- Move website into site/, update AGENTS.md paths
