@@ -33,9 +33,12 @@ jobs:
           channel: stable
           cache: true
 
-      - run: |
-          git config --global --add safe.directory /opt/hostedtoolcache/flutter
-          flutter pub get
+      - name: Git safe.directory for hostedtoolcache
+        run: |
+          find /opt/hostedtoolcache -name '.git' -type d -maxdepth 4 2>/dev/null \
+            | xargs -I{} git config --global --add safe.directory "{}/.."
+
+      - run: flutter pub get
 
       - name: Version
         id: ver
