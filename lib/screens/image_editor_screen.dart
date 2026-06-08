@@ -42,7 +42,7 @@ final imageEditorDataProvider =
 // ── Disk persistence ───────────────────────────────────────────────────────
 
 Future<Directory> get _editorTempDir async {
-  final dir = await getTemporaryDirectory();
+  final dir = await getApplicationDocumentsDirectory();
   final editorDir = Directory('${dir.path}/uppidi_editor');
   if (!await editorDir.exists()) {
     await editorDir.create(recursive: true);
@@ -159,6 +159,7 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
     if (data != null && mounted) {
       ref.read(imageEditorDataProvider.notifier).set(data);
       _restoreFromProvider();
+      setState(() {});
     }
   }
 
