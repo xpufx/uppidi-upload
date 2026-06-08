@@ -31,6 +31,27 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install deps
+        run: flutter pub get
+
+      - name: Install Linux build deps
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq clang cmake ninja-build pkg-config \
+            libgtk-3-dev libsecret-1-dev liblzma-dev file appstream squashfs-tools
+
       - name: Resolve version
         id: resolve
         run: |
