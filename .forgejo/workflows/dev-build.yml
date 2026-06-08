@@ -35,7 +35,7 @@ jobs:
       - name: Install Flutter
         run: |
           git clone --depth 1 https://github.com/flutter/flutter.git /opt/flutter
-          rm -rf /opt/flutter/.git
+          git config --global --add safe.directory /opt/flutter
           flutter config --no-analytics
 
       - name: Set up Android SDK
