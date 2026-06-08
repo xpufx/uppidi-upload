@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: debian
+    runs-on: debian-bookworm
 
     steps:
       - uses: actions/checkout@v4
