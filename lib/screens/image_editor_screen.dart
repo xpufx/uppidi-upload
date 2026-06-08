@@ -5,11 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 
+import '../core/logging/log.dart';
 import '../core/save_file.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/image_editor.dart';
 
 enum _ScreenState { picker, editing }
+
+final _editorLog = Log('ImageEditor');
 
 class ImageEditorScreen extends ConsumerStatefulWidget {
   const ImageEditorScreen({super.key});
@@ -31,21 +34,27 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png', 'webp', 'bmp'],
     );
-    if (result == null || result.files.isEmpty) return;
+    if (result == null || result.files.isEmpty) {
+      _editorLog.info('File pick cancelled');
+      return;
+    }
     if (!mounted) return;
 
     final bytes = await result.files.first.readAsBytes();
+    final name = result.files.first.name;
     if (!mounted) return;
 
+    _editorLog.info('Picked: $name, ${bytes.length} bytes');
     setState(() {
       _originalBytes = bytes;
-      _fileName = result.files.first.name;
+      _fileName = name;
       _editorKey++;
       _state = _ScreenState.editing;
     });
   }
 
   Future<void> _onImageEditingComplete(Uint8List bytes) async {
+    _editorLog.info('Edit complete: ${bytes.length} bytes');
     final action = await showDialog<_SaveAction>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -66,12 +75,18 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
     if (!mounted) return;
 
     if (action == _SaveAction.save) {
+      _editorLog.info('User chose Save');
       final saved = await _saveToDisk(bytes);
       if (saved && mounted) {
+        _editorLog.info('Saved to file');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(_l10n.imageSaved)),
         );
+      } else {
+        _editorLog.info('Save cancelled by user');
       }
+    } else {
+      _editorLog.info('User chose Discard');
     }
 
     if (mounted) {
@@ -84,6 +99,7 @@ class _ImageEditorScreenState extends ConsumerState<ImageEditorScreen> {
   }
 
   void _onCloseEditor(EditorMode mode) {
+    _editorLog.info('Editor closed: $_fileName (state=$_state)');
     setState(() {
       _originalBytes = null;
       _fileName = null;
