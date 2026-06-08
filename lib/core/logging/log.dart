@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart' as pp;
@@ -133,7 +134,7 @@ final class Log {
     );
 
     dev.log(message, name: tag, level: level.index * 250);
-    stderr.writeln(entry.formatted);
+    if (kDebugMode) stderr.writeln(entry.formatted);
 
     _buffer.add(entry);
     if (_buffer.length > _maxBufferEntries) {
@@ -179,8 +180,8 @@ final class Log {
 base class TracingObserver extends ProviderObserver {
   static final _log = Log('Tracing');
 
-  /// Provider name substrings to skip entirely (noisy tickers).
-  static const _skip = ['AgeTick', 'VersionCheck'];
+  /// Provider name substrings to skip entirely (noisy tickers/progress).
+  static const _skip = ['AgeTick', 'VersionCheck', 'progress', 'sentBytes'];
 
   /// Provider name substrings whose values should be redacted.
   static const _secret = ['provider_config', 'ProviderConfig'];
@@ -231,3 +232,6 @@ class RouteTracer extends NavigatorObserver {
     _log.info('← ${route.settings.name ?? route.runtimeType}');
   }
 }
+
+/// Singleton instance — use this, not `RouteTracer()`, to avoid leaks.
+final routeTracer = RouteTracer();

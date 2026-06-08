@@ -40,7 +40,6 @@ class _UploadScreenState extends ConsumerState<UploadScreen>
   late final Animation<double> _infoCardAnim;
   late final Animation<double> _contentAnim;
   final _log = Log('UploadScreen');
-  Type? _lastStateType;
 
   @override
   void initState() {
@@ -90,16 +89,14 @@ class _UploadScreenState extends ConsumerState<UploadScreen>
 
     ref.listen(uploadProvider, (prev, next) {
       if (prev.runtimeType != next.runtimeType) {
-        if (prev is UploadInProgress && next is UploadCompleted) return;
+        if (prev is UploadInProgress && next is UploadCompleted) {
+          _log.info(
+              'upload ${next.isSuccess ? "succeeded" : "failed"}: ${next.fileName}');
+          return;
+        }
         _restartStagger();
       }
     });
-
-    if (uploadState.runtimeType != _lastStateType) {
-      _log.debug(
-          'state: ${uploadState.runtimeType} provider=${provider?.providerId}');
-      _lastStateType = uploadState.runtimeType;
-    }
 
     final scrollBody = Padding(
       padding: const EdgeInsets.all(16),

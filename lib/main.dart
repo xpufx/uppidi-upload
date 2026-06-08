@@ -155,7 +155,7 @@ class _UppidiAppState extends ConsumerState<UppidiApp> {
         Locale('it'),
         Locale('tr'),
       ],
-      navigatorObservers: [RouteTracer()],
+      navigatorObservers: [routeTracer],
       home: switch (shellType) {
         'modals' => const ModalNavStrategy(),
         _ => const TabNavStrategy(),
