@@ -25,6 +25,9 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
+      - name: Install jq (subosito/flutter-action requires it)
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends jq
+
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
