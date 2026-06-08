@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_skill/flutter_skill.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'core/logging/log.dart';
 import 'core/models/upload_record.dart';
 import 'core/registry.dart';
 import 'core/settings_service.dart';
@@ -48,6 +49,10 @@ void main() async {
   if (kDebugMode) FlutterSkillBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(UploadRecordAdapter());
+  await Hive.openBox<String>('settings');
+  final savedLogging =
+      Hive.box<String>('settings').get(SettingsService.debugLoggingKey);
+  Log.enableFileLogging(savedLogging == 'true');
   _registerScreens();
   try {
     await ProviderRegistry.init();
