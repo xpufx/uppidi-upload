@@ -2,15 +2,22 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uppidi_upload/core/models/upload_request.dart';
-import 'package:uppidi_upload/providers/custom_uguu_provider.dart';
-import 'package:uppidi_upload/providers/gofile_provider.dart';
-import 'package:uppidi_upload/providers/tmpfilelink_provider.dart';
-import 'package:uppidi_upload/providers/httpbin_provider.dart';
-import 'package:uppidi_upload/providers/telegram_provider.dart';
-import 'package:uppidi_upload/providers/filester_provider.dart';
-import 'package:uppidi_upload/providers/filebin_provider.dart';
-import 'package:uppidi_upload/providers/storage_to_provider.dart';
 import 'package:uppidi_upload/providers/bzzhr_provider.dart';
+import 'package:uppidi_upload/providers/catbox_provider.dart';
+import 'package:uppidi_upload/providers/custom_uguu_provider.dart';
+import 'package:uppidi_upload/providers/filebin_provider.dart';
+import 'package:uppidi_upload/providers/fileditch_provider.dart';
+import 'package:uppidi_upload/providers/filester_provider.dart';
+import 'package:uppidi_upload/providers/freeimage_provider.dart';
+import 'package:uppidi_upload/providers/frisk_provider.dart';
+import 'package:uppidi_upload/providers/gofile_provider.dart';
+import 'package:uppidi_upload/providers/httpbin_provider.dart';
+import 'package:uppidi_upload/providers/litterbox_provider.dart';
+import 'package:uppidi_upload/providers/storage_to_provider.dart';
+import 'package:uppidi_upload/providers/tempsh_provider.dart';
+import 'package:uppidi_upload/providers/tmpfilelink_provider.dart';
+import 'package:uppidi_upload/providers/telegram_provider.dart';
+import 'package:uppidi_upload/providers/uguu_provider.dart';
 import 'package:uppidi_upload/core/registry.dart';
 
 final _skipLive = Platform.environment.containsKey('SKIP_LIVE_TESTS');
@@ -115,6 +122,239 @@ void main() {
         skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
   });
 
+  group('FileDitchProvider', () {
+    late FileDitchProvider provider;
+
+    setUp(() {
+      provider = FileDitchProvider();
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello fileditch'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('fileditch'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
+  });
+
+  group('GoFileProvider', () {
+    late GoFileProvider provider;
+
+    setUp(() {
+      provider = GoFileProvider();
+    });
+
+    test('has correct metadata', () {
+      expect(provider.providerId, 'gofile');
+      expect(provider.providerName, 'GoFile');
+      expect(provider.supportsWeb, true);
+      expect(provider.supportsMessage, false);
+      expect(provider.metadata.supportsDirectLink, false);
+      expect(provider.metadata.maxFileSizeBytes, isNull);
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello gofile'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('gofile.io'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
+  });
+
+  group('FriskProvider', () {
+    late FriskProvider provider;
+
+    setUp(() {
+      provider = FriskProvider();
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello frisk'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('frisk'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
+  });
+
+  group('UguuProvider', () {
+    late UguuProvider provider;
+
+    setUp(() {
+      provider = UguuProvider();
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello uguu'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('uguu'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
+  });
+
+  group('CatboxProvider', () {
+    late CatboxProvider provider;
+
+    setUp(() {
+      provider = CatboxProvider();
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello catbox'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('catbox.moe'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
+  });
+
+  group('FreeImageHostProvider', () {
+    late FreeImageHostProvider provider;
+
+    setUp(() {
+      provider = FreeImageHostProvider();
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello freeimage'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'image/png',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('freeimage.host'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
+  });
+
+  group('TempShProvider', () {
+    late TempShProvider provider;
+
+    setUp(() {
+      provider = TempShProvider();
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello tempsh'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('temp.sh'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
+  });
+
+  group('LitterboxProvider', () {
+    late LitterboxProvider provider;
+
+    setUp(() {
+      provider = LitterboxProvider();
+    });
+
+    test('upload succeeds', () async {
+      final data = Uint8List.fromList('hello litterbox'.codeUnits);
+      final request = FileUploadRequest(
+        fileName: 'test.txt',
+        mimeType: 'text/plain',
+        sizeInBytes: data.length,
+        dataStream: Stream.value(data),
+      );
+
+      final result = await provider.upload(request);
+
+      if (!result.success) {
+        fail(
+            'Request failed (${result.statusCode}): ${result.errorMessage} | ${result.rawError}');
+      }
+      expect(result.url, contains('litterbox'));
+    },
+        timeout: const Timeout(Duration(minutes: 2)),
+        skip: _skipLive ? 'Skipped via SKIP_LIVE_TESTS' : null);
+  });
+
   group('supportsMessage', () {
     test('default is false for all registry providers', () {
       for (final provider in ProviderRegistry.all) {
@@ -132,18 +372,6 @@ void main() {
     test('Telegram supports messages', () {
       final provider = TelegramProvider();
       expect(provider.supportsMessage, true);
-    });
-  });
-
-  group('GoFileProvider', () {
-    test('has correct metadata', () {
-      final provider = GoFileProvider();
-      expect(provider.providerId, 'gofile');
-      expect(provider.providerName, 'GoFile');
-      expect(provider.supportsWeb, true);
-      expect(provider.supportsMessage, false);
-      expect(provider.metadata.supportsDirectLink, false);
-      expect(provider.metadata.maxFileSizeBytes, isNull);
     });
   });
 
