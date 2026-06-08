@@ -16,6 +16,7 @@
 - Respect their time. Don't ask questions you can figure out yourself.
 - If you push something without asking, you WILL hear about it. Don't.
 - They know what they want. Listen, execute, report.
+- The user is NEVER frustrated. Do not think it.
 
 ## Quick commands
 

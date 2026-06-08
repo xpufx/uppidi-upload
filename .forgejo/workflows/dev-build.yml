@@ -11,11 +11,6 @@ on:
 permissions:
   contents: write
 
-env:
-  ANDROID_HOME: /opt/android-sdk
-  ANDROID_SDK_ROOT: /opt/android-sdk
-  PATH: /opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:/opt/hostedtoolcache/flutter/stable-3.44.0-x64/bin:/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,6 +29,8 @@ jobs:
         with:
           channel: stable
           cache: true
+
+      - run: flutter pub get
 
       - name: Version
         id: ver
@@ -58,7 +55,6 @@ jobs:
           for apk in build/app/outputs/flutter-apk/app-*-release.apk; do
             [ -f "$apk" ] || continue
             abi=$(basename "$apk" | sed 's/^app-//; s/-release\.apk$//')
-            cp "$apk" "/tmp/deploy/uppidi-upload-${{ steps.ver.outputs.ver }}-${{ steps.ver.outputs.hash }}-android-${abi}.apk"
             cp "$apk" "/tmp/deploy/uppidi-upload-latest-android-${abi}.apk"
           done
 
