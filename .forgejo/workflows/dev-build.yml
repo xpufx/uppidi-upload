@@ -46,8 +46,8 @@ jobs:
           mkdir -p /opt/android-sdk/cmdline-tools/latest
           mv /tmp/android-sdk/cmdline-tools/* /opt/android-sdk/cmdline-tools/latest/
           yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk \
-            "platforms;android-34" "build-tools;34.0.0" "platform-tools" 2>&1
-          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk --licenses 2>&1
+            "platforms;android-34" "build-tools;34.0.0" "platform-tools" 2>&1 || true
+          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk --licenses 2>&1 || true
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
 
