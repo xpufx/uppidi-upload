@@ -113,6 +113,6 @@ jobs:
             -H "Authorization: token ${{ secrets.CI_TOKEN }}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @build/app/outputs/flutter-apk/app-release.apk \
-            "https://forge.mrs.aager.de/api/packages/r/xpufx/uppidi/generic/uppidi/dev/uppidi-upload-latest.apk"
+            "https://forge.mrs.aager.de/api/packages/xpufx/generic/uppidi/dev/uppidi-upload-latest.apk"
           echo "✅ Uploaded"
-          echo "🔗 https://forge.mrs.aager.de/xpufx/uppidi/packages"
+          echo "🔗 https://forge.mrs.aager.de/xpufx/-/packages"
