@@ -78,8 +78,11 @@ jobs:
           echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Build Android APK
+        timeout-minutes: 60
         run: |
+          export GRADLE_OPTS="-Xmx2g"
           flutter build apk --release \
+            --target-platform android-arm64 \
             --build-number=$(date +%y%j%H%M) \
             --build-name=${{ steps.ver.outputs.ver }} \
             --dart-define=GIT_HASH=${{ steps.ver.outputs.hash }} \
