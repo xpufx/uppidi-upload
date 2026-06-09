@@ -9,7 +9,7 @@ on:
         type: string
 
 permissions:
-  contents: write
+  packages: write
 
 jobs:
   build:
@@ -80,6 +80,7 @@ jobs:
       - name: Build Android APK
         timeout-minutes: 60
         run: |
+          echo "Building APK (GRADLE_OPTS=-Xmx2g, target=android-arm64)..."
           export GRADLE_OPTS="-Xmx2g"
           flutter build apk --release \
             --target-platform android-arm64 \
@@ -87,22 +88,15 @@ jobs:
             --build-name=${{ steps.ver.outputs.ver }} \
             --dart-define=GIT_HASH=${{ steps.ver.outputs.hash }} \
             --dart-define=DEV_PROVIDERS=true
+          echo "✅ APK: $(ls -lh build/app/outputs/flutter-apk/app-release.apk | awk '{print $5}')"
 
-      - name: Stage artifacts
+      - name: Upload APK to Package Registry
         run: |
-          mkdir -p /tmp/deploy
-          echo "${{ steps.ver.outputs.hash }}" > /tmp/deploy/latest.txt
-          cp build/app/outputs/flutter-apk/app-release.apk \
-            /tmp/deploy/uppidi-upload-latest.apk 2>/dev/null || true
-          ls -lh /tmp/deploy/
-
-      - name: Push to builds branch
-        run: |
-          git config user.name "uppidi-ci"
-          git config user.email "ci@forge.mrs.aager.de"
-          git checkout --orphan build-artifacts-${GITHUB_RUN_ID}
-          git rm -rf . >/dev/null 2>&1 || true
-          cp -r /tmp/deploy/* .
-          git add .
-          git commit -m "dev build ${{ steps.ver.outputs.ver }} (${{ steps.ver.outputs.hash }})"
-          git push origin HEAD:refs/heads/builds --force
+          echo "Uploading APK to forge.mrs.aager.de/xpufx/uppidi/package/generic/uppidi/dev ..."
+          curl -sS -X PUT \
+            -H "Authorization: token ${{ secrets.CI_TOKEN }}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @build/app/outputs/flutter-apk/app-release.apk \
+            "https://forge.mrs.aager.de/api/packages/xpufx/generic/uppidi/dev/uppidi-upload-latest.apk"
+          echo "✅ Uploaded"
+          echo "🔗 https://forge.mrs.aager.de/xpufx/uppidi/packages/generic/uppidi/dev"
