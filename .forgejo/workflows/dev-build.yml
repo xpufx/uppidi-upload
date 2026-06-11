@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: debian-bookworm-node22
 
     steps:
       - uses: actions/checkout@v4
