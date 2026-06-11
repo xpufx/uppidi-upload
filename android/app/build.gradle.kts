@@ -67,3 +67,7 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    implementation("com.google.android.play:core:1.10.3")
+}
