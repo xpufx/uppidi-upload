@@ -7,13 +7,21 @@ on:
         description: 'Override version. Blank = from pubspec.yaml'
         required: false
         type: string
+      runner:
+        description: 'Runner image'
+        required: false
+        type: choice
+        default: debian-bookworm-node22
+        options:
+          - debian-bookworm-node22
+          - debian-bookworm-flutter
 
 permissions:
   packages: write
 
 jobs:
   build:
-    runs-on: debian-bookworm-node22
+    runs-on: ${{ inputs.runner }}
 
     steps:
       - uses: actions/checkout@v4
@@ -21,11 +29,13 @@ jobs:
           fetch-depth: 0
 
       - uses: actions/setup-java@v5
+        if: inputs.runner != 'debian-bookworm-flutter'
         with:
           distribution: 'temurin'
           java-version: 17
 
       - name: Install jq + unzip
+        if: inputs.runner == 'debian-bookworm-node22'
         run: apt-get update -qq && apt-get install -y -qq --no-install-recommends jq unzip
 
       - name: Cache Gradle
@@ -45,16 +55,19 @@ jobs:
           restore-keys: pub-
 
       - uses: subosito/flutter-action@v2
+        if: inputs.runner != 'debian-bookworm-flutter'
         with:
           channel: stable
           cache: true
 
       - name: Git safe.directory for Flutter SDK
+        if: inputs.runner != 'debian-bookworm-flutter'
         run: |
           d=$(find /opt/hostedtoolcache/flutter -name '.git' -type d -maxdepth 3 2>/dev/null | head -1)
           [ -n "$d" ] && git config --global --add safe.directory "${d%/.git}"
 
       - name: Set up Android SDK
+        if: inputs.runner != 'debian-bookworm-flutter'
         run: |
           curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
             -o /tmp/cmdline-tools.zip
