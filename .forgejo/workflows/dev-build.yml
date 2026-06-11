@@ -80,6 +80,14 @@ jobs:
           echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
 
+      - name: Set env for flutter image
+        if: inputs.runner == 'debian-bookworm-flutter'
+        run: |
+          echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
+          echo "/opt/flutter/bin" >> $GITHUB_PATH
+          echo "/opt/android-sdk/platform-tools" >> $GITHUB_PATH
+
       - name: Set up Android signing
         if: env.KEYSTORE_BASE64 != ''
         env:
