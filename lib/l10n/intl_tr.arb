@@ -325,5 +325,14 @@
   "shareMessageDescription": "Varsayılan ileti şablonu. Yükleme ekranında her dosya için özelleştirilebilir.",
   "messageTemplate": "Mesaj şablonu",
   "messageTemplateSaved": "Mesaj şablonu kaydedildi",
-  "messageLabel": "Mesaj"
+  "messageLabel": "Mesaj",
+
+  "noChangesToSave": "Kaydedilecek değişiklik yok",
+  "failedToLoadChannelsUsers": "Kanallar/kullanıcılar yüklenemedi",
+  "failedToLoadGateways": "Gateway'ler yüklenemedi",
+  "matterbridgeNotFullyConfigured": "Matterbridge tam olarak yapılandırılmamış",
+  "sentToProvider": "{provider} adresine gönderildi",
+  "matterbridgeError": "Matterbridge hatası: {code}",
+  "operationFailed": "Başarısız: {error}",
+  "changelogNotAvailable": "Değişiklik günlüğü mevcut değil"
 }

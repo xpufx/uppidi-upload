@@ -339,5 +339,29 @@
   "shareMessageDescription": "Default message template for all providers. Overridden per-upload on the upload screen.",
   "messageTemplate": "Message template",
   "messageTemplateSaved": "Message template saved",
-  "messageLabel": "Message"
+  "messageLabel": "Message",
+
+  "noChangesToSave": "No changes to save",
+  "failedToLoadChannelsUsers": "Failed to load channels/users",
+  "failedToLoadGateways": "Failed to load gateways",
+  "matterbridgeNotFullyConfigured": "Matterbridge not fully configured",
+  "sentToProvider": "Sent to {provider}",
+  "@sentToProvider": {
+    "placeholders": {
+      "provider": {}
+    }
+  },
+  "matterbridgeError": "Matterbridge error: {code}",
+  "@matterbridgeError": {
+    "placeholders": {
+      "code": {}
+    }
+  },
+  "operationFailed": "Failed: {error}",
+  "@operationFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "changelogNotAvailable": "Changelog not available"
 }

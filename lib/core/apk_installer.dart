@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'version.dart';
+
 /// Downloads a file from [url] to a temporary directory and returns the
 /// local path. [onProgress] receives (downloadedBytes, totalBytes, bytesPerSec).
 Future<String> downloadFile(String url,
@@ -10,7 +12,9 @@ Future<String> downloadFile(String url,
   final ext = url.endsWith('.apk') ? '.apk' : '.tar.gz';
   final filePath = '${dir.path}/uppidi-update$ext';
 
-  final dio = Dio();
+  final dio = Dio(BaseOptions(
+    headers: {'User-Agent': 'uppidi-upload/$appVersion'},
+  ));
 
   DateTime lastTime = DateTime.now();
   int lastBytes = 0;

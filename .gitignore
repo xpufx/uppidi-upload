@@ -58,6 +58,7 @@ flatpak-src/
 
 # Agent/IDE config
 opencode.json
+.mimocode/
 
 # Dev tooling (not shipped)
 thoughts/

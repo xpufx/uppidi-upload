@@ -114,7 +114,7 @@ class ZulipProvider extends BaseHttpProvider {
     final cfg = config is ZulipConfig
         ? config
         : ZulipConfig.fromMap(config is Map<String, String> ? config : {});
-    _lastServerUrl = cfg.serverUrl.replaceAll(RegExp(r'/$'), '');
+    final serverUrl = cfg.serverUrl.replaceAll(RegExp(r'/$'), '');
 
     try {
       final prepared = await prepareRequest(config);
@@ -138,7 +138,7 @@ class ZulipProvider extends BaseHttpProvider {
         cancelToken: cancelToken,
       );
 
-      final result = parseResponse(response);
+      final result = _parseResponseWithUrl(response, serverUrl);
       if (!result.success) return result;
 
       // Resolve message content from config
@@ -212,10 +212,12 @@ class ZulipProvider extends BaseHttpProvider {
     }
   }
 
-  String? _lastServerUrl;
-
   @override
   UploadResult parseResponse(Response response) {
+    return _parseResponseWithUrl(response, '');
+  }
+
+  UploadResult _parseResponseWithUrl(Response response, String serverUrl) {
     try {
       if (response.data is! Map) {
         return UploadResult(
@@ -249,7 +251,7 @@ class ZulipProvider extends BaseHttpProvider {
       }
 
       // Build the full URL
-      final fullUrl = '$_lastServerUrl$path';
+      final fullUrl = '$serverUrl$path';
 
       return UploadResult(
         success: true,

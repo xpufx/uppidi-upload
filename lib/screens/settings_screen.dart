@@ -923,7 +923,7 @@ class _BottomCards extends ConsumerStatefulWidget {
 }
 
 class _BottomCardsState extends ConsumerState<_BottomCards> {
-  String _changelogText = 'Changelog not available';
+  String _changelogText = '';
 
   @override
   void initState() {
@@ -1046,7 +1046,9 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
                       builder: (ctx) => AlertDialog(
                         title: Text(l10n.changelogTitle),
                         content: SingleChildScrollView(
-                          child: Text(_changelogText),
+                          child: Text(_changelogText.isEmpty
+                              ? l10n.changelogNotAvailable
+                              : _changelogText),
                         ),
                         actions: [
                           TextButton(
@@ -1107,16 +1109,38 @@ class _BottomCardsState extends ConsumerState<_BottomCards> {
 
 /// ── Message template card ─────────────────────────────────────
 
-class _MessageTemplateCard extends ConsumerWidget {
+class _MessageTemplateCard extends ConsumerStatefulWidget {
   const _MessageTemplateCard();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_MessageTemplateCard> createState() =>
+      _MessageTemplateCardState();
+}
+
+class _MessageTemplateCardState extends ConsumerState<_MessageTemplateCard> {
+  final _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final templateAsync = ref.read(globalMessageTemplateProvider);
+      final value = templateAsync.asData?.value;
+      if (value != null) _controller.text = value;
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final templateAsync = ref.watch(globalMessageTemplateProvider);
-    final controller =
-        TextEditingController(text: templateAsync.asData?.value ?? '');
 
     return Padding(
       padding: const EdgeInsets.only(top: 16),
@@ -1138,7 +1162,7 @@ class _MessageTemplateCard extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               TextFormField(
-                controller: controller,
+                controller: _controller,
                 decoration: InputDecoration(
                   labelText: l10n.messageTemplate,
                   border: const OutlineInputBorder(),
@@ -1155,7 +1179,7 @@ class _MessageTemplateCard extends ConsumerWidget {
                 child: FilledButton.icon(
                   onPressed: () async {
                     final svc = ref.read(settingsServiceProvider);
-                    final text = controller.text.trim();
+                    final text = _controller.text.trim();
                     if (text.isEmpty) {
                       await svc.remove(SettingsService.messageTemplateKey);
                     } else {

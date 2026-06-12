@@ -325,5 +325,14 @@
   "shareMessageDescription": "Template messaggio predefinito per tutti i provider. Sostituibile per ogni singolo caricamento.",
   "messageTemplate": "Template messaggio",
   "messageTemplateSaved": "Template messaggio salvato",
-  "messageLabel": "Messaggio"
+  "messageLabel": "Messaggio",
+
+  "noChangesToSave": "Nessuna modifica da salvare",
+  "failedToLoadChannelsUsers": "Impossibile caricare canali/utenti",
+  "failedToLoadGateways": "Impossibile caricare i gateway",
+  "matterbridgeNotFullyConfigured": "Matterbridge non è completamente configurato",
+  "sentToProvider": "Inviato a {provider}",
+  "matterbridgeError": "Errore Matterbridge: {code}",
+  "operationFailed": "Fallito: {error}",
+  "changelogNotAvailable": "Cronologia delle modifiche non disponibile"
 }

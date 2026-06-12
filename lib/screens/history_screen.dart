@@ -318,8 +318,9 @@ Future<void> _shareViaMatterbridge(
     final token = (config['mb_token'] ?? '').trim();
     if (gateway.isEmpty || serverUrl.isEmpty || token.isEmpty) {
       if (context.mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Matterbridge not fully configured')),
+          SnackBar(content: Text(l10n.matterbridgeNotFullyConfigured)),
         );
       }
       return;
@@ -345,22 +346,24 @@ Future<void> _shareViaMatterbridge(
       );
       dio.close();
       if (context.mounted) {
+        final l10n = AppLocalizations.of(context);
         if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Sent to ${chosen.providerName}')),
+            SnackBar(content: Text(l10n.sentToProvider(chosen.providerName))),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text('Matterbridge error: ${response.statusCode}')),
+                content: Text(l10n.matterbridgeError('${response.statusCode}'))),
           );
         }
       }
     } catch (e) {
       dio.close();
       if (context.mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed: $e')),
+          SnackBar(content: Text(l10n.operationFailed('$e'))),
         );
       }
     }

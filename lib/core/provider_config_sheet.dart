@@ -560,8 +560,9 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
     } catch (e) {
       _log.error('Failed to fetch Zulip resources: $e', error: e);
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load channels/users: $e')),
+          SnackBar(content: Text(l10n.failedToLoadChannelsUsers)),
         );
       }
     } finally {
@@ -598,8 +599,9 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
     } catch (e) {
       _log.error('Failed to fetch Matterbridge gateways: $e', error: e);
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load gateways: $e')),
+          SnackBar(content: Text(l10n.failedToLoadGateways)),
         );
       }
     } finally {
@@ -702,7 +704,12 @@ class _ProviderConfigDialogState extends ConsumerState<_ProviderConfigDialog> {
           _populateFromConfig(data);
         });
       }
-      return const Center(child: CircularProgressIndicator());
+      return Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      );
     }
 
     return Dialog(

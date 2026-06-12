@@ -1061,4 +1061,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messageLabel => 'Message';
+
+  @override
+  String get noChangesToSave => 'No changes to save';
+
+  @override
+  String get failedToLoadChannelsUsers => 'Failed to load channels/users';
+
+  @override
+  String get failedToLoadGateways => 'Failed to load gateways';
+
+  @override
+  String get matterbridgeNotFullyConfigured =>
+      'Matterbridge not fully configured';
+
+  @override
+  String sentToProvider(Object provider) {
+    return 'Sent to $provider';
+  }
+
+  @override
+  String operationFailed(Object error) {
+    return 'Failed: $error';
+  }
 }

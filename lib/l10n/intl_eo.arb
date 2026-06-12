@@ -325,5 +325,14 @@
   "shareMessageDescription": "Implicitaj mesaĝaj ŝablonoj por ĉiuj provizantoj. Anstataŭigita per-alŝuto sur la alŝuta ekrano.",
   "messageTemplate": "Mesaĝa ŝablono",
   "messageTemplateSaved": "Mesaĝa ŝablono konservita",
-  "messageLabel": "Mesaĝo"
+  "messageLabel": "Mesaĝo",
+
+  "noChangesToSave": "Neniuj ŝanĝoj por konservi",
+  "failedToLoadChannelsUsers": "Malsukcesis ŝarĝi kanalojn/uzantojn",
+  "failedToLoadGateways": "Malsukcesis ŝarĝi la pordojn",
+  "matterbridgeNotFullyConfigured": "Matterbridge ne estas plene agordita",
+  "sentToProvider": "Sendita al {provider}",
+  "matterbridgeError": "Matterbridge eraro: {code}",
+  "operationFailed": "Malsukcesis: {error}",
+  "changelogNotAvailable": "Ŝanĝolireo ne disponebla"
 }

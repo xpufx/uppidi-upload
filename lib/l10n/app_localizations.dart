@@ -2011,6 +2011,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Message'**
   String get messageLabel;
+
+  /// No description provided for @noChangesToSave.
+  ///
+  /// In en, this message translates to:
+  /// **'No changes to save'**
+  String get noChangesToSave;
+
+  /// No description provided for @failedToLoadChannelsUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load channels/users'**
+  String get failedToLoadChannelsUsers;
+
+  /// No description provided for @failedToLoadGateways.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load gateways'**
+  String get failedToLoadGateways;
+
+  /// No description provided for @matterbridgeNotFullyConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Matterbridge not fully configured'**
+  String get matterbridgeNotFullyConfigured;
+
+  /// No description provided for @sentToProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to {provider}'**
+  String sentToProvider(Object provider);
+
+  /// No description provided for @operationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed: {error}'**
+  String operationFailed(Object error);
 }
 
 class _AppLocalizationsDelegate

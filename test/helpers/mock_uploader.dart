@@ -48,6 +48,7 @@ class MockBaseUploader implements BaseUploader {
     Map<String, String> config, {
     bool allowInsecureConn = false,
     String? proxyUrl,
+    String? userAgent,
   }) async {
     return createHttpClientOverride?.call() ?? Dio();
   }

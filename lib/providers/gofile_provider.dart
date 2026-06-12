@@ -84,6 +84,10 @@ class GoFileProvider extends BaseHttpProvider {
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         validateStatus: (_) => true,
+        headers: {
+          'User-Agent': prepared.dio.options.headers['User-Agent'] ??
+              'uppidi-upload',
+        },
       ));
 
       if (allowInsecure) {

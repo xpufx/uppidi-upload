@@ -1,3 +1,5 @@
+const _sentinel = Object();
+
 class UploadResult {
   final bool success;
   final String? url;
@@ -29,25 +31,29 @@ class UploadResult {
 
   UploadResult copyWith({
     bool? success,
-    String? url,
-    String? errorMessage,
-    String? rawError,
+    Object? url = _sentinel,
+    Object? errorMessage = _sentinel,
+    Object? rawError = _sentinel,
     int? statusCode,
-    String? stackTrace,
+    Object? stackTrace = _sentinel,
     DateTime? completedAt,
-    String? deleteUrl,
-    String? expiry,
+    Object? deleteUrl = _sentinel,
+    Object? expiry = _sentinel,
   }) {
     return UploadResult(
       success: success ?? this.success,
-      url: url ?? this.url,
-      errorMessage: errorMessage ?? this.errorMessage,
-      rawError: rawError ?? this.rawError,
+      url: identical(url, _sentinel) ? this.url : url as String?,
+      errorMessage:
+          identical(errorMessage, _sentinel) ? this.errorMessage : errorMessage as String?,
+      rawError:
+          identical(rawError, _sentinel) ? this.rawError : rawError as String?,
       statusCode: statusCode ?? this.statusCode,
-      stackTrace: stackTrace ?? this.stackTrace,
+      stackTrace:
+          identical(stackTrace, _sentinel) ? this.stackTrace : stackTrace as String?,
       completedAt: completedAt ?? this.completedAt,
-      deleteUrl: deleteUrl ?? this.deleteUrl,
-      expiry: expiry ?? this.expiry,
+      deleteUrl:
+          identical(deleteUrl, _sentinel) ? this.deleteUrl : deleteUrl as String?,
+      expiry: identical(expiry, _sentinel) ? this.expiry : expiry as String?,
     );
   }
 }

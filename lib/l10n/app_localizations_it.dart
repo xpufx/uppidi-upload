@@ -573,7 +573,8 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get changelogNotAvailable => 'Changelog non disponibile';
+  String get changelogNotAvailable =>
+      'Cronologia delle modifiche non disponibile';
 
   @override
   String debugLogCopied(Object label) {
@@ -1068,4 +1069,27 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get messageLabel => 'Messaggio';
+
+  @override
+  String get noChangesToSave => 'Nessuna modifica da salvare';
+
+  @override
+  String get failedToLoadChannelsUsers => 'Impossibile caricare canali/utenti';
+
+  @override
+  String get failedToLoadGateways => 'Impossibile caricare i gateway';
+
+  @override
+  String get matterbridgeNotFullyConfigured =>
+      'Matterbridge non è completamente configurato';
+
+  @override
+  String sentToProvider(Object provider) {
+    return 'Inviato a $provider';
+  }
+
+  @override
+  String operationFailed(Object error) {
+    return 'Fallito: $error';
+  }
 }

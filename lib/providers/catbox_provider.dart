@@ -26,7 +26,8 @@ class CatboxProvider extends BaseHttpProvider {
   UploadResult parseResponse(Response response) {
     final responseStr = response.data.toString().trim();
 
-    if (responseStr.startsWith('https://')) {
+    if (responseStr.startsWith('https://') ||
+        responseStr.startsWith('http://')) {
       return UploadResult(
         success: true,
         url: responseStr,

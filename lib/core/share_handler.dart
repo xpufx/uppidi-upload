@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
@@ -10,18 +12,29 @@ import 'mime_types.dart';
 final _log = Log('ShareHandler');
 
 class ShareHandler {
+  static StreamSubscription<List<SharedMediaFile>>? _subscription;
+
   static void init(BuildContext context, WidgetRef ref) {
     _log.info('Initializing share handler');
 
-    ReceiveSharingIntent.instance.getMediaStream().listen((files) {
-      _handleSharedFiles(files, ref);
-    }, onError: (e) {
-      _log.warn('Share stream error: $e');
-    });
+    _subscription?.cancel();
+    _subscription = ReceiveSharingIntent.instance.getMediaStream().listen(
+      (files) {
+        _handleSharedFiles(files, ref);
+      },
+      onError: (e) {
+        _log.warn('Share stream error: $e');
+      },
+    );
 
     ReceiveSharingIntent.instance.getInitialMedia().then((files) {
       _handleSharedFiles(files, ref);
     });
+  }
+
+  static void dispose() {
+    _subscription?.cancel();
+    _subscription = null;
   }
 
   static Future<void> _handleSharedFiles(

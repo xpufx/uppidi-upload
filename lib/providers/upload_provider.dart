@@ -131,7 +131,7 @@ class UploadNotifier extends Notifier<UploadState> {
   UploadNotifier({List<BaseUploader>? providers})
       : _injectedProviders = providers;
 
-  final String _selectedExpiry =
+  String _selectedExpiry =
       '24h'; // default for configurableExpiry providers
   Uint8List? _originalFileBytes;
   String? _originalFileName;
@@ -146,6 +146,7 @@ class UploadNotifier extends Notifier<UploadState> {
       _originalFileBytes != null && _originalFileBytes != _lastFileBytes;
 
   void setExpiry(String expiry) {
+    _selectedExpiry = expiry;
     if (state is UploadFileSelected) {
       final prev = state as UploadFileSelected;
       state = UploadFileSelected(
@@ -169,14 +170,18 @@ class UploadNotifier extends Notifier<UploadState> {
 
     // Restore last used provider after frame
     Future.microtask(() async {
-      if (state is! UploadIdle) return;
-      final svc = ref.read(settingsServiceProvider);
-      final lastId = await svc.get(SettingsService.lastUsedProviderKey);
-      if (lastId != null) {
-        final idx = enabled.indexWhere((p) => p.providerId == lastId);
-        if (idx >= 0 && idx != 0) {
-          state = UploadIdle(providers: enabled, selectedProviderIndex: idx);
+      try {
+        if (state is! UploadIdle) return;
+        final svc = ref.read(settingsServiceProvider);
+        final lastId = await svc.get(SettingsService.lastUsedProviderKey);
+        if (lastId != null) {
+          final idx = enabled.indexWhere((p) => p.providerId == lastId);
+          if (idx >= 0 && idx != 0) {
+            state = UploadIdle(providers: enabled, selectedProviderIndex: idx);
+          }
         }
+      } catch (_) {
+        // Notifier disposed before microtask completed
       }
     });
 

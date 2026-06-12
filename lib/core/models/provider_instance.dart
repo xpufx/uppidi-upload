@@ -65,11 +65,13 @@ class ProviderInstance implements BaseUploader {
     Map<String, String> config, {
     bool allowInsecureConn = false,
     String? proxyUrl,
+    String? userAgent,
   }) =>
       _base.createHttpClient(
         config,
         allowInsecureConn: allowInsecureConn,
         proxyUrl: proxyUrl,
+        userAgent: userAgent,
       );
 
   @override

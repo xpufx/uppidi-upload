@@ -879,6 +879,25 @@ class _FileSelectedBottomBarState
   final _msgController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final state = ref.read(uploadProvider);
+      if (state is UploadFileSelected &&
+          _msgController.text.isEmpty &&
+          state.messageText.isEmpty) {
+        final globalTemplate =
+            ref.read(globalMessageTemplateProvider).asData?.value ?? '';
+        if (globalTemplate.isNotEmpty) {
+          _msgController.text = globalTemplate;
+          widget.notifier.setMessage(globalTemplate);
+        }
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _msgController.dispose();
     super.dispose();
@@ -898,14 +917,6 @@ class _FileSelectedBottomBarState
         state is UploadFileSelected ? state.selectedExpiry : null;
 
     if (state is UploadFileSelected) {
-      if (_msgController.text.isEmpty && state.messageText.isEmpty) {
-        final globalTemplate =
-            ref.read(globalMessageTemplateProvider).asData?.value ?? '';
-        if (globalTemplate.isNotEmpty) {
-          _msgController.text = globalTemplate;
-          widget.notifier.setMessage(globalTemplate);
-        }
-      }
       if (_msgController.text != state.messageText) {
         _msgController.text = state.messageText;
       }
@@ -1005,8 +1016,9 @@ class _UploadButton extends ConsumerWidget {
 
               if (provider.providerId == 'local' && !notifier.isModified) {
                 if (context.mounted) {
+                  final l10n = AppLocalizations.of(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('No changes to save')),
+                    SnackBar(content: Text(l10n.noChangesToSave)),
                   );
                 }
                 return;

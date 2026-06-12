@@ -43,6 +43,7 @@ class LocalProvider implements BaseUploader {
     Map<String, String> config, {
     bool allowInsecureConn = false,
     String? proxyUrl,
+    String? userAgent,
   }) {
     throw UnsupportedError('Local provider does not use HTTP');
   }
@@ -58,11 +59,14 @@ class LocalProvider implements BaseUploader {
       final raw = await request.dataStream.first;
       final bytes = Uint8List.fromList(raw);
 
+      final ext = request.fileName.contains('.')
+          ? request.fileName.split('.').last.toLowerCase()
+          : '';
       final savedPath = await saveFileCrossPlatform(
         bytes,
         request.fileName,
         dialogTitle: 'Save image',
-        allowedExtensions: ['jpg', 'jpeg', 'png'],
+        allowedExtensions: ext.isNotEmpty ? [ext] : ['jpg', 'jpeg', 'png'],
         mimeType: request.mimeType,
       );
 

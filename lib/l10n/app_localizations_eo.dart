@@ -571,7 +571,7 @@ class AppLocalizationsEo extends AppLocalizations {
   }
 
   @override
-  String get changelogNotAvailable => 'Ŝanĝoprotokolo ne havebla';
+  String get changelogNotAvailable => 'Ŝanĝolireo ne disponebla';
 
   @override
   String debugLogCopied(Object label) {
@@ -1065,4 +1065,27 @@ class AppLocalizationsEo extends AppLocalizations {
 
   @override
   String get messageLabel => 'Mesaĝo';
+
+  @override
+  String get noChangesToSave => 'Neniuj ŝanĝoj por konservi';
+
+  @override
+  String get failedToLoadChannelsUsers => 'Malsukcesis ŝarĝi kanalojn/uzantojn';
+
+  @override
+  String get failedToLoadGateways => 'Malsukcesis ŝarĝi la pordojn';
+
+  @override
+  String get matterbridgeNotFullyConfigured =>
+      'Matterbridge ne estas plene agordita';
+
+  @override
+  String sentToProvider(Object provider) {
+    return 'Sendita al $provider';
+  }
+
+  @override
+  String operationFailed(Object error) {
+    return 'Malsukcesis: $error';
+  }
 }

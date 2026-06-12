@@ -211,6 +211,7 @@ class _TabNavStrategyState extends ConsumerState<TabNavStrategy> {
       )..layout();
       maxWidth =
           math.max(maxWidth, tp.width + 32); // label + horizontal padding
+      tp.dispose();
     }
     return maxWidth;
   }

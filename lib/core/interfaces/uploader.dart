@@ -43,6 +43,7 @@ abstract class BaseUploader {
     Map<String, String> config, {
     bool allowInsecureConn = false,
     String? proxyUrl,
+    String? userAgent,
   });
 
   Future<UploadResult> upload(

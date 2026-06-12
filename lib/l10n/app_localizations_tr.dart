@@ -1066,4 +1066,27 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get messageLabel => 'Mesaj';
+
+  @override
+  String get noChangesToSave => 'Kaydedilecek değişiklik yok';
+
+  @override
+  String get failedToLoadChannelsUsers => 'Kanallar/kullanıcılar yüklenemedi';
+
+  @override
+  String get failedToLoadGateways => 'Gateway\'ler yüklenemedi';
+
+  @override
+  String get matterbridgeNotFullyConfigured =>
+      'Matterbridge tam olarak yapılandırılmamış';
+
+  @override
+  String sentToProvider(Object provider) {
+    return '$provider adresine gönderildi';
+  }
+
+  @override
+  String operationFailed(Object error) {
+    return 'Başarısız: $error';
+  }
 }
