@@ -63,7 +63,7 @@ class MatterbridgeProvider extends BaseHttpProvider {
 
   @override
   ProviderMetadata get metadata => const ProviderMetadata(
-        maxFileSizeBytes: 50 * 1024 * 1024,
+        maxFileSizeBytes: null,
         supportsDirectLink: false,
         capabilities: {ProviderCapability.requiresAuth},
       );

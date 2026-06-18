@@ -187,6 +187,17 @@ class _UploadScreenState extends ConsumerState<UploadScreen>
                           }
                         },
                       ),
+                    UploadFileLoading(
+                      fileName: final n,
+                      fileSizeBytes: final s,
+                      mimeType: final m,
+                    ) =>
+                      _LoadingState(
+                        key: const ValueKey('file-loading'),
+                        fileName: n,
+                        fileSizeBytes: s,
+                        mimeType: m,
+                      ),
                     UploadFileSelected(
                       fileName: final n,
                       fileSizeBytes: final s,
@@ -1214,6 +1225,60 @@ class _ProgressOverlay extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadingState extends StatelessWidget {
+  final String fileName;
+  final int fileSizeBytes;
+  final String? mimeType;
+
+  const _LoadingState({
+    super.key,
+    required this.fileName,
+    required this.fileSizeBytes,
+    this.mimeType,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 48,
+              height: 48,
+              child: CircularProgressIndicator(
+                strokeWidth: 3,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              fileName,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              formatSize(fileSizeBytes),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -51,6 +51,22 @@ final class UploadIdle extends UploadState {
   });
 }
 
+final class UploadFileLoading extends UploadState {
+  final String fileName;
+  final int fileSizeBytes;
+  final String? mimeType;
+
+  const UploadFileLoading({
+    required this.fileName,
+    required this.fileSizeBytes,
+    this.mimeType,
+    super.results,
+    super.selectedProviderIndex,
+    super.providers,
+    super.selectedExpiry,
+  });
+}
+
 final class UploadFileSelected extends UploadState {
   final String fileName;
   final int fileSizeBytes;
@@ -131,8 +147,7 @@ class UploadNotifier extends Notifier<UploadState> {
   UploadNotifier({List<BaseUploader>? providers})
       : _injectedProviders = providers;
 
-  String _selectedExpiry =
-      '24h'; // default for configurableExpiry providers
+  String _selectedExpiry = '24h'; // default for configurableExpiry providers
   Uint8List? _originalFileBytes;
   String? _originalFileName;
   String? _originalMimeType;
@@ -203,6 +218,15 @@ class UploadNotifier extends Notifier<UploadState> {
           selectedProviderIndex: index,
           providers: prev.providers,
         ),
+      UploadFileLoading() => UploadFileLoading(
+          fileName: prev.fileName,
+          fileSizeBytes: prev.fileSizeBytes,
+          mimeType: prev.mimeType,
+          selectedExpiry: prev.selectedExpiry,
+          results: prev.results,
+          selectedProviderIndex: index,
+          providers: prev.providers,
+        ),
       UploadIdle() => UploadIdle(
           results: prev.results,
           selectedProviderIndex: index,
@@ -252,21 +276,30 @@ class UploadNotifier extends Notifier<UploadState> {
     if (pickResult == null || pickResult.files.isEmpty) return;
 
     final file = pickResult.files.first;
-    _lastFileBytes = await file.readAsBytes();
+
+    state = UploadFileLoading(
+      fileName: file.name,
+      fileSizeBytes: file.size,
+      mimeType: mimeTypeFromExtension(
+        file.name.contains('.') ? file.name.split('.').last : '',
+      ),
+      selectedExpiry: _selectedExpiry,
+      results: state.results,
+      selectedProviderIndex: state.selectedProviderIndex,
+      providers: state.providers,
+    );
 
     try {
+      _lastFileBytes = await file.readAsBytes();
       var request = await createUploadRequest(file);
       _log.info(
-        'File: ${file.name}, size: ${request.sizeInBytes}, mime: ${request.mimeType}',
-      );
+          'File: ${file.name}, size: ${request.sizeInBytes}, mime: ${request.mimeType}');
 
-      // Read preview bytes
       Uint8List? previewBytes = _lastFileBytes;
       if (previewBytes == null && file.path != null) {
         previewBytes = await File(file.path!).readAsBytes();
       }
 
-      // Store request for later upload
       _originalFileBytes = previewBytes;
       _originalFileName = file.name;
       _originalMimeType = request.mimeType;
@@ -329,6 +362,16 @@ class UploadNotifier extends Notifier<UploadState> {
       final detectedMime = mimeType ??
           mimeTypeFromExtension(
               fileName.contains('.') ? fileName.split('.').last : '');
+
+      state = UploadFileLoading(
+        fileName: fileName,
+        fileSizeBytes: size,
+        mimeType: detectedMime,
+        selectedExpiry: _selectedExpiry,
+        results: state.results,
+        selectedProviderIndex: state.selectedProviderIndex,
+        providers: state.providers,
+      );
 
       final previewBytes = await ioFile.readAsBytes();
       _log.info('Shared file: $filePath ($mimeType)');
@@ -879,6 +922,14 @@ Uint8List? _generateThumbnail(Uint8List? fileBytes, String? mimeType) {
       fileSizeBytes: current.fileSizeBytes,
       mimeType: current.mimeType,
       fileBytes: current.fileBytes,
+    );
+  }
+  if (current is UploadFileLoading) {
+    return (
+      fileName: current.fileName,
+      fileSizeBytes: current.fileSizeBytes,
+      mimeType: current.mimeType,
+      fileBytes: null,
     );
   }
   if (current is UploadCompleted) {
