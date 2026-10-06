@@ -201,9 +201,11 @@ void main() {
       var state = notifier.state as UploadCompleted;
       expect(state.isSuccess, isFalse);
 
-      // Retry with same file
+      // Retry with same file — must actually re-attempt the upload.
+      mockUploaders[0].resetUploadCalled();
       await notifier.uploadSelected();
       await Future.delayed(const Duration(milliseconds: 100));
+      expect(mockUploaders[0].uploadCalled, isTrue);
       state = notifier.state as UploadCompleted;
       expect(state.isSuccess, isFalse); // Still fails, but retry works
     });
@@ -362,6 +364,59 @@ void main() {
       expect(selectedState.fileSizeBytes, originalFileSize);
       expect(selectedState.mimeType, originalMimeType);
       expect(selectedState.selectedProviderIndex, 1);
+    });
+
+    test('Retry from UploadCompleted after failure succeeds', () async {
+      final notifier = container.read(uploadProvider.notifier);
+      mockUploaders[0].uploadCallback =
+          (request, {onProgress, cancelToken, config = const {}}) async {
+        return UploadResult(
+            success: false,
+            errorMessage: 'Server error',
+            completedAt: DateTime.now());
+      };
+      await notifier.uploadFromFile(testFile.path, 'text/plain');
+      await notifier.uploadSelected();
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      expect(notifier.state, isA<UploadCompleted>());
+      var state = notifier.state as UploadCompleted;
+      expect(state.isSuccess, isFalse);
+
+      // Retry with a succeeding provider — must re-upload from Completed.
+      mockUploaders[0].uploadCallback =
+          (request, {onProgress, cancelToken, config = const {}}) async {
+        return UploadResult(
+            success: true,
+            url: 'https://example.com/retried.txt',
+            completedAt: DateTime.now());
+      };
+      mockUploaders[0].resetUploadCalled();
+      await notifier.uploadSelected();
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      expect(mockUploaders[0].uploadCalled, isTrue);
+      expect(notifier.state, isA<UploadCompleted>());
+      state = notifier.state as UploadCompleted;
+      expect(state.lastResult.success, isTrue);
+      expect(state.lastResult.url, 'https://example.com/retried.txt');
+    });
+
+    test('uploadSelected with no bytes is a no-op', () async {
+      final notifier = container.read(uploadProvider.notifier);
+      // Idle state has no bytes — must return cleanly without exceptions.
+      await notifier.uploadSelected();
+      expect(notifier.state, isA<UploadIdle>());
+
+      // Completed state with null bytes (e.g. failed file read) — no-op.
+      await notifier.uploadFromFile('/nonexistent/file.txt', 'text/plain');
+      expect(notifier.state, isA<UploadCompleted>());
+      var state = notifier.state as UploadCompleted;
+      expect(state.fileBytes, isNull);
+      mockUploaders[0].resetUploadCalled();
+      await notifier.uploadSelected();
+      expect(mockUploaders[0].uploadCalled, isFalse);
+      expect(notifier.state, isA<UploadCompleted>());
     });
   });
 
