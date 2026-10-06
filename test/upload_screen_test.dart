@@ -632,7 +632,7 @@ void main() {
       expect(find.text(l10n.chooseFile), findsWidgets);
     });
 
-    testWidgets('5. Tap Retry on failure calls uploadSelected()',
+    testWidgets('5. Tap Retry on failure re-uploads from UploadCompleted',
         (WidgetTester tester) async {
       final mockUploaders = [MockBaseUploader()];
       final notifier = MockUploadNotifier(
@@ -678,8 +678,15 @@ void main() {
       await tester.tap(retryButton);
       await tester.pumpAndSettle();
 
-      // Verify uploadSelected() was called
+      // Verify uploadSelected() was called AND the upload was actually
+      // attempted from UploadCompleted (mock default succeeds, flipping
+      // the state to success). A mere spy-flag check would pass even if
+      // retry silently no-ops, so assert the real side effects.
       expect(notifier.uploadSelectedCalled, isTrue);
+      expect(mockUploaders[0].uploadCalled, isTrue);
+      expect(notifier.state, isA<UploadCompleted>());
+      final state = notifier.state as UploadCompleted;
+      expect(state.lastResult.success, isTrue);
     });
 
     testWidgets('6. Tap Debug icon shows error dialog',

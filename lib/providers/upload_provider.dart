@@ -332,15 +332,14 @@ class UploadNotifier extends Notifier<UploadState> {
   }
 
   Future<void> uploadSelected() async {
-    final currentFile =
-        state is UploadFileSelected ? state as UploadFileSelected : null;
-    if (currentFile == null) return;
+    if (state is! UploadFileSelected && state is! UploadCompleted) return;
 
-    Uint8List? uploadBytes = currentFile.fileBytes;
-    String uploadName = currentFile.fileName;
-    String? uploadMime = currentFile.mimeType;
+    final info = _extractFileInfo(state);
+    final Uint8List? uploadBytes = info.fileBytes;
+    final String? uploadName = info.fileName;
+    final String? uploadMime = info.mimeType;
 
-    if (uploadBytes == null) return;
+    if (uploadBytes == null || uploadName == null) return;
 
     final request = FileUploadRequest(
       fileName: uploadName,
@@ -496,6 +495,8 @@ class UploadNotifier extends Notifier<UploadState> {
     var savedMessageText = '';
     final currentState = state;
     if (currentState is UploadFileSelected) {
+      savedMessageText = currentState.messageText;
+    } else if (currentState is UploadCompleted) {
       savedMessageText = currentState.messageText;
     }
     state = UploadInProgress(
