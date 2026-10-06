@@ -15,8 +15,12 @@ import 'package:uppidi_upload/providers/upload_provider.dart';
 import 'package:uppidi_upload/core/models/provider_metadata.dart';
 import 'package:uppidi_upload/core/models/upload_result.dart';
 import 'package:uppidi_upload/l10n/app_localizations.dart';
+import 'package:uppidi_upload/core/config_provider.dart';
+import 'package:uppidi_upload/core/history_service.dart';
 import 'package:uppidi_upload/core/settings_service.dart';
 
+import 'helpers/mock_history.dart';
+import 'helpers/mock_settings.dart';
 import 'helpers/mock_uploader.dart';
 
 /// Mock UploadNotifier to control initial state
@@ -640,9 +644,9 @@ void main() {
           lastResult: UploadResult(success: false, errorMessage: 'Test error'),
           errorMessage: 'Test error',
           fileName: 'test.pdf',
-          fileSizeBytes: 1024,
+          fileSizeBytes: 4,
           mimeType: 'application/pdf',
-          fileBytes: Uint8List(0),
+          fileBytes: Uint8List.fromList([1, 2, 3, 4]),
           providers: mockUploaders,
           selectedProviderIndex: 0,
         ),
@@ -655,6 +659,14 @@ void main() {
         ProviderScope(
           overrides: [
             uploadProvider.overrideWith(() => notifier),
+            // In-memory services: the real SettingsService and
+            // secure-storage-backed providerConfigProvider hang in the
+            // widget-test env (no DBus session / Hive box contention),
+            // so the retry upload would never reach the provider.
+            settingsServiceProvider.overrideWithValue(MockSettingsService()),
+            historyServiceProvider.overrideWithValue(MockHistoryService()),
+            providerConfigProvider('mock')
+                .overrideWith((ref) async => <String, String>{}),
           ],
           child: MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
