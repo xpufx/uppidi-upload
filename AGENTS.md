@@ -103,6 +103,8 @@ outdated claims when modifying `lib/core/registry.dart` or features.
 | `lib/providers/upload_provider.dart` | `UploadNotifier` state machine |
 | `lib/screens/upload_screen.dart` | Main upload UI (~1176 lines) |
 | `lib/core/settings_service.dart` | Hive-backed settings CRUD |
+| `lib/core/health/provider_health.dart` | Pure-Dart health manifest parse + 2-strike logic |
+| `test/health_check_test.dart` | Live health runner (`RUN_HEALTH_CHECK=1`) |
 | `lib/core/history_service.dart` | Hive-backed upload history |
 
 ## Build scripts
@@ -115,6 +117,18 @@ outdated claims when modifying `lib/core/registry.dart` or features.
 - `bash scripts/download_favicons.sh` — refresh provider favicons in `assets/favicons/`.
 
 ## CI
+
+`.forgejo/workflows/health.yml` — scheduled provider health check (every 6h +
+manual dispatch) on the self-hosted `debian-bookworm-flutter` runner. It probes
+the anonymous providers via `test/health_check_test.dart`, updates
+`providers.json` (disable only after 2 consecutive failures), and publishes it
+to the CDN docroot. Normal test runs keep `SKIP_LIVE_TESTS=1`.
+
+**Deploy credential:** publishing `providers.json` needs write access to the
+CDN docroot. Either mount the docroot on the runner and set the `CDN_DOCROOT`
+repo variable, or configure the `CDN_DEPLOY_HOST` / `CDN_DEPLOY_USER` /
+`CDN_DEPLOY_KEY` / `CDN_DOCROOT_PATH` repo secrets (SSH publish). See
+`BUILDING.md` → "Deploying providers.json".
 
 `.github/workflows/build.yml` — full build matrix on tag push or manual dispatch:
 - **Android** (ubuntu-latest): split-per-abi APKs (arm64-v8a, armeabi-v7a, x86_64)

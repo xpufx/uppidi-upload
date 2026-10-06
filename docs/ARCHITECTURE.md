@@ -150,5 +150,6 @@ flowchart TD
 | `lib/core/interfaces/base_http_provider.dart` | HTTP upload base class |
 | `lib/core/interfaces/uploader.dart` | Provider plugin interface |
 | `lib/core/models/` | Data models (Request, Result, Record) |
+| `lib/core/health/provider_health.dart` | Pure-Dart health manifest parse + 2-strike logic |
 | `lib/core/settings_service.dart` | Persisted settings + health manifest |
 | `lib/providers/*_provider.dart` | Plugin implementations |
