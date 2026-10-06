@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'health/provider_health.dart';
+
+export 'health/provider_health.dart'
+    show ProviderHealthInfo, parseHealthManifest;
+
 final settingsServiceProvider =
     Provider<SettingsService>((ref) => SettingsService());
 
@@ -55,17 +60,7 @@ final providerHealthProvider =
       final response = await request.close();
       if (response.statusCode == 200) {
         final body = await response.transform(utf8.decoder).join();
-        final json = jsonDecode(body) as Map<String, dynamic>;
-        return json.map((k, v) {
-          final info = v as Map<String, dynamic>;
-          return MapEntry(
-              k,
-              ProviderHealthInfo(
-                disabled: info['disabled'] as bool? ?? false,
-                since: info['since'] as String?,
-                reason: info['reason'] as String?,
-              ));
-        });
+        return parseHealthManifest(jsonDecode(body));
       }
     } finally {
       client.close(force: true);
@@ -73,13 +68,6 @@ final providerHealthProvider =
   } catch (_) {}
   return {};
 });
-
-class ProviderHealthInfo {
-  final bool disabled;
-  final String? since;
-  final String? reason;
-  const ProviderHealthInfo({required this.disabled, this.since, this.reason});
-}
 
 class SettingsService {
   Box<String>? _box;
