@@ -60,7 +60,12 @@ jobs:
         run: cat build/providers.json
 
       - name: Upload manifest artifact
-        uses: actions/upload-artifact@v4
+        # The Forgejo-maintained fork has the GHES check removed; the upstream
+        # upload-artifact@v4 refuses non-GitHub servers. Pinned to the
+        # v4.3.1 commit rather than the movable `v4` tag, per Forgejo's own
+        # testing.yml warning that a tag can resolve to a commit without the
+        # compatibility patch.
+        uses: https://data.forgejo.org/forgejo/upload-artifact@16871d9e8cfcf27ff31822cac382bbb5450f1e1e
         with:
           name: providers.json
           path: build/providers.json
