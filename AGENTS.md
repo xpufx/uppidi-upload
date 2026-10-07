@@ -121,14 +121,13 @@ outdated claims when modifying `lib/core/registry.dart` or features.
 `.forgejo/workflows/health.yml` — scheduled provider health check (every 6h +
 manual dispatch) on the self-hosted `debian-bookworm-flutter` runner. It probes
 the anonymous providers via `test/health_check_test.dart`, updates
-`providers.json` (disable only after 2 consecutive failures), and publishes it
-to the CDN docroot. Normal test runs keep `SKIP_LIVE_TESTS=1`.
+`providers.json` (disable only after 2 consecutive failures), and uploads it as
+a workflow artifact. Normal test runs keep `SKIP_LIVE_TESTS=1`.
 
-**Deploy credential:** publishing `providers.json` needs write access to the
-CDN docroot. Either mount the docroot on the runner and set the `CDN_DOCROOT`
-repo variable, or configure the `CDN_DEPLOY_HOST` / `CDN_DEPLOY_USER` /
-`CDN_DEPLOY_KEY` / `CDN_DOCROOT_PATH` repo secrets (SSH publish). See
-`BUILDING.md` → "Deploying providers.json".
+**Manifest output:** the manifest is artifact-only — there is no static origin
+and no publish credentials (`CDN_DOCROOT` / `CDN_DEPLOY_*`) yet. When a real
+static origin exists, add a publish step and wire the app's `CDN_URL` define.
+See `BUILDING.md` → "`providers.json` output".
 
 `.github/workflows/build.yml` — full build matrix on tag push or manual dispatch:
 - **Android** (ubuntu-latest): split-per-abi APKs (arm64-v8a, armeabi-v7a, x86_64)

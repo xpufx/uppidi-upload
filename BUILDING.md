@@ -85,7 +85,7 @@ Run it without arguments to see usage and detected environment.
 ## Provider Health Checks
 
 The scheduled provider health check probes the anonymous providers with the
-live upload path and maintains `providers.json` on the CDN. Normal test runs
+live upload path and produces `providers.json`. Normal test runs
 skip live endpoints (`SKIP_LIVE_TESTS=1`); the health job runs the dedicated
 live runner:
 
@@ -105,20 +105,10 @@ disabled only after 2 consecutive failures and re-enabled on the next success.
 CI: `.forgejo/workflows/health.yml` runs every 6 hours on the self-hosted
 `debian-bookworm-flutter` runner.
 
-### Deploying `providers.json` (operator step)
+### `providers.json` output
 
-Publishing needs write access to the Caddy CDN docroot. Choose ONE:
-
-1. **Mounted docroot (preferred).** Mount the CDN docroot on the runner and set
-the `CDN_DOCROOT` repository variable (Forgejo → repo → Settings → Actions →
-Variables) to its absolute path, e.g. `/srv/uppidi`. The runner then writes
-`$CDN_DOCROOT/providers.json` atomically and no secret is needed.
-2. **SSH publish.** If the docroot is not mounted, set these repository secrets
-   (Forgejo → repo → Settings → Actions → Secrets):
-   - `CDN_DEPLOY_HOST` — SSH host of the CDN origin
-   - `CDN_DEPLOY_USER` — SSH user allowed to write the docroot
-   - `CDN_DEPLOY_KEY` — private SSH key for that user
-   - `CDN_DOCROOT_PATH` — absolute docroot path on the host
-
-If neither is configured the publish step fails with an explicit message; the
-manifest is still uploaded as a workflow artifact.
+The manifest is currently produced by the health workflow as a build artifact
+only (`providers.json`, attached to each run). There is no static CDN origin
+wired up yet, so nothing consumes it automatically. When a real static origin
+exists, add publishing to that origin and wire the app's `CDN_URL` build-time
+define to it.

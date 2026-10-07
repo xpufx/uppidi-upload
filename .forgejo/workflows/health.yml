@@ -35,28 +35,19 @@ jobs:
 
       - run: flutter pub get
 
-      # Writes providers.json with the exact production upload path. When the
-      # Caddy docroot is mounted on the self-hosted runner, set the repository
-      # variable CDN_DOCROOT so the runner writes atomically straight into it.
-      # Otherwise the manifest lands in build/ and the publish step below ships
-      # it over SSH.
+      # Writes providers.json with the exact production upload path into the
+      # workflow's build/ directory; the manifest is uploaded as an artifact.
       - name: Run live provider health check
         env:
           RUN_HEALTH_CHECK: '1'
-          CDN_DOCROOT: ${{ vars.CDN_DOCROOT }}
         run: |
           set -euo pipefail
-          if [ -n "${CDN_DOCROOT:-}" ]; then
-            export HEALTH_OUTPUT="$CDN_DOCROOT/providers.json"
-          else
-            export HEALTH_OUTPUT="$PWD/build/providers.json"
-          fi
+          export HEALTH_OUTPUT="$PWD/build/providers.json"
           mkdir -p "$(dirname "$HEALTH_OUTPUT")"
           echo "health: output -> $HEALTH_OUTPUT"
           flutter test test/health_check_test.dart
 
       - name: Show manifest
-        if: vars.CDN_DOCROOT == ''
         run: cat build/providers.json
 
       - name: Upload manifest artifact
@@ -70,38 +61,3 @@ jobs:
           name: providers.json
           path: build/providers.json
           if-no-files-found: ignore
-
-      # Explicit deploy step. Requires new repository secrets:
-      #   CDN_DEPLOY_HOST  — SSH host of the CDN origin
-      #   CDN_DEPLOY_USER  — SSH user allowed to write the docroot
-      #   CDN_DEPLOY_KEY   — private SSH key for that user
-      #   CDN_DOCROOT_PATH — absolute docroot path on the host (e.g. /srv/uppidi)
-      # If the runner can mount the docroot instead, define the CDN_DOCROOT
-      # repository variable and this step is skipped.
-      - name: Publish manifest to CDN docroot
-        if: vars.CDN_DOCROOT == ''
-        env:
-          CDN_DEPLOY_HOST: ${{ secrets.CDN_DEPLOY_HOST }}
-          CDN_DEPLOY_USER: ${{ secrets.CDN_DEPLOY_USER }}
-          CDN_DEPLOY_KEY: ${{ secrets.CDN_DEPLOY_KEY }}
-          CDN_DOCROOT_PATH: ${{ secrets.CDN_DOCROOT_PATH }}
-        run: |
-          set -euo pipefail
-          if [ -z "${CDN_DEPLOY_HOST:-}" ] || [ -z "${CDN_DEPLOY_USER:-}" ] \
-             || [ -z "${CDN_DEPLOY_KEY:-}" ] || [ -z "${CDN_DOCROOT_PATH:-}" ]; then
-            echo "::error::CDN publish is not configured. Set CDN_DOCROOT (repository"
-            echo "::error::variable) to a mounted docroot, or the CDN_DEPLOY_* /"
-            echo "::error::CDN_DOCROOT_PATH repository secrets for SSH publish."
-            exit 1
-          fi
-          install -d -m 700 ~/.ssh
-          printf '%s\n' "$CDN_DEPLOY_KEY" > ~/.ssh/cdn_deploy
-          chmod 600 ~/.ssh/cdn_deploy
-          ssh-keyscan -H "$CDN_DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
-          scp -i ~/.ssh/cdn_deploy -o StrictHostKeyChecking=yes \
-            build/providers.json \
-            "${CDN_DEPLOY_USER}@${CDN_DEPLOY_HOST}:${CDN_DOCROOT_PATH}/providers.json.tmp"
-          ssh -i ~/.ssh/cdn_deploy -o StrictHostKeyChecking=yes \
-            "${CDN_DEPLOY_USER}@${CDN_DEPLOY_HOST}" \
-            "mv -f '${CDN_DOCROOT_PATH}/providers.json.tmp' '${CDN_DOCROOT_PATH}/providers.json'"
-          echo "✅ providers.json published to ${CDN_DEPLOY_HOST}:${CDN_DOCROOT_PATH}"
