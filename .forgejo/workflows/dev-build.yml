@@ -129,11 +129,11 @@ jobs:
 
       - name: Upload APK to Package Registry
         run: |
-          echo "Uploading APK to forge.mrs.aager.de/xpufx/uppidi/package/generic/uppidi/dev ..."
+          echo "Uploading APK to forge.mrs.uppidi.com/xpufx/uppidi/package/generic/uppidi/dev ..."
           curl -sS -X PUT \
-            -H "Authorization: token ${{ secrets.CI_TOKEN }}" \
+            -H "Authorization: token ${{ secrets.CI_TOKEN || secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @build/app/outputs/flutter-apk/app-release.apk \
-            "https://forge.mrs.aager.de/api/packages/xpufx/generic/uppidi/dev/uppidi-upload-latest.apk"
+            "https://forge.mrs.uppidi.com/api/packages/xpufx/generic/uppidi/dev/uppidi-upload-latest.apk"
           echo "✅ Uploaded"
-          echo "🔗 https://forge.mrs.aager.de/xpufx/-/packages"
+          echo "🔗 https://forge.mrs.uppidi.com/xpufx/-/packages"
